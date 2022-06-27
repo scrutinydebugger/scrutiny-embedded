@@ -6,11 +6,12 @@
 //
 //   Copyright (c) 2021-2022 scrutinydebugger
 
-#include <cstring>
+#include <cstring>	
 
 
 #include "scrutiny_setup.h"
 #include "scrutiny_software_id.h"
+#include "scrutiny_tools.h"
 #include "protocol/scrutiny_codec_v1_0.h"
 #include "protocol/scrutiny_protocol_tools.h"
 
@@ -428,7 +429,7 @@ namespace scrutiny
 			constexpr uint16_t datalen_max = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + DISPLAY_NAME_MAX_SIZE;
 			static_assert(datalen_max <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
 
-			const uint16_t display_name_length = strnlen(response_data->display_name, DISPLAY_NAME_MAX_SIZE);
+			const uint16_t display_name_length = scrutiny::tools::strnlen(response_data->display_name, DISPLAY_NAME_MAX_SIZE);	// strnlen
 
 			if (display_name_length > 0xFF)
 			{

@@ -13,6 +13,7 @@ cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_TESTAPP=ON \
         -DBUILD_TEST=ON \
+        -Wno-dev \
         "$APP_ROOT"
 
 nice cmake --build . --target all -- -j8

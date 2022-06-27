@@ -15,6 +15,7 @@
 #include "scrutiny_timebase.h"
 #include "scrutiny_crc.h"
 #include "scrutiny_main_handler.h"
+#include "scrutiny_tools.h"
 
 #include "protocol/scrutiny_protocol.h"
 
