@@ -415,6 +415,8 @@ namespace scrutiny
 
 		ResponseCode CodecV1_0::encode_response_comm_discover(Response* response, const ResponseData::CommControl::Discover* response_data)
 		{
+			static_assert(DISPLAY_NAME_MAX_SIZE < 0x10000, "DISPLAY_NAME_MAX_SIZE must fit in a 16 bits value");
+
 			constexpr uint16_t software_id_size = sizeof(scrutiny::software_id);
 			constexpr uint16_t display_name_length_size = sizeof(response_data->display_name_length);
 			constexpr uint16_t proto_maj_pos = 0;
@@ -429,7 +431,7 @@ namespace scrutiny
 			constexpr uint16_t datalen_max = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + DISPLAY_NAME_MAX_SIZE;
 			static_assert(datalen_max <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
 
-			const uint16_t display_name_length = scrutiny::tools::strnlen(response_data->display_name, DISPLAY_NAME_MAX_SIZE);	// strnlen
+			const uint16_t display_name_length = static_cast<uint16_t>(scrutiny::tools::strnlen(response_data->display_name, DISPLAY_NAME_MAX_SIZE));
 
 			if (display_name_length > 0xFF)
 			{

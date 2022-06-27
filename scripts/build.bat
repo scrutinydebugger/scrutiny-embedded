@@ -4,6 +4,7 @@ cmake ^
     -DCMAKE_BUILD_TYPE=Release^
     -DBUILD_TESTAPP=ON^
     -DBUILD_TEST=ON^
+    -Wno-dev^
     -S . -B build || goto ERROR
 
 cmake --build build -j 4  || goto ERROR

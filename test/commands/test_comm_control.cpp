@@ -49,7 +49,7 @@ TEST_F(TestCommControl, TestDiscover)
 	expected_response[index++] = 0;
 	std::memcpy(&expected_response[index], scrutiny::software_id, sizeof(scrutiny::software_id));
 	index += sizeof(scrutiny::software_id);
-	expected_response[index++] = display_name.length();
+	expected_response[index++] = static_cast<uint8_t>(display_name.length());
 	std::memcpy(&expected_response[index], display_name.c_str(), display_name.length());
 
 	add_crc(request_data, sizeof(request_data) - 4);
