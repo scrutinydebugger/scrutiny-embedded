@@ -10,4 +10,4 @@ set -x
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-exec lib/test/scrutiny_unittest
+exec lib/scrutiny_unittest
