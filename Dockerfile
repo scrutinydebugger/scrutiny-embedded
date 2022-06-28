@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS builder
 RUN set -eux;
 
 ENV DEBIAN_FRONTEND=noninteractive
