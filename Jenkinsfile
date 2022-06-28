@@ -6,7 +6,6 @@ pipeline {
         stage ('Docker') {
             agent {
                 dockerfile {
-                    additionalBuildArgs '--target builder'
                     args '-e HOME=/tmp -e BUILD_CONTEXT=ci -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                     reuseNode true
                 }
