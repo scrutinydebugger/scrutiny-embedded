@@ -2,9 +2,9 @@
 //        Aliases on the types used by the Scrutiny project
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_TYPES_H___
 #define ___SCRUTINY_TYPES_H___

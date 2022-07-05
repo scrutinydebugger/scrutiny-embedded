@@ -1,3 +1,11 @@
+//    scrutiny_tools.h
+//        Some simple tools used across the project
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #ifndef __SCRUTINY_TOOLS_H__
 #define __SCRUTINY_TOOLS_H__
 

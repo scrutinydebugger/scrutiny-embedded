@@ -1,0 +1,151 @@
+{
+    "folders": [
+        "lib",
+        "projects",
+        "test"
+    ],
+    "include_patterns": [
+        "*.cpp",
+        "*.h"
+    ],
+    "exclude_patterns": [],
+    "license": "MIT - See LICENSE file",
+    "project": "Scrutiny Debugger",
+    "repo": "github.com/scrutinydebugger/scrutiny-embedded",
+    "copyright_owner": "Scrutiny Debugger",
+    "copyright_start_date": "2021",
+    "files": {
+        "lib/inc/scrutiny.h": {
+            "docstring": "Main .h file to be included in a project"
+        },
+        "lib/inc/scrutiny_config.h": {
+            "docstring": "Definition of a run-time configuration of the scrutiny module.\nTo be filled in startup phase"
+        },
+        "lib/inc/scrutiny_crc.h": {
+            "docstring": "CRC calculation functions"
+        },
+        "lib/inc/scrutiny_loop_handler.h": {
+            "docstring": "LoopHandler definition.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
+        },
+        "lib/inc/scrutiny_main_handler.h": {
+            "docstring": "The main scrutiny class to be manipulated by the user"
+        },
+        "lib/inc/scrutiny_setup.h": {
+            "docstring": "Compile-time configuration of embedded Scrutiny module.\nThis configuration is global for the module and should be set once per project"
+        },
+        "lib/inc/scrutiny_software_id.h": {
+            "docstring": "Contains the definition of the Scrutiny ID global var used for tagging of firmware."
+        },
+        "lib/inc/scrutiny_timebase.h": {
+            "docstring": "Minimalist helper to keep track of time"
+        },
+        "lib/inc/scrutiny_types.h": {
+            "docstring": "Aliases on the types used by the Scrutiny project"
+        },
+        "lib/inc/protocol/scrutiny_codec_v1_0.h": {
+            "docstring": "Definitions of encode/decode functions for the scrutiny protocol V1.0"
+        },
+        "lib/inc/protocol/scrutiny_comm_handler.h": {
+            "docstring": "Manage the tranport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
+        },
+        "lib/inc/protocol/scrutiny_protocol.h": {
+            "docstring": "Main include file for the scrutiny protocol"
+        },
+        "lib/inc/protocol/scrutiny_protocol_definitions.h": {
+            "docstring": "Defines Request/Rsponse objects and commands/subfunctions IDs.\n Not version specific"
+        },
+        "lib/inc/protocol/scrutiny_protocol_tools.h": {
+            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
+        },
+        "lib/src/scrutiny_config.cpp": {
+            "docstring": "Implementation of the run-time Scrutiny configuration"
+        },
+        "lib/src/scrutiny_crc.cpp": {
+            "docstring": "CRC calculation for scrutiny protocol frames"
+        },
+        "lib/src/scrutiny_loop_handler.cpp": {
+            "docstring": "LoopHandler implementation.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
+        },
+        "lib/src/scrutiny_main_handler.cpp": {
+            "docstring": "The main scrutiny class to be manipulated by the user."
+        },
+        "lib/src/scrutiny_software_id.cpp": {
+            "docstring": "Instanciation of the global ID used for firmware tagging"
+        },
+        "lib/src/protocol/scrutiny_codec_v1_0.cpp": {
+            "docstring": "Encode/Decode functions for the Scrutiny Protocol V1.0"
+        },
+        "lib/src/protocol/scrutiny_comm_handler.cpp": {
+            "docstring": "Manage the tranport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
+        },
+        "lib/src/protocol/scrutiny_protocol_definitions.cpp": {
+            "docstring": "Instanciation of protocol definitions such as magic payload."
+        },
+        "lib/src/protocol/scrutiny_protocol_tools.cpp": {
+            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
+        },
+        "test/scrutiny_test.cpp": {
+            "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
+        },
+        "test/test_crc.cpp": {
+            "docstring": "Test CRC calculation"
+        },
+        "test/test_timebase.cpp": {
+            "docstring": "Test our minimalist time tracker"
+        },
+        "test/scrutiny_test.h": {
+            "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
+        },
+        "test/commands/test_comm_control.cpp": {
+            "docstring": "Test the behaviour of the embedded module when CommControl commands are received"
+        },
+        "test/commands/test_get_info.cpp": {
+            "docstring": "Test the behaviour of the embedded module when GetInfo commands are received"
+        },
+        "test/commands/test_memory_control.cpp": {
+            "docstring": "Test the behaviour of the embedded module when MemoryControl commands are received"
+        },
+        "test/commands/test_user_command.cpp": {
+            "docstring": "Test the behaviour of the embedded module when UserCommand commands are received"
+        },
+        "test/protocol/test_comm_handler.cpp": {
+            "docstring": "Test the tranport-ish layer good behaviour at high level."
+        },
+        "test/protocol/test_protocol_rx_parsing.cpp": {
+            "docstring": "Make sure reception of request bytes are correctly decoded"
+        },
+        "test/protocol/test_protocol_tx_parsing.cpp": {
+            "docstring": "Make sure Response objects are correctly encoded in bytes"
+        },
+        "lib/inc/scrutiny_tools.h": {
+            "docstring": "Some simple tools used across the project"
+        },
+        "projects/testapp/src/file1.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/argument_parser.cpp": {
+            "docstring": "For CLI parsing"
+        },
+        "projects/testapp/src/main.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/file2.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/udp_bridge.cpp": {
+            "docstring": "Class that open a UDP port and handle a single client."
+        },
+        "projects/testapp/src/file1.h": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/file2.h": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/udp_bridge.h": {
+            "docstring": "Class that open a UDP port and handle a single client."
+        },
+        "projects/testapp/src/argument_parser.h": {
+            "docstring": "For CLI parsing"
+        }
+    }
+}

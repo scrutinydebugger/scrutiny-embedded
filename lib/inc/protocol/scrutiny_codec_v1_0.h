@@ -2,9 +2,9 @@
 //        Definitions of encode/decode functions for the scrutiny protocol V1.0
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_CODEC_V1_0___
 #define ___SCRUTINY_CODEC_V1_0___
