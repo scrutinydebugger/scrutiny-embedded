@@ -1,3 +1,11 @@
+//    argument_parser.cpp
+//        For CLI parsing
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #include <cstdlib>
 #include <string>
 #include <algorithm>

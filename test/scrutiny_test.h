@@ -4,9 +4,9 @@
 //         Includes bunch of helper for easy testing.
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <gtest/gtest.h>
 #include <cstdlib>

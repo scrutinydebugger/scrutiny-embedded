@@ -2,9 +2,9 @@
 //        Implementation of the run-time Scrutiny configuration
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include "scrutiny_config.h"
 #include <cstring>

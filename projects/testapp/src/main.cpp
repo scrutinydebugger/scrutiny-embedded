@@ -1,3 +1,10 @@
+//    main.cpp
+//        Placeholder file for variable extraction test
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include "file1.h"
 #include "file2.h"

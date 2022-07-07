@@ -1,3 +1,11 @@
+//    argument_parser.h
+//        For CLI parsing
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #ifndef ___ARGUMENT_PARSER_H___
 #define ___ARGUMENT_PARSER_H___
 

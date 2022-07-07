@@ -2,9 +2,9 @@
 //        CRC calculation functions
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_CRC_H___
 #define ___SCRUTINY_CRC_H___

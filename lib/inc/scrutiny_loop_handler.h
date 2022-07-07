@@ -4,9 +4,9 @@
 //        that depends on the execution requency such as embedded datalogging
 //
 //   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 scrutinydebugger
+//   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_LOOP_HANDLER_H___
 #define ___SCRUTINY_LOOP_HANDLER_H___
