@@ -69,7 +69,7 @@ namespace scrutiny
 #pragma warning(push)
 #pragma warning(disable:4127)   // Get rid of constexpr always true condition warning.
 #endif 
-		uint8_t encode_address_big_endian(uint8_t* buf, register uint64_t addr)
+		uint8_t encode_address_big_endian(uint8_t* buf, uint64_t addr)
 		{
 			constexpr unsigned int addr_size = sizeof(void*);
 			static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");

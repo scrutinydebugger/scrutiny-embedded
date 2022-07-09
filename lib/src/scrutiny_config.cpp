@@ -7,6 +7,7 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include "scrutiny_config.h"
+#include "scrutiny_tools.h"
 #include <cstring>
 
 namespace scrutiny
@@ -103,7 +104,7 @@ namespace scrutiny
 
 	void Config::set_display_name(const char* name)
 	{
-		strncpy(m_display_name, name, DISPLAY_NAME_MAX_SIZE);
+		scrutiny::tools::strncpy(m_display_name, name, DISPLAY_NAME_MAX_SIZE);
 	}
 
 }
