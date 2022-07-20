@@ -10,7 +10,16 @@
 #include "file2.h"
 #include "argument_parser.h"
 #include "scrutiny.h"
+#include "abstract_comm_channel.h"
 #include "udp_bridge.h"
+
+#if defined(_WIN32)
+#include "win_serial_port_bridge.h"
+using SerialPortBridge = WinSerialPortBridge;
+#else
+#include "nix_serial_port_bridge.h"
+using SerialPortBridge = NixSerialPortBridge;
+#endif
 
 #include <iostream>
 #include <iomanip>
@@ -67,6 +76,71 @@ void init_all_values()
 }
 
 
+void process_scrutiny_lib(AbstractCommChannel* channel)
+{
+    uint8_t buffer[1024];
+    scrutiny::MainHandler scrutiny_handler;
+    scrutiny::Config config;
+    config.max_bitrate = 100000;
+    config.set_display_name("TestApp Executable");
+    scrutiny_handler.init(&config);
+    
+    chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;
+    last_timestamp = chrono::steady_clock::now();
+    now_timestamp = chrono::steady_clock::now();
+    
+    try
+    {
+        channel->start();
+        int len_received = 0;
+        while (true)
+        {
+            len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
+            now_timestamp = chrono::steady_clock::now();
+            uint32_t timestep = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
+
+            if (len_received > 0)
+            {
+                cout << "in:  ("<< dec << len_received << ")\t" ;
+                for (int i=0; i<len_received; i++)
+                {
+                    cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
+                }
+                cout << endl;
+            }
+
+            scrutiny_handler.comm()->receive_data(buffer, len_received);
+
+            uint32_t data_to_send = scrutiny_handler.comm()->data_to_send();
+            data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
+
+            if (data_to_send > 0)
+            {
+                scrutiny_handler.comm()->pop_data(buffer, data_to_send);
+                channel->send(buffer, data_to_send); 
+
+                cout << "out: (" << dec << data_to_send << ")\t" ;
+                for (unsigned int i=0; i<data_to_send; i++)
+                {
+                    cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
+                }
+                cout << endl;
+            }
+
+            scrutiny_handler.process(timestep);
+            this_thread::sleep_for(chrono::milliseconds(10));
+            last_timestamp = now_timestamp;
+        }
+    }
+    catch (std::exception const& e)
+    {
+        cerr << e.what() << endl;
+    }
+
+    channel->stop();
+}
+
+
 int main(int argc, char* argv[]) 
 {
     static_assert(sizeof(char) == 1, "testapp doesn't support char bigger than 8 bits (yet)");
@@ -76,11 +150,7 @@ int main(int argc, char* argv[])
     (void)staticIntInMainFunc;
     init_all_values();
         
-    scrutiny::MainHandler scrutiny_handler;
-    scrutiny::Config config;
-    config.max_bitrate = 100000;
-    config.set_display_name("TestApp Executable");
-    scrutiny_handler.init(&config);
+    
 
     ArgumentParser parser;
     parser.parse(argc, argv);
@@ -92,10 +162,6 @@ int main(int argc, char* argv[])
     }
     else
     {
-        chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;
-        last_timestamp = chrono::steady_clock::now();
-        now_timestamp = chrono::steady_clock::now();
-
         if (parser.command() == TestAppCommand::Memdump)
         {
             MemoryRegion region;
@@ -118,62 +184,24 @@ int main(int argc, char* argv[])
         
         else if (parser.command() == TestAppCommand::UdpListen)
         {
+            cout << "UDP comm on port " << parser.udp_port() <<  endl;
+
             UdpBridge::global_init();
-            uint8_t buffer[1024];
             UdpBridge udp_bridge(parser.udp_port());
-            try
-            {
-                udp_bridge.start();
-                int len_received = 0;
-                while (true)
-                {
-                    len_received = udp_bridge.receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
-                    now_timestamp = chrono::steady_clock::now();
-                    uint32_t timestep = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
+            
+            process_scrutiny_lib(&udp_bridge);
 
-                    if (len_received > 0)
-                    {
-                        cout << "in:  ("<< dec << len_received << ")\t" ;
-                        for (int i=0; i<len_received; i++)
-                        {
-                            cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
-                        }
-                        cout << endl;
-                    }
-
-                    scrutiny_handler.comm()->receive_data(buffer, len_received);
-
-                    uint32_t data_to_send = scrutiny_handler.comm()->data_to_send();
-                    data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
-
-                    if (data_to_send > 0)
-                    {
-                        scrutiny_handler.comm()->pop_data(buffer, data_to_send);
-                        udp_bridge.reply(buffer, data_to_send); // Send to last sender.
-
-                        cout << "out: (" << dec << data_to_send << ")\t" ;
-                        for (unsigned int i=0; i<data_to_send; i++)
-                        {
-                            cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
-                        }
-                        cout << endl;
-                    }
-
-                    scrutiny_handler.process(timestep);
-                    this_thread::sleep_for(chrono::milliseconds(10));
-                    last_timestamp = now_timestamp;
-                }
-            }
-            catch (std::exception const& e)
-            {
-                cerr << e.what() << endl;
-            }
-
-            udp_bridge.stop();
             UdpBridge::global_close();
         }
-    }
+        else if (parser.command() == TestAppCommand::SerialListen)
+        {
+            auto serial_config = parser.serial_config();
+            SerialPortBridge serial(serial_config.port_name, serial_config.baudrate);
+            cout << "Serial comm on " << serial_config.port_name << " @" << serial_config.baudrate << " baud" << endl;
 
+            process_scrutiny_lib(&serial);
+        }        
+    }
 
     return errorcode;
 }
