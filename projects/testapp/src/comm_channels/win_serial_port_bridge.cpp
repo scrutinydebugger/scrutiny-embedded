@@ -3,6 +3,9 @@
 #endif
 
 #include "win_serial_port_bridge.h"
+#include <cstdlib>
+#include <cstdint>
+
 #include <windows.h>
 #include <winbase.h>
 #include <string>
@@ -16,7 +19,6 @@ WinSerialPortBridge::WinSerialPortBridge(const std::string& port_name, uint32_t 
 {
     
 }
-
 
 void WinSerialPortBridge::start()
 {
@@ -68,7 +70,7 @@ void WinSerialPortBridge::throw_system_error(const std::string &msg)
     throw std::system_error(GetLastError(), std::system_category(), msg.c_str());
 }
 
-int WinSerialPortBridge::receive(uint8_t* buffer, int len)
+int WinSerialPortBridge::receive(uint8_t* buffer, size_t len)
 {
     DWORD nbRead=0;
     BOOL HResult;
@@ -85,7 +87,7 @@ int WinSerialPortBridge::receive(uint8_t* buffer, int len)
     return static_cast<int>(nbRead);
 }
 
-void WinSerialPortBridge::send(const uint8_t* buffer, int len)
+void WinSerialPortBridge::send(const uint8_t* buffer, size_t len)
 {
     BOOL HResult;
 

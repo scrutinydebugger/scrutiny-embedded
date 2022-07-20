@@ -5,24 +5,29 @@
 #error "This file cannot be compiled under Windows"
 #endif
 
-#include <string>
 #include "abstract_comm_channel.h"
 
+#include <string>
+#include <cstdint>
+#include <cstdlib>
+#include "abstract_comm_channel.h"  
 
 class NixSerialPortBridge : public AbstractCommChannel
 {
 public:
-    NixSerialPortBridge(std::string port_name, uint32_t baudrate);
-    void start();
-    void stop();
+    NixSerialPortBridge(const std::string& port_name, uint32_t baudrate);
 
-    int receive(uint8_t* buffer, int len);
-    void send(const uint8_t* buffer, int len);
-    static void throw_system_error(const char* msg);
+    virtual void stop();
+    virtual void start();
+    virtual int receive(uint8_t* buffer, size_t len);
+    virtual void send(const uint8_t* buffer, size_t len);
+
+    static void throw_system_error(const std::string &msg);
 
 private:
     std::string m_port_name;
     uint32_t m_baudrate;
+    int m_fd;
 };
 
 
