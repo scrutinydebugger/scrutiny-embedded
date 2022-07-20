@@ -70,7 +70,7 @@ void WinSerialPortBridge::throw_system_error(const std::string &msg)
     throw std::system_error(GetLastError(), std::system_category(), msg.c_str());
 }
 
-int WinSerialPortBridge::receive(uint8_t* buffer, size_t len)
+int WinSerialPortBridge::receive(uint8_t* buffer, int len)
 {
     DWORD nbRead=0;
     BOOL HResult;
@@ -87,7 +87,7 @@ int WinSerialPortBridge::receive(uint8_t* buffer, size_t len)
     return static_cast<int>(nbRead);
 }
 
-void WinSerialPortBridge::send(const uint8_t* buffer, size_t len)
+void WinSerialPortBridge::send(const uint8_t* buffer, int len)
 {
     BOOL HResult;
 

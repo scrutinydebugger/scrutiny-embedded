@@ -147,7 +147,7 @@ void NixSerialPortBridge::stop()
     m_fd = -1;
 }
 
-int NixSerialPortBridge::receive(uint8_t* buffer, size_t len)
+int NixSerialPortBridge::receive(uint8_t* buffer, int len)
 {
     int n = 0;
     if (m_fd > 0)
@@ -157,7 +157,7 @@ int NixSerialPortBridge::receive(uint8_t* buffer, size_t len)
     return n;
 }
 
-void NixSerialPortBridge::send(const uint8_t* buffer, size_t len)
+void NixSerialPortBridge::send(const uint8_t* buffer, int len)
 {
     if (m_fd > 0)
     {
