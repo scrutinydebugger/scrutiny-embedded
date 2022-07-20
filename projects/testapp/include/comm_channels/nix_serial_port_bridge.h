@@ -1,3 +1,11 @@
+//    nix_serial_port_bridge.h
+//        Class that make a *Nix Serial port available as a communication channel for the Testapp
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #ifndef ___NIX_SERIAL_PORT_BRIDGE_H___
 #define ___NIX_SERIAL_PORT_BRIDGE_H___
 

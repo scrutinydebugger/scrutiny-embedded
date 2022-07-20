@@ -132,20 +132,35 @@
         "projects/testapp/src/file2.cpp": {
             "docstring": "Placeholder file for variable extraction test"
         },
-        "projects/testapp/src/udp_bridge.cpp": {
+        "projects/testapp/src/comm_channels/udp_bridge.cpp": {
             "docstring": "Class that open a UDP port and handle a single client."
         },
-        "projects/testapp/src/file1.h": {
+        "projects/testapp/include/file1.h": {
             "docstring": "Placeholder file for variable extraction test"
         },
-        "projects/testapp/src/file2.h": {
+        "projects/testapp/include/file2.h": {
             "docstring": "Placeholder file for variable extraction test"
         },
-        "projects/testapp/src/udp_bridge.h": {
+        "projects/testapp/include/comm_channels/udp_bridge.h": {
             "docstring": "Class that open a UDP port and handle a single client."
         },
-        "projects/testapp/src/argument_parser.h": {
+        "projects/testapp/include/argument_parser.h": {
             "docstring": "For CLI parsing"
+        },
+        "projects/testapp/include/comm_channels/abstract_comm_channel.h": {
+            "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
+        },
+        "projects/testapp/include/comm_channels/nix_serial_port_bridge.h": {
+            "docstring": "Class that make a *Nix Serial port available as a communication channel for the Testapp"
+        },
+        "projects/testapp/include/comm_channels/win_serial_port_bridge.h": {
+            "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
+        },
+        "projects/testapp/src/comm_channels/nix_serial_port_bridge.cpp": {
+            "docstring": "Class that make a *Nix Serial port available as a communication channel for the Testapp"
+        },
+        "projects/testapp/src/comm_channels/win_serial_port_bridge.cpp": {
+            "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
         }
     }
 }
