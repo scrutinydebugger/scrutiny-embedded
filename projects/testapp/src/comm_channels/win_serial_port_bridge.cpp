@@ -61,6 +61,13 @@ void WinSerialPortBridge::start()
         stop();
         throw_system_error("Cannot open port. SetCommState failed");
     }
+
+    HResult = PurgeComm(m_serial_handle, PURGE_RXABORT |  PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+    if (HResult == FALSE)
+    {
+        stop();
+        throw_system_error("Cannot open port. PurgeComm failed");
+    }
 }
 
 
@@ -108,6 +115,8 @@ void WinSerialPortBridge::send(const uint8_t* buffer, int len)
             stop();
             throw_system_error("Cannot write port");
         }
+
+        FlushFileBuffers(m_serial_handle);  // Do not check result as this may fail on virtual driver.
     }
 }
 
