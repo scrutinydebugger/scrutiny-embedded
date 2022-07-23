@@ -83,6 +83,7 @@ void process_scrutiny_lib(AbstractCommChannel* channel)
     scrutiny::Config config;
     config.max_bitrate = 100000;
     config.set_display_name("TestApp Executable");
+    config.prng_seed = 0xdeadbeef;
     scrutiny_handler.init(&config);
     
     chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;

@@ -24,6 +24,7 @@ namespace scrutiny
 		max_bitrate = src->max_bitrate;
 		user_command_callback = src->user_command_callback;
 		set_display_name(src->m_display_name);
+		prng_seed = src->prng_seed;
 
 		for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
 		{
@@ -62,6 +63,7 @@ namespace scrutiny
 		{
 			m_display_name[i] = '\0';
 		}
+		prng_seed = 0;
 	}
 
 	bool Config::add_forbidden_address_range(void* start, void* end)

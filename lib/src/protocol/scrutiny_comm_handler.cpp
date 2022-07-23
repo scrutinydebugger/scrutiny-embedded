@@ -16,10 +16,14 @@ namespace scrutiny
 {
 	namespace protocol
 	{
-		void CommHandler::init(Timebase* timebase)
+
+		uint32_t CommHandler::s_session_counter = 0;
+
+		void CommHandler::init(Timebase* timebase, uint32_t prng_seed)
 		{
 			m_timebase = timebase;
-
+			m_prng.seed(prng_seed);
+			s_session_counter = m_prng.get();
 			m_active_request.data = m_rx_buffer;   // Half duplex comm. Share buffer
 			m_active_response.data = m_tx_buffer;  // Half duplex comm. Share buffer
 
@@ -507,7 +511,6 @@ namespace scrutiny
 
 		bool CommHandler::connect()
 		{
-			static uint32_t session_counter=0;	// todo : improve with prng
 			if (!m_enabled)
 			{
 				return false;
@@ -519,7 +522,7 @@ namespace scrutiny
 			}
 
 
-			m_session_id = session_counter++;
+			m_session_id = s_session_counter++;
 			m_session_active = true;
 			m_heartbeat_received = false;
 			m_heartbeat_timestamp = m_timebase->get_timestamp();
