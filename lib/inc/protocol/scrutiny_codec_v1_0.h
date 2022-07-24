@@ -12,6 +12,7 @@
 #include <cstdint>
 #include "scrutiny_protocol_definitions.h"
 #include "scrutiny_software_id.h"
+#include "scrutiny_types.h"
 
 namespace scrutiny
 {
@@ -97,6 +98,26 @@ namespace scrutiny
 			bool m_overflow;
 		};
 
+
+		class GetRPVDefinitionResponseEncoder
+		{
+		public:
+			GetRPVDefinitionResponseEncoder();
+			void init(Response* response, const uint32_t max_size);
+			void write(const RuntimePublishedValue* rpv);
+			inline bool overflow() { return m_overflow; };
+			void reset();
+
+		protected:
+			uint8_t* m_buffer;
+			Response* m_response;
+			uint32_t m_cursor;
+			uint32_t m_size_limit;
+			bool m_overflow;
+		};
+
+
+
 		namespace ResponseData
 		{
 			namespace GetInfo
@@ -127,6 +148,11 @@ namespace scrutiny
 					uint8_t region_index;
 					uint64_t start;
 					uint64_t end;
+				};
+
+				struct GetRPVCount
+				{
+					uint16_t count;
 				};
 			}
 
@@ -169,6 +195,12 @@ namespace scrutiny
 					uint8_t region_type;
 					uint8_t region_index;
 				};
+
+				struct GetRPVDefinition
+				{
+					uint16_t start_index;
+					uint16_t count;
+				};
 			}
 
 			namespace CommControl
@@ -206,7 +238,9 @@ namespace scrutiny
 			ResponseCode encode_response_special_memory_region_count(const ResponseData::GetInfo::GetSpecialMemoryRegionCount* response_data, Response* response);
 			ResponseCode encode_response_special_memory_region_location(const ResponseData::GetInfo::GetSpecialMemoryRegionLocation* response_data, Response* response);
 			ResponseCode encode_response_supported_features(const ResponseData::GetInfo::GetSupportedFeatures* response_data, Response* response);
+			ResponseCode encode_response_get_rpv_count(const ResponseData::GetInfo::GetRPVCount* response_data, Response* response);
 
+			
 			ResponseCode encode_response_comm_discover(Response* response, const ResponseData::CommControl::Discover* response_data);
 			ResponseCode encode_response_comm_heartbeat(const ResponseData::CommControl::Heartbeat* response_data, Response* response);
 			ResponseCode encode_response_comm_get_params(const ResponseData::CommControl::GetParams* response_data, Response* response);
@@ -214,6 +248,7 @@ namespace scrutiny
 
 
 			ResponseCode decode_request_get_special_memory_region_location(const Request* request, RequestData::GetInfo::GetSpecialMemoryRegionLocation* request_data);
+			ResponseCode decode_request_get_rpv_definition(const Request* request, RequestData::GetInfo::GetRPVDefinition* request_data);
 
 			ResponseCode decode_request_comm_discover(const Request* request, RequestData::CommControl::Discover* request_data);
 			ResponseCode decode_request_comm_heartbeat(const Request* request, RequestData::CommControl::Heartbeat* request_data);
@@ -226,11 +261,14 @@ namespace scrutiny
 			WriteMemoryBlocksRequestParser* decode_request_memory_control_write(const Request* request, const bool masked_wirte);
 			WriteMemoryBlocksResponseEncoder* encode_response_memory_control_write(Response* response, uint32_t max_size);
 
+			GetRPVDefinitionResponseEncoder* encode_response_get_rpv_definition(Response* response, uint32_t max_size);
+
 		protected:
 			ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
 			ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
 			WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
 			WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
+			GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;
 		};
 	}
 }

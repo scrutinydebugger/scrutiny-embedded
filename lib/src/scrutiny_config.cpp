@@ -25,6 +25,8 @@ namespace scrutiny
 		user_command_callback = src->user_command_callback;
 		set_display_name(src->m_display_name);
 		prng_seed = src->prng_seed;
+		m_rpv_count = src->m_rpv_count;
+		m_rpvs = src->m_rpvs;
 
 		for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
 		{
@@ -46,6 +48,9 @@ namespace scrutiny
 	void Config::clear()
 	{
 		max_bitrate = 0;
+		m_rpv_count = 0;
+		m_rpvs = nullptr;
+
 		for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
 		{
 			m_forbidden_address_ranges[i].set = false;
@@ -59,7 +64,7 @@ namespace scrutiny
 		m_forbidden_range_count = 0;
 		m_readonly_range_count = 0;
 		user_command_callback = nullptr;
-		for (uint16_t i=0; i<DISPLAY_NAME_MAX_SIZE; i++)
+		for (uint16_t i=0; i<SCRUTINY_DISPLAY_NAME_MAX_SIZE; i++)
 		{
 			m_display_name[i] = '\0';
 		}
@@ -106,7 +111,13 @@ namespace scrutiny
 
 	void Config::set_display_name(const char* name)
 	{
-		scrutiny::tools::strncpy(m_display_name, name, DISPLAY_NAME_MAX_SIZE);
+		scrutiny::tools::strncpy(m_display_name, name, SCRUTINY_DISPLAY_NAME_MAX_SIZE);
+	}
+
+	void Config::set_published_values(RuntimePublishedValue* array, uint16_t nbr)
+	{
+		m_rpvs = array;
+		m_rpv_count = nbr;
 	}
 
 }

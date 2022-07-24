@@ -110,11 +110,13 @@ namespace scrutiny
 			protocol::ResponseData::GetInfo::GetSpecialMemoryRegionCount get_special_memory_region_count;
 			protocol::ResponseData::GetInfo::GetSpecialMemoryRegionLocation get_special_memory_region_location;
 			protocol::ResponseData::GetInfo::GetSupportedFeatures get_supproted_features;
+			protocol::ResponseData::GetInfo::GetRPVCount get_rpv_count;
 		} response_data;
 
 		union
 		{
 			protocol::RequestData::GetInfo::GetSpecialMemoryRegionLocation get_special_memory_region_location;
+			protocol::RequestData::GetInfo::GetRPVDefinition get_rpv_definition;
 		} request_data;
 
 		protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
@@ -208,6 +210,51 @@ namespace scrutiny
 
 			code = m_codec.encode_response_special_memory_region_location(&response_data.get_special_memory_region_location, response);
 			break;
+			// =================================
+
+		case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesCount:
+			response_data.get_rpv_count.count = m_config.get_rpv_count();
+			code = m_codec.encode_response_get_rpv_count(&response_data.get_rpv_count, response);
+			break;
+			// =================================
+
+		case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition:
+			protocol::GetRPVDefinitionResponseEncoder* get_rpv_definition_encoder;
+			
+			code = m_codec.decode_request_get_rpv_definition(request, &request_data.get_rpv_definition);
+			if (code != protocol::ResponseCode::OK)
+			{
+				break;
+			}
+
+			get_rpv_definition_encoder = m_codec.encode_response_get_rpv_definition(response, m_comm_handler.tx_buffer_size());
+
+			if (request_data.get_rpv_definition.start_index >= m_config.get_rpv_count())
+			{
+				code = protocol::ResponseCode::FailureToProceed;
+				break;
+			}
+
+			if (request_data.get_rpv_definition.start_index + request_data.get_rpv_definition.count > m_config.get_rpv_count())
+			{
+				code = protocol::ResponseCode::FailureToProceed;
+				break;
+			}
+			
+			const RuntimePublishedValue* rpvs;
+			rpvs = m_config.get_rpvs_array();
+			for (int32_t i=request_data.get_rpv_definition.start_index; i<request_data.get_rpv_definition.start_index + request_data.get_rpv_definition.count; i++)
+			{
+				get_rpv_definition_encoder->write(&rpvs[i]);
+				if (get_rpv_definition_encoder->overflow())	// If it doesn't fit the transmit buffer
+				{
+					code = protocol::ResponseCode::Overflow;
+					break;
+				}
+			}
+
+			code = protocol::ResponseCode::OK;
+			break;
 
 			// =================================
 		default:
@@ -288,6 +335,8 @@ namespace scrutiny
 			response_data.get_params.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TMEOUT_US;
 			response_data.get_params.address_size = sizeof(void*);
 			code = m_codec.encode_response_comm_get_params(&response_data.get_params, response);
+
+			
 			break;
 
 			// =========== [Connect] ==========

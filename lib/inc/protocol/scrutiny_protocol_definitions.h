@@ -105,7 +105,9 @@ namespace scrutiny
 				GetSoftwareId = 2,
 				GetSupportedFeatures = 3,
 				GetSpecialMemoryRegionCount = 4,
-				GetSpecialMemoryLocation = 5
+				GetSpecialMemoryLocation = 5,
+				GetRuntimePublishedValuesCount = 6,
+				GetRuntimePublishedValuesDefinition = 7
 			};
 
 			enum class MemoryRegionType

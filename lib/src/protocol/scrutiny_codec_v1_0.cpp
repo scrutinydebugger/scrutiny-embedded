@@ -12,6 +12,7 @@
 #include "scrutiny_setup.h"
 #include "scrutiny_software_id.h"
 #include "scrutiny_tools.h"
+#include "scrutiny_types.h"
 #include "protocol/scrutiny_codec_v1_0.h"
 #include "protocol/scrutiny_protocol_tools.h"
 
@@ -320,6 +321,55 @@ namespace scrutiny
 			m_overflow = false;
 		}
 
+
+		//==============================================================
+
+		GetRPVDefinitionResponseEncoder::GetRPVDefinitionResponseEncoder() :
+			m_buffer(NULL),
+			m_response(NULL),
+			m_cursor(0),
+			m_size_limit(0),
+			m_overflow(false)
+		{
+
+		}
+
+		void GetRPVDefinitionResponseEncoder::init(Response* response, const uint32_t max_size)
+		{
+			m_size_limit = max_size;
+			m_buffer = response->data;
+			m_response = response;
+			reset();
+		}
+
+		void GetRPVDefinitionResponseEncoder::write(const RuntimePublishedValue* rpv)
+		{
+			constexpr unsigned int addr_size = sizeof(void*);
+
+			//id (2) + type (1) + address size (2,4,8)
+			if (m_cursor + 2 + 1 + addr_size > m_size_limit)
+			{
+				m_overflow = true;
+				return;
+			}
+
+			encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+			m_cursor += 2;
+			m_buffer[m_cursor] = static_cast<uint8_t>(rpv->type);
+			m_cursor += 1;
+			encode_address_big_endian(&m_buffer[m_cursor], rpv->addr);
+			m_cursor += addr_size;
+
+			m_response->data_length = static_cast<uint16_t>(m_cursor);
+		}
+
+		void GetRPVDefinitionResponseEncoder::reset()
+		{
+			m_cursor = 0;
+			m_overflow = false;
+		}
+
+
 		//==============================================================
 
 
@@ -409,13 +459,45 @@ namespace scrutiny
 			return ResponseCode::OK;
 		}
 
+		ResponseCode CodecV1_0::decode_request_get_rpv_definition(const Request* request, RequestData::GetInfo::GetRPVDefinition* request_data)
+		{
+			constexpr uint16_t start_index_pos = 0;
+			constexpr uint16_t start_index_size = sizeof(request_data->start_index);
+			constexpr uint16_t count_pos = start_index_size;
+			constexpr uint16_t count_size = sizeof(request_data->count);
+
+			constexpr uint16_t datalen = start_index_size + count_size;
+
+			if (request->data_length != datalen)
+			{
+				return ResponseCode::InvalidRequest;
+			}
+
+			request_data->start_index = decode_16_bits_big_endian(&request->data[start_index_pos]);
+			request_data->count = decode_16_bits_big_endian(&request->data[count_pos]);
+			return ResponseCode::OK;
+		}
+
+
+		ResponseCode CodecV1_0::encode_response_get_rpv_count(const ResponseData::GetInfo::GetRPVCount* response_data, Response* response)
+		{
+			constexpr uint16_t count_size = sizeof(response_data->count);
+			constexpr uint16_t datalen = count_size;
+			static_assert(datalen <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
+
+			encode_16_bits_big_endian(response_data->count, &response->data[0]);
+			response->data_length = datalen;
+			return ResponseCode::OK;
+		}
+
+
 
 
 		// ============================ CommunicationControl ============================
 
 		ResponseCode CodecV1_0::encode_response_comm_discover(Response* response, const ResponseData::CommControl::Discover* response_data)
 		{
-			static_assert(DISPLAY_NAME_MAX_SIZE < 0x10000, "DISPLAY_NAME_MAX_SIZE must fit in a 16 bits value");
+			static_assert(SCRUTINY_DISPLAY_NAME_MAX_SIZE < 0x10000, "SCRUTINY_DISPLAY_NAME_MAX_SIZE must fit in a 16 bits value");
 
 			constexpr uint16_t software_id_size = sizeof(scrutiny::software_id);
 			constexpr uint16_t display_name_length_size = sizeof(response_data->display_name_length);
@@ -428,10 +510,10 @@ namespace scrutiny
 			constexpr uint16_t display_name_length_pos = firmware_id_pos + software_id_size;
 			constexpr uint16_t display_name_pos = display_name_length_pos + display_name_length_size;
 
-			constexpr uint16_t datalen_max = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + DISPLAY_NAME_MAX_SIZE;
+			constexpr uint16_t datalen_max = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + SCRUTINY_DISPLAY_NAME_MAX_SIZE;
 			static_assert(datalen_max <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
 
-			const uint16_t display_name_length = static_cast<uint16_t>(scrutiny::tools::strnlen(response_data->display_name, DISPLAY_NAME_MAX_SIZE));
+			const uint16_t display_name_length = static_cast<uint16_t>(scrutiny::tools::strnlen(response_data->display_name, SCRUTINY_DISPLAY_NAME_MAX_SIZE));
 
 			if (display_name_length > 0xFF)
 			{
@@ -605,6 +687,13 @@ namespace scrutiny
 			response->data_length = 0;
 			m_memory_control_write_response_encoder.init(response, max_size);
 			return &m_memory_control_write_response_encoder;
+		}
+
+		GetRPVDefinitionResponseEncoder* CodecV1_0::encode_response_get_rpv_definition(Response* response, uint32_t max_size)
+		{
+			response->data_length = 0;
+			m_get_rpv_definition_response_encoder.init(response, max_size);
+			return &m_get_rpv_definition_response_encoder;
 		}
 	}
 }
