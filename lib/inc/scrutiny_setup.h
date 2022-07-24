@@ -28,13 +28,9 @@
 #define SCRUTINY_READONLY_ADDRESS_RANGE_COUNT  4u			// Number of memory range that we disallow write access to Scruitny
 
 #define SCRUTINY_MAX_LOOP 16u								// Maximum number of independant time domain loops. (for datalogging)
-#define DISPLAY_NAME_MAX_SIZE 32u							// Size of the buffer containing the instance display name provided on DISCOVER request
+#define SCRUTINY_DISPLAY_NAME_MAX_SIZE 32u							// Size of the buffer containing the instance display name provided on DISCOVER request
+#define SCRUTINY_MAX_RPV 32u
 // ================================
-
-namespace scrutiny
-{
-	typedef unsigned int loop_id_t;
-}
 
 
 // ========================= Sanity check =====================
@@ -64,6 +60,10 @@ namespace scrutiny
 
 #if SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT < 0 || SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT > 0xFF
 #error Invalid value for SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT
+#endif
+
+#if SCRUTINY_MAX_RPV > 0xFFFF
+#error Cannot have more than 65535 Runtime Published Values. Count is 16 bits
 #endif
 
 #endif  // ___SCRUTINY_H___

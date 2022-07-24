@@ -206,3 +206,147 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 	scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 	ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
+
+
+/*
+	Reads the number of Runtime Published Values
+*/
+
+TEST_F(TestGetInfo, TestGetRPVCount)
+{
+	uint8_t tx_buffer[32];
+	scrutiny::Config new_config;
+
+	uint32_t v1 = 555;
+	float v2 = 1.34f;
+	uint16_t v3 = 1000;
+
+	scrutiny::RuntimePublishedValue rpvs[3] = {
+		{0x1111, scrutiny::VariableType::uint32, &v1},
+		{0x2222, scrutiny::VariableType::float32, &v2},
+		{0x3333, scrutiny::VariableType::uint16, &v3}
+	};
+
+	new_config.set_published_values(rpvs, 3);
+	scrutiny_handler.init(&new_config);
+	scrutiny_handler.comm()->connect();
+
+	// Make request
+	uint8_t request_data[8] = { 1,6,0,0 };
+	add_crc(request_data, sizeof(request_data) - 4);
+
+	// Make expected response
+	uint8_t expected_response[9 + 2] = { 0x81, 6, 0, 0, 2, 0, 3};
+	add_crc(expected_response, sizeof(expected_response) -4);
+
+	scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+	scrutiny_handler.process(0);
+
+	uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+	ASSERT_LT(n_to_read, sizeof(tx_buffer));
+	EXPECT_EQ(n_to_read, sizeof(expected_response));
+
+	uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+	EXPECT_EQ(nread, n_to_read);
+	ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+
+
+
+/*
+	Reads the  Runtime Published Values definitions
+*/
+
+TEST_F(TestGetInfo, TestGetRPVDefinition)
+{
+	constexpr uint32_t addr_size = sizeof(std::uintptr_t);
+	uint8_t tx_buffer[64];
+	scrutiny::Config new_config;
+
+	uint32_t v1 = 555;
+	float v2 = 1.34f;
+	uint16_t v3 = 1000;
+
+	scrutiny::RuntimePublishedValue rpvs[3] = {
+		{0x1122, scrutiny::VariableType::uint32, &v1},
+		{0x3344, scrutiny::VariableType::float32, &v2},
+		{0x5566, scrutiny::VariableType::uint16, &v3}
+	};
+
+	new_config.set_published_values(rpvs, 3);
+	scrutiny_handler.init(&new_config);
+	scrutiny_handler.comm()->connect();
+
+	// Make request
+	uint8_t request_data[8+4] = { 1,7,0,4, 0, 1, 0, 2};	// start=1, count =2
+	add_crc(request_data, sizeof(request_data) - 4);
+
+	// Make expected response
+	uint8_t expected_response[9 + (3+addr_size)*2] = { 0x81, 7, 0, 0, (3+addr_size)*2};
+	unsigned int index = 5;
+	expected_response[index++] = 0x33;
+	expected_response[index++] = 0x44;
+	expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableType::float32);
+	index += encode_addr(&expected_response[index], &v2);
+	
+	expected_response[index++] = 0x55;
+	expected_response[index++] = 0x66;
+	expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableType::uint16);
+	index += encode_addr(&expected_response[index], &v3);
+	
+	add_crc(expected_response, sizeof(expected_response) -4);
+
+	scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+	scrutiny_handler.process(0);
+
+	uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+	ASSERT_LT(n_to_read, sizeof(tx_buffer));
+	EXPECT_EQ(n_to_read, sizeof(expected_response));
+
+	uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+	EXPECT_EQ(nread, n_to_read);
+	ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+/*
+	Make sure that we get an overflow if user tries to read an RPV that is out of bound
+*/
+
+TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
+{
+	const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::GetInfo;
+	const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
+	const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+
+	constexpr uint32_t addr_size = sizeof(std::uintptr_t);
+	uint8_t tx_buffer[32];
+	
+	scrutiny::Config new_config;
+	uint32_t v1 = 555;
+	float v2 = 1.34f;
+	uint16_t v3 = 1000;
+
+	scrutiny::RuntimePublishedValue rpvs[3] = {
+		{0x1122, scrutiny::VariableType::uint32, &v1},
+		{0x3344, scrutiny::VariableType::float32, &v2},
+		{0x5566, scrutiny::VariableType::uint16, &v3}
+	};
+
+	new_config.set_published_values(rpvs, 3);
+	scrutiny_handler.init(&new_config);
+	scrutiny_handler.comm()->connect();
+
+	// Make request
+	uint8_t request_data[8+4] = { 1,7,0,4, 0, 1, 0, 3};	// start=1, count =3.  Will overflow
+	add_crc(request_data, sizeof(request_data) - 4);
+
+	scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+	scrutiny_handler.process(0);
+
+	uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+	ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+	scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+	ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+}
