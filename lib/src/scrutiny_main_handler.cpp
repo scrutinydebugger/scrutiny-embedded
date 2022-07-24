@@ -13,15 +13,13 @@
 
 namespace scrutiny
 {
-
-
 	void MainHandler::init(Config* config)
 	{
 		m_processing_request = false;
 		m_disconnect_pending = false;
-		m_comm_handler.init(&m_timebase);
-
 		m_config.copy_from(config);
+		
+		m_comm_handler.init(&m_timebase, m_config.prng_seed);
 	}
 
 	void MainHandler::process(const uint32_t timestep_us)

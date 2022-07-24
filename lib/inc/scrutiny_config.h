@@ -37,15 +37,16 @@ namespace scrutiny
 
 		inline AddressRange* forbidden_ranges() { return m_forbidden_address_ranges; }
 		inline AddressRange* readonly_ranges() { return m_readonly_address_ranges; }
-		inline uint8_t forbidden_ranges_count() { return m_forbidden_range_count ; }
-		inline uint8_t readonly_ranges_count() { return m_readonly_range_count ; }
-		inline uint32_t forbidden_ranges_max() { return SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; }
-		inline uint32_t readonly_ranges_max() { return SCRUTINY_READONLY_ADDRESS_RANGE_COUNT; }
+		inline uint8_t forbidden_ranges_count() const { return m_forbidden_range_count ; }
+		inline uint8_t readonly_ranges_count() const { return m_readonly_range_count ; }
+		inline uint32_t forbidden_ranges_max() const { return SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; }
+		inline uint32_t readonly_ranges_max() const { return SCRUTINY_READONLY_ADDRESS_RANGE_COUNT; }
 		inline bool is_user_command_callback_set() { return user_command_callback != nullptr; }
-		inline const char* display_name(){return m_display_name;}
+		inline const char* display_name() const {return m_display_name;}
 		void set_display_name(char* name);
 		uint32_t max_bitrate;
 		user_command_callback_t user_command_callback;
+		uint32_t prng_seed;
 
 	private:
 		AddressRange m_forbidden_address_ranges[SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT];

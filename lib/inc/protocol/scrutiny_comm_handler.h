@@ -17,6 +17,7 @@
 #include "scrutiny_protocol.h"
 
 #include "scrutiny_protocol_definitions.h"
+#include "scrutiny_tools.h"
 
 namespace scrutiny
 {
@@ -26,7 +27,7 @@ namespace scrutiny
 		{
 		public:
 
-			void init(Timebase* timebase);
+			void init(Timebase* timebase, uint32_t prng_seed=0);
 			void receive_data(uint8_t* data, uint32_t len);
 			bool send_response(Response* response);
 			void reset();
@@ -87,6 +88,7 @@ namespace scrutiny
 			void reset_tx();
 
 			Timebase* m_timebase;
+			tools::MulBerry32PRNG m_prng;
 			State m_state;
 			bool m_enabled;
 			uint32_t m_session_id;
@@ -112,6 +114,10 @@ namespace scrutiny
 			uint32_t m_nbytes_to_send;
 			uint32_t m_nbytes_sent;
 			TxError m_tx_error;
+			
+		
+		private:
+			static uint32_t s_session_counter;
 		};
 	}
 }

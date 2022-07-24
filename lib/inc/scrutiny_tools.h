@@ -10,6 +10,7 @@
 #define __SCRUTINY_TOOLS_H__
 
 #include <cstdlib>
+#include <cstdint>
 
 namespace scrutiny
 {
@@ -48,6 +49,26 @@ namespace scrutiny
             }
             return n;
         }
+
+        //Taken from https://gist.github.com/tommyettinger/46a874533244883189143505d203312
+        class MulBerry32PRNG    
+        {
+            public:
+            MulBerry32PRNG(uint32_t seed) : m_state(seed){}
+            MulBerry32PRNG() : m_state(0){}
+
+            void seed(uint32_t _seed){m_state = _seed;}
+            uint32_t get() 
+            {
+                uint32_t z = m_state += 0x6D2B79F5;
+                z = (z ^ z >> 15) * (1 | z);
+                z ^= z + (z ^ z >> 7) * (61 | z);
+                return z ^ z >> 14;
+            }
+
+            private:
+            uint32_t m_state;
+        };
     }
 }
 
