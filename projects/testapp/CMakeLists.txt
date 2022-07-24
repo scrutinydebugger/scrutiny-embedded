@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(testapp)
 
-#set(SCRUTINY_LIB_ROOT, ${CMAKE_CURRENT_SOURCE_DIR}/../../lib)
-
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
@@ -38,7 +36,7 @@ else()
     target_compile_options(${PROJECT_NAME}
         PRIVATE
             -no-pie  
-            -gdwarf
+            -gdwarf-4
             -O0
             -Wall -Wextra -Wpedantic
         )
@@ -46,7 +44,7 @@ else()
     target_link_options(${PROJECT_NAME}
         PUBLIC
             -no-pie
-            -gdwarf
+            -gdwarf-4
         )
 endif()
 
