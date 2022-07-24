@@ -34,23 +34,28 @@ typedef int SOCKET;
 typedef sockaddr SOCKADDR;
 #endif
 
-class UdpBridge
+#include "abstract_comm_channel.h"
+
+class UdpBridge : public AbstractCommChannel
 {
- public:
-    
+public:
     UdpBridge(uint16_t port);
 
     static void global_init();
     static void global_close();
 
-    void start();
-    void stop();
+    void send(const uint8_t* buffer, int len, int flags = 0);
     int receive(uint8_t* buffer, int len, int flags = 0);
-    void reply(const uint8_t* buffer, int len, int flags = 0);
+    
+    virtual void start();
+    virtual void stop();
+    virtual void send(const uint8_t* buffer, int len) {send(buffer, len, 0);}
+    virtual int receive(uint8_t* buffer, int len) {return receive(buffer, len, 0);}
+    
     void set_nonblocking();
     static void throw_system_error(const char* msg);
 
-  private:
+private:
     uint16_t m_port;
     SOCKET m_sock;                // SOCKET = int for linux, SOCKET for windows
     SOCKADDR m_last_packet_addr;  // SOCKADDR = sockaddr for linux, SOCKADDR for windows

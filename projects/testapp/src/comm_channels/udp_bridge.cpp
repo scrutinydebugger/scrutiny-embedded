@@ -9,6 +9,8 @@
 #include "udp_bridge.h"
 #include <thread>
 #include <chrono>
+#include <cstdlib>
+#include <cstdint>
 
 #if defined(_WIN32)
 WSAData UdpBridge::wsa_data;
@@ -139,7 +141,7 @@ int UdpBridge::receive(uint8_t* buffer, int len, int flags)
 }
 
 
- void UdpBridge::reply(const uint8_t* buffer, int len, int flags)
+ void UdpBridge::send(const uint8_t* buffer, int len, int flags)
  {
     int ret = sendto(m_sock, reinterpret_cast<const char*>(buffer), len, flags, &m_last_packet_addr, sizeof(m_last_packet_addr));
 

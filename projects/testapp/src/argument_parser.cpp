@@ -72,6 +72,49 @@ void ArgumentParser::parse(int argc, char* argv[])
 			m_last_error = "Missing port";
 		}
 	}
+	else if (cmd == "serial-listen")
+	{
+		m_command = TestAppCommand::SerialListen;
+		if (argc >= 3)
+		{
+			m_serial_config.baudrate = 115200;
+
+			m_serial_config.port_name = argv[2];
+			bool arg_error = false;
+			for (int32_t i=3; i<argc; i++)
+			{
+				std::string arg(argv[i]);
+
+				if (arg == "--baudrate")
+				{
+					if (i+1 >= argc)
+					{
+						m_last_error = "Missing baudrate";
+						arg_error = true;
+						break;
+					}
+					
+					int32_t baudrate = atoi(m_argv[i+1]);
+					if(baudrate <= 0 || baudrate > 0x7FFFFFFF)
+					{
+						m_last_error = "Invalid baudrate";
+						arg_error = true;
+						break;
+					}
+					m_serial_config.baudrate = static_cast<uint32_t>(baudrate);
+				}
+			}
+
+			if (!arg_error)
+			{
+				m_valid = true;
+			}
+		}
+		else
+		{
+			m_last_error = "Missing port name";
+		}
+	}
 	else
 	{
 		m_last_error = std::string("Unknown command ") + cmd;

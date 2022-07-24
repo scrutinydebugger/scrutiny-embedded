@@ -5,23 +5,35 @@ add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/file1.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/file2.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/argument_parser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/udp_bridge.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/file1.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/file2.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/udp_bridge.cpp
         )  
-
-target_link_libraries(${PROJECT_NAME}
-    scrutiny-embedded   
-    )
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} 
         wsock32
     )
-endif (WIN32)
 
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/win_serial_port_bridge.cpp
+    )
+else()
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/nix_serial_port_bridge.cpp
+    )
+endif ()
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+   ${CMAKE_CURRENT_LIST_DIR}/include
+   ${CMAKE_CURRENT_LIST_DIR}/include/comm_channels
+)
+
+target_link_libraries(${PROJECT_NAME}
+    scrutiny-embedded   
+    )
 
 if(MSVC)    # MSVC doesn't support dwarf output. We still allows build of testapp.
     target_compile_options(${PROJECT_NAME} 
