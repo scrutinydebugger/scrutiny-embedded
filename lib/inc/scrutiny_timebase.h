@@ -13,41 +13,41 @@
 
 namespace scrutiny
 {
-	class Timebase
-	{
-	public:
-		Timebase() : m_time_us(0) {}
+    class Timebase
+    {
+    public:
+        Timebase() : m_time_us(0) {}
 
-		inline void step(const uint32_t timestep_us)
-		{
-			m_time_us += timestep_us;
-		}
+        inline void step(const uint32_t timestep_us)
+        {
+            m_time_us += timestep_us;
+        }
 
-		inline uint32_t get_timestamp() 
-		{
-			return m_time_us;
-		};
+        inline uint32_t get_timestamp() 
+        {
+            return m_time_us;
+        };
 
-		inline bool has_expired(uint32_t timestamp, uint32_t timeout_us)
-		{
-			bool expired = false;
-			const uint32_t diff = m_time_us - timestamp;
-			if (diff >= timeout_us)
-			{
-				expired = true;
-			}
+        inline bool has_expired(uint32_t timestamp, uint32_t timeout_us)
+        {
+            bool expired = false;
+            const uint32_t diff = m_time_us - timestamp;
+            if (diff >= timeout_us)
+            {
+                expired = true;
+            }
 
-			return expired;
-		}
+            return expired;
+        }
 
-		inline void reset(uint32_t val = 0)
-		{
-			m_time_us = val;
-		}
+        inline void reset(uint32_t val = 0)
+        {
+            m_time_us = val;
+        }
 
-	protected:
-		uint32_t m_time_us;
-	};
+    protected:
+        uint32_t m_time_us;
+    };
 }
 
 

@@ -42,35 +42,35 @@ StructD file1StructDInstance;
 
 namespace NamespaceInFile1
 {
-	namespace NamespaceInFile1Nested1
-	{
-		unsigned long file1GlobalNestedVar1;
-		static unsigned long file1StaticNestedVar1;
-	}	
+    namespace NamespaceInFile1Nested1
+    {
+        unsigned long file1GlobalNestedVar1;
+        static unsigned long file1StaticNestedVar1;
+    }	
 }
 
 
 void file1SetValues()
 {
-	file1StaticChar = 99;
-	file1StaticInt = 987654;
-	file1StaticShort = -666;
-	file1StaticLong = -55555;
-	file1StaticUnsignedChar = 44u;
-	file1StaticUnsignedInt = 3333u;
-	file1StaticUnsignedShort = 22222u;
-	file1StaticUnsignedLong = 321321u;
-	file1StaticFloat = 1.23456789f;
-	file1StaticDouble = 9.87654321;
-	file1StaticBool = true;
+    file1StaticChar = 99;
+    file1StaticInt = 987654;
+    file1StaticShort = -666;
+    file1StaticLong = -55555;
+    file1StaticUnsignedChar = 44u;
+    file1StaticUnsignedInt = 3333u;
+    file1StaticUnsignedShort = 22222u;
+    file1StaticUnsignedLong = 321321u;
+    file1StaticFloat = 1.23456789f;
+    file1StaticDouble = 9.87654321;
+    file1StaticBool = true;
 
-	file1StructAStaticInstance.structAMemberInt = -789;
-	file1StructAStaticInstance.structAMemberUInt = 147258u;
-	file1StructAStaticInstance.structAMemberFloat = 88.88f;
-	file1StructAStaticInstance.structAMemberDouble = 99.99;
-	file1StructAStaticInstance.structAMemberBool = true ;
+    file1StructAStaticInstance.structAMemberInt = -789;
+    file1StructAStaticInstance.structAMemberUInt = 147258u;
+    file1StructAStaticInstance.structAMemberFloat = 88.88f;
+    file1StructAStaticInstance.structAMemberDouble = 99.99;
+    file1StructAStaticInstance.structAMemberBool = true ;
 
-	NamespaceInFile1::NamespaceInFile1Nested1::file1StaticNestedVar1 = 945612345u;
+    NamespaceInFile1::NamespaceInFile1Nested1::file1StaticNestedVar1 = 945612345u;
 
     file1GlobalChar = -10;
     file1GlobalInt = -1000;
@@ -113,9 +113,9 @@ void file1SetValues()
 
 int funcInFile1(int a, int b)
 {
-	static long long staticLongInFuncFile1 = -0x123456789abcdef;
+    static long long staticLongInFuncFile1 = -0x123456789abcdef;
     (void)staticLongInFuncFile1;
-	return a+b;
+    return a+b;
 }
 
 
