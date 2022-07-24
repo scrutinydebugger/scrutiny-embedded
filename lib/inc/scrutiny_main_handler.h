@@ -9,7 +9,7 @@
 #ifndef __SCRUTINY_HANDLER_H__
 #define __SCRUTINY_HANDLER_H__
 
-#include <cstdint>
+#include <stdint.h>
 
 #include "scrutiny_setup.h"
 #include "scrutiny_loop_handler.h"

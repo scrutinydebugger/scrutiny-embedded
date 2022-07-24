@@ -10,7 +10,7 @@
 #ifndef ___SCRUTINY_PROTOCOL_TOOLS_H___
 #define ___SCRUTINY_PROTOCOL_TOOLS_H___
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace scrutiny
 {

@@ -10,7 +10,7 @@
 #ifndef ___SCRUTINY_COMM_HANDLER_H___
 #define ___SCRUTINY_COMM_HANDLER_H___
 
-#include <cstdint>
+#include <stdint.h>
 
 #include "scrutiny_setup.h"
 #include "scrutiny_timebase.h"

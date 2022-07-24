@@ -11,7 +11,7 @@
 #ifndef ___SCRUTINY_LOOP_HANDLER_H___
 #define ___SCRUTINY_LOOP_HANDLER_H___
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace scrutiny
 {

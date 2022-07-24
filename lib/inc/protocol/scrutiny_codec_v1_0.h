@@ -9,7 +9,7 @@
 #ifndef ___SCRUTINY_CODEC_V1_0___
 #define ___SCRUTINY_CODEC_V1_0___
 
-#include <cstdint>
+#include <stdint.h>
 #include "scrutiny_protocol_definitions.h"
 #include "scrutiny_software_id.h"
 #include "scrutiny_types.h"

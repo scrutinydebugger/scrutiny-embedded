@@ -6,7 +6,7 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include <cstdint>
+#include <stdint.h>
 #include "protocol/scrutiny_protocol_definitions.h"
 
 //Randomly generated

@@ -6,7 +6,7 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include <cstring>	
+#include <string.h>	
 
 
 #include "scrutiny_setup.h"
@@ -264,7 +264,7 @@ namespace scrutiny
             m_cursor += addr_size;
             encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             m_cursor += 2;
-            std::memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
+            memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
             m_response->data_length = static_cast<uint16_t>(m_cursor);
@@ -394,7 +394,7 @@ namespace scrutiny
             static_assert(datalen <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
 
             response->data_length = datalen;
-            std::memcpy(response->data, scrutiny::software_id, sizeof(scrutiny::software_id));
+            memcpy(response->data, scrutiny::software_id, sizeof(scrutiny::software_id));
             return ResponseCode::OK;
         }
 
@@ -523,9 +523,9 @@ namespace scrutiny
             response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-            std::memcpy(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
+            memcpy(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
             response->data[display_name_length_pos] = static_cast<uint8_t>(display_name_length);
-            std::memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length);
+            memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length);
             return ResponseCode::OK;
         }
 
@@ -585,7 +585,7 @@ namespace scrutiny
             static_assert(datalen <= SCRUTINY_TX_BUFFER_SIZE, "SCRUTINY_TX_BUFFER_SIZE too small");
 
             response->data_length = datalen;
-            std::memcpy(&response->data[0], response_data->magic, magic_size);
+            memcpy(&response->data[0], response_data->magic, magic_size);
             encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
 
             return ResponseCode::OK;
@@ -602,9 +602,9 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            std::memcpy(request_data->magic, request->data, magic_size);
+            memcpy(request_data->magic, request->data, magic_size);
             
-            if (std::memcmp(CommControl::DISCOVER_MAGIC, request_data->magic, magic_size) != 0)
+            if (memcmp(CommControl::DISCOVER_MAGIC, request_data->magic, magic_size) != 0)
             {
                 return ResponseCode::InvalidRequest;
             }
@@ -640,7 +640,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            std::memcpy(request_data->magic, request->data, magic_size);
+            memcpy(request_data->magic, request->data, magic_size);
 
             return ResponseCode::OK;
         }

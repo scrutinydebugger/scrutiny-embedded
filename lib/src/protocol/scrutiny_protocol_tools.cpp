@@ -9,7 +9,7 @@
 
 #include "protocol/scrutiny_protocol_tools.h"
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace scrutiny
 {

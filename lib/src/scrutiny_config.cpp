@@ -8,7 +8,7 @@
 
 #include "scrutiny_config.h"
 #include "scrutiny_tools.h"
-#include <cstring>
+#include <string.h>
 
 namespace scrutiny
 {
