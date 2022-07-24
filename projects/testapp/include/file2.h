@@ -19,26 +19,24 @@ void file2SetValues();
 class classAFile2
 {
 public:
-	int intInClassA;
+    int intInClassA;
 };
 
 namespace namespaceAFile2
 {
+    class classBFile2
+    {
+        class ClassBAFile2
+        {
+            public:
+                int intInClassBA;
+                classAFile2 classAInstance;
+        };
 
-	class classBFile2
-	{
-		class ClassBAFile2
-		{
-			public:
-				int intInClassBA;
-				classAFile2 classAInstance;
-		};
-
-
-		public:
-			int intInClassB;
-			ClassBAFile2 nestedClassInstance;
-	};
+        public:
+            int intInClassB;
+            ClassBAFile2 nestedClassInstance;
+    };
 }
 
 #pragma pack(pop)

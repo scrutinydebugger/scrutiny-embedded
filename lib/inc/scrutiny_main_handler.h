@@ -19,44 +19,44 @@
 
 namespace scrutiny
 {
-	class MainHandler
-	{
+    class MainHandler
+    {
 
-	public:
-		void init(Config* config);
-		//void process_loop(loop_id_t loop);
-		//loop_id_t add_loop(LoopHandler* loop);
+    public:
+        void init(Config* config);
+        //void process_loop(loop_id_t loop);
+        //loop_id_t add_loop(LoopHandler* loop);
 
-		void process(const uint32_t timestep_us);
+        void process(const uint32_t timestep_us);
 
-		void process_request(const protocol::Request* request, protocol::Response* response);
-		protocol::ResponseCode process_get_info(const protocol::Request* request, protocol::Response* response);
-		protocol::ResponseCode process_comm_control(const protocol::Request* request, protocol::Response* response);
-		protocol::ResponseCode process_memory_control(const protocol::Request* request, protocol::Response* response);
-		protocol::ResponseCode process_user_command(const protocol::Request* request, protocol::Response* response);
+        void process_request(const protocol::Request* request, protocol::Response* response);
+        protocol::ResponseCode process_get_info(const protocol::Request* request, protocol::Response* response);
+        protocol::ResponseCode process_comm_control(const protocol::Request* request, protocol::Response* response);
+        protocol::ResponseCode process_memory_control(const protocol::Request* request, protocol::Response* response);
+        protocol::ResponseCode process_user_command(const protocol::Request* request, protocol::Response* response);
 
-		inline protocol::CommHandler* comm()
-		{
-			return &m_comm_handler;
-		}
+        inline protocol::CommHandler* comm()
+        {
+            return &m_comm_handler;
+        }
 
-		inline Config* get_config() { return &m_config; }
+        inline Config* get_config() { return &m_config; }
 
-	private:
+    private:
 
-		bool touches_forbidden_region(const protocol::MemoryBlock* block);
-		bool touches_readonly_region(const protocol::MemoryBlock* block);
+        bool touches_forbidden_region(const protocol::MemoryBlock* block);
+        bool touches_readonly_region(const protocol::MemoryBlock* block);
 
-		//LoopHandler* m_loop_handlers[SCRUTINY_MAX_LOOP];
-		Timebase m_timebase;
-		protocol::CommHandler m_comm_handler;
-		bool m_processing_request;
-		bool m_disconnect_pending;
-		Config m_config;
+        //LoopHandler* m_loop_handlers[SCRUTINY_MAX_LOOP];
+        Timebase m_timebase;
+        protocol::CommHandler m_comm_handler;
+        bool m_processing_request;
+        bool m_disconnect_pending;
+        Config m_config;
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1,0)
-		protocol::CodecV1_0 m_codec;
+        protocol::CodecV1_0 m_codec;
 #endif
-	};
+    };
 }
 
 #endif
