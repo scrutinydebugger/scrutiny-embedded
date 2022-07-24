@@ -50,7 +50,8 @@ namespace scrutiny
             return n;
         }
 
-        class MulBerry32PRNG
+        //Taken from https://gist.github.com/tommyettinger/46a874533244883189143505d203312
+        class MulBerry32PRNG    
         {
             public:
             MulBerry32PRNG(uint32_t seed) : m_state(seed){}
