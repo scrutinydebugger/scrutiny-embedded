@@ -29,6 +29,7 @@ namespace scrutiny
             return n;
         }
 
+        // strncpy is not standard + non-standard implementation does shenanigans.
         inline size_t strncpy(char* dst, const char* src, size_t maxlen)
         {
             size_t n=0;
