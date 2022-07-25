@@ -7,10 +7,10 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include <cstring>
+#include <string.h>
 
-#include "protocol/scrutiny_comm_handler.h"
-#include "scrutiny_crc.h"
+#include "protocol/scrutiny_comm_handler.hpp"
+#include "scrutiny_crc.hpp"
 
 namespace scrutiny
 {
@@ -141,7 +141,7 @@ namespace scrutiny
                     const uint16_t missing_bytes = m_active_request.data_length - m_data_bytes_received;
                     const uint16_t data_bytes_to_read = (available_bytes >= missing_bytes) ? missing_bytes : available_bytes;
 
-                    std::memcpy(&m_rx_buffer[m_data_bytes_received], &data[i], data_bytes_to_read);
+                    memcpy(&m_rx_buffer[m_data_bytes_received], &data[i], data_bytes_to_read);
                     m_data_bytes_received += data_bytes_to_read;
                     i += data_bytes_to_read;
 
@@ -314,7 +314,7 @@ namespace scrutiny
                 data_bytes_to_copy = len - i;
             }
 
-            std::memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
+            memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
 
             i += data_bytes_to_copy;
             m_nbytes_sent += data_bytes_to_copy;
@@ -372,7 +372,7 @@ namespace scrutiny
                 return false;
             }
 
-            if (std::memcmp(CommControl::DISCOVER_MAGIC, m_active_request.data, sizeof(CommControl::DISCOVER_MAGIC)) != 0)
+            if (memcmp(CommControl::DISCOVER_MAGIC, m_active_request.data, sizeof(CommControl::DISCOVER_MAGIC)) != 0)
             {
                 return false;
             }

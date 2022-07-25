@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 #include <cstring>
 
-#include "scrutiny.h"
-#include "scrutiny_test.h"
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 class TestGetInfo : public ScrutinyTest
 {
@@ -319,7 +319,6 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
     const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
-    constexpr uint32_t addr_size = sizeof(std::uintptr_t);
     uint8_t tx_buffer[32];
     
     scrutiny::Config new_config;

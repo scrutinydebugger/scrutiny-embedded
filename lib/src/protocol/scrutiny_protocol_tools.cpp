@@ -7,9 +7,9 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "protocol/scrutiny_protocol_tools.h"
+#include "protocol/scrutiny_protocol_tools.hpp"
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace scrutiny
 {

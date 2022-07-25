@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include <cstring>
+#include <string.h>
 
-#include "scrutiny_main_handler.h"
-#include "scrutiny_software_id.h"
+#include "scrutiny_main_handler.hpp"
+#include "scrutiny_software_id.hpp"
 
 namespace scrutiny
 {
@@ -360,7 +360,7 @@ namespace scrutiny
             }
 
             response_data.connect.session_id = m_comm_handler.get_session_id();
-            std::memcpy(response_data.connect.magic, protocol::CommControl::CONNECT_MAGIC, sizeof(protocol::CommControl::CONNECT_MAGIC));
+            memcpy(response_data.connect.magic, protocol::CommControl::CONNECT_MAGIC, sizeof(protocol::CommControl::CONNECT_MAGIC));
             code = m_codec.encode_response_comm_connect(&response_data.connect, response);
             break;
 
@@ -496,7 +496,7 @@ namespace scrutiny
 
                 if (!masked)
                 {
-                    std::memcpy(block.start_address, block.source_data, block.length);
+                    memcpy(block.start_address, block.source_data, block.length);
                 }
                 else
                 {

@@ -9,13 +9,13 @@
 #ifndef __SCRUTINY_HANDLER_H__
 #define __SCRUTINY_HANDLER_H__
 
-#include <cstdint>
+#include <stdint.h>
 
-#include "scrutiny_setup.h"
-#include "scrutiny_loop_handler.h"
-#include "scrutiny_timebase.h"
-#include "protocol/scrutiny_protocol.h"
-#include "scrutiny_config.h"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_loop_handler.hpp"
+#include "scrutiny_timebase.hpp"
+#include "protocol/scrutiny_protocol.hpp"
+#include "scrutiny_config.hpp"
 
 namespace scrutiny
 {

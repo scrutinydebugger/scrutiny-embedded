@@ -14,7 +14,7 @@
 #error "File designed for windows"
 #endif
 
-#include "abstract_comm_channel.h"
+#include "abstract_comm_channel.hpp"
 
 #include <windows.h>
 #include <string>

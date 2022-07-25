@@ -10,7 +10,7 @@
 #error "This file cannot be compiled under Windows"
 #endif
 
-#include "nix_serial_port_bridge.h"
+#include "nix_serial_port_bridge.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <string>

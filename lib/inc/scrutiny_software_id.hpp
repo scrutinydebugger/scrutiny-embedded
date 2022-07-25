@@ -9,7 +9,7 @@
 #ifndef ___SCRUTINY_SOFTWARE_ID_H___
 #define ___SCRUTINY_SOFTWARE_ID_H___
 
-#include <cstdint>
+#include <stdint.h>
 
 #define SCRUTINY_SOFTWARE_ID_LENGTH 32u
 

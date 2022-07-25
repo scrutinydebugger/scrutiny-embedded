@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 #include <cstdint>
 
-#include "scrutiny_crc.h"
+#include "scrutiny_crc.hpp"
 
 TEST(TestCRC, TestCRC32)
 {

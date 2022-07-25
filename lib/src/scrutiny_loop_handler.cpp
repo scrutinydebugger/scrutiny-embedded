@@ -8,7 +8,7 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "scrutiny_loop_handler.h"
+#include "scrutiny_loop_handler.hpp"
 
 
 namespace scrutiny

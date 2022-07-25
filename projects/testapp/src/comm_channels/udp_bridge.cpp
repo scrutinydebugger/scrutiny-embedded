@@ -6,7 +6,7 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "udp_bridge.h"
+#include "udp_bridge.hpp"
 #include <thread>
 #include <chrono>
 #include <cstdlib>

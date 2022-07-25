@@ -6,18 +6,18 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "file1.h"
-#include "file2.h"
-#include "argument_parser.h"
-#include "scrutiny.h"
-#include "abstract_comm_channel.h"
-#include "udp_bridge.h"
+#include "file1.hpp"
+#include "file2.hpp"
+#include "argument_parser.hpp"
+#include "scrutiny.hpp"
+#include "abstract_comm_channel.hpp"
+#include "udp_bridge.hpp"
 
 #if defined(_WIN32)
-#include "win_serial_port_bridge.h"
+#include "win_serial_port_bridge.hpp"
 using SerialPortBridge = WinSerialPortBridge;
 #else
-#include "nix_serial_port_bridge.h"
+#include "nix_serial_port_bridge.hpp"
 using SerialPortBridge = NixSerialPortBridge;
 #endif
 

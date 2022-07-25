@@ -10,7 +10,7 @@
 #include <string>
 #include <algorithm>
 
-#include "argument_parser.h"
+#include "argument_parser.hpp"
 
 
 ArgumentParser::ArgumentParser() :

@@ -9,8 +9,8 @@
 #ifndef __SCRUTINY_TOOLS_H__
 #define __SCRUTINY_TOOLS_H__
 
-#include <cstdlib>
-#include <cstdint>
+#include <stdlib.h>
+#include <stdint.h>
 
 namespace scrutiny
 {

@@ -9,7 +9,7 @@
 #ifndef ___SCRUTINY_TIMEBASE_H___
 #define ___SCRUTINY_TIMEBASE_H___
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace scrutiny
 {

@@ -10,8 +10,8 @@
 #ifndef ___SCRUTINY_CONFIG_H___
 #define ___SCRUTINY_CONFIG_H___
 
-#include "scrutiny_setup.h"
-#include "scrutiny_types.h"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_types.hpp"
 
 namespace scrutiny
 {
