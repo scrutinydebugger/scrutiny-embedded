@@ -17,7 +17,7 @@
 #include "win_serial_port_bridge.hpp"
 using SerialPortBridge = WinSerialPortBridge;
 #else
-#include "nix_serial_port_bridge.h"
+#include "nix_serial_port_bridge.hpp"
 using SerialPortBridge = NixSerialPortBridge;
 #endif
 

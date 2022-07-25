@@ -56,6 +56,6 @@ namespace scrutiny
             void* addr;
     };
 
-};
+}
 
 #endif   //  ___SCRUTINY_TYPES_H___
