@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "scrutiny.h"
+#include "scrutiny.hpp"
 
 #define ASSERT_BUF_EQ(a,b,c) ASSERT_TRUE(COMPARE_BUF(a, b, c))
 #define EXPECT_BUF_EQ(a,b,c) EXPECT_TRUE(COMPARE_BUF(a, b, c))

@@ -8,8 +8,8 @@
 
 #include <gtest/gtest.h>
 
-#include "scrutiny.h"
-#include "scrutiny_test.h"
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 
 class TestTxParsing : public ScrutinyTest

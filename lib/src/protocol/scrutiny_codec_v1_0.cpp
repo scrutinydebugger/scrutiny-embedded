@@ -9,12 +9,12 @@
 #include <string.h>	
 
 
-#include "scrutiny_setup.h"
-#include "scrutiny_software_id.h"
-#include "scrutiny_tools.h"
-#include "scrutiny_types.h"
-#include "protocol/scrutiny_codec_v1_0.h"
-#include "protocol/scrutiny_protocol_tools.h"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_software_id.hpp"
+#include "scrutiny_tools.hpp"
+#include "scrutiny_types.hpp"
+#include "protocol/scrutiny_codec_v1_0.hpp"
+#include "protocol/scrutiny_protocol_tools.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(disable:4127)   // Get rid of constexpr always true condition warning.

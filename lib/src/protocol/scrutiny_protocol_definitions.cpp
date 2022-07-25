@@ -7,7 +7,7 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <stdint.h>
-#include "protocol/scrutiny_protocol_definitions.h"
+#include "protocol/scrutiny_protocol_definitions.hpp"
 
 //Randomly generated
 extern const uint8_t scrutiny::protocol::CommControl::DISCOVER_MAGIC[4] = { 0x7E, 0x18, 0xFC, 0x68 };

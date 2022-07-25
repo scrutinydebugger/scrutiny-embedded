@@ -9,8 +9,8 @@
 
 #include <string.h>
 
-#include "protocol/scrutiny_comm_handler.h"
-#include "scrutiny_crc.h"
+#include "protocol/scrutiny_comm_handler.hpp"
+#include "scrutiny_crc.hpp"
 
 namespace scrutiny
 {

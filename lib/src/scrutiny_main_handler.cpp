@@ -8,8 +8,8 @@
 
 #include <string.h>
 
-#include "scrutiny_main_handler.h"
-#include "scrutiny_software_id.h"
+#include "scrutiny_main_handler.hpp"
+#include "scrutiny_software_id.hpp"
 
 namespace scrutiny
 {

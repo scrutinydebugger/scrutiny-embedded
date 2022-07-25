@@ -10,7 +10,7 @@
 #ifndef ___SCRUTINY_SETUP_H___
 #define ___SCRUTINY_SETUP_H___ 
 
-#include "scrutiny_software_id.h"
+#include "scrutiny_software_id.hpp"
 
 #define SCRUTINY_PROTOCOL_VERSION(MAJOR, MINOR) ((((MAJOR) << 8) & 0xFF00) | ((MINOR) & 0xFF))
 #define SCRUTINY_PROTOCOL_VERSION_MAJOR(v) ((v>>8) & 0xFF)

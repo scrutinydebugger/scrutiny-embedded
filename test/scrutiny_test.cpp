@@ -9,8 +9,8 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <cstdint>
-#include "scrutiny.h"
-#include "scrutiny_test.h"
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 void ScrutinyTest::add_crc(uint8_t* data, uint16_t data_len)
 {

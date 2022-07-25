@@ -34,7 +34,7 @@ typedef int SOCKET;
 typedef sockaddr SOCKADDR;
 #endif
 
-#include "abstract_comm_channel.h"
+#include "abstract_comm_channel.hpp"
 
 class UdpBridge : public AbstractCommChannel
 {

@@ -6,7 +6,7 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "file2.h"
+#include "file2.hpp"
 
 char file2GlobalChar;
 int file2GlobalInt;

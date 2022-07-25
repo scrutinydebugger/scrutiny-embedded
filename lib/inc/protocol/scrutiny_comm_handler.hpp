@@ -12,12 +12,11 @@
 
 #include <stdint.h>
 
-#include "scrutiny_setup.h"
-#include "scrutiny_timebase.h"
-#include "scrutiny_protocol.h"
-
-#include "scrutiny_protocol_definitions.h"
-#include "scrutiny_tools.h"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_timebase.hpp"
+#include "scrutiny_protocol.hpp"
+#include "scrutiny_protocol_definitions.hpp"
+#include "scrutiny_tools.hpp"
 
 namespace scrutiny
 {

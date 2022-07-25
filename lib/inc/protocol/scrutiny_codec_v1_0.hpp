@@ -10,9 +10,9 @@
 #define ___SCRUTINY_CODEC_V1_0___
 
 #include <stdint.h>
-#include "scrutiny_protocol_definitions.h"
-#include "scrutiny_software_id.h"
-#include "scrutiny_types.h"
+#include "scrutiny_protocol_definitions.hpp"
+#include "scrutiny_software_id.hpp"
+#include "scrutiny_types.hpp"
 
 namespace scrutiny
 {

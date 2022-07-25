@@ -7,7 +7,7 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <gtest/gtest.h>
-#include "scrutiny.h"
+#include "scrutiny.hpp"
 
 
 TEST(TestTimebase, CheckTimeouts)

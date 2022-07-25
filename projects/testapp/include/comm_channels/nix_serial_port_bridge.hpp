@@ -13,12 +13,12 @@
 #error "This file cannot be compiled under Windows"
 #endif
 
-#include "abstract_comm_channel.h"
+#include "abstract_comm_channel.hpp"
 
 #include <string>
 #include <cstdint>
 #include <cstdlib>
-#include "abstract_comm_channel.h"  
+#include "abstract_comm_channel.hpp"  
 
 class NixSerialPortBridge : public AbstractCommChannel
 {

@@ -11,7 +11,7 @@
 #error "File designed for windows"
 #endif
 
-#include "win_serial_port_bridge.h"
+#include "win_serial_port_bridge.hpp"
 #include <cstdlib>
 #include <cstdint>
 

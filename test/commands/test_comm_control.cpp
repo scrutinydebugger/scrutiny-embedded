@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 #include <cstring>
 
-#include "scrutiny.h"
-#include "scrutiny_test.h"
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 #define DISPLAY_NAME "helloworld"
 #define DISPLAY_NAME_LENGTH 10

@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-#include "scrutiny_software_id.h"
+#include "scrutiny_software_id.hpp"
 
 namespace scrutiny
 {
