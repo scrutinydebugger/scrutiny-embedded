@@ -1,0 +1,60 @@
+
+#include <SPI.h>
+#include <SSD1306AsciiSpi.h>
+#include "Console.hpp"
+
+SSD1306AsciiSpi display;
+
+#include <scrutiny.h>
+scrutiny::MainHandler scrutiny_handler;
+
+volatile uint32_t last_call_us = 0;
+
+void setup()
+{
+#define OLED_DC 9
+#define OLED_CS 10
+#define OLED_RESET 8
+    display.begin(&Adafruit128x64, OLED_CS, OLED_DC, OLED_RESET);
+    display.setFont(Adafruit5x7);
+    display.setScrollMode(SCROLL_MODE_AUTO);
+
+    setup_console();
+    printf("Console rdy\n");
+
+    scrutiny::Config config;
+    config.max_bitrate = 100000;
+    config.set_display_name("Arduino");
+    scrutiny_handler.init(&config);
+    printf("Scrutiny rdy\n");
+
+    printf("%p\n", &last_call_us);
+
+    Serial.begin(115200);
+}
+
+void loop()
+{
+    uint32_t current_us = micros();
+    uint32_t timestep_us = current_us - last_call_us;
+
+    int16_t c = Serial.read();
+    if (c != -1)
+    {
+        uint8_t uc = static_cast<uint8_t>(c);
+        scrutiny_handler.comm()->receive_data(&uc, 1);
+    }
+
+    uint8_t buffer[16];
+    uint32_t data_to_send = scrutiny_handler.comm()->data_to_send();
+    data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
+    if (data_to_send > 0)
+    {
+        scrutiny_handler.comm()->pop_data(buffer, data_to_send);
+        Serial.write(buffer, data_to_send);
+    }
+
+    scrutiny_handler.process(timestep_us);
+
+    last_call_us = current_us;
+}
