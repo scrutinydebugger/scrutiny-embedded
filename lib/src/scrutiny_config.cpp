@@ -27,6 +27,7 @@ namespace scrutiny
         prng_seed = src->prng_seed;
         m_rpv_count = src->m_rpv_count;
         m_rpvs = src->m_rpvs;
+        m_rpv_read_callback = src->m_rpv_read_callback;
 
         for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
         {
@@ -50,6 +51,7 @@ namespace scrutiny
         max_bitrate = 0;
         m_rpv_count = 0;
         m_rpvs = nullptr;
+        m_rpv_read_callback = nullptr;
 
         for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
         {
@@ -114,10 +116,17 @@ namespace scrutiny
         scrutiny::tools::strncpy(m_display_name, name, SCRUTINY_DISPLAY_NAME_MAX_SIZE);
     }
 
-    void Config::set_published_values(RuntimePublishedValue* array, uint16_t nbr)
+    void Config::set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb)
     {
         m_rpvs = array;
         m_rpv_count = nbr;
+        m_rpv_read_callback = rd_cb;
     }
+
+    bool Config::published_values_configured()
+    {
+        return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0);
+    }
+
 
 }

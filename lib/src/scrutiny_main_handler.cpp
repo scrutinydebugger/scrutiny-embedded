@@ -512,6 +512,59 @@ namespace scrutiny
             }
             break;
         }
+
+        // =========== [Read RPV] ==========
+        case protocol::MemoryControl::Subfunction::ReadRPV:
+        {
+           protocol::ReadRPVRequestParser* readrpv_parser;
+           protocol::ReadRPVResponseEncoder* readrpv_encoder;
+
+           if (!m_config.published_values_configured())
+           {
+               code = protocol::ResponseCode::UnsupportedFeature;
+               break;
+           }
+
+           readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request, m_config.get_rpvs_array(), m_config.get_rpv_count() );
+           readrpv_encoder = m_codec.encode_response_memory_control_read_rpv(response, m_comm_handler.tx_buffer_size(), m_config.get_rpv_read_callback());
+
+           if (!readrpv_parser->is_valid())
+           {
+               code = protocol::ResponseCode::InvalidRequest;
+               break;
+           }
+
+           if (!readrpv_parser->all_known_rpv())
+           {
+               code = protocol::ResponseCode::FailureToProceed;
+               break;
+           }
+
+           if (readrpv_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+           {
+               code = protocol::ResponseCode::Overflow;
+               break;
+           }
+
+           RuntimePublishedValue rpv;
+           while (!readrpv_parser->finished())
+           {
+               readrpv_parser->next(&rpv);
+
+               if (!readrpv_parser->is_valid())
+               {
+                   code = protocol::ResponseCode::InvalidRequest;
+                   break;
+               }
+
+               readrpv_encoder->write(&rpv);
+           }
+           code = protocol::ResponseCode::OK;
+
+           break;
+        }
+
+        
             // =================================
         default:
             code = protocol::ResponseCode::UnsupportedFeature;

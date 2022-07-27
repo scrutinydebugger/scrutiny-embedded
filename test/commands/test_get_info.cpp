@@ -212,22 +212,47 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     Reads the number of Runtime Published Values
 */
 
+static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType* outval)
+{
+    uint32_t v1 = 555;
+    float v2 = 1.34f;
+    uint16_t v3 = 1000;
+
+    if (rpv.id == 0x1122 && rpv.type == scrutiny::VariableType::uint32)
+    {
+        outval->uint32 = v1;
+    }
+
+    else if (rpv.id == 0x3344 && rpv.type == scrutiny::VariableType::float32)
+    {
+        outval->float32 = v2;
+    }
+
+    else if (rpv.id == 0x5566 && rpv.type == scrutiny::VariableType::uint16)
+    {
+        outval->uint16 = v3;
+    }
+    else
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
 TEST_F(TestGetInfo, TestGetRPVCount)
 {
     uint8_t tx_buffer[32];
     scrutiny::Config new_config;
 
-    uint32_t v1 = 555;
-    float v2 = 1.34f;
-    uint16_t v3 = 1000;
-
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1111, scrutiny::VariableType::uint32, &v1},
-        {0x2222, scrutiny::VariableType::float32, &v2},
-        {0x3333, scrutiny::VariableType::uint16, &v3}
+        {0x1122, scrutiny::VariableType::uint32},
+        {0x3344, scrutiny::VariableType::float32},
+        {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3);
+    new_config.set_published_values(rpvs, 3, rpv_read_callback);
     scrutiny_handler.init(&new_config);
     scrutiny_handler.comm()->connect();
 
@@ -252,8 +277,6 @@ TEST_F(TestGetInfo, TestGetRPVCount)
 }
 
 
-
-
 /*
     Reads the  Runtime Published Values definitions
 */
@@ -264,17 +287,13 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
     uint8_t tx_buffer[64];
     scrutiny::Config new_config;
 
-    uint32_t v1 = 555;
-    float v2 = 1.34f;
-    uint16_t v3 = 1000;
-
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32, &v1},
-        {0x3344, scrutiny::VariableType::float32, &v2},
-        {0x5566, scrutiny::VariableType::uint16, &v3}
+        {0x1122, scrutiny::VariableType::uint32},
+        {0x3344, scrutiny::VariableType::float32},
+        {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3);
+    new_config.set_published_values(rpvs, 3, rpv_read_callback);
     scrutiny_handler.init(&new_config);
     scrutiny_handler.comm()->connect();
 
@@ -283,17 +302,15 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + (3+addr_size)*2] = { 0x81, 7, 0, 0, (3+addr_size)*2};
+    uint8_t expected_response[9 + 3*2] = { 0x81, 7, 0, 0, 3*2};
     unsigned int index = 5;
     expected_response[index++] = 0x33;
     expected_response[index++] = 0x44;
     expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableType::float32);
-    index += encode_addr(&expected_response[index], &v2);
     
     expected_response[index++] = 0x55;
     expected_response[index++] = 0x66;
     expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableType::uint16);
-    index += encode_addr(&expected_response[index], &v3);
     
     add_crc(expected_response, sizeof(expected_response) -4);
 
@@ -322,17 +339,14 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     uint8_t tx_buffer[32];
     
     scrutiny::Config new_config;
-    uint32_t v1 = 555;
-    float v2 = 1.34f;
-    uint16_t v3 = 1000;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32, &v1},
-        {0x3344, scrutiny::VariableType::float32, &v2},
-        {0x5566, scrutiny::VariableType::uint16, &v3}
+        {0x1122, scrutiny::VariableType::uint32},
+        {0x3344, scrutiny::VariableType::float32},
+        {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3);
+    new_config.set_published_values(rpvs, 3, rpv_read_callback);
     scrutiny_handler.init(&new_config);
     scrutiny_handler.comm()->connect();
 

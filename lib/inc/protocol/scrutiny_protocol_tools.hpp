@@ -30,6 +30,18 @@ namespace scrutiny
             buff[3] = static_cast<uint8_t>((value >> 0) & 0xFFu);
         }
 
+        inline void encode_64_bits_big_endian(const uint64_t value, uint8_t* buff)
+        {
+            buff[0] = static_cast<uint8_t>((value >> 56) & 0xFFu);
+            buff[1] = static_cast<uint8_t>((value >> 48) & 0xFFu);
+            buff[2] = static_cast<uint8_t>((value >> 40) & 0xFFu);
+            buff[3] = static_cast<uint8_t>((value >> 32) & 0xFFu);
+            buff[4] = static_cast<uint8_t>((value >> 24) & 0xFFu);
+            buff[5] = static_cast<uint8_t>((value >> 16) & 0xFFu);
+            buff[6] = static_cast<uint8_t>((value >> 8) & 0xFFu);
+            buff[7] = static_cast<uint8_t>((value >> 0) & 0xFFu);
+        }
+
         inline void encode_16_bits_little_endian(const uint16_t value, uint8_t* buff)
         {
             buff[1] = static_cast<uint8_t>((value >> 8) & 0xFFu);
@@ -38,6 +50,18 @@ namespace scrutiny
 
         inline void encode_32_bits_little_endian(const uint32_t value, uint8_t* buff)
         {
+            buff[3] = static_cast<uint8_t>((value >> 24) & 0xFFu);
+            buff[2] = static_cast<uint8_t>((value >> 16) & 0xFFu);
+            buff[1] = static_cast<uint8_t>((value >> 8) & 0xFFu);
+            buff[0] = static_cast<uint8_t>((value >> 0) & 0xFFu);
+        }
+
+        inline void encode_64_bits_little_endian(const uint64_t value, uint8_t* buff)
+        {
+            buff[7] = static_cast<uint8_t>((value >> 56) & 0xFFu);
+            buff[6] = static_cast<uint8_t>((value >> 48) & 0xFFu);
+            buff[5] = static_cast<uint8_t>((value >> 40) & 0xFFu);
+            buff[4] = static_cast<uint8_t>((value >> 32) & 0xFFu);
             buff[3] = static_cast<uint8_t>((value >> 24) & 0xFFu);
             buff[2] = static_cast<uint8_t>((value >> 16) & 0xFFu);
             buff[1] = static_cast<uint8_t>((value >> 8) & 0xFFu);

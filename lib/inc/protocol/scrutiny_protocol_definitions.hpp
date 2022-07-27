@@ -138,7 +138,8 @@ namespace scrutiny
             {
                 Read = 1,
                 Write = 2,
-                WriteMasked = 3
+                WriteMasked = 3,
+                ReadRPV = 4
             };
         }
 

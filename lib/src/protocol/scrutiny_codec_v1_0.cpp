@@ -24,6 +24,7 @@ namespace scrutiny
 {
     namespace protocol
     {
+
         //==============================================================
 
         ReadMemoryBlocksRequestParser::ReadMemoryBlocksRequestParser() :
@@ -138,7 +139,7 @@ namespace scrutiny
             constexpr unsigned int addr_size = sizeof(void*);
             uint32_t cursor = 0;
             uint16_t length;
-
+            
             while (true)
             {
                 if (cursor + addr_size + 2 > m_size_limit)
@@ -344,10 +345,8 @@ namespace scrutiny
 
         void GetRPVDefinitionResponseEncoder::write(const RuntimePublishedValue* rpv)
         {
-            constexpr unsigned int addr_size = sizeof(void*);
-
             //id (2) + type (1) + address size (2,4,8)
-            if (m_cursor + 2 + 1 + addr_size > m_size_limit)
+            if (m_cursor + 2 + 1 > m_size_limit)
             {
                 m_overflow = true;
                 return;
@@ -357,8 +356,6 @@ namespace scrutiny
             m_cursor += 2;
             m_buffer[m_cursor] = static_cast<uint8_t>(rpv->type);
             m_cursor += 1;
-            encode_address_big_endian(&m_buffer[m_cursor], rpv->addr);
-            m_cursor += addr_size;
 
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
@@ -369,6 +366,199 @@ namespace scrutiny
             m_overflow = false;
         }
 
+
+        //==============================================================
+
+        ReadRPVResponseEncoder::ReadRPVResponseEncoder() :
+            m_buffer(NULL),
+            m_response(NULL),
+            m_cursor(0),
+            m_size_limit(0),
+            m_overflow(false),
+            m_read_callback(nullptr),
+            m_unsupported_type(false)
+        {
+
+        }
+
+        void ReadRPVResponseEncoder::init(Response* response, const uint32_t max_size, RpvReadCallback cb)
+        {
+            m_size_limit = max_size;
+            m_buffer = response->data;
+            m_response = response;
+            m_read_callback = cb;
+            m_size_limit = max_size;
+            reset();
+        }
+
+        void ReadRPVResponseEncoder::write(const RuntimePublishedValue* rpv)
+        {
+            const uint8_t typesize = tools::get_type_size(rpv->type);
+            scrutiny::AnyType v;
+            //id (2) + type (1)
+            if (m_cursor + 2 + typesize > m_size_limit)
+            {
+                m_overflow = true;
+                return;
+            }
+            const bool success = m_read_callback(*rpv, &v);
+            if (success)
+            {
+                if (typesize == 1 || typesize == 2 || typesize == 4 || typesize == 8)
+                {
+                    encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+                    m_cursor += 2;
+            
+                    switch (typesize)
+                    {
+                    case 1:
+                        m_buffer[m_cursor] = v.uint8;
+                        break;
+                    case 2:
+                        encode_16_bits_big_endian(v.uint16, &m_buffer[m_cursor]);
+                        break;
+                    case 4:
+                        encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
+                        break;
+                    case 8:
+                        encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
+                        break;
+                    default:    // handled above
+                        break;
+                    }
+
+                    m_cursor += typesize;
+                    m_response->data_length = static_cast<uint16_t>(m_cursor);
+                }
+                else
+                {
+                    // Silently skip.
+                }
+            }
+            else
+            {
+                // skip silently
+            }
+        }
+
+        void ReadRPVResponseEncoder::reset()
+        {
+            m_cursor = 0;
+            m_overflow = false;
+            m_unsupported_type = false;
+        }
+
+
+
+         //==============================================================
+
+        ReadRPVRequestParser::ReadRPVRequestParser() :
+            m_buffer(nullptr),
+            m_bytes_read(0),
+            m_request_len(0),
+            m_required_tx_buffer_size(0),
+            m_finished(false),
+            m_invalid(false),
+            m_rpvs(nullptr),
+            m_rpv_table_len(0),
+            m_not_found(false)
+        {
+
+        }
+
+        void ReadRPVRequestParser::init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len)
+        {
+            m_buffer = request->data;
+            m_request_len = request->data_length;
+            m_rpv_table_len = len;
+            m_rpvs = rpvs;
+            m_not_found = false;
+            reset();
+            validate();
+        }
+
+        void ReadRPVRequestParser::validate()
+        {
+            // It's a list of 16 bits value. So we need an even number of bytes
+            if ((m_request_len & 0x01) != 0)
+            {
+                m_invalid = true;
+                return;
+            }
+            
+            for (uint16_t i=0; i < m_request_len; i+=2)
+            {
+                uint16_t id = decode_16_bits_big_endian(&m_buffer[i]);
+                bool found= false;
+                for (uint16_t j=0; j<m_rpv_table_len; j++)
+                {
+                    if (m_rpvs[j].id == id)
+                    {
+                        const uint8_t typesize = scrutiny::tools::get_type_size(m_rpvs[j].type);
+                        if (typesize == 1 || typesize == 2 || typesize == 4 || typesize== 8)
+                        {
+                            m_required_tx_buffer_size += 2 + typesize;    // Must be skipped otheriwse
+                        }
+                        // Impossible to burst a 32bits with a 16bits request buffer len
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    m_not_found = true;
+                    break;
+                }
+            }
+        }
+
+        bool ReadRPVRequestParser::next(RuntimePublishedValue* rpv)
+        {
+            if (m_finished || m_invalid)
+            {
+                return false;
+            }
+
+            uint16_t id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            m_bytes_read += 2;
+            bool found = false;
+            for (uint16_t i=0; i<m_rpv_table_len; i++)
+            {
+                if (m_rpvs[i].id == id)
+                {
+                    *rpv = m_rpvs[i];
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                m_finished = true;
+                m_not_found = true;
+            }
+
+            if (m_bytes_read == m_request_len)
+            {
+                m_finished = true;
+            }
+            else if (m_bytes_read > m_request_len)
+            {
+                m_finished = true;
+                m_invalid = true;
+            }
+
+            return found;
+        }
+
+        void ReadRPVRequestParser::reset()
+        {
+            m_bytes_read = 0;
+            m_invalid = false;
+            m_finished = false;
+            m_required_tx_buffer_size = 0;
+            m_not_found = false;
+        }
 
         //==============================================================
 
@@ -694,6 +884,19 @@ namespace scrutiny
             response->data_length = 0;
             m_get_rpv_definition_response_encoder.init(response, max_size);
             return &m_get_rpv_definition_response_encoder;
+        }
+        
+        ReadRPVResponseEncoder* CodecV1_0::encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size, RpvReadCallback read_cb)
+        {
+            response->data_length = 0;
+            m_read_rpv_response_encoder.init(response, max_size, read_cb);
+            return &m_read_rpv_response_encoder;
+        }
+
+        ReadRPVRequestParser* CodecV1_0::decode_request_memory_control_read_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t len)
+        {
+            m_memory_control_read_rpv_parser.init(request, rpvs, len);
+            return &m_memory_control_read_rpv_parser;
         }
     }
 }
