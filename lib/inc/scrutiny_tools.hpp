@@ -20,6 +20,11 @@ namespace scrutiny
     {
         inline uint8_t get_type_size(VariableType v)
         {
+            if (v == VariableType::unknown)
+            {
+                return 0;
+            }
+
             return 1 << (static_cast<uint8_t>(v) & 0xF);
         }
 
