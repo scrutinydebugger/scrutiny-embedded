@@ -12,10 +12,17 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "scrutiny_types.hpp"
+
 namespace scrutiny
 {
     namespace tools
     {
+        inline uint8_t get_type_size(VariableType v)
+        {
+            return 1 << (static_cast<uint8_t>(v) & 0xF);
+        }
+
         inline size_t strnlen(const char* s, size_t maxlen)
         {
             size_t n=0;

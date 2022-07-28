@@ -11,8 +11,6 @@
 #include "scrutiny_test.hpp"
 #include <cstring>
 
-#include <cstring>
-
 class TestMemoryControl : public ScrutinyTest
 {
 protected:
@@ -201,7 +199,7 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
     index += encode_addr(&request_data[index], &some_buffer);
     request_data[index++] = static_cast<uint8_t>(buf1_size >> 8);
     request_data[index++] = static_cast<uint8_t>(buf1_size >> 0);
-
+     
     index += encode_addr(&request_data[index], &some_buffer);	// 2nd block
 
     uint16_t length_to_receive;

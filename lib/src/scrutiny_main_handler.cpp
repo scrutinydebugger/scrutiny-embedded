@@ -512,6 +512,124 @@ namespace scrutiny
             }
             break;
         }
+
+        // =========== [Read RPV] ==========
+        case protocol::MemoryControl::Subfunction::ReadRPV:
+        {
+           protocol::ReadRPVRequestParser* readrpv_parser;
+           protocol::ReadRPVResponseEncoder* readrpv_encoder;
+
+           if (!m_config.read_published_values_configured())
+           {
+               code = protocol::ResponseCode::UnsupportedFeature;
+               break;
+           }
+
+           readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request, m_config.get_rpvs_array(), m_config.get_rpv_count() );
+           readrpv_encoder = m_codec.encode_response_memory_control_read_rpv(response, m_comm_handler.tx_buffer_size());
+
+           if (!readrpv_parser->is_valid())
+           {
+               code = protocol::ResponseCode::InvalidRequest;
+               break;
+           }
+
+           if (!readrpv_parser->all_known_rpv())
+           {
+               code = protocol::ResponseCode::FailureToProceed;
+               break;
+           }
+
+           if (readrpv_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+           {
+               code = protocol::ResponseCode::Overflow;
+               break;
+           }
+
+            RuntimePublishedValue rpv;
+            scrutiny::AnyType v;
+            while (!readrpv_parser->finished())
+            {
+                const bool ok_to_process = readrpv_parser->next(&rpv);
+
+                if (!readrpv_parser->is_valid())
+                {
+                    code = protocol::ResponseCode::InvalidRequest;
+                    break;
+                }
+                
+                if (ok_to_process)
+                {
+                    const bool success = m_config.get_rpv_read_callback()(rpv, &v);
+                    if (success)
+                    {
+                        readrpv_encoder->write(&rpv, v);
+                    }
+                }
+           }
+           code = protocol::ResponseCode::OK;
+
+           break;
+        }
+
+        case protocol::MemoryControl::Subfunction::WriteRPV:
+        {
+            protocol::WriteRPVRequestParser* writerpv_parser;
+            protocol::WriteRPVResponseEncoder* writerpv_encoder;
+
+            if (!m_config.write_published_values_configured())
+            {
+                code = protocol::ResponseCode::UnsupportedFeature;
+                break;
+            }
+
+            writerpv_parser = m_codec.decode_request_memory_control_write_rpv(request, m_config.get_rpvs_array(), m_config.get_rpv_count() );
+            writerpv_encoder = m_codec.encode_response_memory_control_write_rpv(response, m_comm_handler.tx_buffer_size());
+
+            if (!writerpv_parser->is_valid())
+           {
+               code = protocol::ResponseCode::InvalidRequest;
+               break;
+           }
+
+           if (!writerpv_parser->all_known_rpv())
+           {
+               code = protocol::ResponseCode::FailureToProceed;
+               break;
+           }
+
+           if (writerpv_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+           {
+               code = protocol::ResponseCode::Overflow;
+               break;
+           }
+
+            RuntimePublishedValue rpv;
+            scrutiny::AnyType v;
+            while (!writerpv_parser->finished())
+            {
+                const bool ok_to_process = writerpv_parser->next(&rpv, &v);
+
+                if (!writerpv_parser->is_valid())
+                {
+                    code = protocol::ResponseCode::InvalidRequest;
+                    break;
+                }
+
+                if (ok_to_process)
+                {
+                    const bool success = m_config.get_rpv_write_callback()(rpv, &v);
+                    if (success)
+                    {
+                        writerpv_encoder->write(&rpv);
+                    }
+                }
+            }
+            code = protocol::ResponseCode::OK;
+            break;
+        }
+
+        
             // =================================
         default:
             code = protocol::ResponseCode::UnsupportedFeature;
