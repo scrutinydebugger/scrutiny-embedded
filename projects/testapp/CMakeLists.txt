@@ -60,7 +60,7 @@ else()
         )
     
     if(SCRUTINY_WERR)
-        target_compile_options(${PROJECT_NAME} PRIVATE -werror )
+        target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
     endif()
 
     target_link_options(${PROJECT_NAME}
