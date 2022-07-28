@@ -39,9 +39,21 @@ target_link_libraries(${PROJECT_NAME}
 if(MSVC)
     target_compile_options(scrutiny-embedded PRIVATE /W4 /Od)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Od)
+
+    if(SCRUTINY_WERR)
+        target_compile_options(scrutiny-embedded PRIVATE /WX)
+        target_compile_options(${PROJECT_NAME} PRIVATE /WX)
+    endif()
+
 else()
     target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+
+    if(SCRUTINY_WERR)
+        target_compile_options(scrutiny-embedded PRIVATE -Werror)
+        target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
+    endif()
+
 endif()
 
 include(GoogleTest)
