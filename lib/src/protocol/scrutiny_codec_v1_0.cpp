@@ -488,9 +488,9 @@ namespace scrutiny
             m_required_tx_buffer_size(0),
             m_finished(false),
             m_invalid(false),
+            m_not_found(false),
             m_rpvs(nullptr),
-            m_rpv_table_len(0),
-            m_not_found(false)
+            m_rpv_table_len(0)
         {
 
         }
@@ -598,9 +598,9 @@ namespace scrutiny
             m_required_tx_buffer_size(0),
             m_finished(false),
             m_invalid(false),
+            m_not_found(false),
             m_rpvs(nullptr),
-            m_rpv_table_len(0),
-            m_not_found(false)
+            m_rpv_table_len(0)
         {
 
         }
