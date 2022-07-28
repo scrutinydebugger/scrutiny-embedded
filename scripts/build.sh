@@ -9,10 +9,14 @@ set -x
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
+BuildContext="${BUILD_CONTEXT:-dev}"
+[[ $BuildContext = "ci" ]] && WERR="ON" || WERR="OFF"
+
 cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_TESTAPP=ON \
-        -DBUILD_TEST=ON \
+        -DSCRUTINY_BUILD_TESTAPP=ON \
+        -DSCRUTINY_BUILD_TEST=ON \
+        -DSCRUTINY_WERR=$WERR \
         -Wno-dev \
         "$APP_ROOT"
 

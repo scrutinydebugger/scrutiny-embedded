@@ -1,7 +1,0 @@
-{
-    "name": "Scrutiny",
-    "build": {
-        "includeDir": "inc",
-        "srcDir": "src"
-    }
-}

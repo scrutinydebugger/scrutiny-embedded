@@ -664,7 +664,7 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     {
         request_data[request_index++] = (vals_and_payload[i].id >> 8) & 0xFF;
         request_data[request_index++] = (vals_and_payload[i].id) & 0xFF;
-        for (int j=0; j<vals_and_payload[i].data.size(); j++)
+        for (unsigned int j=0; j<vals_and_payload[i].data.size(); j++)
         {
             request_data[request_index++] = vals_and_payload[i].data[j];
         }

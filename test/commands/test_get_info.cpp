@@ -283,7 +283,6 @@ TEST_F(TestGetInfo, TestGetRPVCount)
 
 TEST_F(TestGetInfo, TestGetRPVDefinition)
 {
-    constexpr uint32_t addr_size = sizeof(std::uintptr_t);
     uint8_t tx_buffer[64];
     scrutiny::Config new_config;
 
