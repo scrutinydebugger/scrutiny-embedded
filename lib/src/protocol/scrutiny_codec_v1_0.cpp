@@ -375,69 +375,55 @@ namespace scrutiny
             m_cursor(0),
             m_size_limit(0),
             m_overflow(false),
-            m_read_callback(nullptr),
             m_unsupported_type(false)
         {
 
         }
 
-        void ReadRPVResponseEncoder::init(Response* response, const uint32_t max_size, RpvReadCallback cb)
+        void ReadRPVResponseEncoder::init(Response* response, const uint32_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
             m_response = response;
-            m_read_callback = cb;
             m_size_limit = max_size;
             reset();
         }
 
-        void ReadRPVResponseEncoder::write(const RuntimePublishedValue* rpv)
+        void ReadRPVResponseEncoder::write(const RuntimePublishedValue* rpv, AnyType v)
         {
             const uint8_t typesize = tools::get_type_size(rpv->type);
-            scrutiny::AnyType v;
             //id (2) + type (1)
             if (m_cursor + 2 + typesize > m_size_limit)
             {
                 m_overflow = true;
                 return;
             }
-            const bool success = m_read_callback(*rpv, &v);
-            if (success)
-            {
-                if (typesize == 1 || typesize == 2 || typesize == 4 || typesize == 8)
-                {
-                    encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-                    m_cursor += 2;
-            
-                    switch (typesize)
-                    {
-                    case 1:
-                        m_buffer[m_cursor] = v.uint8;
-                        break;
-                    case 2:
-                        encode_16_bits_big_endian(v.uint16, &m_buffer[m_cursor]);
-                        break;
-                    case 4:
-                        encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
-                        break;
-                    case 8:
-                        encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
-                        break;
-                    default:    // handled above
-                        break;
-                    }
 
-                    m_cursor += typesize;
-                    m_response->data_length = static_cast<uint16_t>(m_cursor);
-                }
-                else
-                {
-                    // Silently skip.
-                }
-            }
-            else
+            if (typesize == 1 || typesize == 2 || typesize == 4 || typesize == 8)
             {
-                // skip silently
+                encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+                m_cursor += 2;
+        
+                switch (typesize)
+                {
+                case 1:
+                    m_buffer[m_cursor] = v.uint8;
+                    break;
+                case 2:
+                    encode_16_bits_big_endian(v.uint16, &m_buffer[m_cursor]);
+                    break;
+                case 4:
+                    encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
+                    break;
+                case 8:
+                    encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
+                    break;
+                default:    // handled above
+                    break;
+                }
+
+                m_cursor += typesize;
+                m_response->data_length = static_cast<uint16_t>(m_cursor);
             }
         }
 
@@ -449,6 +435,49 @@ namespace scrutiny
         }
 
 
+ //==============================================================
+
+        WriteRPVResponseEncoder::WriteRPVResponseEncoder() :
+            m_buffer(NULL),
+            m_response(NULL),
+            m_cursor(0),
+            m_size_limit(0),
+            m_overflow(false)
+        {
+
+        }
+
+        void WriteRPVResponseEncoder::init(Response* response, const uint32_t max_size)
+        {
+            m_size_limit = max_size;
+            m_buffer = response->data;
+            m_response = response;
+            m_size_limit = max_size;
+            reset();
+        }
+
+        void WriteRPVResponseEncoder::write(const RuntimePublishedValue* rpv)
+        {
+            const uint8_t typesize = tools::get_type_size(rpv->type);
+            //id (2) + datalen (1)
+            if (m_cursor + 2 + 1 > m_size_limit)
+            {
+                m_overflow = true;
+                return;
+            }
+
+            encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += 2;
+            m_buffer[m_cursor++] = typesize;
+          
+            m_response->data_length = static_cast<uint16_t>(m_cursor);
+        }
+
+        void WriteRPVResponseEncoder::reset()
+        {
+            m_cursor = 0;
+            m_overflow = false;
+        }
 
          //==============================================================
 
@@ -559,6 +588,161 @@ namespace scrutiny
             m_required_tx_buffer_size = 0;
             m_not_found = false;
         }
+
+        // ==================================
+
+        WriteRPVRequestParser::WriteRPVRequestParser() :
+            m_buffer(nullptr),
+            m_bytes_read(0),
+            m_request_len(0),
+            m_required_tx_buffer_size(0),
+            m_finished(false),
+            m_invalid(false),
+            m_rpvs(nullptr),
+            m_rpv_table_len(0),
+            m_not_found(false)
+        {
+
+        }
+
+        void WriteRPVRequestParser::init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len)
+        {
+            m_buffer = request->data;
+            m_request_len = request->data_length;
+            m_rpv_table_len = len;
+            m_rpvs = rpvs;
+            m_not_found = false;
+            reset();
+            validate();
+        }
+
+        void WriteRPVRequestParser::validate()
+        {
+            uint32_t cursor=0;
+            uint8_t typesize=0;
+            uint16_t id;
+            bool found;
+            while (cursor < m_request_len)
+            {
+                if (cursor +2 > m_request_len)
+                {
+                    m_invalid = true;
+                    break;
+                }
+
+                id = decode_16_bits_big_endian(&m_buffer[cursor]);
+                cursor += 2;
+                found = false;
+                for (uint16_t i=0; i<m_rpv_table_len; i++)
+                {
+                    if (m_rpvs[i].id == id)
+                    {
+                        typesize = tools::get_type_size(m_rpvs[i].type);
+                        found = true;
+                        m_required_tx_buffer_size += 3; // id (2) + len (1)
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    m_not_found = true;
+                    break;
+                }
+
+                // We don't validate if the type is supported. it will be silently skipped by encoder.
+                cursor += typesize;
+                if (cursor > m_request_len)
+                {
+                    m_invalid = true;
+                    break;
+                }
+            }
+        }
+
+        bool WriteRPVRequestParser::next(RuntimePublishedValue* rpv, AnyType *v)
+        {
+            bool ok_to_process = false;
+            // We can't parse the request if a previous entry was not found.
+            if (m_finished || m_invalid)
+            {
+                return false;
+            }
+
+            if (m_bytes_read + 2 > m_request_len)
+            {
+                m_invalid = true;
+                return false;
+            }
+
+            const uint16_t id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            m_bytes_read += 2;
+            bool found = false;
+            for (uint16_t i=0; i<m_rpv_table_len; i++)
+            {
+                if (m_rpvs[i].id == id)
+                {
+                    *rpv = m_rpvs[i];   // Default copy
+                    found = true;
+                    break;
+                }
+            }
+
+            // Impossible to know the meaning of the rest of the payload. We need to stop all; 
+            if (!found)
+            {
+                m_not_found = true;
+                m_invalid = true;
+                return false;
+            }
+            
+
+            const uint8_t typesize = tools::get_type_size(rpv->type);
+            ok_to_process = true;
+            switch (typesize)
+            {
+                case 1:
+                    v->uint8 = m_buffer[m_bytes_read];
+                    break;
+                case 2:
+                    v->uint16 = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+                    break;
+                case 4:
+                    v->uint32 = decode_32_bits_big_endian(&m_buffer[m_bytes_read]);
+                    break;
+                case 8:
+                    v->uint64 = decode_64_bits_big_endian(&m_buffer[m_bytes_read]);
+                    break;
+                default:
+                    ok_to_process = false;
+                    break;
+            }
+
+            m_bytes_read += typesize;
+
+            if (m_bytes_read == m_request_len)
+            {
+                m_finished = true;
+            }
+            else if (m_bytes_read > m_request_len)
+            {
+                m_finished = true;
+                m_invalid = true;
+            }
+
+            return ok_to_process;
+        }
+
+        void WriteRPVRequestParser::reset()
+        {
+            m_bytes_read = 0;
+            m_invalid = false;
+            m_finished = false;
+            m_required_tx_buffer_size = 0;
+            m_not_found = false;
+        }
+
+        //==============================================================
 
         //==============================================================
 
@@ -886,10 +1070,10 @@ namespace scrutiny
             return &m_get_rpv_definition_response_encoder;
         }
         
-        ReadRPVResponseEncoder* CodecV1_0::encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size, RpvReadCallback read_cb)
+        ReadRPVResponseEncoder* CodecV1_0::encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size)
         {
             response->data_length = 0;
-            m_read_rpv_response_encoder.init(response, max_size, read_cb);
+            m_read_rpv_response_encoder.init(response, max_size);
             return &m_read_rpv_response_encoder;
         }
 
@@ -897,6 +1081,19 @@ namespace scrutiny
         {
             m_memory_control_read_rpv_parser.init(request, rpvs, len);
             return &m_memory_control_read_rpv_parser;
+        }
+
+        WriteRPVResponseEncoder* CodecV1_0::encode_response_memory_control_write_rpv(Response* response, const uint32_t max_size)
+        {
+            response->data_length = 0;
+            m_write_rpv_response_encoder.init(response, max_size);
+            return &m_write_rpv_response_encoder;
+        }
+
+        WriteRPVRequestParser* CodecV1_0::decode_request_memory_control_write_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t len)
+        {
+            m_memory_control_write_rpv_parser.init(request, rpvs, len);
+            return &m_memory_control_write_rpv_parser;
         }
     }
 }

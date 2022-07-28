@@ -24,6 +24,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_get_info.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_comm_control.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control_rpv.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     )
 target_include_directories(${PROJECT_NAME}

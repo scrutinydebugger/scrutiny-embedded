@@ -34,8 +34,9 @@ namespace scrutiny
         bool add_readonly_address_range(void* start, void* end);
         void set_display_name(const char* name);
         void copy_from(const Config* src);
-        void set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb);
-        bool published_values_configured();
+        void set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb=nullptr, RpvWriteCallback wr_cb=nullptr);
+        bool read_published_values_configured();
+        bool write_published_values_configured();
         void clear();
 
         inline AddressRange* forbidden_ranges() { return m_forbidden_address_ranges; }
@@ -49,6 +50,7 @@ namespace scrutiny
         inline const RuntimePublishedValue* get_rpvs_array() const {return m_rpvs;}
         inline const char* display_name() const {return m_display_name;}
         inline RpvReadCallback get_rpv_read_callback() { return m_rpv_read_callback; }
+        inline RpvWriteCallback get_rpv_write_callback() { return m_rpv_write_callback; }
         void set_display_name(char* name);
         uint32_t max_bitrate;
         user_command_callback_t user_command_callback;
@@ -63,6 +65,7 @@ namespace scrutiny
         uint16_t m_rpv_count;
         const RuntimePublishedValue *m_rpvs;
         RpvReadCallback m_rpv_read_callback;
+        RpvWriteCallback m_rpv_write_callback;
 
     };
 }

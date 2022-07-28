@@ -91,7 +91,7 @@ namespace scrutiny
     };
 
     typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType* outval);
-    //typedef void (*rpv_write_callback)(const uint16_t rpv_id, uint8_t *data);
+    typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType* inval);
 }
 
 #endif   //  ___SCRUTINY_TYPES_H___
