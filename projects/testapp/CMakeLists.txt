@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(testapp)
 
+option(SCRUTINY_WERR "Converts all warning to error" OFF)
+
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
@@ -40,6 +42,10 @@ if(MSVC)    # MSVC doesn't support dwarf output. We still allows build of testap
         PRIVATE
             /W4 /Od)
 
+    if(SCRUTINY_WERR)
+        target_compile_options(${PROJECT_NAME} PRIVATE /WX)
+    endif()
+
     target_link_options(${PROJECT_NAME}
         PUBLIC
             /DYNAMICBASE:NO
@@ -52,6 +58,10 @@ else()
             -O0
             -Wall -Wextra -Wpedantic
         )
+    
+    if(SCRUTINY_WERR)
+        target_compile_options(${PROJECT_NAME} PRIVATE -werror )
+    endif()
 
     target_link_options(${PROJECT_NAME}
         PUBLIC
