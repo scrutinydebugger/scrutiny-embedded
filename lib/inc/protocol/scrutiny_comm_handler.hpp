@@ -26,7 +26,7 @@ namespace scrutiny
         {
         public:
 
-            void init(Timebase* timebase, uint32_t prng_seed=0);
+            void init(uint8_t* rx_buffer, uint16_t rx_buffer_size, uint8_t* tx_buffer, uint16_t tx_buffer_size, Timebase* timebase, uint32_t prng_seed=0);
             void receive_data(uint8_t* data, uint32_t len);
             bool send_response(Response* response);
             void reset();
@@ -56,8 +56,8 @@ namespace scrutiny
             inline void disable() { reset(); m_enabled = false; }
             inline bool is_connected() { return m_session_active; }
             inline uint32_t get_session_id() { return m_session_id; }
-            inline uint16_t rx_buffer_size() { return SCRUTINY_RX_BUFFER_SIZE; }
-            inline uint16_t tx_buffer_size() { return SCRUTINY_TX_BUFFER_SIZE; }
+            inline uint16_t rx_buffer_size() { return m_rx_buffer_size; }
+            inline uint16_t tx_buffer_size() { return m_tx_buffer_size; }
 
         protected:
 
@@ -97,8 +97,10 @@ namespace scrutiny
             bool m_heartbeat_received;
 
             // Reception
-            uint8_t m_rx_buffer[SCRUTINY_RX_BUFFER_SIZE];
-            uint8_t m_tx_buffer[SCRUTINY_TX_BUFFER_SIZE];
+            uint8_t* m_rx_buffer;
+            uint16_t m_rx_buffer_size;
+            uint8_t* m_tx_buffer;
+            uint16_t m_tx_buffer_size;
             Request m_active_request;
             RxFSMState m_rx_state;
             RxError m_rx_error;

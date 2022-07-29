@@ -22,8 +22,12 @@ protected:
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
+
     virtual void SetUp()
     {
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         scrutiny_handler.init(&config);
         scrutiny_handler.comm()->connect();
     }
@@ -189,7 +193,6 @@ static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const 
 TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
 {
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -197,8 +200,8 @@ TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -228,7 +231,6 @@ TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
 TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
 {
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -236,8 +238,8 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -270,7 +272,6 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
 TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
 {
     uint8_t tx_buffer[128];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x9000, scrutiny::VariableType::uint8},
@@ -300,8 +301,8 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     expected_encoding.insert({ 0x9009, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb} });   // -5.123
 
 
-    new_config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
     const uint16_t nb_vals = static_cast<uint16_t>(expected_encoding.size());
     // Make request
@@ -362,7 +363,6 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
     const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -370,8 +370,8 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -401,7 +401,6 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
     const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -409,8 +408,8 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -440,7 +439,6 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     const scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -448,8 +446,8 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     uint16_t bufsize = scrutiny_handler.comm()->tx_buffer_size();
@@ -493,7 +491,6 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
 {
     dest_buffer_for_rpv_write.clear();
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8},
@@ -508,8 +505,8 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
         {0x1009, scrutiny::VariableType::float64}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -542,7 +539,6 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 {
     dest_buffer_for_rpv_write.clear();
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8},
@@ -557,8 +553,8 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
         {0x1009, scrutiny::VariableType::float64}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -593,7 +589,6 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 {
     dest_buffer_for_rpv_write.clear();
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8},
@@ -629,8 +624,8 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     vals_and_payload.push_back({ 0x1009, scrutiny::VariableType::sint64, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}});    // 54 - 63
 
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -711,7 +706,6 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
     const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
      scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8},
@@ -726,8 +720,8 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         {0x1009, scrutiny::VariableType::float64}
     };
 
-    new_config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request

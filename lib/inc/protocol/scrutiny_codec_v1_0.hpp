@@ -22,11 +22,11 @@ namespace scrutiny
     {
         const unsigned int REQUEST_OVERHEAD = 8;
         const unsigned int RESPONSE_OVERHEAD = 9;
+        const unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
 
         class ReadMemoryBlocksRequestParser
         {
         public:
-            ReadMemoryBlocksRequestParser();
             void init(const Request* request);
             void next(MemoryBlock* memblock);
             inline bool finished() { return m_finished; };
@@ -48,7 +48,6 @@ namespace scrutiny
         class ReadMemoryBlocksResponseEncoder
         {
         public:
-            ReadMemoryBlocksResponseEncoder();
             void init(Response* response, const uint32_t max_size);
             void write(MemoryBlock* memblock);
             inline bool overflow() { return m_overflow; };
@@ -65,7 +64,6 @@ namespace scrutiny
         class WriteMemoryBlocksRequestParser
         {
         public:
-            WriteMemoryBlocksRequestParser();
             void init(const Request* request, bool masked_write);
             void next(MemoryBlock* memblock);
             inline bool finished() { return m_finished; };
@@ -88,7 +86,6 @@ namespace scrutiny
         class WriteMemoryBlocksResponseEncoder
         {
         public:
-            WriteMemoryBlocksResponseEncoder();
             void init(Response* response, uint32_t max_size);
             void write(MemoryBlock* memblock);
             inline bool overflow() { return m_overflow; };
@@ -105,7 +102,6 @@ namespace scrutiny
         class GetRPVDefinitionResponseEncoder
         {
         public:
-            GetRPVDefinitionResponseEncoder();
             void init(Response* response, const uint32_t max_size);
             void write(const RuntimePublishedValue* rpv);
             inline bool overflow() { return m_overflow; };
@@ -122,7 +118,6 @@ namespace scrutiny
         class ReadRPVResponseEncoder
         {
         public:
-            ReadRPVResponseEncoder();
             void init(Response* response, const uint32_t max_size);
             void write(const RuntimePublishedValue* rpv, AnyType v);
             inline bool overflow() { return m_overflow; };
@@ -140,7 +135,6 @@ namespace scrutiny
         class ReadRPVRequestParser
         {
         public:
-            ReadRPVRequestParser();
             void init(const Request* request);
             bool next(uint16_t* id);
             inline bool finished() { return m_finished; };
@@ -160,7 +154,6 @@ namespace scrutiny
         class WriteRPVResponseEncoder
         {
         public:
-            WriteRPVResponseEncoder();
             void init(Response* response, const uint32_t max_size);
             void write(const RuntimePublishedValue* rpv);
             inline bool overflow() { return m_overflow; };
@@ -178,7 +171,6 @@ namespace scrutiny
         class WriteRPVRequestParser
         {
         public:
-            WriteRPVRequestParser();
             void init(const Request* request, MainHandler* main_handler);
             bool next(RuntimePublishedValue* rpv, AnyType *v);
             inline bool finished() { return m_finished; };
@@ -225,8 +217,8 @@ namespace scrutiny
                 {
                     uint8_t region_type;
                     uint8_t region_index;
-                    uint64_t start;
-                    uint64_t end;
+                    uintptr_t start;
+                    uintptr_t end;
                 };
 
                 struct GetRPVCount
@@ -348,15 +340,22 @@ namespace scrutiny
             WriteRPVResponseEncoder* encode_response_memory_control_write_rpv(Response* response, const uint32_t max_size);
 
         protected:
-            ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
-            ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
-            WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
-            WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
-            GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;
-            ReadRPVRequestParser m_memory_control_read_rpv_parser;
-            ReadRPVResponseEncoder m_read_rpv_response_encoder;
-            WriteRPVRequestParser m_memory_control_write_rpv_parser;
-            WriteRPVResponseEncoder m_write_rpv_response_encoder;
+            union
+            {
+                ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
+                WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
+                ReadRPVRequestParser m_memory_control_read_rpv_parser;
+                WriteRPVRequestParser m_memory_control_write_rpv_parser;
+            } parsers;
+
+            union
+            {
+                ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
+                WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
+                GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;
+                ReadRPVResponseEncoder m_read_rpv_response_encoder;
+                WriteRPVResponseEncoder m_write_rpv_response_encoder;
+            } encoders;
         };
     }
 }

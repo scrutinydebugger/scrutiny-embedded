@@ -75,14 +75,17 @@ void init_all_values()
     mainfunc1(123);
 }
 
+static uint8_t scrutiny_rx_buffer[128];
+static uint8_t scrutiny_tx_buffer[256];
 
 void process_scrutiny_lib(AbstractCommChannel* channel)
 {
     uint8_t buffer[1024];
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
+    config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.max_bitrate = 100000;
-    config.set_display_name("TestApp Executable");
+    config.display_name = "TestApp Executable";
     config.prng_seed = 0xdeadbeef;
     scrutiny_handler.init(&config);
     

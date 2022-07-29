@@ -12,6 +12,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
+#define TX_BUFFER_SIZE 128
 
 class TestUserCommand : public ScrutinyTest
 {
@@ -19,6 +20,14 @@ protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
+
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[TX_BUFFER_SIZE];
+
+    virtual void SetUp()
+    {
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
+    }
 };
 
 
@@ -30,7 +39,7 @@ void my_callback1(const uint8_t subfunction, const uint8_t* request_data, const 
     EXPECT_EQ(request_data[1], 0x34);
     EXPECT_EQ(request_data[2], 0x56);
 
-    EXPECT_EQ(response_max_data_length, SCRUTINY_TX_BUFFER_SIZE);
+    EXPECT_EQ(response_max_data_length, TX_BUFFER_SIZE);
 
     response_data[0] = 0x11;
     response_data[1] = 0x22;

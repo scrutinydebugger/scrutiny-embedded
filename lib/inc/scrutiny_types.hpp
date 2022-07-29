@@ -11,6 +11,11 @@
 
 namespace scrutiny 
 {
+    struct AddressRange
+    {
+        void* start;
+        void* end;
+    };
 
 	typedef unsigned int loop_id_t;
 

@@ -15,58 +15,55 @@
 
 namespace scrutiny
 {
-    struct AddressRange
-    {
-        uint64_t start;
-        uint64_t end;
-        bool set;
-    };
-    
+    class MainHandler;
 
     class Config
     {
     public:
+        friend class MainHandler;
 
         Config();
-        bool add_forbidden_address_range(const uint64_t start, const uint64_t end);
-        bool add_readonly_address_range(const uint64_t start, const uint64_t end);
-        bool add_forbidden_address_range(void* start, void* end);
-        bool add_readonly_address_range(void* start, void* end);
-        void set_display_name(const char* name);
-        void copy_from(const Config* src);
-        void set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb=nullptr, RpvWriteCallback wr_cb=nullptr);
-        bool read_published_values_configured();
-        bool write_published_values_configured();
         void clear();
-
-        inline AddressRange* forbidden_ranges() { return m_forbidden_address_ranges; }
-        inline AddressRange* readonly_ranges() { return m_readonly_address_ranges; }
-        inline uint8_t forbidden_ranges_count() const { return m_forbidden_range_count ; }
-        inline uint8_t readonly_ranges_count() const { return m_readonly_range_count ; }
-        inline uint32_t forbidden_ranges_max() const { return SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; }
-        inline uint32_t readonly_ranges_max() const { return SCRUTINY_READONLY_ADDRESS_RANGE_COUNT; }
+        
+        void set_buffers(uint8_t* rx_buffer, const uint16_t rx_buffer_size, uint8_t* tx_buffer, const uint16_t tx_buffer_size);
+        void set_forbidden_address_range(const AddressRange* range, const uint8_t count);
+        void set_readonly_address_range(const AddressRange* range, const uint8_t count);
+        void set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb=nullptr, RpvWriteCallback wr_cb=nullptr);
+    
         inline bool is_user_command_callback_set() { return user_command_callback != nullptr; }
-        inline uint16_t get_rpv_count() const {return m_rpv_count;}
+        inline bool is_buffer_set() {return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr);}
+        inline bool is_forbidden_address_range_set() {return m_forbidden_address_ranges != nullptr;}
+        inline bool is_readonly_address_range_set() {return m_readonly_address_ranges != nullptr;}
+        inline bool is_read_published_values_configured() { return (m_rpv_read_callback != nullptr &&  m_rpvs != nullptr && m_rpv_count > 0);};
+        inline bool is_write_published_values_configured() { return (m_rpv_write_callback != nullptr &&  m_rpvs != nullptr && m_rpv_count > 0);};
+
+        inline const AddressRange* forbidden_ranges() { return m_forbidden_address_ranges; }
+        inline uint8_t forbidden_ranges_count() const { return m_forbidden_range_count ; }
+        inline const AddressRange* readonly_ranges() { return m_readonly_address_ranges; }
+        inline uint8_t readonly_ranges_count() const { return m_readonly_range_count ; }
         inline const RuntimePublishedValue* get_rpvs_array() const {return m_rpvs;}
-        inline const char* display_name() const {return m_display_name;}
+        inline uint16_t get_rpv_count() const {return m_rpv_count;}
         inline RpvReadCallback get_rpv_read_callback() { return m_rpv_read_callback; }
         inline RpvWriteCallback get_rpv_write_callback() { return m_rpv_write_callback; }
-        void set_display_name(char* name);
+
         uint32_t max_bitrate;
         user_command_callback_t user_command_callback;
         uint32_t prng_seed;
+        const char* display_name;
 
     private:
-        AddressRange m_forbidden_address_ranges[SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT];
-        AddressRange m_readonly_address_ranges[SCRUTINY_READONLY_ADDRESS_RANGE_COUNT];
+        uint8_t* m_rx_buffer;
+        uint16_t m_rx_buffer_size;
+        uint8_t* m_tx_buffer;
+        uint16_t m_tx_buffer_size;
+        const AddressRange* m_forbidden_address_ranges;
         uint8_t m_forbidden_range_count;
+        const AddressRange* m_readonly_address_ranges;
         uint8_t m_readonly_range_count;
-        char m_display_name[SCRUTINY_DISPLAY_NAME_MAX_SIZE];
-        uint16_t m_rpv_count;
         const RuntimePublishedValue *m_rpvs;
+        uint16_t m_rpv_count;
         RpvReadCallback m_rpv_read_callback;
         RpvWriteCallback m_rpv_write_callback;
-
     };
 }
 

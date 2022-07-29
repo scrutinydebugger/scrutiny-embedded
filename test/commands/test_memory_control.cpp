@@ -18,8 +18,12 @@ protected:
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
+
     virtual void SetUp()
     {
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         scrutiny_handler.init(&config);
         scrutiny_handler.comm()->connect();
     }
@@ -189,9 +193,9 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
     const scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
     const scrutiny::protocol::ResponseCode ok = scrutiny::protocol::ResponseCode::OK;
 
-    uint8_t tx_buffer[SCRUTINY_TX_BUFFER_SIZE * 2];
-    uint8_t some_buffer[SCRUTINY_TX_BUFFER_SIZE] = { 0 };
-    uint16_t buf1_size = SCRUTINY_TX_BUFFER_SIZE - (addr_size + 2) * 2 - 1;	// We fill all the buffer minus 1 byte.
+    uint8_t tx_buffer[sizeof(_rx_buffer) * 2];
+    uint8_t some_buffer[sizeof(_rx_buffer)] = { 0 };
+    uint16_t buf1_size = sizeof(_rx_buffer) - (addr_size + 2) * 2 - 1;	// We fill all the buffer minus 1 byte.
 
     // Building request
     uint8_t request_data[64] = { static_cast<uint8_t>(cmd), subfn, 0, (addr_size + 2) * 2 };
@@ -247,12 +251,15 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
 
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    scrutiny::Config new_config;
     // indices [6,7,8,9] are forbidden
     uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
     uint64_t end = start + 4;
-    new_config.add_forbidden_address_range(start, end);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start, end)
+    };
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     constexpr uint8_t datalen = sizeof(void*) + 2;
@@ -298,12 +305,16 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
 
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    scrutiny::Config new_config;
+
     // indices [6,7,8,9] are readonly
     uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
     uint64_t end = start + 4;
-    new_config.add_readonly_address_range(start, end);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange readonly_range[] = {
+        scrutiny::tools::make_address_range(start, end)
+    };
+    config.set_readonly_address_range(readonly_range, sizeof(readonly_range)/sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     constexpr uint8_t datalen = sizeof(void*) + 2;
@@ -635,12 +646,15 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
 
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    scrutiny::Config new_config;
     // indices [6,7,8,9] are forbidden
     uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
     uint64_t end = start + 4;
-    new_config.add_forbidden_address_range(start, end);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start, end)
+    };
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     constexpr uint16_t window_size = 4;
@@ -689,12 +703,15 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
 
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    scrutiny::Config new_config;
     // indices [6,7,8,9] are forbidden
     uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
     uint64_t end = start + 4;
-    new_config.add_readonly_address_range(start, end);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start, end)
+    };
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     constexpr uint16_t window_size = 4;
