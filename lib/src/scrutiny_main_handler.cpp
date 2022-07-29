@@ -52,6 +52,38 @@ namespace scrutiny
         }
     }
 
+    bool MainHandler::get_rpv(uint16_t id, RuntimePublishedValue* rpv)
+    {
+        const uint16_t rpv_count = m_config.get_rpv_count();
+        bool found = false;
+        for (uint16_t i=0; i<rpv_count; i++)
+        {
+            if(m_config.get_rpvs_array()[i].id == id)
+            {
+                found = true;
+                *rpv = m_config.get_rpvs_array()[i];
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    VariableType MainHandler::get_rpv_type(uint16_t id)
+    {
+        RuntimePublishedValue rpv;
+        const bool found = get_rpv(id, &rpv);
+
+        if (!found)
+        {
+            return VariableType::unknown;
+        }
+        else
+        {
+            return rpv.type;
+        }
+    }
+
 
     void MainHandler::process_request(const protocol::Request* request, protocol::Response* response)
     {
@@ -525,7 +557,7 @@ namespace scrutiny
                break;
            }
 
-           readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request, m_config.get_rpvs_array(), m_config.get_rpv_count() );
+           readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request );
            readrpv_encoder = m_codec.encode_response_memory_control_read_rpv(response, m_comm_handler.tx_buffer_size());
 
            if (!readrpv_parser->is_valid())
@@ -534,40 +566,55 @@ namespace scrutiny
                break;
            }
 
-           if (!readrpv_parser->all_known_rpv())
-           {
-               code = protocol::ResponseCode::FailureToProceed;
-               break;
-           }
-
-           if (readrpv_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
-           {
-               code = protocol::ResponseCode::Overflow;
-               break;
-           }
-
             RuntimePublishedValue rpv;
             scrutiny::AnyType v;
+            uint16_t id=0;
+            bool success = true;
+
             while (!readrpv_parser->finished())
             {
-                const bool ok_to_process = readrpv_parser->next(&rpv);
+                const bool ok_to_process = readrpv_parser->next(&id);
 
                 if (!readrpv_parser->is_valid())
                 {
+                    success = false;
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-                
+
                 if (ok_to_process)
                 {
-                    const bool success = m_config.get_rpv_read_callback()(rpv, &v);
-                    if (success)
+                    const bool rpv_found = get_rpv(id, &rpv);
+                    if (!rpv_found)
                     {
-                        readrpv_encoder->write(&rpv, v);
+                        success = false;
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+
+                    const bool callback_success = m_config.get_rpv_read_callback()(rpv, &v);
+                    if (!callback_success)
+                    {
+                        success = false;
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+
+                    readrpv_encoder->write(&rpv, v);
+
+                    if (readrpv_encoder->overflow())
+                    {
+                        success = false;
+                        code = protocol::ResponseCode::Overflow;
+                        break;
                     }
                 }
-           }
-           code = protocol::ResponseCode::OK;
+            }
+
+            if (success)
+            {
+                code = protocol::ResponseCode::OK;
+            }
 
            break;
         }
@@ -583,53 +630,60 @@ namespace scrutiny
                 break;
             }
 
-            writerpv_parser = m_codec.decode_request_memory_control_write_rpv(request, m_config.get_rpvs_array(), m_config.get_rpv_count() );
+            writerpv_parser = m_codec.decode_request_memory_control_write_rpv(request, this );
             writerpv_encoder = m_codec.encode_response_memory_control_write_rpv(response, m_comm_handler.tx_buffer_size());
 
             if (!writerpv_parser->is_valid())
-           {
-               code = protocol::ResponseCode::InvalidRequest;
-               break;
-           }
-
-           if (!writerpv_parser->all_known_rpv())
-           {
-               code = protocol::ResponseCode::FailureToProceed;
-               break;
-           }
-
-           if (writerpv_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
-           {
-               code = protocol::ResponseCode::Overflow;
-               break;
-           }
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
 
             RuntimePublishedValue rpv;
             scrutiny::AnyType v;
+            bool success = true;
             while (!writerpv_parser->finished())
             {
                 const bool ok_to_process = writerpv_parser->next(&rpv, &v);
 
                 if (!writerpv_parser->is_valid())
                 {
+                    success = false;
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
 
-                if (ok_to_process)
+                if (!ok_to_process)
                 {
-                    const bool success = m_config.get_rpv_write_callback()(rpv, &v);
-                    if (success)
-                    {
-                        writerpv_encoder->write(&rpv);
-                    }
+                    continue;
+                }
+
+                const bool write_success = m_config.get_rpv_write_callback()(rpv, &v);
+                if (!write_success)
+                {
+                    success = false;
+                    code = protocol::ResponseCode::FailureToProceed;
+                    break;
+                }
+
+                writerpv_encoder->write(&rpv);
+
+                if (writerpv_encoder->overflow())
+                {
+                    success = false;
+                    code = protocol::ResponseCode::Overflow;
+                    break;
                 }
             }
-            code = protocol::ResponseCode::OK;
+
+            if (success)
+            {
+                code = protocol::ResponseCode::OK;
+            }
+
             break;
         }
 
-        
             // =================================
         default:
             code = protocol::ResponseCode::UnsupportedFeature;
