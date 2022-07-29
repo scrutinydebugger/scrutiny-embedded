@@ -17,9 +17,12 @@ protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
 
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
+
     virtual void SetUp()
     {
-        comm.init(&tb);
+        comm.init(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer), &tb);
         comm.connect();
     }
 };
@@ -105,12 +108,12 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_Overflow)
 {
-    ASSERT_LT(SCRUTINY_RX_BUFFER_SIZE, 0xFFFFu - 1u);  // Lengths are 16bits maximum by protocol definition
+    ASSERT_LT(sizeof(_rx_buffer), 0xFFFFu - 1u);  // Lengths are 16bits maximum by protocol definition
 
-    uint16_t datalen = SCRUTINY_RX_BUFFER_SIZE + 1;
+    uint16_t datalen = sizeof(_rx_buffer) + 1;
 
-    uint8_t data[SCRUTINY_RX_BUFFER_SIZE + 8] = { 1,2, static_cast<uint8_t>((datalen >> 8) & 0xFF) , static_cast<uint8_t>(datalen & 0xFF) };
-    add_crc(data, SCRUTINY_RX_BUFFER_SIZE + 4);
+    uint8_t data[sizeof(_rx_buffer) + 8] = { 1,2, static_cast<uint8_t>((datalen >> 8) & 0xFF) , static_cast<uint8_t>(datalen & 0xFF) };
+    add_crc(data, sizeof(_rx_buffer) + 4);
 
     comm.receive_data(data, sizeof(data));
 

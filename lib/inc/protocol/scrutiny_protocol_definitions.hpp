@@ -26,6 +26,7 @@ namespace scrutiny
             uint8_t command_id;
             uint8_t subfunction_id;
             uint16_t data_length;
+            uint16_t data_max_length;
             uint8_t* data;
             uint32_t crc;
         };
@@ -44,6 +45,7 @@ namespace scrutiny
             uint8_t subfunction_id;
             uint8_t response_code;
             uint16_t data_length;
+            uint16_t data_max_length;
             uint8_t* data;
             uint32_t crc;
         };

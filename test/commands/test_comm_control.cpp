@@ -22,10 +22,15 @@ protected:
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
+
     virtual void SetUp()
     {
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         config.max_bitrate = 0x12345678;
-        config.set_display_name(DISPLAY_NAME);
+        config.display_name = DISPLAY_NAME;
+
         scrutiny_handler.init(&config);
     }
 };
@@ -167,10 +172,10 @@ TEST_F(TestCommControl, TestGetParams)
 
     uint8_t expected_response[9 + datalen] = { 0x82,3,0,0, datalen };
     uint8_t i = 5;
-    expected_response[i++] = (SCRUTINY_RX_BUFFER_SIZE >> 8) & 0xFF;
-    expected_response[i++] = (SCRUTINY_RX_BUFFER_SIZE) & 0xFF;
-    expected_response[i++] = (SCRUTINY_TX_BUFFER_SIZE >> 8) & 0xFF;
-    expected_response[i++] = (SCRUTINY_TX_BUFFER_SIZE) & 0xFF;
+    expected_response[i++] = (sizeof(_rx_buffer) >> 8) & 0xFF;
+    expected_response[i++] = (sizeof(_rx_buffer)) & 0xFF;
+    expected_response[i++] = (sizeof(_rx_buffer) >> 8) & 0xFF;
+    expected_response[i++] = (sizeof(_rx_buffer)) & 0xFF;
     expected_response[i++] = (config.max_bitrate >> 24) & 0xFF;
     expected_response[i++] = (config.max_bitrate >> 16) & 0xFF;
     expected_response[i++] = (config.max_bitrate >> 8) & 0xFF;

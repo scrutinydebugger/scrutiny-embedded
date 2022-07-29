@@ -17,13 +17,44 @@ namespace scrutiny
     {
         m_processing_request = false;
         m_disconnect_pending = false;
-        m_config.copy_from(config);
-        
-        m_comm_handler.init(&m_timebase, m_config.prng_seed);
+        m_config = *config;
+
+        m_comm_handler.init(
+            m_config.m_rx_buffer, m_config.m_rx_buffer_size,
+            m_config.m_tx_buffer, m_config.m_tx_buffer_size,
+            &m_timebase, m_config.prng_seed
+            );
+
+        check_config();
+        if (!m_enabled)
+        {
+            m_comm_handler.disable();
+        }
+    }
+
+    void MainHandler::check_config()
+    {
+        m_enabled = true;
+        if (m_config.m_rx_buffer == nullptr || m_config.m_rx_buffer_size < 32)
+        {
+            m_enabled = false;
+        }
+
+        if (m_config.m_tx_buffer == nullptr || m_config.m_tx_buffer_size < 32)
+        {
+            m_enabled = false;
+        }
     }
 
     void MainHandler::process(const uint32_t timestep_us)
     {
+        if (!m_enabled)
+        {
+            m_processing_request = false;
+            m_disconnect_pending = false;
+            m_comm_handler.reset();
+            return;
+        }
         m_timebase.step(timestep_us);
         m_comm_handler.process();
 
@@ -56,7 +87,7 @@ namespace scrutiny
     {
         const uint16_t rpv_count = m_config.get_rpv_count();
         bool found = false;
-        for (uint16_t i=0; i<rpv_count; i++)
+        for (uint16_t i=0; i<rpv_count; i++)    // if unset this count will be 0
         {
             if(m_config.get_rpvs_array()[i].id == id)
             {
@@ -199,37 +230,39 @@ namespace scrutiny
 
             if (static_cast<protocol::GetInfo::MemoryRegionType>(request_data.get_special_memory_region_location.region_type) == protocol::GetInfo::MemoryRegionType::ReadOnly)
             {
+                if (!m_config.is_readonly_address_range_set())
+                {
+                    code = protocol::ResponseCode::FailureToProceed;
+                    break;
+                }
+
                 if (request_data.get_special_memory_region_location.region_index >= m_config.readonly_ranges_count())
                 {
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
 
-                if (!m_config.readonly_ranges()[request_data.get_special_memory_region_location.region_index].set)
+                const uint8_t index = request_data.get_special_memory_region_location.region_index;
+                response_data.get_special_memory_region_location.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
+                response_data.get_special_memory_region_location.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
+            }
+            else if (static_cast<protocol::GetInfo::MemoryRegionType>(request_data.get_special_memory_region_location.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
+            {
+                if (!m_config.is_forbidden_address_range_set())
                 {
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
 
-                response_data.get_special_memory_region_location.start = m_config.readonly_ranges()[request_data.get_special_memory_region_location.region_index].start;
-                response_data.get_special_memory_region_location.end = m_config.readonly_ranges()[request_data.get_special_memory_region_location.region_index].end;
-            }
-            else if (static_cast<protocol::GetInfo::MemoryRegionType>(request_data.get_special_memory_region_location.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
-            {
                 if (request_data.get_special_memory_region_location.region_index >= m_config.forbidden_ranges_count())
                 {
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
 
-                if (!m_config.forbidden_ranges()[request_data.get_special_memory_region_location.region_index].set)
-                {
-                    code = protocol::ResponseCode::FailureToProceed;
-                    break;
-                }
-
-                response_data.get_special_memory_region_location.start = m_config.forbidden_ranges()[request_data.get_special_memory_region_location.region_index].start;
-                response_data.get_special_memory_region_location.end = m_config.forbidden_ranges()[request_data.get_special_memory_region_location.region_index].end;
+                const uint8_t index = request_data.get_special_memory_region_location.region_index;
+                response_data.get_special_memory_region_location.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
+                response_data.get_special_memory_region_location.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
             else
             {
@@ -328,7 +361,9 @@ namespace scrutiny
                 break;
 
             // Magic validation is done by the codec.
-            response_data.discover.display_name = m_config.display_name();
+            response_data.discover.display_name = m_config.display_name;
+            response_data.discover.display_name_length = strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH);
+
             code = m_codec.encode_response_comm_discover(response, &response_data.discover);
             break;
 
@@ -360,15 +395,13 @@ namespace scrutiny
 
             // =========== [GetParams] ==========
         case protocol::CommControl::Subfunction::GetParams:
-            response_data.get_params.data_tx_buffer_size = SCRUTINY_TX_BUFFER_SIZE;
-            response_data.get_params.data_rx_buffer_size = SCRUTINY_RX_BUFFER_SIZE;
+            response_data.get_params.data_tx_buffer_size = m_config.m_tx_buffer_size;
+            response_data.get_params.data_rx_buffer_size = m_config.m_rx_buffer_size;
             response_data.get_params.max_bitrate = m_config.max_bitrate;
             response_data.get_params.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
             response_data.get_params.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TMEOUT_US;
             response_data.get_params.address_size = sizeof(void*);
             code = m_codec.encode_response_comm_get_params(&response_data.get_params, response);
-
-            
             break;
 
             // =========== [Connect] ==========
@@ -551,7 +584,7 @@ namespace scrutiny
            protocol::ReadRPVRequestParser* readrpv_parser;
            protocol::ReadRPVResponseEncoder* readrpv_encoder;
 
-           if (!m_config.read_published_values_configured())
+           if (!m_config.is_read_published_values_configured())
            {
                code = protocol::ResponseCode::UnsupportedFeature;
                break;
@@ -624,7 +657,7 @@ namespace scrutiny
             protocol::WriteRPVRequestParser* writerpv_parser;
             protocol::WriteRPVResponseEncoder* writerpv_encoder;
 
-            if (!m_config.write_published_values_configured())
+            if (!m_config.is_write_published_values_configured())
             {
                 code = protocol::ResponseCode::UnsupportedFeature;
                 break;
@@ -696,26 +729,26 @@ namespace scrutiny
 
     bool MainHandler::touches_forbidden_region(const protocol::MemoryBlock* block)
     {
-        const uint64_t block_start = reinterpret_cast<uint64_t>(block->start_address);
-        const uint64_t block_end = block_start + block->length;
-        for (unsigned int i = 0; i < m_config.forbidden_ranges_max(); i++)
+        if (!m_config.is_forbidden_address_range_set())
+        {
+            return false;
+        }
+
+        const uintptr_t block_start = reinterpret_cast<uintptr_t>(block->start_address);
+        const uintptr_t block_end = block_start + block->length;
+
+        for (unsigned int i = 0; i < m_config.forbidden_ranges_count(); i++)
         {
             const AddressRange& range = m_config.forbidden_ranges()[i];
-            if (range.set)	// We make assumption here that ranges are assigned squentially, which is the case
-            {
-                if (block_start >= range.start && block_start <= range.end)
-                {
-                    return true;
-                }
 
-                if (block_end >= range.start && block_end <= range.end)
-                {
-                    return true;
-                }
-            }
-            else
+            if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
-                break;
+                return true;
+            }
+
+            if (block_end >= reinterpret_cast<uintptr_t>(range.start) && block_end <= reinterpret_cast<uintptr_t>(range.end))
+            {
+                return true;
             }
         }
         return false;
@@ -723,26 +756,25 @@ namespace scrutiny
 
     bool MainHandler::touches_readonly_region(const protocol::MemoryBlock* block)
     {
-        const uint64_t block_start = reinterpret_cast<uint64_t>(block->start_address);
-        const uint64_t block_end = block_start + block->length;
-        for (unsigned int i = 0; i < m_config.readonly_ranges_max(); i++)
+        if (!m_config.is_readonly_address_range_set())
+        {
+            return false;
+        }
+
+        const uintptr_t block_start = reinterpret_cast<uintptr_t>(block->start_address);
+        const uintptr_t block_end = block_start + block->length;
+        for (unsigned int i = 0; i < m_config.readonly_ranges_count(); i++)
         {
             const AddressRange& range = m_config.readonly_ranges()[i];
-            if (range.set)	// We make assumption here that ranges are assigned squentially, which is the case
-            {
-                if (block_start >= range.start && block_start <= range.end)
-                {
-                    return true;
-                }
 
-                if (block_end >= range.start && block_end <= range.end)
-                {
-                    return true;
-                }
-            }
-            else
+            if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
-                break;
+                return true;
+            }
+
+            if (block_end >= reinterpret_cast<uintptr_t>(range.start) && block_end <= reinterpret_cast<uintptr_t>(range.end))
+            {
+                return true;
             }
         }
         return false;
@@ -774,17 +806,4 @@ namespace scrutiny
 
         return code;
     }
-
-
-    /*
-    loop_id_t MainHandler::add_loop(LoopHandler* loop)
-    {
-        return 0;
-    }
-
-    void MainHandler::process_loop(loop_id_t loop)
-    {
-
-    }
-    */
 }

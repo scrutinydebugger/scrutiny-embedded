@@ -14,10 +14,23 @@
 
 #include "scrutiny_types.hpp"
 
+#include <stdint.h>
+
 namespace scrutiny
 {
     namespace tools
     {
+        inline AddressRange make_address_range(uintptr_t start, uintptr_t end)
+        {
+            return {reinterpret_cast<void*>(start), reinterpret_cast<void*>(end)};
+        }
+
+        inline AddressRange make_address_range(void* start, void* end)
+        {
+            return {start, end};
+        }
+
+
         inline uint8_t get_type_size(VariableType v)
         {
             if (v == VariableType::unknown)
