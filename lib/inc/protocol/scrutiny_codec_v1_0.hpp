@@ -16,6 +16,8 @@
 
 namespace scrutiny
 {
+    class MainHandler;
+
     namespace protocol
     {
         const unsigned int REQUEST_OVERHEAD = 8;
@@ -83,7 +85,6 @@ namespace scrutiny
             bool m_masked_write;
         };
 
-
         class WriteMemoryBlocksResponseEncoder
         {
         public:
@@ -100,7 +101,6 @@ namespace scrutiny
             uint32_t m_size_limit;
             bool m_overflow;
         };
-
 
         class GetRPVDefinitionResponseEncoder
         {
@@ -137,17 +137,14 @@ namespace scrutiny
             bool m_unsupported_type;
         };
 
-
         class ReadRPVRequestParser
         {
         public:
             ReadRPVRequestParser();
-            void init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len);
-            bool next(RuntimePublishedValue* rpv);
+            void init(const Request* request);
+            bool next(uint16_t* id);
             inline bool finished() { return m_finished; };
             inline bool is_valid() { return !m_invalid; };
-            inline bool all_known_rpv() { return !m_not_found; };
-            inline uint32_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
             void reset();
 
         protected:
@@ -156,13 +153,8 @@ namespace scrutiny
             uint8_t* m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
-            uint32_t m_required_tx_buffer_size;
             bool m_finished;
-            bool m_unsupported_type;
             bool m_invalid;
-            bool m_not_found;
-            const RuntimePublishedValue *m_rpvs;
-            uint16_t m_rpv_table_len;
         };
 
         class WriteRPVResponseEncoder
@@ -187,12 +179,10 @@ namespace scrutiny
         {
         public:
             WriteRPVRequestParser();
-            void init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len);
-            bool next(RuntimePublishedValue* rpv, AnyType* v);
+            void init(const Request* request, MainHandler* main_handler);
+            bool next(RuntimePublishedValue* rpv, AnyType *v);
             inline bool finished() { return m_finished; };
             inline bool is_valid() { return !m_invalid; };
-            inline bool all_known_rpv() { return !m_not_found; };
-            inline uint32_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
             void reset();
 
         protected:
@@ -201,12 +191,9 @@ namespace scrutiny
             uint8_t* m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
-            uint32_t m_required_tx_buffer_size;
             bool m_finished;
             bool m_invalid;
-            bool m_not_found;
-            const RuntimePublishedValue *m_rpvs;
-            uint16_t m_rpv_table_len;
+            MainHandler* m_main_handler;
         };
         
 
@@ -354,10 +341,10 @@ namespace scrutiny
             WriteMemoryBlocksResponseEncoder* encode_response_memory_control_write(Response* response, uint32_t max_size);
 
             GetRPVDefinitionResponseEncoder* encode_response_get_rpv_definition(Response* response, uint32_t max_size);
-            ReadRPVRequestParser* decode_request_memory_control_read_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t rpv_len);
+            ReadRPVRequestParser* decode_request_memory_control_read_rpv(const Request* request);
             ReadRPVResponseEncoder* encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size);
 
-            WriteRPVRequestParser* decode_request_memory_control_write_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t rpv_len);
+            WriteRPVRequestParser* decode_request_memory_control_write_rpv(const Request* request, MainHandler *main_handler);
             WriteRPVResponseEncoder* encode_response_memory_control_write_rpv(Response* response, const uint32_t max_size);
 
         protected:
