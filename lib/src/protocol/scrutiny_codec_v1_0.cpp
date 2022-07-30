@@ -7,6 +7,7 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <string.h>	
+#include <stdint.h>
 
 
 #include "scrutiny_setup.hpp"
@@ -17,6 +18,7 @@
 #include "protocol/scrutiny_codec_v1_0.hpp"
 #include "protocol/scrutiny_protocol_tools.hpp"
 
+
 #if defined(_MSC_VER)
 #pragma warning(disable:4127)   // Get rid of constexpr always true condition warning.
 #endif 
@@ -25,7 +27,6 @@ namespace scrutiny
 {
     namespace protocol
     {
-
         //==============================================================
 
         void ReadMemoryBlocksRequestParser::init(const Request* request)
@@ -67,7 +68,7 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void*);
             uint16_t length;
-            uint64_t addr;
+            uintptr_t addr;
             if (m_finished || m_invalid)
             {
                 return;

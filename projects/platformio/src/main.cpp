@@ -10,6 +10,9 @@ scrutiny::MainHandler scrutiny_handler;
 
 volatile uint32_t last_call_us = 0;
 
+uint8_t scrutiny_rx_buffer[32];
+uint8_t scrutiny_tx_buffer[48];
+
 void setup()
 {
 #define OLED_DC 9
@@ -23,8 +26,10 @@ void setup()
     printf("Console rdy\n");
 
     scrutiny::Config config;
+    config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.max_bitrate = 100000;
-    config.set_display_name("Arduino");
+    config.display_name="Arduino";
+
     scrutiny_handler.init(&config);
     printf("Scrutiny rdy\n");
 

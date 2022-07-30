@@ -252,8 +252,8 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
-    uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
     scrutiny::AddressRange forbidden_ranges[] = {
         scrutiny::tools::make_address_range(start, end)
     };
@@ -307,8 +307,8 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 
     // indices [6,7,8,9] are readonly
-    uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
     scrutiny::AddressRange readonly_range[] = {
         scrutiny::tools::make_address_range(start, end)
     };
@@ -647,8 +647,8 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
-    uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
     scrutiny::AddressRange forbidden_ranges[] = {
         scrutiny::tools::make_address_range(start, end)
     };
@@ -704,8 +704,8 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     uint8_t tx_buffer[32];
     uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
-    uint64_t start = reinterpret_cast<uint64_t>(buf) + 6;
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
     scrutiny::AddressRange forbidden_ranges[] = {
         scrutiny::tools::make_address_range(start, end)
     };

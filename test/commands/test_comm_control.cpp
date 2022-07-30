@@ -47,7 +47,7 @@ TEST_F(TestCommControl, TestDiscover)
 
     uint8_t tx_buffer[64];
     //proto_maj, proto_min, magic, name_len, name
-    uint8_t expected_response[9 + 2+32+1+ DISPLAY_NAME_LENGTH] = { 0x82,1,0,0,2+32+1+ DISPLAY_NAME_LENGTH };   // Version 1.0
+    uint8_t expected_response[9 + 2+sizeof(scrutiny::software_id)+1+ DISPLAY_NAME_LENGTH] = { 0x82,1,0,0,2+sizeof(scrutiny::software_id)+1+ DISPLAY_NAME_LENGTH };   // Version 1.0
 
     uint16_t index = 5;
     expected_response[index++] = 1;

@@ -50,6 +50,7 @@ namespace scrutiny
         user_command_callback_t user_command_callback;
         uint32_t prng_seed;
         const char* display_name;
+        bool memory_write_enable;
 
     private:
         uint8_t* m_rx_buffer;

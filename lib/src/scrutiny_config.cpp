@@ -33,6 +33,7 @@ namespace scrutiny
         max_bitrate = 0;
         user_command_callback= nullptr;
         prng_seed = 0;
+        memory_write_enable =true;
     }
 
     void Config::set_buffers(uint8_t* rx_buffer, const uint16_t rx_buffer_size, uint8_t* tx_buffer, const uint16_t tx_buffer_size)

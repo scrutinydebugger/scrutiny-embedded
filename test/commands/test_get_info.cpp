@@ -206,8 +206,8 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     uint8_t tx_buffer[32];
     uint8_t* buf[4];
 
-    uint64_t start = reinterpret_cast<uint64_t>(buf);
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf);
+    uintptr_t end = start + 4;
     scrutiny::AddressRange readonly_ranges[] = {
         scrutiny::tools::make_address_range(start, end),
         scrutiny::tools::make_address_range(start+1, end+1)

@@ -116,7 +116,6 @@ namespace scrutiny
             uint32_t m_nbytes_sent;
             TxError m_tx_error;
             
-        
         private:
             static uint32_t s_session_counter;
         };

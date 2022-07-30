@@ -23,6 +23,8 @@ namespace scrutiny
         const unsigned int REQUEST_OVERHEAD = 8;
         const unsigned int RESPONSE_OVERHEAD = 9;
         const unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
+        const unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
+        const unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
 
         class ReadMemoryBlocksRequestParser
         {
