@@ -13,6 +13,7 @@
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_tools.hpp"
 #include "scrutiny_types.hpp"
+#include "scrutiny_main_handler.hpp"
 #include "protocol/scrutiny_codec_v1_0.hpp"
 #include "protocol/scrutiny_protocol_tools.hpp"
 
@@ -485,23 +486,16 @@ namespace scrutiny
             m_buffer(nullptr),
             m_bytes_read(0),
             m_request_len(0),
-            m_required_tx_buffer_size(0),
             m_finished(false),
-            m_invalid(false),
-            m_not_found(false),
-            m_rpvs(nullptr),
-            m_rpv_table_len(0)
+            m_invalid(false)
         {
 
         }
 
-        void ReadRPVRequestParser::init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len)
+        void ReadRPVRequestParser::init(const Request* request)
         {
             m_buffer = request->data;
             m_request_len = request->data_length;
-            m_rpv_table_len = len;
-            m_rpvs = rpvs;
-            m_not_found = false;
             reset();
             validate();
         }
@@ -514,70 +508,30 @@ namespace scrutiny
                 m_invalid = true;
                 return;
             }
-            
-            for (uint16_t i=0; i < m_request_len; i+=2)
-            {
-                uint16_t id = decode_16_bits_big_endian(&m_buffer[i]);
-                bool found= false;
-                for (uint16_t j=0; j<m_rpv_table_len; j++)
-                {
-                    if (m_rpvs[j].id == id)
-                    {
-                        const uint8_t typesize = scrutiny::tools::get_type_size(m_rpvs[j].type);
-                        if (typesize == 1 || typesize == 2 || typesize == 4 || typesize== 8)
-                        {
-                            m_required_tx_buffer_size += 2 + typesize;    // Must be skipped otheriwse
-                        }
-                        // Impossible to burst a 32bits with a 16bits request buffer len
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    m_not_found = true;
-                    break;
-                }
-            }
         }
 
-        bool ReadRPVRequestParser::next(RuntimePublishedValue* rpv)
+        bool ReadRPVRequestParser::next(uint16_t* id)
         {
             if (m_finished || m_invalid)
             {
                 return false;
             }
-
-            uint16_t id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
-            m_bytes_read += 2;
-            bool found = false;
-            for (uint16_t i=0; i<m_rpv_table_len; i++)
+            
+            if (m_bytes_read + 2 > m_request_len)
             {
-                if (m_rpvs[i].id == id)
-                {
-                    *rpv = m_rpvs[i];
-                    found = true;
-                    break;
-                }
+                m_invalid = true;
+                return false;
             }
 
-            if (!found)
-            {
-                m_finished = true;
-                m_not_found = true;
-            }
+            *id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            m_bytes_read+=2;
 
             if (m_bytes_read == m_request_len)
             {
                 m_finished = true;
             }
-            else if (m_bytes_read > m_request_len)
-            {
-                m_finished = true;
-                m_invalid = true;
-            }
 
-            return found;
+            return !m_invalid;
         }
 
         void ReadRPVRequestParser::reset()
@@ -585,8 +539,6 @@ namespace scrutiny
             m_bytes_read = 0;
             m_invalid = false;
             m_finished = false;
-            m_required_tx_buffer_size = 0;
-            m_not_found = false;
         }
 
         // ==================================
@@ -595,69 +547,25 @@ namespace scrutiny
             m_buffer(nullptr),
             m_bytes_read(0),
             m_request_len(0),
-            m_required_tx_buffer_size(0),
             m_finished(false),
             m_invalid(false),
-            m_not_found(false),
-            m_rpvs(nullptr),
-            m_rpv_table_len(0)
+            m_main_handler(nullptr)
         {
 
         }
 
-        void WriteRPVRequestParser::init(const Request* request, const RuntimePublishedValue *rpvs, const uint16_t len)
+        void WriteRPVRequestParser::init(const Request* request, MainHandler* main_handler)
         {
             m_buffer = request->data;
             m_request_len = request->data_length;
-            m_rpv_table_len = len;
-            m_rpvs = rpvs;
-            m_not_found = false;
+            m_main_handler = main_handler;
             reset();
             validate();
         }
 
         void WriteRPVRequestParser::validate()
         {
-            uint32_t cursor=0;
-            uint8_t typesize=0;
-            uint16_t id;
-            bool found;
-            while (cursor < m_request_len)
-            {
-                if (cursor +2 > m_request_len)
-                {
-                    m_invalid = true;
-                    break;
-                }
-
-                id = decode_16_bits_big_endian(&m_buffer[cursor]);
-                cursor += 2;
-                found = false;
-                for (uint16_t i=0; i<m_rpv_table_len; i++)
-                {
-                    if (m_rpvs[i].id == id)
-                    {
-                        typesize = tools::get_type_size(m_rpvs[i].type);
-                        found = true;
-                        m_required_tx_buffer_size += 3; // id (2) + len (1)
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    m_not_found = true;
-                    break;
-                }
-
-                // We don't validate if the type is supported. it will be silently skipped by encoder.
-                cursor += typesize;
-                if (cursor > m_request_len)
-                {
-                    m_invalid = true;
-                    break;
-                }
-            }
+            // Do nothing. invalidity will be discovered while parsing.
         }
 
         bool WriteRPVRequestParser::next(RuntimePublishedValue* rpv, AnyType *v)
@@ -677,27 +585,24 @@ namespace scrutiny
 
             const uint16_t id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
-            bool found = false;
-            for (uint16_t i=0; i<m_rpv_table_len; i++)
-            {
-                if (m_rpvs[i].id == id)
-                {
-                    *rpv = m_rpvs[i];   // Default copy
-                    found = true;
-                    break;
-                }
-            }
-
+            
+            const bool found = m_main_handler->get_rpv(id, rpv);
+            
             // Impossible to know the meaning of the rest of the payload. We need to stop all; 
             if (!found)
             {
-                m_not_found = true;
                 m_invalid = true;
                 return false;
             }
-            
 
             const uint8_t typesize = tools::get_type_size(rpv->type);
+
+            if (m_bytes_read + typesize > m_request_len)
+            {
+                m_invalid = true;
+                return false;
+            }
+
             ok_to_process = true;
             switch (typesize)
             {
@@ -718,16 +623,12 @@ namespace scrutiny
                     break;
             }
 
-            m_bytes_read += typesize;
+            // We don't flag error on unsupported types. We skip them
+            m_bytes_read += typesize;  
 
             if (m_bytes_read == m_request_len)
             {
                 m_finished = true;
-            }
-            else if (m_bytes_read > m_request_len)
-            {
-                m_finished = true;
-                m_invalid = true;
             }
 
             return ok_to_process;
@@ -738,8 +639,6 @@ namespace scrutiny
             m_bytes_read = 0;
             m_invalid = false;
             m_finished = false;
-            m_required_tx_buffer_size = 0;
-            m_not_found = false;
         }
 
         //==============================================================
@@ -1077,9 +976,9 @@ namespace scrutiny
             return &m_read_rpv_response_encoder;
         }
 
-        ReadRPVRequestParser* CodecV1_0::decode_request_memory_control_read_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t len)
+        ReadRPVRequestParser* CodecV1_0::decode_request_memory_control_read_rpv(const Request* request)
         {
-            m_memory_control_read_rpv_parser.init(request, rpvs, len);
+            m_memory_control_read_rpv_parser.init(request);
             return &m_memory_control_read_rpv_parser;
         }
 
@@ -1090,9 +989,9 @@ namespace scrutiny
             return &m_write_rpv_response_encoder;
         }
 
-        WriteRPVRequestParser* CodecV1_0::decode_request_memory_control_write_rpv(const Request* request, const RuntimePublishedValue* rpvs, const uint16_t len)
+        WriteRPVRequestParser* CodecV1_0::decode_request_memory_control_write_rpv(const Request* request, MainHandler* main_handler)
         {
-            m_memory_control_write_rpv_parser.init(request, rpvs, len);
+            m_memory_control_write_rpv_parser.init(request, main_handler);
             return &m_memory_control_write_rpv_parser;
         }
     }

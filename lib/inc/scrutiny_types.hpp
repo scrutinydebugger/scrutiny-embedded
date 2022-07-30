@@ -62,7 +62,8 @@ namespace scrutiny
         cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64),
         cfloat128 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_128),
         cfloat256 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_256),
-        boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8)
+        boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8),
+        unknown = 0xFF
     };
 
     union AnyType

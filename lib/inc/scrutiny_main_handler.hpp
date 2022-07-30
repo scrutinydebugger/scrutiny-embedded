@@ -26,6 +26,8 @@ namespace scrutiny
         void init(Config* config);
         //void process_loop(loop_id_t loop);
         //loop_id_t add_loop(LoopHandler* loop);
+        bool get_rpv(uint16_t id, RuntimePublishedValue* rpv);
+        VariableType get_rpv_type(uint16_t id);
 
         void process(const uint32_t timestep_us);
 
