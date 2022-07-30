@@ -2,8 +2,9 @@ if not exist build mkdir build
 
 cmake ^
     -DCMAKE_BUILD_TYPE=Release^
-    -DBUILD_TESTAPP=ON^
-    -DBUILD_TEST=ON^
+    -DSCRUTINY_BUILD_TESTAPP=ON^
+    -DSCRUTINY_BUILD_TEST=ON^
+    -DSCRUTINY_WERR=OFF^
     -Wno-dev^
     -S . -B build || goto ERROR
 

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
+option(SCRUTINY_WERR "Converts all warning to error" OFF)
+
 project(scrutiny-embedded)
 add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_main_handler.cpp
@@ -17,3 +19,13 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/inc/
     )
+
+if (MSVC)
+    if(SCRUTINY_WERR)
+        target_compile_options(${PROJECT_NAME} PRIVATE /WX)
+    endif()
+else()
+    if(SCRUTINY_WERR)
+        target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
+    endif()
+endif()
