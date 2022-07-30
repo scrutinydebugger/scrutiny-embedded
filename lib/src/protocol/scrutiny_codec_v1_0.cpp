@@ -9,7 +9,6 @@
 #include <string.h>	
 #include <stdint.h>
 
-
 #include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_tools.hpp"
@@ -156,7 +155,7 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void*);
             uint16_t length;
-            uint64_t addr;
+            uintptr_t addr;
             if (m_finished || m_invalid)
             {
                 return;
@@ -628,17 +627,14 @@ namespace scrutiny
             }
 
             response->data[0] = 0x00;
-            if (response_data->memory_read)
-                response->data[0] |= 0x80;
-            
             if (response_data->memory_write)
-                response->data[0] |= 0x40;
+                response->data[0] |= 0x80;
 
             if (response_data->datalog_acquire)
-                response->data[0] |= 0x20;
+                response->data[0] |= 0x40;
 
             if (response_data->user_command)
-                response->data[0] |= 0x10;
+                response->data[0] |= 0x20;
             
             response->data_length = 1;
             return ResponseCode::OK;
