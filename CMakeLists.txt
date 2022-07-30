@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-option(SCRUTINY_BUILD_TEST "Activate test suite" ON)
+option(SCRUTINY_BUILD_TEST "Activate test suite" OFF)
 
 add_subdirectory(lib)
 add_subdirectory(projects)
