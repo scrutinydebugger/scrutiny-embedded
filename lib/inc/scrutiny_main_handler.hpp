@@ -24,8 +24,6 @@ namespace scrutiny
 
     public:
         void init(Config* config);
-        //void process_loop(loop_id_t loop);
-        //loop_id_t add_loop(LoopHandler* loop);
         bool get_rpv(uint16_t id, RuntimePublishedValue* rpv);
         VariableType get_rpv_type(uint16_t id);
 
@@ -48,13 +46,14 @@ namespace scrutiny
 
         bool touches_forbidden_region(const protocol::MemoryBlock* block);
         bool touches_readonly_region(const protocol::MemoryBlock* block);
+        void check_config();
 
-        //LoopHandler* m_loop_handlers[SCRUTINY_MAX_LOOP];
         Timebase m_timebase;
         protocol::CommHandler m_comm_handler;
         bool m_processing_request;
         bool m_disconnect_pending;
         Config m_config;
+        bool m_enabled;
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1,0)
         protocol::CodecV1_0 m_codec;
 #endif

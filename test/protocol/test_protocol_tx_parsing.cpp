@@ -19,10 +19,13 @@ protected:
     scrutiny::protocol::CommHandler comm;
     uint8_t response_buffer[256];
     scrutiny::protocol::Response response;
+    
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
 
     virtual void SetUp()
     {
-        comm.init(&tb);
+        comm.init(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer), &tb);
         response.data = response_buffer;
         comm.connect();
     }

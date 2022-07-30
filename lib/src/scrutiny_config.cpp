@@ -1,4 +1,4 @@
-//    scrutiny_config.cpp
+    //    scrutiny_config.cpp
 //        Implementation of the run-time Scrutiny configuration
 //
 //   - License : MIT - See LICENSE file.
@@ -17,105 +17,43 @@ namespace scrutiny
         clear();
     }
 
-
-    void Config::copy_from(const Config* src)
-    {
-        clear();
-        max_bitrate = src->max_bitrate;
-        user_command_callback = src->user_command_callback;
-        set_display_name(src->m_display_name);
-        prng_seed = src->prng_seed;
-        m_rpv_count = src->m_rpv_count;
-        m_rpvs = src->m_rpvs;
-        m_rpv_read_callback = src->m_rpv_read_callback;
-        m_rpv_write_callback = src->m_rpv_write_callback;
-
-        for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
-        {
-            if (src->m_forbidden_address_ranges[i].set)
-            {
-                add_forbidden_address_range(src->m_forbidden_address_ranges[i].start, src->m_forbidden_address_ranges[i].end);
-            }
-        }
-
-        for (uint32_t i = 0; i < SCRUTINY_READONLY_ADDRESS_RANGE_COUNT; i++)
-        {
-            if (src->m_readonly_address_ranges[i].set)
-            {
-                add_readonly_address_range(src->m_readonly_address_ranges[i].start, src->m_readonly_address_ranges[i].end);
-            }
-        }
-    }
-
     void Config::clear()
     {
-        max_bitrate = 0;
-        m_rpv_count = 0;
+        m_tx_buffer = nullptr;
+        m_rx_buffer = nullptr;
+        m_forbidden_address_ranges = nullptr;
+        m_forbidden_range_count = 0;
+        m_readonly_address_ranges = nullptr;
+        m_readonly_range_count = 0;
         m_rpvs = nullptr;
+        m_rpv_count = 0;
         m_rpv_read_callback = nullptr;
         m_rpv_write_callback = nullptr;
-
-        for (uint32_t i = 0; i < SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT; i++)
-        {
-            m_forbidden_address_ranges[i].set = false;
-        }
-
-        for (uint32_t i = 0; i < SCRUTINY_READONLY_ADDRESS_RANGE_COUNT; i++)
-        {
-            m_readonly_address_ranges[i].set = false;
-        }
-
-        m_forbidden_range_count = 0;
-        m_readonly_range_count = 0;
-        user_command_callback = nullptr;
-        for (uint16_t i=0; i<SCRUTINY_DISPLAY_NAME_MAX_SIZE; i++)
-        {
-            m_display_name[i] = '\0';
-        }
+        display_name = "";
+        max_bitrate = 0;
+        user_command_callback= nullptr;
         prng_seed = 0;
+        memory_write_enable =true;
     }
 
-    bool Config::add_forbidden_address_range(void* start, void* end)
+    void Config::set_buffers(uint8_t* rx_buffer, const uint16_t rx_buffer_size, uint8_t* tx_buffer, const uint16_t tx_buffer_size)
     {
-        return add_forbidden_address_range(reinterpret_cast<uint64_t>(start), reinterpret_cast<uint64_t>(end));
+        m_rx_buffer = rx_buffer;
+        m_rx_buffer_size = rx_buffer_size;
+        m_tx_buffer = tx_buffer;
+        m_tx_buffer_size = tx_buffer_size;
     }
 
-    bool Config::add_readonly_address_range(void* start, void* end)
+    void Config::set_forbidden_address_range(const AddressRange* range, const uint8_t count)
     {
-        return add_readonly_address_range(reinterpret_cast<uint64_t>(start), reinterpret_cast<uint64_t>(end));
+        m_forbidden_address_ranges = range;
+        m_forbidden_range_count = count;
     }
 
-    bool Config::add_forbidden_address_range(const uint64_t start, const uint64_t end)
+    void Config::set_readonly_address_range(const AddressRange* range, const uint8_t count)
     {
-        if (m_forbidden_range_count >= SCRUTINY_FORBIDDEN_ADDRESS_RANGE_COUNT)
-        {
-            return false;
-        }
-
-        m_forbidden_address_ranges[m_forbidden_range_count].start = start;
-        m_forbidden_address_ranges[m_forbidden_range_count].end = end;
-        m_forbidden_address_ranges[m_forbidden_range_count].set = true;
-        m_forbidden_range_count++;
-        return true;
-    }
-
-    bool Config::add_readonly_address_range(const uint64_t start, const uint64_t end)
-    {
-        if (m_readonly_range_count >= SCRUTINY_READONLY_ADDRESS_RANGE_COUNT)
-        {
-            return false;
-        }
-
-        m_readonly_address_ranges[m_readonly_range_count].start = start;
-        m_readonly_address_ranges[m_readonly_range_count].end = end;
-        m_readonly_address_ranges[m_readonly_range_count].set = true;
-        m_readonly_range_count++;
-        return true;
-    }
-
-    void Config::set_display_name(const char* name)
-    {
-        scrutiny::tools::strncpy(m_display_name, name, SCRUTINY_DISPLAY_NAME_MAX_SIZE);
+        m_readonly_address_ranges = range;
+        m_readonly_range_count = count;
     }
 
     void Config::set_published_values(RuntimePublishedValue* array, uint16_t nbr, RpvReadCallback rd_cb, RpvWriteCallback wr_cb)
@@ -125,16 +63,4 @@ namespace scrutiny
         m_rpv_read_callback = rd_cb;
         m_rpv_write_callback = wr_cb;
     }
-
-    bool Config::read_published_values_configured()
-    {
-        return (m_rpv_read_callback != nullptr &&  m_rpvs != nullptr && m_rpv_count > 0);
-    }
-
-    bool Config::write_published_values_configured()
-    {
-        return (m_rpv_write_callback != nullptr &&  m_rpvs != nullptr && m_rpv_count > 0);
-    }
-
-
 }

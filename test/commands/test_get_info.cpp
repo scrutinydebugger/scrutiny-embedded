@@ -17,10 +17,15 @@ class TestGetInfo : public ScrutinyTest
 protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
+    scrutiny::Config config;
+
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
 
     virtual void SetUp()
     {
-        scrutiny::Config config;
+        
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         scrutiny_handler.init(&config);
         scrutiny_handler.comm()->connect();
     }
@@ -85,13 +90,22 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
 {
     uint8_t tx_buffer[32];
     uint8_t* buf[6];
-    scrutiny::Config new_config;
+   
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
-    new_config.add_readonly_address_range(start, end);
-    new_config.add_readonly_address_range(start+1, end+1);
-    new_config.add_forbidden_address_range(start+2, end+2);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange readonly_ranges[] = {
+        scrutiny::tools::make_address_range(start, end),
+        scrutiny::tools::make_address_range(start+1, end+1)
+    };
+
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start+2, end+2)
+    };
+
+    config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges)/sizeof(readonly_ranges[0]));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(forbidden_ranges[0]));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -122,15 +136,23 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
 {
     uint8_t tx_buffer[32];
     uint8_t* buf[4];
-    scrutiny::Config new_config;
-    constexpr uint32_t addr_size = sizeof(void*);
 
+    constexpr uint32_t addr_size = sizeof(void*);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
-    new_config.add_readonly_address_range(start, end);
-    new_config.add_readonly_address_range(start+1, end+1);
-    new_config.add_forbidden_address_range(start+2, end+2);
-    scrutiny_handler.init(&new_config);
+    scrutiny::AddressRange readonly_ranges[] = {
+        scrutiny::tools::make_address_range(start, end),
+        scrutiny::tools::make_address_range(start+1, end+1)
+    };
+
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start+2, end+2)
+    };
+
+    config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges)/sizeof(readonly_ranges[0]));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(forbidden_ranges[0]));
+
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -183,14 +205,21 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 
     uint8_t tx_buffer[32];
     uint8_t* buf[4];
-    scrutiny::Config new_config;
 
-    uint64_t start = reinterpret_cast<uint64_t>(buf);
-    uint64_t end = start + 4;
-    new_config.add_readonly_address_range(start, end);
-    new_config.add_readonly_address_range(start+1, end+1);
-    new_config.add_forbidden_address_range(start+2, end+2);
-    scrutiny_handler.init(&new_config);
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf);
+    uintptr_t end = start + 4;
+    scrutiny::AddressRange readonly_ranges[] = {
+        scrutiny::tools::make_address_range(start, end),
+        scrutiny::tools::make_address_range(start+1, end+1)
+    };
+
+    scrutiny::AddressRange forbidden_ranges[] = {
+        scrutiny::tools::make_address_range(start+2, end+2)
+    };
+
+    config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges)/sizeof(readonly_ranges[0]));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges)/sizeof(forbidden_ranges[0]));
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -214,29 +243,17 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 
 static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType* outval)
 {
-    uint32_t v1 = 555;
-    float v2 = 1.34f;
-    uint16_t v3 = 1000;
+    static_cast<void>(rpv);
+    static_cast<void>(outval);
+    // nothing to do here.
+    return true;
+}
 
-    if (rpv.id == 0x1122 && rpv.type == scrutiny::VariableType::uint32)
-    {
-        outval->uint32 = v1;
-    }
-
-    else if (rpv.id == 0x3344 && rpv.type == scrutiny::VariableType::float32)
-    {
-        outval->float32 = v2;
-    }
-
-    else if (rpv.id == 0x5566 && rpv.type == scrutiny::VariableType::uint16)
-    {
-        outval->uint16 = v3;
-    }
-    else
-    {
-        return false;
-    }
-
+static bool rpv_write_callback(scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType* inval)
+{
+    static_cast<void>(rpv);
+    static_cast<void>(inval);
+    // nothing to do here.
     return true;
 }
 
@@ -244,7 +261,6 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
 TEST_F(TestGetInfo, TestGetRPVCount)
 {
     uint8_t tx_buffer[32];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -252,8 +268,8 @@ TEST_F(TestGetInfo, TestGetRPVCount)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3, rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -284,7 +300,6 @@ TEST_F(TestGetInfo, TestGetRPVCount)
 TEST_F(TestGetInfo, TestGetRPVDefinition)
 {
     uint8_t tx_buffer[64];
-    scrutiny::Config new_config;
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
@@ -292,8 +307,8 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3, rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
@@ -337,16 +352,14 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
 
     uint8_t tx_buffer[32];
     
-    scrutiny::Config new_config;
-
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
         {0x5566, scrutiny::VariableType::uint16}
     };
 
-    new_config.set_published_values(rpvs, 3, rpv_read_callback);
-    scrutiny_handler.init(&new_config);
+    config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
+    scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request

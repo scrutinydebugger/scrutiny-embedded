@@ -19,14 +19,20 @@ namespace scrutiny
 
         uint32_t CommHandler::s_session_counter = 0;
 
-        void CommHandler::init(Timebase* timebase, uint32_t prng_seed)
+        void CommHandler::init(uint8_t* rx_buffer, uint16_t rx_buffer_size, uint8_t* tx_buffer, uint16_t tx_buffer_size, Timebase* timebase, uint32_t prng_seed)
         {
+            m_rx_buffer = rx_buffer;
+            m_rx_buffer_size = rx_buffer_size;
+            m_tx_buffer = tx_buffer;
+            m_tx_buffer_size = tx_buffer_size;
             m_timebase = timebase;
             m_prng.seed(prng_seed);
             s_session_counter = m_prng.get();
             m_active_request.data = m_rx_buffer;   // Half duplex comm. Share buffer
+            m_active_request.data_max_length = m_rx_buffer_size;
             m_active_response.data = m_tx_buffer;  // Half duplex comm. Share buffer
-
+            m_active_response.data_max_length = m_tx_buffer_size;
+            m_enabled = true;
             reset();
         }
 
@@ -130,7 +136,7 @@ namespace scrutiny
 
                 case RxFSMState::WaitForData:
                 {
-                    if (m_active_request.data_length > SCRUTINY_RX_BUFFER_SIZE)
+                    if (m_active_request.data_length > m_rx_buffer_size)
                     {
                         m_rx_error = RxError::Overflow;
                         m_rx_state = RxFSMState::Error;
@@ -238,7 +244,7 @@ namespace scrutiny
                 return false; // Half duplex comm. Discard data;
             }
 
-            if (response->data_length > SCRUTINY_TX_BUFFER_SIZE)
+            if (response->data_length > m_tx_buffer_size)
             {
                 reset_tx();
                 m_tx_error = TxError::Overflow;
@@ -450,7 +456,7 @@ namespace scrutiny
 
         void CommHandler::add_crc(Response* response)
         {
-            if (response->data_length > SCRUTINY_TX_BUFFER_SIZE)
+            if (response->data_length > m_tx_buffer_size)
                 return;
 
             uint8_t header[5];
@@ -467,7 +473,6 @@ namespace scrutiny
         void CommHandler::reset()
         {
             m_state = State::Idle;
-            m_enabled = true;
             m_heartbeat_timestamp = m_timebase->get_timestamp();
             m_last_heartbeat_challenge = 0;
             m_heartbeat_received = false;
