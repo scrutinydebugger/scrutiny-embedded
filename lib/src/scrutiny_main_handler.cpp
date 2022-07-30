@@ -371,7 +371,7 @@ namespace scrutiny
 
                 // Magic validation is done by the codec.
                 response_data.discover.display_name = m_config.display_name;
-                response_data.discover.display_name_length = strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH);
+                response_data.discover.display_name_length = static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
 
                 code = m_codec.encode_response_comm_discover(response, &response_data.discover);
                 break;
