@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('Parallel') {
             parallel{
-                stage('Native GCC'){
+                stage('GCC'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
@@ -32,7 +32,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Native Clang'){
+                stage('Clang'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-clang'
