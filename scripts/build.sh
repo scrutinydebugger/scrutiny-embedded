@@ -9,7 +9,6 @@ BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"
 set -x
 
 mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
 
 SCRUTINY_WERR=${SCRUTINY_WERR:-OFF}
 SCRUTINY_BUILD_TEST=${SCRUTINY_BUILD_TEST:-OFF}
@@ -23,6 +22,7 @@ cmake -GNinja \
         -DSCRUTINY_BUILD_TEST=$SCRUTINY_BUILD_TEST \
         -DSCRUTINY_BUILD_TESTAPP=$SCRUTINY_BUILD_TESTAPP \
         -Wno-dev \
-        "$APP_ROOT"
+        -S "$APP_ROOT" \
+        -B "$BUILD_DIR"
 
 nice cmake --build . --target all -- -j8

@@ -7,7 +7,4 @@ BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"
 
 set -x
 
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
-
-exec test/scrutiny_unittest
+exec "$BUILD_DIR/test/scrutiny_unittest"
