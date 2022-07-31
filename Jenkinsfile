@@ -11,14 +11,14 @@ pipeline {
                 }
             }
             stages {
-                stage ('Build') {
+                stage ('Build and test (Native)') {
                     steps {
-                        sh 'scripts/build.sh'
+                        sh 'SCRUTINY_CI_PROFILE=build-test-native scripts/ci.sh'
                     }
                 }
-                stage ('Test') {
+                stage ('Build AVR-GCC') {
                     steps {
-                        sh 'scripts/runtests.sh'
+                        sh 'SCRUTINY_CI_PROFILE=build-avr-gcc scripts/ci.sh'
                     }
                 }
             }
