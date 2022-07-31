@@ -43,7 +43,7 @@ pipeline {
                                 export CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake
                                 SCRUTINY_BUILD_TEST=0
                                 SCRUTINY_BUILD_TESTAPP=0
-                                SCRUTINY_BUILD_FOLDER=${AVR_BUILD_FOLDER}
+                                SCRUTINY_BUILD_FOLDER=${AVR_GCC_BUILD_FOLDER}
                                 scripts/build.sh
                                 '''
                             }
