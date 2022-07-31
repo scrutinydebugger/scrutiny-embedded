@@ -43,6 +43,7 @@ pipeline {
                     }
                     steps{
                         sh '''
+                        export CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake
                         export SCRUTINY_BUILD_TEST=0
                         export SCRUTINY_BUILD_TESTAPP=0
                         export SCRUTINY_WERR=1
