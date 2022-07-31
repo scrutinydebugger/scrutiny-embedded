@@ -51,6 +51,24 @@ pipeline {
                         '''
                     }
                 }
+                stage('CLang'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target clang'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=clang -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=cmake/clang.cmake \
+                        SCRUTINY_BUILD_TEST=0 \
+                        SCRUTINY_BUILD_TESTAPP=0 \
+                        SCRUTINY_WERR=1 \
+                        scripts/build.sh
+                        '''
+                    }
+                }
             }
         }
     }

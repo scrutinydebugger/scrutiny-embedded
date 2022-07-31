@@ -20,3 +20,8 @@ RUN apt-get update && apt-get install -y \
     gcc-avr \
     avr-libc \
     && rm -rf /var/lib/apt/lists/*
+
+FROM base as clang
+RUN apt-get update && apt-get install -y \
+    clang \
+    && rm -rf /var/lib/apt/lists/*    
