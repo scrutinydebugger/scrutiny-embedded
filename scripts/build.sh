@@ -2,6 +2,8 @@
 set -euo pipefail
 
 APP_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
+
+BUILD_CONTEXT="${BUILD_CONTEXT:-dev}"
 BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"
 
 set -x
@@ -9,14 +11,7 @@ set -x
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-BUILD_CONTEXT="${BUILD_CONTEXT:-dev}"
-
-if [ $BUILD_CONTEXT = "ci" ]; then 
-        SCRUTINY_WERR=${SCRUTINY_WERR:-ON}
-else
-        SCRUTINY_WERR=${SCRUTINY_WERR:-OFF}
-fi
-
+SCRUTINY_WERR=${SCRUTINY_WERR:-OFF}
 SCRUTINY_BUILD_TEST=${SCRUTINY_BUILD_TEST:-OFF}
 SCRUTINY_BUILD_TESTAPP=${SCRUTINY_BUILD_TESTAPP:-OFF}
 
