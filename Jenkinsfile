@@ -32,7 +32,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Native CLang'){
+                stage('Native Clang'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-clang'
@@ -40,13 +40,25 @@ pipeline {
                             reuseNode true
                         }
                     }
-                    steps{
-                        sh '''
-                        CMAKE_TOOLCHAIN_FILE=cmake/clang.cmake \
-                        SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_BUILD_TESTAPP=1 \
-                        scripts/build.sh
-                        '''
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=cmake/clang.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_WERR=0 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
                     }
                 }
                 stage('AVR'){
