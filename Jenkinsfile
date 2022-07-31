@@ -17,9 +17,8 @@ pipeline {
                         stage("Build") {
                             steps {
                                 sh '''
-                                unset CMAKE_TOOLCHAIN_FILE
-                                SCRUTINY_BUILD_TEST=1
-                                SCRUTINY_BUILD_TESTAPP=1
+                                export SCRUTINY_BUILD_TEST=1
+                                export SCRUTINY_BUILD_TESTAPP=1
                                 scripts/build.sh
                                 '''
                             }
@@ -44,9 +43,8 @@ pipeline {
                     steps{
                         sh '''
                         export CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake
-                        SCRUTINY_BUILD_TEST=0
-                        SCRUTINY_BUILD_TESTAPP=0
-                        SCRUTINY_BUILD_FOLDER=build-avr
+                        export SCRUTINY_BUILD_TEST=0
+                        export SCRUTINY_BUILD_TESTAPP=0
                         scripts/build.sh
                         '''
                     }
