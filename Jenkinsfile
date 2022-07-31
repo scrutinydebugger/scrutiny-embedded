@@ -13,7 +13,8 @@ pipeline {
             stages {
                 stage ('Build and test (Native)') {
                     steps {
-                        sh 'SCRUTINY_CI_PROFILE=build-test-native scripts/ci.sh'
+                        sh 'SCRUTINY_CI_PROFILE=build-test-native 
+                        scripts/ci.sh'
                     }
                 }
                 stage ('Build AVR-GCC') {
