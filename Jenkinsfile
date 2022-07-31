@@ -1,3 +1,8 @@
+environment {
+    NATIVE_BUILD_FOLDER="build-native"
+    AVR_GCC_BUILD_FOLDER="build-avr"
+}
+
 pipeline {
     agent {
         label 'docker'
@@ -11,15 +16,38 @@ pipeline {
                 }
             }
             stages {
-                stage ('Build and test (Native)') {
-                    steps {
-                        sh 'SCRUTINY_CI_PROFILE=build-test-native 
-                        scripts/ci.sh'
-                    }
-                }
-                stage ('Build AVR-GCC') {
-                    steps {
-                        sh 'SCRUTINY_CI_PROFILE=build-avr-gcc scripts/ci.sh'
+                stage('Testing'){
+                    parallel{
+                        stage('Native'){
+                            steps("Build") {
+                                sh '''
+                                unset CMAKE_TOOLCHAIN_FILE
+                                SCRUTINY_BUILD_TEST=1
+                                SCRUTINY_BUILD_TESTAPP=1
+                                SCRUTINY_BUILD_FOLDER=${NATIVE_BUILD_FOLDER}
+                                scripts/build.sh
+                                '''
+                            }
+
+                            steps("Test") {
+                                sh '''
+                                SCRUTINY_BUILD_FOLDER=${NATIVE_BUILD_FOLDER}
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+
+                        stage('AVR'){
+                            steps{
+                                sh '''
+                                export CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake
+                                SCRUTINY_BUILD_TEST=0
+                                SCRUTINY_BUILD_TESTAPP=0
+                                SCRUTINY_BUILD_FOLDER=${AVR_BUILD_FOLDER}
+                                scripts/build.sh
+                                '''
+                            }
+                        }
                     }
                 }
             }

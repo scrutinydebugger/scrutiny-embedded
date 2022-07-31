@@ -10,7 +10,18 @@ fi
 
 set -x
 
-if [ ${SCRUTINY_CI_PROFILE} = "build-test-native" ]; then
+NATIVE_BUILD_FOLDER="$APP_ROOT"/build-native
+
+if [ ${SCRUTINY_CI_PROFILE} = "build-native" ]; then
+    unset CMAKE_TOOLCHAIN_FILE
+    export SCRUTINY_BUILD_FOLDER="$NATIVE_BUILD_FOLDER"
+    export SCRUTINY_BUILD_TEST=1
+    export SCRUTINY_BUILD_TESTAPP=1
+    $APP_ROOT/scripts/build.sh
+    $APP_ROOT/scripts/runtests.sh
+    $APP_ROOT/scripts/clean.sh
+
+elif if [ ${SCRUTINY_CI_PROFILE} = "test-native" ]; then
     unset CMAKE_TOOLCHAIN_FILE
     export SCRUTINY_BUILD_TEST=1
     export SCRUTINY_BUILD_TESTAPP=1
