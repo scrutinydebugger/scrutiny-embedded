@@ -43,7 +43,7 @@ pipeline {
                     }
                     steps{
                         sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd -L)/cmake/avr-gcc.cmake \
+                        CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake \
                         SCRUTINY_BUILD_TEST=0 \
                         SCRUTINY_BUILD_TESTAPP=0 \
                         SCRUTINY_WERR=1 \
