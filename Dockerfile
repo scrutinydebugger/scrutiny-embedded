@@ -9,19 +9,19 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /tmp/
 
-FROM base as native
+FROM base as native-gcc
 RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base as avr
+FROM base as avr-gcc
 RUN apt-get update && apt-get install -y \
     binutils \
     gcc-avr \
     avr-libc \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base as clang
+FROM base as native-clang
 RUN apt-get update && apt-get install -y \
     clang \
     && rm -rf /var/lib/apt/lists/*    

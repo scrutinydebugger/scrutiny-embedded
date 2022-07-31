@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-option(SCRUTINY_WERR "Converts all warning to error" OFF)
+option(SCRUTINY_WERR "Converts all warning to error" ON)
 
 project(scrutiny-embedded)
 add_library(${PROJECT_NAME} STATIC

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(testapp)
 
-option(SCRUTINY_WERR "Converts all warning to error" OFF)
+option(SCRUTINY_WERR "Converts all warning to error" ON)
 
 add_executable(${PROJECT_NAME})
 
