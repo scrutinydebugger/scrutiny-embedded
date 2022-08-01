@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME}
     scrutiny-embedded   
     )
 
-if(MSVC)    # MSVC doesn't support dwarf output. We still allows build of testapp.
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")    # MSVC doesn't support dwarf output. We still allows build of testapp.
     target_compile_options(${PROJECT_NAME} 
         PRIVATE
             /W4 /Od)
@@ -51,21 +51,35 @@ if(MSVC)    # MSVC doesn't support dwarf output. We still allows build of testap
             /DYNAMICBASE:NO
         )
 else()
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(COMPILER_NO_PIE_OPTION "-fno-pie")
+        set(LINKER_NO_PIE_OPTION "-no-pie") # clang use system linker.
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(COMPILER_NO_PIE_OPTION "-no-pie")
+        set(LINKER_NO_PIE_OPTION "-no-pie")
+    else()
+        set(COMPILER_NO_PIE_OPTION "")
+        set(LINKER_NO_PIE_OPTION "")
+    endif()
+
     target_compile_options(${PROJECT_NAME}
         PRIVATE
-            -no-pie  
+            ${COMPILER_NO_PIE_OPTION}  
             -gdwarf-4
             -O0
             -Wall -Wextra -Wpedantic
         )
+
+    target_compile_options(scrutiny-embedded PRIVATE ${COMPILER_NO_PIE_OPTION})
     
     if(SCRUTINY_WERR)
         target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
+        target_compile_options(scrutiny-embedded PRIVATE -Werror)
     endif()
 
     target_link_options(${PROJECT_NAME}
         PUBLIC
-            -no-pie
+        ${LINKER_NO_PIE_OPTION}
             -gdwarf-4
         )
 endif()

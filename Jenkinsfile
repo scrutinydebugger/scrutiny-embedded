@@ -3,7 +3,7 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage('Parallel') {
+        stage('All') {
             parallel{
                 stage('GCC'){
                     agent {
@@ -17,6 +17,7 @@ pipeline {
                         stage("Build") {
                             steps {
                                 sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 scripts/build.sh
@@ -44,10 +45,9 @@ pipeline {
                         stage("Build") {
                             steps {
                                 sh '''
-                                CMAKE_TOOLCHAIN_FILE=cmake/clang.cmake \
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
-                                SCRUTINY_WERR=0 \
                                 scripts/build.sh
                                 '''
                             }
@@ -71,14 +71,13 @@ pipeline {
                     }
                     steps{
                         sh '''
-                        CMAKE_TOOLCHAIN_FILE=cmake/avr-gcc.cmake \
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
                         SCRUTINY_BUILD_TEST=0 \
                         SCRUTINY_BUILD_TESTAPP=0 \
                         scripts/build.sh
                         '''
                     }
                 }
-                
             }
         }
     }
