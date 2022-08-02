@@ -56,7 +56,7 @@ TEST_F(TestCommHandler, TestConsecutiveSend)
     success = comm.send_response(&response);   // This one should be ignored
     EXPECT_FALSE(success);
 
-    uint32_t n_to_read = comm.data_to_send();
+    uint16_t n_to_read = comm.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(buf));
     EXPECT_EQ(n_to_read, sizeof(expected_data));

@@ -33,12 +33,24 @@ namespace scrutiny
             m_active_response.data = m_tx_buffer;  // Half duplex comm. Share buffer
             m_active_response.data_max_length = m_tx_buffer_size;
             m_enabled = true;
+
+            if (m_rx_buffer_size < MINIMUM_RX_BUFFER_SIZE || m_rx_buffer_size > MAXIMUM_RX_BUFFER_SIZE)
+            {
+                m_enabled = false;
+            }
+
+            if (m_tx_buffer_size < MINIMUM_TX_BUFFER_SIZE || m_tx_buffer_size > MAXIMUM_TX_BUFFER_SIZE)
+            {
+                m_enabled = false;
+            }
+
+
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t* data, uint32_t len)
+        void CommHandler::receive_data(uint8_t* data, uint16_t len)
         {
-            uint32_t i = 0;
+            uint16_t i = 0;
 
             if (m_enabled == false)
             {
@@ -100,21 +112,21 @@ namespace scrutiny
                     {
                         if ((len - i) >= 2)
                         {
-                            m_active_request.data_length = (((uint16_t)data[i]) << 8) | ((uint16_t)data[i + 1]);
+                            m_active_request.data_length = (static_cast<uint16_t>(data[i]) << 8u) | (static_cast<uint16_t>(data[i + 1]));
                             m_length_bytes_received = 2;
                             i += 2;
                             next_state = true;
                         }
                         else
                         {
-                            m_active_request.data_length = (((uint16_t)data[i]) << 8);
+                            m_active_request.data_length = static_cast<uint16_t>(data[i]) << 8u;
                             m_length_bytes_received = 1;
                             i += 1;
                         }
                     }
                     else
                     {
-                        m_active_request.data_length |= ((uint16_t)data[i]);
+                        m_active_request.data_length |= static_cast<uint16_t>(data[i]);
                         m_length_bytes_received = 2;
                         i += 1;
                         next_state = true;
@@ -163,19 +175,19 @@ namespace scrutiny
                 {
                     if (m_crc_bytes_received == 0)
                     {
-                        m_active_request.crc = ((uint32_t)data[i]) << 24;
+                        m_active_request.crc = static_cast<uint32_t>(data[i]) << 24u;
                     }
                     else if (m_crc_bytes_received == 1)
                     {
-                        m_active_request.crc |= ((uint32_t)data[i]) << 16;
+                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 16u;
                     }
                     else if (m_crc_bytes_received == 2)
                     {
-                        m_active_request.crc |= ((uint32_t)data[i]) << 8;
+                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 8u;
                     }
                     else if (m_crc_bytes_received == 3)
                     {
-                        m_active_request.crc |= ((uint32_t)data[i]) << 0;
+                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 0;
                         m_state = State::Idle;
 
                         if (check_crc(&m_active_request))
@@ -266,16 +278,19 @@ namespace scrutiny
             return true;
         }
 
-        uint32_t CommHandler::pop_data(uint8_t* buffer, uint32_t len)
+        uint16_t CommHandler::pop_data(uint8_t* buffer, uint16_t len)
         {
+            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF, "Cannot parse successfully with 16bits counters");
+            static_assert(protocol::BUFFER_OVERFLOW_MARGIN > protocol::RESPONSE_OVERHEAD, "Cannot guarantee protection against overflow during parsing.");
+
             if (m_state != State::Transmitting)
             {
-                return 0;
+                return 0u;
             }
 
-            const uint32_t nbytes_to_send = m_nbytes_to_send - m_nbytes_sent;
-            uint32_t i = 0;
+            uint16_t i = 0u;
 
+            const uint16_t nbytes_to_send = static_cast<uint16_t>(m_nbytes_to_send - m_nbytes_sent);
             if (len > nbytes_to_send)
             {
                 len = nbytes_to_send;
@@ -283,73 +298,71 @@ namespace scrutiny
 
             while (m_nbytes_sent < 5 && i < len)
             {
-                if (m_nbytes_sent == 0)
+                if (m_nbytes_sent == 0u)
                 {
                     buffer[i] = m_active_response.command_id;
                 }
-                else if (m_nbytes_sent == 1)
+                else if (m_nbytes_sent == 1u)
                 {
                     buffer[i] = m_active_response.subfunction_id;
                 }
-                else if (m_nbytes_sent == 2)
+                else if (m_nbytes_sent == 2u)
                 {
                     buffer[i] = m_active_response.response_code;
                 }
-                else if (m_nbytes_sent == 3)
+                else if (m_nbytes_sent == 3u)
                 {
-                    buffer[i] = (m_active_response.data_length >> 8) & 0xFF;
+                    buffer[i] = static_cast<uint8_t>((m_active_response.data_length >> 8) & 0xFFu);
                 }
-                else if (m_nbytes_sent == 4)
+                else if (m_nbytes_sent == 4u)
                 {
-                    buffer[i] = m_active_response.data_length & 0xFF;
+                    buffer[i] = static_cast<uint8_t>(m_active_response.data_length & 0xFFu);
                 }
 
                 i++;
-                m_nbytes_sent += 1;
-            }
-
-            int32_t remaining_data_bytes = static_cast<int32_t>(m_active_response.data_length) - (static_cast<int32_t>(m_nbytes_sent) - 5);
-            if (remaining_data_bytes < 0)
-            {
-                remaining_data_bytes = 0;
-            }
-
-            uint32_t data_bytes_to_copy = static_cast<uint32_t>(remaining_data_bytes);
-            if (data_bytes_to_copy > len - i)
-            {
-                data_bytes_to_copy = len - i;
-            }
-
-            memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
-
-            i += data_bytes_to_copy;
-            m_nbytes_sent += data_bytes_to_copy;
-
-            const uint32_t crc_position = m_active_response.data_length + 5;
-            while (i < len)
-            {
-                if (m_nbytes_sent == crc_position)
-                {
-                    buffer[i] = (m_active_response.crc >> 24) & 0xFF;
-                }
-                else if (m_nbytes_sent == crc_position + 1)
-                {
-                    buffer[i] = (m_active_response.crc >> 16) & 0xFF;
-                }
-                else if (m_nbytes_sent == crc_position + 2)
-                {
-                    buffer[i] = (m_active_response.crc >> 8) & 0xFF;
-                }
-                else if (m_nbytes_sent == crc_position + 3)
-                {
-                    buffer[i] = (m_active_response.crc >> 0) & 0xFF;
-                }
-                else
-                {
-                    break;  // Should never go here.
-                }
                 m_nbytes_sent++;
-                i++;
+            }
+
+            if (m_nbytes_sent >= 5u && i<len)
+            {
+                const uint16_t data_byte_sent = (m_nbytes_sent - 5);
+                if (data_byte_sent < m_active_response.data_length)
+                {
+                    const uint16_t remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent-5);
+                    const uint16_t user_request_remaining = (len - i);
+                    const uint16_t data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes;  // Don't read more than available.
+                    memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
+
+                    i += data_bytes_to_copy;
+                    m_nbytes_sent += data_bytes_to_copy;
+                }
+
+                const uint16_t crc_position = m_active_response.data_length + 5u;    // Will fit as per static_assert above.
+                while (i < len)
+                {
+                    if (m_nbytes_sent == crc_position)
+                    {
+                        buffer[i] = (m_active_response.crc >> 24u) & 0xFFu;
+                    }
+                    else if (m_nbytes_sent == crc_position + 1u)
+                    {
+                        buffer[i] = (m_active_response.crc >> 16u) & 0xFFu;
+                    }
+                    else if (m_nbytes_sent == crc_position + 2u)
+                    {
+                        buffer[i] = (m_active_response.crc >> 8) & 0xFFu;
+                    }
+                    else if (m_nbytes_sent == crc_position + 3u)
+                    {
+                        buffer[i] = (m_active_response.crc >> 0u) & 0xFFu;
+                    }
+                    else
+                    {
+                        break;  // Should never go here.
+                    }
+                    m_nbytes_sent++;
+                    i++;
+                }
             }
 
             if (m_nbytes_sent >= m_nbytes_to_send)
@@ -431,7 +444,7 @@ namespace scrutiny
             return success;
         }
 
-        uint32_t CommHandler::data_to_send()
+        uint16_t CommHandler::data_to_send()
         {
             if (m_state != State::Transmitting)
             {

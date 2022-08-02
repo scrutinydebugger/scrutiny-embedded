@@ -215,11 +215,11 @@ TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
@@ -255,11 +255,11 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
@@ -324,17 +324,17 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     index = 5;
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         const uint16_t id = p->first;
-        ASSERT_LE(index, nread - 2);    // safety check
+        ASSERT_LE(index, static_cast<unsigned int>(nread - 2));    // safety check
 
         EXPECT_EQ(tx_buffer[index], (id >> 8) & 0xFF) << "index=" << index << ", ID = " << id;
         EXPECT_EQ(tx_buffer[index+1], id & 0xFF) << "index=" << index << ", ID = " << id;
@@ -378,7 +378,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -416,7 +416,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -467,7 +467,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -517,11 +517,11 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 
@@ -566,11 +566,11 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 
@@ -672,10 +672,10 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     scrutiny_handler.comm()->receive_data(request_data, required_request_size);
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     EXPECT_EQ(n_to_read, required_response_size);
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, required_response_size);
 
@@ -736,7 +736,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         scrutiny_handler.comm()->receive_data(request_data, request_size);
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer)) << " i=" << i;
         ASSERT_EQ(n_to_read, 9u) << " i=" << i;
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);

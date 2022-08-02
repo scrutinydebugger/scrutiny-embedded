@@ -27,15 +27,6 @@ namespace scrutiny
     namespace protocol
     {
         //==============================================================
-
-        void ReadMemoryBlocksRequestParser::init(const Request* request)
-        {
-            m_buffer = request->data;
-            m_size_limit = request->data_length;
-            reset();
-            validate();
-        }
-
         void ReadMemoryBlocksRequestParser::validate()
         {
             constexpr unsigned int addr_size = sizeof(void*);
@@ -44,7 +35,7 @@ namespace scrutiny
 
             while (true)
             {
-                if (cursor + addr_size + 2 > m_size_limit)
+                if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - cursor))
                 {
                     m_invalid = true;
                     return;
@@ -56,11 +47,19 @@ namespace scrutiny
 
                 m_required_tx_buffer_size += addr_size + 2 + length;
 
-                if (cursor == m_size_limit)
+                if (cursor == m_request_datasize)
                 {
                     break;
                 }
             }
+        }
+
+        void ReadMemoryBlocksRequestParser::init(const Request* request)
+        {
+            m_buffer = request->data;
+            m_request_datasize = request->data_length;
+            reset();
+            validate();
         }
 
         void ReadMemoryBlocksRequestParser::next(MemoryBlock* memblock)
@@ -73,7 +72,7 @@ namespace scrutiny
                 return;
             }
 
-            if (m_bytes_read + addr_size + 2 > m_size_limit)
+            if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize-m_bytes_read))
             {
                 m_finished = true;
                 m_invalid = true;
@@ -88,7 +87,7 @@ namespace scrutiny
             memblock->start_address = reinterpret_cast<uint8_t*>(addr);
             memblock->length = length;
 
-            if (m_bytes_read == m_size_limit)
+            if (m_bytes_read == m_request_datasize)
             {
                 m_finished = true;
             }
@@ -116,12 +115,12 @@ namespace scrutiny
         void WriteMemoryBlocksRequestParser::validate()
         {
             constexpr unsigned int addr_size = sizeof(void*);
-            uint32_t cursor = 0;
+            uint16_t cursor = 0;
             uint16_t length;
             
             while (true)
             {
-                if (cursor + addr_size + 2 > m_size_limit)
+                if (addr_size + 2 > static_cast<uint16_t>(m_size_limit-cursor))
                 {
                     m_invalid = true;
                     return;
@@ -161,7 +160,7 @@ namespace scrutiny
                 return;
             }
 
-            if (m_bytes_read + addr_size + 2 > m_size_limit)
+            if (addr_size + 2 > static_cast<uint16_t>(m_size_limit-m_bytes_read))
             {
                 m_finished = true;
                 m_invalid = true;
@@ -173,8 +172,8 @@ namespace scrutiny
             length = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
-            if ((m_bytes_read + length > m_size_limit) || 
-                (m_masked_write && (m_bytes_read + 2*length) > m_size_limit))
+            if ((length > static_cast<uint16_t>(m_size_limit-m_bytes_read)) || 
+                (m_masked_write && (length<<1) > static_cast<uint16_t>(m_size_limit-m_bytes_read)))
             {
                 m_invalid = true;
                 m_finished = true;
@@ -212,7 +211,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void ReadMemoryBlocksResponseEncoder::init(Response* response, const uint32_t max_size)
+        void ReadMemoryBlocksResponseEncoder::init(Response* response, const uint16_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -224,7 +223,13 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void*);
 
-            if (m_cursor + addr_size + 2 + memblock->length > m_size_limit)
+            if (memblock->length > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2)  // Make sure that the addition below doesn't blow up
+            {
+                m_overflow = true;
+                return;
+            }
+
+            if (addr_size + 2 + memblock->length > static_cast<uint16_t>(m_size_limit-m_cursor))
             {
                 m_overflow = true;
                 return;
@@ -237,7 +242,7 @@ namespace scrutiny
             memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
-            m_response->data_length = static_cast<uint16_t>(m_cursor);
+            m_response->data_length = m_cursor;
         }
 
         void ReadMemoryBlocksResponseEncoder::reset()
@@ -248,7 +253,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void WriteMemoryBlocksResponseEncoder::init(Response* response, uint32_t max_size)
+        void WriteMemoryBlocksResponseEncoder::init(Response* response, uint16_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -260,7 +265,7 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void*);
 
-            if (m_cursor + addr_size + 2 > m_size_limit)
+            if ( addr_size + 2u > static_cast<uint16_t>(m_size_limit-m_cursor))
             {
                 m_overflow = true;
                 return;
@@ -283,7 +288,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void GetRPVDefinitionResponseEncoder::init(Response* response, const uint32_t max_size)
+        void GetRPVDefinitionResponseEncoder::init(Response* response, const uint16_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -294,7 +299,7 @@ namespace scrutiny
         void GetRPVDefinitionResponseEncoder::write(const RuntimePublishedValue* rpv)
         {
             //id (2) + type (1) + address size (2,4,8)
-            if (m_cursor + 2 + 1 > m_size_limit)
+            if (2u + 1u > static_cast<uint16_t>(m_size_limit-m_cursor))
             {
                 m_overflow = true;
                 return;
@@ -305,7 +310,7 @@ namespace scrutiny
             m_buffer[m_cursor] = static_cast<uint8_t>(rpv->type);
             m_cursor += 1;
 
-            m_response->data_length = static_cast<uint16_t>(m_cursor);
+            m_response->data_length = m_cursor;
         }
 
         void GetRPVDefinitionResponseEncoder::reset()
@@ -317,7 +322,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void ReadRPVResponseEncoder::init(Response* response, const uint32_t max_size)
+        void ReadRPVResponseEncoder::init(Response* response, const uint16_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -330,13 +335,13 @@ namespace scrutiny
         {
             const uint8_t typesize = tools::get_type_size(rpv->type);
             //id (2) + type (1)
-            if (m_cursor + 2 + typesize > m_size_limit)
+            if (2u + typesize > static_cast<uint16_t>(m_size_limit-m_cursor))
             {
                 m_overflow = true;
                 return;
             }
 
-            if (typesize == 1 || typesize == 2 || typesize == 4 || typesize == 8)
+            if (typesize == 1u || typesize == 2u || typesize == 4u || typesize == 8u)
             {
                 encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
                 m_cursor += 2;
@@ -360,7 +365,7 @@ namespace scrutiny
                 }
 
                 m_cursor += typesize;
-                m_response->data_length = static_cast<uint16_t>(m_cursor);
+                m_response->data_length = m_cursor;
             }
         }
 
@@ -374,7 +379,7 @@ namespace scrutiny
 
  //==============================================================
 
-        void WriteRPVResponseEncoder::init(Response* response, const uint32_t max_size)
+        void WriteRPVResponseEncoder::init(Response* response, const uint16_t max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -387,7 +392,7 @@ namespace scrutiny
         {
             const uint8_t typesize = tools::get_type_size(rpv->type);
             //id (2) + datalen (1)
-            if (m_cursor + 2 + 1 > m_size_limit)
+            if (2u + 1u > static_cast<uint16_t>(m_size_limit-m_cursor))
             {
                 m_overflow = true;
                 return;
@@ -397,7 +402,7 @@ namespace scrutiny
             m_cursor += 2;
             m_buffer[m_cursor++] = typesize;
           
-            m_response->data_length = static_cast<uint16_t>(m_cursor);
+            m_response->data_length = m_cursor;
         }
 
         void WriteRPVResponseEncoder::reset()
@@ -433,7 +438,7 @@ namespace scrutiny
                 return false;
             }
             
-            if (m_bytes_read + 2 > m_request_len)
+            if (2 > m_request_len-m_bytes_read)
             {
                 m_invalid = true;
                 return false;
@@ -465,12 +470,6 @@ namespace scrutiny
             m_request_len = request->data_length;
             m_main_handler = main_handler;
             reset();
-            validate();
-        }
-
-        void WriteRPVRequestParser::validate()
-        {
-            // Do nothing. invalidity will be discovered while parsing.
         }
 
         bool WriteRPVRequestParser::next(RuntimePublishedValue* rpv, AnyType *v)
@@ -482,7 +481,7 @@ namespace scrutiny
                 return false;
             }
 
-            if (m_bytes_read + 2 > m_request_len)
+            if (2 > m_request_len-m_bytes_read)
             {
                 m_invalid = true;
                 return false;
@@ -502,7 +501,7 @@ namespace scrutiny
 
             const uint8_t typesize = tools::get_type_size(rpv->type);
 
-            if (m_bytes_read + typesize > m_request_len)
+            if (typesize > static_cast<uint16_t>(m_request_len-m_bytes_read))
             {
                 m_invalid = true;
                 return false;
@@ -866,7 +865,7 @@ namespace scrutiny
             return &parsers.m_memory_control_read_request_parser;
         }
 
-        ReadMemoryBlocksResponseEncoder* CodecV1_0::encode_response_memory_control_read(Response* response, uint32_t max_size)
+        ReadMemoryBlocksResponseEncoder* CodecV1_0::encode_response_memory_control_read(Response* response, uint16_t max_size)
         {
             response->data_length = 0;
             encoders.m_memory_control_read_response_encoder.init(response, max_size);
@@ -880,21 +879,21 @@ namespace scrutiny
             return &parsers.m_memory_control_write_request_parser;
         }
 
-        WriteMemoryBlocksResponseEncoder* CodecV1_0::encode_response_memory_control_write(Response* response, uint32_t max_size)
+        WriteMemoryBlocksResponseEncoder* CodecV1_0::encode_response_memory_control_write(Response* response, uint16_t max_size)
         {
             response->data_length = 0;
             encoders.m_memory_control_write_response_encoder.init(response, max_size);
             return &encoders.m_memory_control_write_response_encoder;
         }
 
-        GetRPVDefinitionResponseEncoder* CodecV1_0::encode_response_get_rpv_definition(Response* response, uint32_t max_size)
+        GetRPVDefinitionResponseEncoder* CodecV1_0::encode_response_get_rpv_definition(Response* response, uint16_t max_size)
         {
             response->data_length = 0;
             encoders.m_get_rpv_definition_response_encoder.init(response, max_size);
             return &encoders.m_get_rpv_definition_response_encoder;
         }
         
-        ReadRPVResponseEncoder* CodecV1_0::encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size)
+        ReadRPVResponseEncoder* CodecV1_0::encode_response_memory_control_read_rpv(Response* response, const uint16_t max_size)
         {
             response->data_length = 0;
             encoders.m_read_rpv_response_encoder.init(response, max_size);
@@ -907,7 +906,7 @@ namespace scrutiny
             return &parsers.m_memory_control_read_rpv_parser;
         }
 
-        WriteRPVResponseEncoder* CodecV1_0::encode_response_memory_control_write_rpv(Response* response, const uint32_t max_size)
+        WriteRPVResponseEncoder* CodecV1_0::encode_response_memory_control_write_rpv(Response* response, const uint16_t max_size)
         {
             response->data_length = 0;
             encoders.m_write_rpv_response_encoder.init(response, max_size);

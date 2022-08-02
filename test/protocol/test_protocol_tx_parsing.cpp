@@ -49,12 +49,12 @@ TEST_F(TestTxParsing, TestReadAllData)
     uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
-    uint32_t n_to_read = comm.data_to_send();
+    uint16_t n_to_read = comm.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(buf));
     EXPECT_EQ(n_to_read, sizeof(expected_data));
 
-    uint32_t nread = comm.pop_data(buf, n_to_read);
+    uint16_t nread = comm.pop_data(buf, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(buf, expected_data, sizeof(expected_data));
@@ -79,13 +79,13 @@ TEST_F(TestTxParsing, TestReadBytePerByte)
     uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
-    uint32_t n_to_read = comm.data_to_send();
+    uint16_t n_to_read = comm.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(buf));
     EXPECT_EQ(n_to_read, sizeof(expected_data));
 
-    uint32_t nread;
-    for (uint32_t i = 0; i < n_to_read; i++)
+    uint16_t nread;
+    for (uint16_t i = 0; i < n_to_read; i++)
     {
         nread = comm.pop_data(&buf[i], 1);
         EXPECT_EQ(nread, 1u);
@@ -112,11 +112,11 @@ TEST_F(TestTxParsing, TestReadByChunk)
     uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
-    uint32_t n_to_read = comm.data_to_send();
+    uint16_t n_to_read = comm.data_to_send();
     uint8_t chunks[3] = { 3,6,3 };
     ASSERT_EQ(n_to_read, 12u);
 
-    uint32_t nread;
+    uint16_t nread;
     uint8_t index = 0;
     for (uint32_t i = 0; i < sizeof(chunks); i++)
     {
@@ -146,8 +146,8 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
     uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
-    uint32_t n_to_read = comm.data_to_send();
-    uint32_t nread = comm.pop_data(buf, n_to_read + 10);
+    uint16_t n_to_read = comm.data_to_send();
+    uint16_t nread = comm.pop_data(buf, n_to_read + 10);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(buf, expected_data, sizeof(expected_data));
