@@ -64,7 +64,7 @@ void NixSerialPortBridge::start()
     tty.c_cc[VTIME] = 0;    // Non-blocking
     tty.c_cc[VMIN] = 0;
 
-    speed_t baudrate;
+    speed_t baudrate=0;
 
     switch(m_baudrate)
     {

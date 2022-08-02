@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.14)
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -36,7 +37,7 @@ target_link_libraries(${PROJECT_NAME}
     gtest_main
     )
 
-if(MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(scrutiny-embedded PRIVATE /W4 /Od)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Od)
 
@@ -46,8 +47,25 @@ if(MSVC)
     endif()
 
 else()
-    target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    # We don't require no-pie here. But we need scrutiny-embedded to have the same parameter has this project.
+    # So we need to set an explicit value, if we don't set no-pie or -pie (blank), cmake might chose to keep scrutiny-embedded
+    # from cache, which might have no-pie because of testapp and decide to set -pie for this project; this will fail.
+    # So we use no-pie to have an explicit value, and it will avoir recompilation if we use the same has testapp.
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(COMPILER_NO_PIE_OPTION "-fno-pie")
+        set(LINKER_NO_PIE_OPTION "-no-pie") # clang use system linker.
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(COMPILER_NO_PIE_OPTION "-no-pie")
+        set(LINKER_NO_PIE_OPTION "-no-pie")
+    else()
+        set(COMPILER_NO_PIE_OPTION "")
+        set(LINKER_NO_PIE_OPTION "")
+    endif()
+
+    target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic ${COMPILER_NO_PIE_OPTION})
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic ${COMPILER_NO_PIE_OPTION})
+    target_link_options(${PROJECT_NAME} PUBLIC ${LINKER_NO_PIE_OPTION})
 
     if(SCRUTINY_WERR)
         target_compile_options(scrutiny-embedded PRIVATE -Werror)

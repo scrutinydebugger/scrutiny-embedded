@@ -2,22 +2,29 @@
 set -euo pipefail
 
 APP_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
-BUILD_DIR="$APP_ROOT/build"
+
+BUILD_CONTEXT="${BUILD_CONTEXT:-dev}"
+BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"
 
 set -x
 
 mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
 
-BuildContext="${BUILD_CONTEXT:-dev}"
-[[ $BuildContext = "ci" ]] && WERR="ON" || WERR="OFF"
+SCRUTINY_WERR=${SCRUTINY_WERR:-ON}
+SCRUTINY_BUILD_TEST=${SCRUTINY_BUILD_TEST:-OFF}
+SCRUTINY_BUILD_TESTAPP=${SCRUTINY_BUILD_TESTAPP:-OFF}
+
+CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE:-}
+[[ -z "$CMAKE_TOOLCHAIN_FILE" ]] && TOOLCHAIN_ARG="" || TOOLCHAIN_ARG="-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
 
 cmake -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
-        -DSCRUTINY_BUILD_TESTAPP=ON \
-        -DSCRUTINY_BUILD_TEST=ON \
-        -DSCRUTINY_WERR=$WERR \
+        -DSCRUTINY_WERR=$SCRUTINY_WERR \
+        -DSCRUTINY_BUILD_TEST=$SCRUTINY_BUILD_TEST \
+        -DSCRUTINY_BUILD_TESTAPP=$SCRUTINY_BUILD_TESTAPP \
         -Wno-dev \
-        "$APP_ROOT"
+        "$TOOLCHAIN_ARG" \
+        -S "$APP_ROOT" \
+        -B "$BUILD_DIR"
 
-nice cmake --build . --target all -- -j8
+nice cmake --build "$BUILD_DIR" --target all -- -j8

@@ -313,14 +313,11 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     request_data[2] = ((nb_vals * 2) >> 8) & 0xFF;    // length msb
     request_data[3] = ((nb_vals * 2) & 0xFF);    // length lsb
     unsigned int index = 4;
-    unsigned int response_payload_size = 0; //
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         const uint16_t id = p->first;
         request_data[index++] = (id >> 8) & 0xFF;
         request_data[index++] = (id) & 0xFF;
-
-        response_payload_size += 2+static_cast<unsigned int>(p->second.size());
     }
     add_crc(request_data, request_buffer_size - 4);
 

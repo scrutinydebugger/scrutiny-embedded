@@ -3,22 +3,79 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage ('Docker') {
-            agent {
-                dockerfile {
-                    args '-e HOME=/tmp -e BUILD_CONTEXT=ci -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
-                    reuseNode true
-                }
-            }
-            stages {
-                stage ('Build') {
-                    steps {
-                        sh 'scripts/build.sh'
+        stage('All') {
+            parallel{
+                stage('GCC'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
                     }
                 }
-                stage ('Test') {
-                    steps {
-                        sh 'scripts/runtests.sh'
+                stage('Clang'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-clang'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-clang -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('AVR'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target avr-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=avr-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
+                        SCRUTINY_BUILD_TEST=0 \
+                        SCRUTINY_BUILD_TESTAPP=0 \
+                        scripts/build.sh
+                        '''
                     }
                 }
             }

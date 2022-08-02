@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-option(SCRUTINY_WERR "Converts all warning to error" OFF)
+option(SCRUTINY_WERR "Converts all warning to error" ON)
 
 project(scrutiny-embedded)
 add_library(${PROJECT_NAME} STATIC
@@ -14,7 +14,9 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_definitions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_tools.cpp
     )
-    
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/inc/
