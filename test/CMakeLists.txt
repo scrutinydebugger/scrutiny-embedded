@@ -75,4 +75,7 @@ else()
 endif()
 
 include(GoogleTest)
-gtest_discover_tests(${PROJECT_NAME})
+
+if (NOT ${CMAKE_CROSSCOMPILING})
+    gtest_discover_tests(${PROJECT_NAME})
+endif()

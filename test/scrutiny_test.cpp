@@ -97,26 +97,26 @@ unsigned int ScrutinyTest::encode_addr(uint8_t* buffer, void* addr)
 
     if (addr_size >= 1)
     {
-        buffer[i--] = static_cast<uint8_t>((ptr >> 0) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (0 * (addr_size >= 1))) & 0xFF);
     }
 
     if (addr_size >= 2)
     {
-        buffer[i--] = static_cast<uint8_t>((ptr >> 8) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (8 * (addr_size >= 2))) & 0xFF);
     }
 
     if (addr_size >= 4)
     {
-        buffer[i--] = static_cast<uint8_t>((ptr >> 16) & 0xFF);
-        buffer[i--] = static_cast<uint8_t>((ptr >> 24) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (16 * (addr_size >= 4))) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (24 * (addr_size >= 4))) & 0xFF);
     }
 
     if (addr_size == 8)
     {
-        buffer[i--] = static_cast<uint8_t>((ptr >> 32) & 0xFF);
-        buffer[i--] = static_cast<uint8_t>((ptr >> 40) & 0xFF);
-        buffer[i--] = static_cast<uint8_t>((ptr >> 48) & 0xFF);
-        buffer[i--] = static_cast<uint8_t>((ptr >> 56) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (32 * (addr_size >= 8))) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (40 * (addr_size >= 8))) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (48 * (addr_size >= 8))) & 0xFF);
+        buffer[i--] = static_cast<uint8_t>((ptr >> (56 * (addr_size >= 8))) & 0xFF);
     }
 
     return addr_size;
