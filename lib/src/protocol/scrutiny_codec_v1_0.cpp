@@ -481,7 +481,7 @@ namespace scrutiny
                 return false;
             }
 
-            if (2 > m_request_len-m_bytes_read)
+            if (2u > static_cast<uint16_t>(m_request_len-m_bytes_read))
             {
                 m_invalid = true;
                 return false;
