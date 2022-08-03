@@ -81,7 +81,7 @@ pipeline {
                 stage('aarch64-linux-gcc'){
                     agent {
                         dockerfile {
-                            additionalBuildArgs '--target avr-gcc'
+                            additionalBuildArgs '--target aarch64-linux-gcc'
                             args '-e HOME=/tmp -e BUILD_CONTEXT=aarch64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
@@ -98,7 +98,7 @@ pipeline {
                 stage('powerpc64-linux-gcc'){
                     agent {
                         dockerfile {
-                            additionalBuildArgs '--target avr-gcc'
+                            additionalBuildArgs '--target powerpc64-linux-gcc'
                             args '-e HOME=/tmp -e BUILD_CONTEXT=powerpc64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
@@ -115,7 +115,7 @@ pipeline {
                 stage('arm-none-gcc'){
                     agent {
                         dockerfile {
-                            additionalBuildArgs '--target avr-gcc'
+                            additionalBuildArgs '--target arm-none-gcc'
                             args '-e HOME=/tmp -e BUILD_CONTEXT=arm-none-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
