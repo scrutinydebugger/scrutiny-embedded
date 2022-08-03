@@ -61,12 +61,12 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -126,12 +126,12 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -147,7 +147,7 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
     const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
     const scrutiny::protocol::ResponseCode code = scrutiny::protocol::ResponseCode::InvalidRequest;
 
-    uint8_t tx_buffer[32];
+    uint8_t tx_buffer[64];
 
     // Building request
     uint8_t request_data[64] = { static_cast<uint8_t>(cmd), subfn };
@@ -169,7 +169,7 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
         scrutiny_handler.comm()->receive_data(request_data, length_to_receive);
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_GT(n_to_read, 0u) << "[ i=" << static_cast<uint32_t>(i) << "]";
         ASSERT_LT(n_to_read, sizeof(tx_buffer)) << "[i=" << static_cast<uint32_t>(i) << "]";
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
@@ -219,7 +219,7 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
         scrutiny_handler.comm()->receive_data(request_data, length_to_receive);
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -278,7 +278,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -333,7 +333,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -381,12 +381,12 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -432,12 +432,12 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -489,12 +489,12 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -553,12 +553,12 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -589,11 +589,11 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
@@ -623,11 +623,11 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint32_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
@@ -674,7 +674,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -731,7 +731,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
@@ -795,7 +795,7 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 

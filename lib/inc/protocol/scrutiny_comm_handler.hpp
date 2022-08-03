@@ -27,13 +27,13 @@ namespace scrutiny
         public:
 
             void init(uint8_t* rx_buffer, uint16_t rx_buffer_size, uint8_t* tx_buffer, uint16_t tx_buffer_size, Timebase* timebase, uint32_t prng_seed=0);
-            void receive_data(uint8_t* data, uint32_t len);
+            void receive_data(uint8_t* data, uint16_t len);
             bool send_response(Response* response);
             void reset();
             Response* prepare_response();
 
-            uint32_t pop_data(uint8_t* buffer, uint32_t len);
-            uint32_t data_to_send();
+            uint16_t pop_data(uint8_t* buffer, uint16_t len);
+            uint16_t data_to_send();
 
             bool check_crc(const Request* req);
             void add_crc(Response* response);
@@ -112,8 +112,8 @@ namespace scrutiny
 
             // Transmission
             Response m_active_response;
-            uint32_t m_nbytes_to_send;
-            uint32_t m_nbytes_sent;
+            uint16_t m_nbytes_to_send;
+            uint16_t m_nbytes_sent;
             TxError m_tx_error;
             
         private:

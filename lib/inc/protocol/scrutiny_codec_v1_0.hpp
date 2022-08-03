@@ -20,11 +20,14 @@ namespace scrutiny
 
     namespace protocol
     {
-        const unsigned int REQUEST_OVERHEAD = 8;
-        const unsigned int RESPONSE_OVERHEAD = 9;
-        const unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
-        const unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
-        const unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
+        constexpr unsigned int REQUEST_OVERHEAD = 8;
+        constexpr unsigned int RESPONSE_OVERHEAD = 9;
+        constexpr unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
+        constexpr unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
+        constexpr unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
+        constexpr uint16_t BUFFER_OVERFLOW_MARGIN = 16;     // This margin let us detect overflow in comm with less calculations.
+        constexpr unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN;
+        constexpr unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN;
 
         class ReadMemoryBlocksRequestParser
         {
@@ -33,16 +36,15 @@ namespace scrutiny
             void next(MemoryBlock* memblock);
             inline bool finished() { return m_finished; };
             inline bool is_valid() { return !m_invalid; };
-            inline uint32_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
+            inline uint16_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
             void reset();
 
         protected:
             void validate();
-
             uint8_t* m_buffer;
-            uint32_t m_bytes_read;
-            uint32_t m_size_limit;
-            uint32_t m_required_tx_buffer_size;
+            uint16_t m_bytes_read;
+            uint16_t m_request_datasize;
+            uint16_t m_required_tx_buffer_size;
             bool m_finished;
             bool m_invalid;
         };
@@ -50,7 +52,7 @@ namespace scrutiny
         class ReadMemoryBlocksResponseEncoder
         {
         public:
-            void init(Response* response, const uint32_t max_size);
+            void init(Response* response, const uint16_t max_size);
             void write(MemoryBlock* memblock);
             inline bool overflow() { return m_overflow; };
             void reset();
@@ -58,8 +60,8 @@ namespace scrutiny
         protected:
             uint8_t* m_buffer;
             Response* m_response;
-            uint32_t m_cursor;
-            uint32_t m_size_limit;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
             bool m_overflow;
         };
 
@@ -77,9 +79,9 @@ namespace scrutiny
             void validate();
 
             uint8_t* m_buffer;
-            uint32_t m_bytes_read;
-            uint32_t m_size_limit;
-            uint32_t m_required_tx_buffer_size;
+            uint16_t m_bytes_read;
+            uint16_t m_size_limit;
+            uint16_t m_required_tx_buffer_size;
             bool m_finished;
             bool m_invalid;
             bool m_masked_write;
@@ -88,7 +90,7 @@ namespace scrutiny
         class WriteMemoryBlocksResponseEncoder
         {
         public:
-            void init(Response* response, uint32_t max_size);
+            void init(Response* response, uint16_t max_size);
             void write(MemoryBlock* memblock);
             inline bool overflow() { return m_overflow; };
             void reset();
@@ -96,15 +98,15 @@ namespace scrutiny
         protected:
             uint8_t* m_buffer;
             Response* m_response;
-            uint32_t m_cursor;
-            uint32_t m_size_limit;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
             bool m_overflow;
         };
 
         class GetRPVDefinitionResponseEncoder
         {
         public:
-            void init(Response* response, const uint32_t max_size);
+            void init(Response* response, const uint16_t max_size);
             void write(const RuntimePublishedValue* rpv);
             inline bool overflow() { return m_overflow; };
             void reset();
@@ -112,15 +114,15 @@ namespace scrutiny
         protected:
             uint8_t* m_buffer;
             Response* m_response;
-            uint32_t m_cursor;
-            uint32_t m_size_limit;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
             bool m_overflow;
         };
 
         class ReadRPVResponseEncoder
         {
         public:
-            void init(Response* response, const uint32_t max_size);
+            void init(Response* response, const uint16_t max_size);
             void write(const RuntimePublishedValue* rpv, AnyType v);
             inline bool overflow() { return m_overflow; };
             void reset();
@@ -128,8 +130,8 @@ namespace scrutiny
         protected:
             uint8_t* m_buffer;
             Response* m_response;
-            uint32_t m_cursor;
-            uint32_t m_size_limit;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
             bool m_overflow;
             bool m_unsupported_type;
         };
@@ -156,7 +158,7 @@ namespace scrutiny
         class WriteRPVResponseEncoder
         {
         public:
-            void init(Response* response, const uint32_t max_size);
+            void init(Response* response, const uint16_t max_size);
             void write(const RuntimePublishedValue* rpv);
             inline bool overflow() { return m_overflow; };
             void reset();
@@ -164,8 +166,8 @@ namespace scrutiny
         protected:
             uint8_t* m_buffer;
             Response* m_response;
-            uint32_t m_cursor;
-            uint32_t m_size_limit;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
             bool m_overflow;
             bool m_unsupported_type;
         };
@@ -180,8 +182,6 @@ namespace scrutiny
             void reset();
 
         protected:
-            void validate();
-
             uint8_t* m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
@@ -329,17 +329,17 @@ namespace scrutiny
             ResponseCode decode_request_comm_disconnect(const Request* request, RequestData::CommControl::Disconnect* request_data);
 
             ReadMemoryBlocksRequestParser* decode_request_memory_control_read(const Request* request);
-            ReadMemoryBlocksResponseEncoder* encode_response_memory_control_read(Response* response, uint32_t max_size);
+            ReadMemoryBlocksResponseEncoder* encode_response_memory_control_read(Response* response, uint16_t max_size);
 
             WriteMemoryBlocksRequestParser* decode_request_memory_control_write(const Request* request, const bool masked_wirte);
-            WriteMemoryBlocksResponseEncoder* encode_response_memory_control_write(Response* response, uint32_t max_size);
+            WriteMemoryBlocksResponseEncoder* encode_response_memory_control_write(Response* response, uint16_t max_size);
 
-            GetRPVDefinitionResponseEncoder* encode_response_get_rpv_definition(Response* response, uint32_t max_size);
+            GetRPVDefinitionResponseEncoder* encode_response_get_rpv_definition(Response* response, uint16_t max_size);
             ReadRPVRequestParser* decode_request_memory_control_read_rpv(const Request* request);
-            ReadRPVResponseEncoder* encode_response_memory_control_read_rpv(Response* response, const uint32_t max_size);
+            ReadRPVResponseEncoder* encode_response_memory_control_read_rpv(Response* response, const uint16_t max_size);
 
             WriteRPVRequestParser* decode_request_memory_control_write_rpv(const Request* request, MainHandler *main_handler);
-            WriteRPVResponseEncoder* encode_response_memory_control_write_rpv(Response* response, const uint32_t max_size);
+            WriteRPVResponseEncoder* encode_response_memory_control_write_rpv(Response* response, const uint16_t max_size);
 
         protected:
             union

@@ -81,6 +81,7 @@ static uint8_t scrutiny_tx_buffer[256];
 void process_scrutiny_lib(AbstractCommChannel* channel)
 {
     uint8_t buffer[1024];
+    static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
@@ -113,10 +114,10 @@ void process_scrutiny_lib(AbstractCommChannel* channel)
                 cout << endl;
             }
 
-            scrutiny_handler.comm()->receive_data(buffer, len_received);
+            scrutiny_handler.comm()->receive_data(buffer, static_cast<uint16_t>(len_received));
 
-            uint32_t data_to_send = scrutiny_handler.comm()->data_to_send();
-            data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
+            uint16_t data_to_send = scrutiny_handler.comm()->data_to_send();
+            data_to_send = min(data_to_send, static_cast<uint16_t>(sizeof(buffer)));
 
             if (data_to_send > 0)
             {

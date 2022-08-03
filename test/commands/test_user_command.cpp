@@ -74,7 +74,7 @@ TEST_F(TestUserCommand, TestCommandCalled)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_EQ(n_to_read, sizeof(expected_response));
 
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
@@ -97,7 +97,7 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
 
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
@@ -119,7 +119,7 @@ TEST_F(TestUserCommand, TestNoCallback)
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint32_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
 
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
