@@ -814,10 +814,6 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 */
 TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
 {
-    constexpr scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    constexpr uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
-    constexpr scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
-
     constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
     constexpr uint16_t nb_write = buffersize_min_mod3 / 3;   //16bits ID + 16bits data
     constexpr uint16_t rx_data_size = nb_write * 3;       // 16bits ID + 8bits data
