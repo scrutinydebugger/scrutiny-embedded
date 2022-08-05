@@ -82,14 +82,16 @@ namespace scrutiny
         enum class RxError
         {
             None,
-            Overflow
+            Overflow,
+            Disabled
         };
 
         enum class TxError
         {
             None,
             Overflow,
-            Busy
+            Busy,
+            Disabled
         };
 
         struct Version
