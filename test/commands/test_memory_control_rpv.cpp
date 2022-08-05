@@ -748,4 +748,122 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 }
 
 
-// todo add a test for overflow. Need to allow non preprocessor buffer first.
+/*
+    Write so many RPV that the response that confirms which RPV is written doesn't fit the TX buffer
+    This requires a Rx buffer bigger than the Tx buffer (unlikely)
+*/
+
+TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
+{
+    constexpr scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    constexpr uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
+    constexpr scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
+
+    constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
+    constexpr uint16_t nb_write = buffersize_min_mod3/3+1;   //16bits ID + 16bits data
+    constexpr uint16_t rx_data_size = nb_write*3;       // 16bits ID + 8bits data
+    constexpr uint16_t tx_data_size = (nb_write-1)*3;   // 16bits ID + 8bits length.  -1 to cause overflow
+    constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
+
+    static_assert(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    static_assert(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    static_assert(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
+
+    uint8_t internal_rx_buffer[rx_data_size];
+    uint8_t internal_tx_buffer[tx_data_size];
+
+    scrutiny::RuntimePublishedValue rpvs[] = {
+       {0x1000, scrutiny::VariableType::uint8}
+    };
+
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    // Make request
+    
+    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF };
+
+    uint16_t index = 4;
+    for (uint16_t i = 0; i < nb_write; i++)
+    {
+        request_data[index++] = 0x10;
+        request_data[index++] = 0x00;
+        request_data[index++] = 0xAA;
+    }
+
+    add_crc(request_data, request_size - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, request_size);
+    scrutiny_handler.process(0);
+
+    uint8_t tx_buffer[32];
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_EQ(n_to_read, 9u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+
+    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow));
+}
+
+/*
+    Write so many RPV that the response that confirms which RPV is written completely fills the TX buffer without overflow
+    This requires a Rx buffer bigger than the Tx buffer (unlikely)
+*/
+TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
+{
+    constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
+    constexpr uint16_t nb_write = buffersize_min_mod3 / 3;   //16bits ID + 16bits data
+    constexpr uint16_t rx_data_size = nb_write * 3;       // 16bits ID + 8bits data
+    constexpr uint16_t tx_data_size = nb_write * 3;   // 16bits ID + 8bits length.
+    constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
+    constexpr uint16_t response_size = tx_data_size + scrutiny::protocol::RESPONSE_OVERHEAD;
+
+    static_assert(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    static_assert(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    static_assert(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
+
+    uint8_t internal_rx_buffer[rx_data_size];
+    uint8_t internal_tx_buffer[tx_data_size];
+
+    scrutiny::RuntimePublishedValue rpvs[] = {
+       {0x1000, scrutiny::VariableType::uint8}
+    };
+
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    uint8_t request_data[request_size] = { 3,5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF };
+    uint8_t expected_response[response_size] = { 0x83, 5, 0, ((tx_data_size) >> 8) & 0xFF, (tx_data_size) & 0xFF };
+
+    uint16_t rx_index = 4;
+    uint16_t tx_index = 5;
+    for (uint16_t i = 0; i < nb_write; i++)
+    {
+        request_data[rx_index++] = 0x10;    // ID
+        request_data[rx_index++] = 0x00;    // ID
+        request_data[rx_index++] = 0xAA;    // Data
+
+        expected_response[tx_index++] = 0x10;   // ID
+        expected_response[tx_index++] = 0x00;   // ID
+        expected_response[tx_index++] = 1;      // length
+    }
+
+    add_crc(request_data, request_size - 4);
+    add_crc(expected_response, response_size - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, request_size);
+    scrutiny_handler.process(0);
+
+    uint8_t tx_buffer[response_size];
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_EQ(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+
+    ASSERT_BUF_EQ(tx_buffer, expected_response, response_size);
+}

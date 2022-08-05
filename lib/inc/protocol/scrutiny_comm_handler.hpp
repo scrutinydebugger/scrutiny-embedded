@@ -48,6 +48,7 @@ namespace scrutiny
             inline bool request_received() { return m_request_received; }
             inline Request* get_request() { return &m_active_request; }
             inline RxError get_rx_error() const { return m_rx_error; }
+            inline TxError get_tx_error() const { return m_tx_error; }
             inline bool transmitting() const { return (m_state == State::Transmitting); }
             inline bool receiving() const { return (m_state == State::Receiving); }
 

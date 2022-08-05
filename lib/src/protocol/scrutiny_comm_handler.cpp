@@ -54,6 +54,7 @@ namespace scrutiny
 
             if (m_enabled == false)
             {
+                m_rx_error=RxError::Disabled;
                 return;
             }
 
@@ -245,8 +246,10 @@ namespace scrutiny
 
         bool CommHandler::send_response(Response* response)
         {
+            m_tx_error = TxError::None;
             if (m_enabled == false)
             {
+                m_tx_error = TxError::Disabled;
                 return false;
             }
 
@@ -280,8 +283,7 @@ namespace scrutiny
 
         uint16_t CommHandler::pop_data(uint8_t* buffer, uint16_t len)
         {
-            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF, "Cannot parse successfully with 16bits counters");
-            static_assert(protocol::BUFFER_OVERFLOW_MARGIN > protocol::RESPONSE_OVERHEAD, "Cannot guarantee protection against overflow during parsing.");
+            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF-9, "Cannot parse successfully with 16bits counters");
 
             if (m_state != State::Transmitting)
             {

@@ -153,3 +153,76 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
     ASSERT_BUF_EQ(buf, expected_data, sizeof(expected_data));
 }
 
+TEST_F(TestTxParsing, TestSendsOverflow)
+{
+    static_assert(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
+
+    constexpr uint16_t datalen = sizeof(_tx_buffer)+1;
+    response.command_id = 0x81;
+    response.subfunction_id = 0x02;
+    response.response_code = 0x03;
+    
+    response.data_length = datalen;
+    add_crc(&response);
+
+    comm.send_response(&response);
+
+    uint16_t n_to_read = comm.data_to_send();
+    EXPECT_EQ(n_to_read, 0);
+
+    EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::Overflow);
+}
+
+
+TEST_F(TestTxParsing, TestSendsFullBuffer)
+{
+    uint8_t buf[sizeof(_tx_buffer)+scrutiny::protocol::RESPONSE_OVERHEAD];
+    static_assert(sizeof(_tx_buffer) < 0xFFFF, "buffer too big");
+
+    constexpr uint16_t datalen = sizeof(_tx_buffer);
+    response.command_id = 0x81;
+    response.subfunction_id = 0x02;
+    response.response_code = 0x03;
+    response.data_length = datalen;
+    uint16_t i=0;
+    uint8_t n=0;
+    for (n=0, i=0; i<datalen; i++, n++)
+    {
+        response.data[i] = n;
+    }
+
+    add_crc(&response);
+
+    comm.send_response(&response);
+    EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::None);
+
+    uint16_t n_to_read = comm.data_to_send();
+    ASSERT_EQ(n_to_read, datalen+scrutiny::protocol::RESPONSE_OVERHEAD);
+    
+    uint16_t nread = comm.pop_data(buf, n_to_read);
+    EXPECT_EQ(nread, n_to_read);
+
+    ASSERT_BUF_EQ(&buf[5], response.data, datalen);
+}
+
+
+TEST_F(TestTxParsing, TestSendsOverflowRestart)
+{
+    static_assert(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
+    constexpr uint16_t datalen = sizeof(_tx_buffer);
+    response.command_id = 0x81;
+    response.subfunction_id = 0x02;
+    response.response_code = 0x03;
+    
+    response.data_length = datalen+1;
+    add_crc(&response);
+
+    comm.send_response(&response);
+    EXPECT_EQ(comm.data_to_send(), 0);
+    EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::Overflow);
+
+    response.data_length = datalen;
+    comm.send_response(&response);
+    EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::None);
+    EXPECT_EQ(comm.data_to_send(), datalen+scrutiny::protocol::RESPONSE_OVERHEAD);
+}
