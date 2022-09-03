@@ -352,7 +352,6 @@ namespace scrutiny
                     }
                 }
 
-                code = protocol::ResponseCode::OK;
                 break;
             }
                 // =================================
