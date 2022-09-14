@@ -64,6 +64,83 @@ void memdump(uintptr_t startAddr, uint32_t length)
     }
 }
 
+
+
+static uint8_t scrutiny_rx_buffer[128];
+static uint8_t scrutiny_tx_buffer[256];
+
+scrutiny::RuntimePublishedValue rpvs[] = {
+    {0x1000, scrutiny::VariableType::sint8},
+    {0x1001, scrutiny::VariableType::sint16},
+    {0x1002, scrutiny::VariableType::sint32},
+    {0x1003, scrutiny::VariableType::sint64},
+
+    {0x2000, scrutiny::VariableType::uint8},
+    {0x2001, scrutiny::VariableType::uint16},
+    {0x2002, scrutiny::VariableType::uint32},
+    {0x2003, scrutiny::VariableType::uint64},
+
+    {0x3000, scrutiny::VariableType::float32},
+    {0x3001, scrutiny::VariableType::float64},
+    {0x4000, scrutiny::VariableType::boolean}
+};
+
+struct {
+    int8_t rpv_id_1000;
+    int16_t rpv_id_1001;
+    int32_t rpv_id_1002;
+    int64_t rpv_id_1003;
+
+    uint8_t rpv_id_2000;
+    uint16_t rpv_id_2001;
+    uint32_t rpv_id_2002;
+    uint64_t rpv_id_2003;
+
+    float rpv_id_3000;
+    double rpv_id_3001;
+
+    bool rpv_id_4000;
+} rpvStorage;
+
+bool TestAppRPVReadCallback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType* outval)
+{
+    bool ok = true;
+    if (rpv.id == 0x1000) {outval->sint8 = rpvStorage.rpv_id_1000;}
+    else if (rpv.id == 0x1001) {outval->sint16 = rpvStorage.rpv_id_1001;}
+    else if (rpv.id == 0x1002) {outval->sint32 = rpvStorage.rpv_id_1002;}
+    else if (rpv.id == 0x1003) {outval->sint64 = rpvStorage.rpv_id_1003;}
+    else if (rpv.id == 0x2000) {outval->uint8 = rpvStorage.rpv_id_2000;}
+    else if (rpv.id == 0x2001) {outval->uint16 = rpvStorage.rpv_id_2001;}
+    else if (rpv.id == 0x2002) {outval->uint32 = rpvStorage.rpv_id_2002;}
+    else if (rpv.id == 0x2003) {outval->uint64 = rpvStorage.rpv_id_2003;}
+    else if (rpv.id == 0x3000) {outval->float32 = rpvStorage.rpv_id_3000;}
+    else if (rpv.id == 0x3001) {outval->float64 = rpvStorage.rpv_id_3001;}
+    else if (rpv.id == 0x4000) {outval->boolean = rpvStorage.rpv_id_4000;}
+    else {ok =false;}
+    
+    return ok;
+}
+
+
+bool TestAppRPVWriteCallback(const scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType* inval)
+{
+    bool ok = true;
+    if (rpv.id == 0x1000) {rpvStorage.rpv_id_1000 = inval->sint8;}
+    else if (rpv.id == 0x1001) {rpvStorage.rpv_id_1001 = inval->sint16;}
+    else if (rpv.id == 0x1002) {rpvStorage.rpv_id_1002 = inval->sint32;}
+    else if (rpv.id == 0x1003) {rpvStorage.rpv_id_1003 = inval->sint64;}
+    else if (rpv.id == 0x2000) {rpvStorage.rpv_id_2000 = inval->uint8;}
+    else if (rpv.id == 0x2001) {rpvStorage.rpv_id_2001 = inval->uint16;}
+    else if (rpv.id == 0x2002) {rpvStorage.rpv_id_2002 = inval->uint32;}
+    else if (rpv.id == 0x2003) {rpvStorage.rpv_id_2003 = inval->uint64;}
+    else if (rpv.id == 0x3000) {rpvStorage.rpv_id_3000 = inval->float32;}
+    else if (rpv.id == 0x3001) {rpvStorage.rpv_id_3001 = inval->float64;}
+    else if (rpv.id == 0x4000) {rpvStorage.rpv_id_4000 = inval->boolean;}
+    else {ok =false;}
+    
+    return ok;
+}
+
 void init_all_values()
 {
     file1SetValues();
@@ -73,10 +150,19 @@ void init_all_values()
     file2func1(123);
     mainfunc1();
     mainfunc1(123);
-}
 
-static uint8_t scrutiny_rx_buffer[128];
-static uint8_t scrutiny_tx_buffer[256];
+    rpvStorage.rpv_id_1000 = -10;
+    rpvStorage.rpv_id_1001 = -30000;
+    rpvStorage.rpv_id_1002 = 0xABCDEF;
+    rpvStorage.rpv_id_1003 = 0xAABBCCDDEEFF;
+    rpvStorage.rpv_id_2000 = 0xABu;
+    rpvStorage.rpv_id_2001 = 0x1234u;
+    rpvStorage.rpv_id_2002 = 0x12345678u;
+    rpvStorage.rpv_id_2003 = 0x111111111111u;
+    rpvStorage.rpv_id_3000 = 3.1415926f;
+    rpvStorage.rpv_id_3001 = 2.71828;
+    rpvStorage.rpv_id_4000 = true;
+}
 
 void process_scrutiny_lib(AbstractCommChannel* channel)
 {
@@ -85,6 +171,7 @@ void process_scrutiny_lib(AbstractCommChannel* channel)
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
+    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.max_bitrate = 100000;
     config.display_name = "TestApp Executable";
     config.prng_seed = 0xdeadbeef;
