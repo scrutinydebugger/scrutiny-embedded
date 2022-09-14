@@ -9,6 +9,8 @@
 #ifndef ___SCRUTINY_TYPES_H___
 #define ___SCRUTINY_TYPES_H___
 
+#include "stdint.h"
+
 namespace scrutiny 
 {
     struct AddressRange
