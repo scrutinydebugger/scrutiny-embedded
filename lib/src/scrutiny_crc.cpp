@@ -10,7 +10,7 @@
 
 namespace scrutiny
 {
-    uint32_t crc32(const uint8_t* data, const uint32_t size, const uint32_t start_value)
+    uint32_t crc32(const uint8_t *data, const uint32_t size, const uint32_t start_value)
     {
         uint32_t crc = ~start_value;
 

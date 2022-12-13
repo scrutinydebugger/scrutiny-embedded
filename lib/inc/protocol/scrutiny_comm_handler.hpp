@@ -25,18 +25,17 @@ namespace scrutiny
         class CommHandler
         {
         public:
-
-            void init(uint8_t* rx_buffer, uint16_t rx_buffer_size, uint8_t* tx_buffer, uint16_t tx_buffer_size, Timebase* timebase, uint32_t prng_seed=0);
-            void receive_data(uint8_t* data, uint16_t len);
-            bool send_response(Response* response);
+            void init(uint8_t *rx_buffer, uint16_t rx_buffer_size, uint8_t *tx_buffer, uint16_t tx_buffer_size, Timebase *timebase, uint32_t prng_seed = 0);
+            void receive_data(uint8_t *data, uint16_t len);
+            bool send_response(Response *response);
             void reset();
-            Response* prepare_response();
+            Response *prepare_response();
 
-            uint16_t pop_data(uint8_t* buffer, uint16_t len);
+            uint16_t pop_data(uint8_t *buffer, uint16_t len);
             uint16_t data_to_send();
 
-            bool check_crc(const Request* req);
-            void add_crc(Response* response);
+            bool check_crc(const Request *req);
+            void add_crc(Response *response);
 
             bool heartbeat(uint16_t challenge);
             void process();
@@ -46,7 +45,7 @@ namespace scrutiny
             inline void wait_next_request() { reset_rx(); }
 
             inline bool request_received() { return m_request_received; }
-            inline Request* get_request() { return &m_active_request; }
+            inline Request *get_request() { return &m_active_request; }
             inline RxError get_rx_error() const { return m_rx_error; }
             inline TxError get_tx_error() const { return m_tx_error; }
             inline bool transmitting() const { return (m_state == State::Transmitting); }
@@ -54,14 +53,17 @@ namespace scrutiny
 
             inline bool is_enabled() const { return m_enabled; }
             inline void enable() { m_enabled = true; }
-            inline void disable() { reset(); m_enabled = false; }
+            inline void disable()
+            {
+                reset();
+                m_enabled = false;
+            }
             inline bool is_connected() { return m_session_active; }
             inline uint32_t get_session_id() { return m_session_id; }
             inline uint16_t rx_buffer_size() { return m_rx_buffer_size; }
             inline uint16_t tx_buffer_size() { return m_tx_buffer_size; }
 
         protected:
-
             void process_active_request();
             bool received_discover_request();
             bool received_connect_request();
@@ -87,7 +89,7 @@ namespace scrutiny
             void reset_rx();
             void reset_tx();
 
-            Timebase* m_timebase;
+            Timebase *m_timebase;
             tools::MulBerry32PRNG m_prng;
             State m_state;
             bool m_enabled;
@@ -98,9 +100,9 @@ namespace scrutiny
             bool m_heartbeat_received;
 
             // Reception
-            uint8_t* m_rx_buffer;
+            uint8_t *m_rx_buffer;
             uint16_t m_rx_buffer_size;
-            uint8_t* m_tx_buffer;
+            uint8_t *m_tx_buffer;
             uint16_t m_tx_buffer_size;
             Request m_active_request;
             RxFSMState m_rx_state;
@@ -116,13 +118,11 @@ namespace scrutiny
             uint16_t m_nbytes_to_send;
             uint16_t m_nbytes_sent;
             TxError m_tx_error;
-            
+
         private:
             static uint32_t s_session_counter;
         };
     }
 }
-
-
 
 #endif //___SCRUTINY_COMM_HANDLER_H___

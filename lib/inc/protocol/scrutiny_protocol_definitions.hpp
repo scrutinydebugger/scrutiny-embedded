@@ -27,7 +27,7 @@ namespace scrutiny
             uint8_t subfunction_id;
             uint16_t data_length;
             uint16_t data_max_length;
-            uint8_t* data;
+            uint8_t *data;
             uint32_t crc;
         };
 
@@ -46,16 +46,16 @@ namespace scrutiny
             uint8_t response_code;
             uint16_t data_length;
             uint16_t data_max_length;
-            uint8_t* data;
+            uint8_t *data;
             uint32_t crc;
         };
 
         struct MemoryBlock
         {
-            uint8_t* start_address;
+            uint8_t *start_address;
             uint16_t length;
-            uint8_t* source_data;
-            uint8_t* mask;
+            uint8_t *source_data;
+            uint8_t *mask;
         };
 
         enum class CommandId
@@ -66,7 +66,6 @@ namespace scrutiny
             DataLogControl = 0x04,
             UserCommand = 0x05
         };
-
 
         enum class ResponseCode
         {
@@ -99,7 +98,6 @@ namespace scrutiny
             uint8_t major;
             uint8_t minor;
         };
-
 
         namespace GetInfo
         {
@@ -151,5 +149,4 @@ namespace scrutiny
     }
 }
 
-
-#endif  // ___SCRUTINY_PROTOCOL_DEFINITION_H___
+#endif // ___SCRUTINY_PROTOCOL_DEFINITION_H___

@@ -23,29 +23,28 @@ namespace scrutiny
     {
 
     public:
-        void init(Config* config);
-        bool get_rpv(uint16_t id, RuntimePublishedValue* rpv);
+        void init(Config *config);
+        bool get_rpv(uint16_t id, RuntimePublishedValue *rpv);
         VariableType get_rpv_type(uint16_t id);
 
         void process(const uint32_t timestep_us);
 
-        void process_request(const protocol::Request* request, protocol::Response* response);
-        protocol::ResponseCode process_get_info(const protocol::Request* request, protocol::Response* response);
-        protocol::ResponseCode process_comm_control(const protocol::Request* request, protocol::Response* response);
-        protocol::ResponseCode process_memory_control(const protocol::Request* request, protocol::Response* response);
-        protocol::ResponseCode process_user_command(const protocol::Request* request, protocol::Response* response);
+        void process_request(const protocol::Request *request, protocol::Response *response);
+        protocol::ResponseCode process_get_info(const protocol::Request *request, protocol::Response *response);
+        protocol::ResponseCode process_comm_control(const protocol::Request *request, protocol::Response *response);
+        protocol::ResponseCode process_memory_control(const protocol::Request *request, protocol::Response *response);
+        protocol::ResponseCode process_user_command(const protocol::Request *request, protocol::Response *response);
 
-        inline protocol::CommHandler* comm()
+        inline protocol::CommHandler *comm()
         {
             return &m_comm_handler;
         }
 
-        inline Config* get_config() { return &m_config; }
+        inline Config *get_config() { return &m_config; }
 
     private:
-
-        bool touches_forbidden_region(const protocol::MemoryBlock* block);
-        bool touches_readonly_region(const protocol::MemoryBlock* block);
+        bool touches_forbidden_region(const protocol::MemoryBlock *block);
+        bool touches_readonly_region(const protocol::MemoryBlock *block);
         void check_config();
 
         Timebase m_timebase;
@@ -54,7 +53,7 @@ namespace scrutiny
         bool m_disconnect_pending;
         Config m_config;
         bool m_enabled;
-#if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1,0)
+#if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec;
 #endif
     };

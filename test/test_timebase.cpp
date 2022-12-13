@@ -9,7 +9,6 @@
 #include <gtest/gtest.h>
 #include "scrutiny.hpp"
 
-
 TEST(TestTimebase, CheckTimeouts)
 {
     scrutiny::Timebase tb;
@@ -43,6 +42,4 @@ TEST(TestTimebase, CheckTimeouts)
     EXPECT_TRUE(tb.has_expired(timestamp, 1));
     EXPECT_TRUE(tb.has_expired(timestamp, 2));
     EXPECT_FALSE(tb.has_expired(timestamp, 3));
-
 }
-

@@ -21,7 +21,6 @@ namespace scrutiny
         VARIABLE_FREQ
     };
 
-
     class LoopHandler
     {
     public:
@@ -29,13 +28,12 @@ namespace scrutiny
         void init();
         void process();
 
-        //void rx_bytes(uint8_t* data, uint32_t len);
+        // void rx_bytes(uint8_t* data, uint32_t len);
 
     protected:
         LoopType m_loop_type;
         float m_frequency;
     };
 }
-
 
 #endif //___SCRUTINY_LOOP_HANDLER_H___

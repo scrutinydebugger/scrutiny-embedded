@@ -33,9 +33,8 @@ protected:
     }
 };
 
-
 // ==== Test Runtime Published Valuers
-static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType* outval)
+static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
 {
     uint32_t v1 = 0x12345678;
     float v2 = 1.34f;
@@ -53,7 +52,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint16 = v3;
     }
-    
+
     else if (rpv.id == 0x9000 && rpv.type == scrutiny::VariableType::uint8)
     {
         outval->uint8 = 0x99;
@@ -103,8 +102,8 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
-
-struct AllTypeResult {
+struct AllTypeResult
+{
 
     void clear()
     {
@@ -135,57 +134,56 @@ struct AllTypeResult {
 };
 static AllTypeResult dest_buffer_for_rpv_write;
 
-static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType* inval)
+static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType *inval)
 {
-     if (rpv.id == 0x1000 && rpv.type == scrutiny::VariableType::uint8)
-     {
+    if (rpv.id == 0x1000 && rpv.type == scrutiny::VariableType::uint8)
+    {
         dest_buffer_for_rpv_write.some_u8 = inval->uint8;
-     }
-     else if (rpv.id == 0x1001 && rpv.type == scrutiny::VariableType::uint16)
-     {
+    }
+    else if (rpv.id == 0x1001 && rpv.type == scrutiny::VariableType::uint16)
+    {
         dest_buffer_for_rpv_write.some_u16 = inval->uint16;
-     }
-     else if (rpv.id == 0x1002 && rpv.type == scrutiny::VariableType::uint32)
-     {
+    }
+    else if (rpv.id == 0x1002 && rpv.type == scrutiny::VariableType::uint32)
+    {
         dest_buffer_for_rpv_write.some_u32 = inval->uint32;
-     }
-     else if (rpv.id == 0x1003 && rpv.type == scrutiny::VariableType::uint64)
-     {
+    }
+    else if (rpv.id == 0x1003 && rpv.type == scrutiny::VariableType::uint64)
+    {
         dest_buffer_for_rpv_write.some_u64 = inval->uint64;
-     }
+    }
 
-     else if (rpv.id == 0x1004 && rpv.type == scrutiny::VariableType::sint8)
-     {
+    else if (rpv.id == 0x1004 && rpv.type == scrutiny::VariableType::sint8)
+    {
         dest_buffer_for_rpv_write.some_s8 = inval->sint8;
-     }
-     else if (rpv.id == 0x1005 && rpv.type == scrutiny::VariableType::sint16)
-     {
+    }
+    else if (rpv.id == 0x1005 && rpv.type == scrutiny::VariableType::sint16)
+    {
         dest_buffer_for_rpv_write.some_s16 = inval->sint16;
-     }
-     else if (rpv.id == 0x1006 && rpv.type == scrutiny::VariableType::sint32)
-     {
+    }
+    else if (rpv.id == 0x1006 && rpv.type == scrutiny::VariableType::sint32)
+    {
         dest_buffer_for_rpv_write.some_s32 = inval->sint32;
-     }
-     else if (rpv.id == 0x1007 && rpv.type == scrutiny::VariableType::sint64)
-     {
+    }
+    else if (rpv.id == 0x1007 && rpv.type == scrutiny::VariableType::sint64)
+    {
         dest_buffer_for_rpv_write.some_s64 = inval->sint64;
-     }
+    }
 
-     else if (rpv.id == 0x1008 && rpv.type == scrutiny::VariableType::float32)
-     {
+    else if (rpv.id == 0x1008 && rpv.type == scrutiny::VariableType::float32)
+    {
         dest_buffer_for_rpv_write.some_f32 = inval->float32;
-     }
-     else if (rpv.id == 0x1009 && rpv.type == scrutiny::VariableType::float64)
-     {
+    }
+    else if (rpv.id == 0x1009 && rpv.type == scrutiny::VariableType::float64)
+    {
         dest_buffer_for_rpv_write.some_f64 = inval->float64;
-     }
-     else
-     {
+    }
+    else
+    {
         return false;
-     }
-     return true;
+    }
+    return true;
 }
-
 
 /*
     Try to read a single RPV. Validate that we receive the right value
@@ -197,20 +195,19 @@ TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}
-    };
+        {0x5566, scrutiny::VariableType::uint16}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 2] = { 3,4,0,2, 0x11, 0x22 };
+    uint8_t request_data[8 + 2] = {3, 4, 0, 2, 0x11, 0x22};
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 2+4] = { 0x83, 4, 0, 0, 2+4, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78};
-    add_crc(expected_response, sizeof(expected_response) -4);
+    uint8_t expected_response[9 + 2 + 4] = {0x83, 4, 0, 0, 2 + 4, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78};
+    add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
@@ -235,22 +232,21 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}
-    };
+        {0x5566, scrutiny::VariableType::uint16}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 6] = { 3,4,0,6, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 };
+    uint8_t request_data[8 + 6] = {3, 4, 0, 6, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66};
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
     // 0x3fab851f = 1.34 in float
     // ID1, value1, ID2, value2, Id3, value3
-    uint8_t expected_response[9 + 6+4+4+2] = { 0x83, 4, 0, 0, 6+4+4+2, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78, 0x33, 0x44, 0x3f, 0xab, 0x85, 0x1f, 0x55, 0x66, 0xab, 0xcd};
-    add_crc(expected_response, sizeof(expected_response) -4);
+    uint8_t expected_response[9 + 6 + 4 + 4 + 2] = {0x83, 4, 0, 0, 6 + 4 + 4 + 2, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78, 0x33, 0x44, 0x3f, 0xab, 0x85, 0x1f, 0x55, 0x66, 0xab, 0xcd};
+    add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
@@ -263,7 +259,6 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
-
 
 /*
     Try to read a RPV of each type. Validate encoding is good
@@ -283,23 +278,21 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
         {0x9006, scrutiny::VariableType::sint32},
         {0x9007, scrutiny::VariableType::sint64},
         {0x9008, scrutiny::VariableType::float32},
-        {0x9009, scrutiny::VariableType::float64}
-    };
+        {0x9009, scrutiny::VariableType::float64}};
 
     std::map<uint16_t, std::vector<uint8_t>> expected_encoding;
-    expected_encoding.insert({ 0x9000, {0x99} });
-    expected_encoding.insert({ 0x9001, {0xA5, 0xA5} });
-    expected_encoding.insert({ 0x9002, {0x99, 0x88, 0x77, 0x66} });
-    expected_encoding.insert({ 0x9003, {0xFF, 0xFF, 0x11, 0x11, 0x22, 0x22, 0x33, 0x33} });
+    expected_encoding.insert({0x9000, {0x99}});
+    expected_encoding.insert({0x9001, {0xA5, 0xA5}});
+    expected_encoding.insert({0x9002, {0x99, 0x88, 0x77, 0x66}});
+    expected_encoding.insert({0x9003, {0xFF, 0xFF, 0x11, 0x11, 0x22, 0x22, 0x33, 0x33}});
 
-    expected_encoding.insert({ 0x9004, {0xC0} });   // -64
-    expected_encoding.insert({ 0x9005, {0x8A, 0xD0} }); // -30000
-    expected_encoding.insert({ 0x9006, {0xC4, 0x65, 0x36, 0x00} }); // -1 000 000 000
-    expected_encoding.insert({ 0x9007, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00} }); // -90 000 000 000
+    expected_encoding.insert({0x9004, {0xC0}});                                           // -64
+    expected_encoding.insert({0x9005, {0x8A, 0xD0}});                                     // -30000
+    expected_encoding.insert({0x9006, {0xC4, 0x65, 0x36, 0x00}});                         // -1 000 000 000
+    expected_encoding.insert({0x9007, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // -90 000 000 000
 
-    expected_encoding.insert({ 0x9008, {0x3f, 0xb9, 0x99, 0x9a} }); // 1.45
-    expected_encoding.insert({ 0x9009, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb} });   // -5.123
-
+    expected_encoding.insert({0x9008, {0x3f, 0xb9, 0x99, 0x9a}});                         // 1.45
+    expected_encoding.insert({0x9009, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // -5.123
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
@@ -307,17 +300,17 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     const uint16_t nb_vals = static_cast<uint16_t>(expected_encoding.size());
     // Make request
     uint16_t request_buffer_size = 8 + nb_vals * 2;
-    uint8_t* request_data = new uint8_t[request_buffer_size];
-    request_data[0] = 3;    // command
-    request_data[1] = 4;    // subcommand
-    request_data[2] = ((nb_vals * 2) >> 8) & 0xFF;    // length msb
-    request_data[3] = ((nb_vals * 2) & 0xFF);    // length lsb
+    uint8_t *request_data = new uint8_t[request_buffer_size];
+    request_data[0] = 3;                           // command
+    request_data[1] = 4;                           // subcommand
+    request_data[2] = ((nb_vals * 2) >> 8) & 0xFF; // length msb
+    request_data[3] = ((nb_vals * 2) & 0xFF);      // length lsb
     unsigned int index = 4;
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         const uint16_t id = p->first;
         request_data[index++] = (id >> 8) & 0xFF;
-        request_data[index++] = (id) & 0xFF;
+        request_data[index++] = (id)&0xFF;
     }
     add_crc(request_data, request_buffer_size - 4);
 
@@ -334,20 +327,19 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         const uint16_t id = p->first;
-        ASSERT_LE(index, static_cast<unsigned int>(nread - 2));    // safety check
+        ASSERT_LE(index, static_cast<unsigned int>(nread - 2)); // safety check
 
         EXPECT_EQ(tx_buffer[index], (id >> 8) & 0xFF) << "index=" << index << ", ID = " << id;
-        EXPECT_EQ(tx_buffer[index+1], id & 0xFF) << "index=" << index << ", ID = " << id;
+        EXPECT_EQ(tx_buffer[index + 1], id & 0xFF) << "index=" << index << ", ID = " << id;
         index += 2;
-        ASSERT_LE(index, nread-p->second.size());    // safety check
-        for (unsigned int n=0; n<p->second.size(); n++)
+        ASSERT_LE(index, nread - p->second.size()); // safety check
+        for (unsigned int n = 0; n < p->second.size(); n++)
         {
             EXPECT_EQ(tx_buffer[index], p->second[n]) << "index=" << index << ", ID=" << id << "/Bytes #" << n;
             index++;
         }
     }
 }
-
 
 /*
     Send a read request with invalid data length. Expect an invalidRequest response
@@ -364,15 +356,14 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}
-    };
+        {0x5566, scrutiny::VariableType::uint16}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 3] = { 3,4,0,3, 0x11, 0x22, 0x33 };    // Incomplete ID
+    uint8_t request_data[8 + 3] = {3, 4, 0, 3, 0x11, 0x22, 0x33}; // Incomplete ID
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -402,15 +393,14 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}
-    };
+        {0x5566, scrutiny::VariableType::uint16}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 4] = { 3,4,0,4, 0x11, 0x22, 0x99, 0x99 };    // 0x9999 doesn't exists
+    uint8_t request_data[8 + 4] = {3, 4, 0, 4, 0x11, 0x22, 0x99, 0x99}; // 0x9999 doesn't exists
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -440,29 +430,28 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     scrutiny::RuntimePublishedValue rpvs[3] = {
         {0x1122, scrutiny::VariableType::uint32},
         {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}
-    };
+        {0x5566, scrutiny::VariableType::uint16}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), rpv_read_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     uint16_t bufsize = scrutiny_handler.comm()->tx_buffer_size();
-    uint16_t nbrpv = bufsize/6+1;   // Will cause overflow. Do not hceck overhead. Buffer store data only
-    uint16_t request_buffer_size = nbrpv*2 + 8;
-    uint8_t* request_data = new uint8_t[request_buffer_size];
-    request_data[0] = 3;    // command
-    request_data[1] = 4;    // subcommand
-    request_data[2] = ((nbrpv*2) >> 8)&0xFF;    // length msb
-    request_data[3] = ((nbrpv*2) & 0xFF);    // length lsb
+    uint16_t nbrpv = bufsize / 6 + 1; // Will cause overflow. Do not hceck overhead. Buffer store data only
+    uint16_t request_buffer_size = nbrpv * 2 + 8;
+    uint8_t *request_data = new uint8_t[request_buffer_size];
+    request_data[0] = 3;                         // command
+    request_data[1] = 4;                         // subcommand
+    request_data[2] = ((nbrpv * 2) >> 8) & 0xFF; // length msb
+    request_data[3] = ((nbrpv * 2) & 0xFF);      // length lsb
 
-    for (uint16_t i=0; i<nbrpv; i++)
+    for (uint16_t i = 0; i < nbrpv; i++)
     {
-        request_data[4+2*i] = 0x11;
-        request_data[4+2*i+1] = 0x22;
+        request_data[4 + 2 * i] = 0x11;
+        request_data[4 + 2 * i + 1] = 0x22;
     }
     // Make request
-    add_crc(request_data, request_buffer_size-4);
+    add_crc(request_data, request_buffer_size - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
@@ -479,7 +468,6 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
 //=================================================
 //==================  WRITE  ======================
 //=================================================
-
 
 /*
     Try to write a single RPV. Validate that the data reach the destination intact
@@ -499,20 +487,19 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
         {0x1006, scrutiny::VariableType::sint32},
         {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}
-    };
+        {0x1009, scrutiny::VariableType::float64}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 2 + 4] = { 3,5,0,6, 0x10, 0x02, 0x11, 0x22, 0x33, 0x44 };
+    uint8_t request_data[8 + 2 + 4] = {3, 5, 0, 6, 0x10, 0x02, 0x11, 0x22, 0x33, 0x44};
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 2 + 1] = { 0x83, 5, 0, 0, 3, 0x10, 0x02, 4}; // id + length
-    add_crc(expected_response, sizeof(expected_response) -4);
+    uint8_t expected_response[9 + 2 + 1] = {0x83, 5, 0, 0, 3, 0x10, 0x02, 4}; // id + length
+    add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
@@ -527,7 +514,6 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
 
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u32, 0x11223344u);
 }
-
 
 /*
     Try to write a multiple RPV. Validate that the data reach the destination intact
@@ -547,21 +533,20 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
         {0x1006, scrutiny::VariableType::sint32},
         {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}
-    };
+        {0x1009, scrutiny::VariableType::float64}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
     // 0x1002 = 0x11223344, 0x1006 = -1234567890
-    uint8_t request_data[8 + (2+4)*2] = { 3,5,0,(2+4)*2, 0x10, 0x02, 0x11, 0x22, 0x33, 0x44, 0x10, 0x06, 0xB6, 0x69, 0xFD, 0x2E};
+    uint8_t request_data[8 + (2 + 4) * 2] = {3, 5, 0, (2 + 4) * 2, 0x10, 0x02, 0x11, 0x22, 0x33, 0x44, 0x10, 0x06, 0xB6, 0x69, 0xFD, 0x2E};
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 6] = { 0x83, 5, 0, 0, (2+1)*2, 0x10, 0x02, 4, 0x10, 0x06, 4};
-    add_crc(expected_response, sizeof(expected_response) -4);
+    uint8_t expected_response[9 + 6] = {0x83, 5, 0, 0, (2 + 1) * 2, 0x10, 0x02, 4, 0x10, 0x06, 4};
+    add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
@@ -574,11 +559,9 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 
-
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u32, 0x11223344u);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s32, -1234567890);
 }
-
 
 /*
     Try to write multiple RPV, on of each type. Validate that the data reach the destination intact
@@ -597,8 +580,7 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
         {0x1006, scrutiny::VariableType::sint32},
         {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}
-    };
+        {0x1009, scrutiny::VariableType::float64}};
 
     struct TestEntry
     {
@@ -606,33 +588,32 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
         scrutiny::VariableType type;
         std::vector<uint8_t> data;
     };
-    
+
     std::vector<TestEntry> vals_and_payload;
 
-    vals_and_payload.push_back({ 0x1000, scrutiny::VariableType::uint8, {0x55}}); // 4-6
-    vals_and_payload.push_back({ 0x1001, scrutiny::VariableType::uint16, {0xAB, 0xCD}}); //7-10
-    vals_and_payload.push_back({ 0x1002, scrutiny::VariableType::uint32, {0x12, 0x34, 0x56, 0x78}}); // 11-16
-    vals_and_payload.push_back({ 0x1003, scrutiny::VariableType::uint64, {0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10}}); // 17-24
-    vals_and_payload.push_back({ 0x1004, scrutiny::VariableType::sint8, {0xC0}});   // 25-27
-    vals_and_payload.push_back({ 0x1005, scrutiny::VariableType::sint16, {0x8A, 0xD0}});    // 28 - 31
-    vals_and_payload.push_back({ 0x1006, scrutiny::VariableType::sint32, {0xC4, 0x65, 0x36, 0x00}}); // 32 - 37
-    vals_and_payload.push_back({ 0x1007, scrutiny::VariableType::sint64, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}});    // 38 - 47
-    vals_and_payload.push_back({ 0x1008, scrutiny::VariableType::sint32, {0x3f, 0xb9, 0x99, 0x9a}});    // 48 - 53
-    vals_and_payload.push_back({ 0x1009, scrutiny::VariableType::sint64, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}});    // 54 - 63
+    vals_and_payload.push_back({0x1000, scrutiny::VariableType::uint8, {0x55}});                                            // 4-6
+    vals_and_payload.push_back({0x1001, scrutiny::VariableType::uint16, {0xAB, 0xCD}});                                     // 7-10
+    vals_and_payload.push_back({0x1002, scrutiny::VariableType::uint32, {0x12, 0x34, 0x56, 0x78}});                         // 11-16
+    vals_and_payload.push_back({0x1003, scrutiny::VariableType::uint64, {0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10}}); // 17-24
+    vals_and_payload.push_back({0x1004, scrutiny::VariableType::sint8, {0xC0}});                                            // 25-27
+    vals_and_payload.push_back({0x1005, scrutiny::VariableType::sint16, {0x8A, 0xD0}});                                     // 28 - 31
+    vals_and_payload.push_back({0x1006, scrutiny::VariableType::sint32, {0xC4, 0x65, 0x36, 0x00}});                         // 32 - 37
+    vals_and_payload.push_back({0x1007, scrutiny::VariableType::sint64, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // 38 - 47
+    vals_and_payload.push_back({0x1008, scrutiny::VariableType::sint32, {0x3f, 0xb9, 0x99, 0x9a}});                         // 48 - 53
+    vals_and_payload.push_back({0x1009, scrutiny::VariableType::sint64, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // 54 - 63
 
-
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint16_t required_request_size = 8; // request overhead
+    uint16_t required_request_size = 8;  // request overhead
     uint16_t required_response_size = 9; // request overhead
 
-    for (unsigned int i=0; i < vals_and_payload.size(); i++)
+    for (unsigned int i = 0; i < vals_and_payload.size(); i++)
     {
         required_request_size += 2 + scrutiny::tools::get_type_size(vals_and_payload[i].type);
-        required_response_size += 2 + 1;    // id (2) + len (1)
+        required_response_size += 2 + 1; // id (2) + len (1)
     }
 
     uint8_t *request_data = new uint8_t[required_request_size];
@@ -643,20 +624,20 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 
     request_data[0] = 3;
     request_data[1] = 5;
-    request_data[2] = ((required_request_size-8) >> 8) & 0xFF ;
-    request_data[3] = (required_request_size -8) & 0xFF;
+    request_data[2] = ((required_request_size - 8) >> 8) & 0xFF;
+    request_data[3] = (required_request_size - 8) & 0xFF;
 
     expected_response[0] = 0x83;
     expected_response[1] = 5;
     expected_response[2] = 0;
-    expected_response[3] = ((required_response_size-9)>>8)&0xFF;
-    expected_response[4] = (required_response_size-9) & 0xFF;
+    expected_response[3] = ((required_response_size - 9) >> 8) & 0xFF;
+    expected_response[4] = (required_response_size - 9) & 0xFF;
 
-    for (unsigned int i=0; i < vals_and_payload.size(); i++)
+    for (unsigned int i = 0; i < vals_and_payload.size(); i++)
     {
         request_data[request_index++] = (vals_and_payload[i].id >> 8) & 0xFF;
         request_data[request_index++] = (vals_and_payload[i].id) & 0xFF;
-        for (unsigned int j=0; j<vals_and_payload[i].data.size(); j++)
+        for (unsigned int j = 0; j < vals_and_payload[i].data.size(); j++)
         {
             request_data[request_index++] = vals_and_payload[i].data[j];
         }
@@ -691,7 +672,6 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     EXPECT_EQ(dest_buffer_for_rpv_write.some_f64, -5.123);
 }
 
-
 /*
     Send a write request with invalid data length. Expect an invalidRequest response
 */
@@ -704,7 +684,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 
     uint8_t tx_buffer[32];
 
-     scrutiny::RuntimePublishedValue rpvs[] = {
+    scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8},
         {0x1001, scrutiny::VariableType::uint16},
         {0x1002, scrutiny::VariableType::uint32},
@@ -714,25 +694,24 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         {0x1006, scrutiny::VariableType::sint32},
         {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}
-    };
+        {0x1009, scrutiny::VariableType::float64}};
 
-    config.set_published_values(rpvs, sizeof(rpvs)/sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
 
-    uint8_t fullrequest_no_crc[4 + 2+4] = { 3,5,0, 0, 0x10, 0x02,  0x11, 0x22, 0x33, 0x44 }; 
+    uint8_t fullrequest_no_crc[4 + 2 + 4] = {3, 5, 0, 0, 0x10, 0x02, 0x11, 0x22, 0x33, 0x44};
 
-    for (uint8_t i=1; i<6-1; i++)  // For all size : 1,2,3,4,5 we expect a failure. 0 and 6 would be the correct size
+    for (uint8_t i = 1; i < 6 - 1; i++) // For all size : 1,2,3,4,5 we expect a failure. 0 and 6 would be the correct size
     {
         uint16_t request_size = 8 + i;
-        uint8_t* request_data = new uint8_t[request_size];
-        std::memcpy(request_data, fullrequest_no_crc, request_size-4);
+        uint8_t *request_data = new uint8_t[request_size];
+        std::memcpy(request_data, fullrequest_no_crc, request_size - 4);
         request_data[3] = i;
-        add_crc(request_data, 4+i);
-        
+        add_crc(request_data, 4 + i);
+
         scrutiny_handler.comm()->receive_data(request_data, request_size);
         scrutiny_handler.process(0);
 
@@ -742,11 +721,10 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
         scrutiny_handler.process(0);
 
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << " i=" << i ;
+        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << " i=" << i;
         delete[] request_data;
     }
 }
-
 
 /*
     Write so many RPV that the response that confirms which RPV is written doesn't fit the TX buffer
@@ -760,9 +738,9 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     constexpr scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
-    constexpr uint16_t nb_write = buffersize_min_mod3/3+1;   //16bits ID + 16bits data
-    constexpr uint16_t rx_data_size = nb_write*3;       // 16bits ID + 8bits data
-    constexpr uint16_t tx_data_size = (nb_write-1)*3;   // 16bits ID + 8bits length.  -1 to cause overflow
+    constexpr uint16_t nb_write = buffersize_min_mod3 / 3 + 1; // 16bits ID + 16bits data
+    constexpr uint16_t rx_data_size = nb_write * 3;            // 16bits ID + 8bits data
+    constexpr uint16_t tx_data_size = (nb_write - 1) * 3;      // 16bits ID + 8bits length.  -1 to cause overflow
     constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
 
     static_assert(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
@@ -773,8 +751,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     uint8_t internal_tx_buffer[tx_data_size];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
-       {0x1000, scrutiny::VariableType::uint8}
-    };
+        {0x1000, scrutiny::VariableType::uint8}};
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
@@ -782,8 +759,8 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     scrutiny_handler.comm()->connect();
 
     // Make request
-    
-    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF };
+
+    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size)&0xFF};
 
     uint16_t index = 4;
     for (uint16_t i = 0; i < nb_write; i++)
@@ -815,9 +792,9 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
 {
     constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
-    constexpr uint16_t nb_write = buffersize_min_mod3 / 3;   //16bits ID + 16bits data
-    constexpr uint16_t rx_data_size = nb_write * 3;       // 16bits ID + 8bits data
-    constexpr uint16_t tx_data_size = nb_write * 3;   // 16bits ID + 8bits length.
+    constexpr uint16_t nb_write = buffersize_min_mod3 / 3; // 16bits ID + 16bits data
+    constexpr uint16_t rx_data_size = nb_write * 3;        // 16bits ID + 8bits data
+    constexpr uint16_t tx_data_size = nb_write * 3;        // 16bits ID + 8bits length.
     constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
     constexpr uint16_t response_size = tx_data_size + scrutiny::protocol::RESPONSE_OVERHEAD;
 
@@ -829,28 +806,27 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     uint8_t internal_tx_buffer[tx_data_size];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
-       {0x1000, scrutiny::VariableType::uint8}
-    };
+        {0x1000, scrutiny::VariableType::uint8}};
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[request_size] = { 3,5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF };
-    uint8_t expected_response[response_size] = { 0x83, 5, 0, ((tx_data_size) >> 8) & 0xFF, (tx_data_size) & 0xFF };
+    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size)&0xFF};
+    uint8_t expected_response[response_size] = {0x83, 5, 0, ((tx_data_size) >> 8) & 0xFF, (tx_data_size)&0xFF};
 
     uint16_t rx_index = 4;
     uint16_t tx_index = 5;
     for (uint16_t i = 0; i < nb_write; i++)
     {
-        request_data[rx_index++] = 0x10;    // ID
-        request_data[rx_index++] = 0x00;    // ID
-        request_data[rx_index++] = 0xAA;    // Data
+        request_data[rx_index++] = 0x10; // ID
+        request_data[rx_index++] = 0x00; // ID
+        request_data[rx_index++] = 0xAA; // Data
 
-        expected_response[tx_index++] = 0x10;   // ID
-        expected_response[tx_index++] = 0x00;   // ID
-        expected_response[tx_index++] = 1;      // length
+        expected_response[tx_index++] = 0x10; // ID
+        expected_response[tx_index++] = 0x00; // ID
+        expected_response[tx_index++] = 1;    // length
     }
 
     add_crc(request_data, request_size - 4);
