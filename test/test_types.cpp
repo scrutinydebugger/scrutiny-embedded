@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "scrutiny.hpp"
 
-
 TEST(TestTypes, TestSize)
 {
     ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::sint8), 1);

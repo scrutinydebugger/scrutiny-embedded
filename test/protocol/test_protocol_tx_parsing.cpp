@@ -11,7 +11,6 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-
 class TestTxParsing : public ScrutinyTest
 {
 protected:
@@ -19,7 +18,7 @@ protected:
     scrutiny::protocol::CommHandler comm;
     uint8_t response_buffer[256];
     scrutiny::protocol::Response response;
-    
+
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
@@ -46,7 +45,7 @@ TEST_F(TestTxParsing, TestReadAllData)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
+    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -59,7 +58,6 @@ TEST_F(TestTxParsing, TestReadAllData)
 
     ASSERT_BUF_EQ(buf, expected_data, sizeof(expected_data));
 }
-
 
 TEST_F(TestTxParsing, TestReadBytePerByte)
 {
@@ -76,7 +74,7 @@ TEST_F(TestTxParsing, TestReadBytePerByte)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
+    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -109,11 +107,11 @@ TEST_F(TestTxParsing, TestReadByChunk)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
+    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
-    uint8_t chunks[3] = { 3,6,3 };
+    uint8_t chunks[3] = {3, 6, 3};
     ASSERT_EQ(n_to_read, 12u);
 
     uint16_t nread;
@@ -143,7 +141,7 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81,2,3,0,3,0x11, 0x22, 0x33 };
+    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -157,11 +155,11 @@ TEST_F(TestTxParsing, TestSendsOverflow)
 {
     static_assert(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
 
-    constexpr uint16_t datalen = sizeof(_tx_buffer)+1;
+    constexpr uint16_t datalen = sizeof(_tx_buffer) + 1;
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
     response.response_code = 0x03;
-    
+
     response.data_length = datalen;
     add_crc(&response);
 
@@ -173,10 +171,9 @@ TEST_F(TestTxParsing, TestSendsOverflow)
     EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::Overflow);
 }
 
-
 TEST_F(TestTxParsing, TestSendsFullBuffer)
 {
-    uint8_t buf[sizeof(_tx_buffer)+scrutiny::protocol::RESPONSE_OVERHEAD];
+    uint8_t buf[sizeof(_tx_buffer) + scrutiny::protocol::RESPONSE_OVERHEAD];
     static_assert(sizeof(_tx_buffer) < 0xFFFF, "buffer too big");
 
     constexpr uint16_t datalen = sizeof(_tx_buffer);
@@ -184,9 +181,9 @@ TEST_F(TestTxParsing, TestSendsFullBuffer)
     response.subfunction_id = 0x02;
     response.response_code = 0x03;
     response.data_length = datalen;
-    uint16_t i=0;
-    uint8_t n=0;
-    for (n=0, i=0; i<datalen; i++, n++)
+    uint16_t i = 0;
+    uint8_t n = 0;
+    for (n = 0, i = 0; i < datalen; i++, n++)
     {
         response.data[i] = n;
     }
@@ -197,14 +194,13 @@ TEST_F(TestTxParsing, TestSendsFullBuffer)
     EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::None);
 
     uint16_t n_to_read = comm.data_to_send();
-    ASSERT_EQ(n_to_read, datalen+scrutiny::protocol::RESPONSE_OVERHEAD);
-    
+    ASSERT_EQ(n_to_read, datalen + scrutiny::protocol::RESPONSE_OVERHEAD);
+
     uint16_t nread = comm.pop_data(buf, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(&buf[5], response.data, datalen);
 }
-
 
 TEST_F(TestTxParsing, TestSendsOverflowRestart)
 {
@@ -213,8 +209,8 @@ TEST_F(TestTxParsing, TestSendsOverflowRestart)
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
     response.response_code = 0x03;
-    
-    response.data_length = datalen+1;
+
+    response.data_length = datalen + 1;
     add_crc(&response);
 
     comm.send_response(&response);
@@ -224,5 +220,5 @@ TEST_F(TestTxParsing, TestSendsOverflowRestart)
     response.data_length = datalen;
     comm.send_response(&response);
     EXPECT_EQ(comm.get_tx_error(), scrutiny::protocol::TxError::None);
-    EXPECT_EQ(comm.data_to_send(), datalen+scrutiny::protocol::RESPONSE_OVERHEAD);
+    EXPECT_EQ(comm.data_to_send(), datalen + scrutiny::protocol::RESPONSE_OVERHEAD);
 }

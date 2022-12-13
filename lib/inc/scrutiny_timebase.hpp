@@ -23,7 +23,7 @@ namespace scrutiny
             m_time_us += timestep_us;
         }
 
-        inline uint32_t get_timestamp() 
+        inline uint32_t get_timestamp()
         {
             return m_time_us;
         };
@@ -49,6 +49,5 @@ namespace scrutiny
         uint32_t m_time_us;
     };
 }
-
 
 #endif

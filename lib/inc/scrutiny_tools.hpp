@@ -22,14 +22,13 @@ namespace scrutiny
     {
         inline AddressRange make_address_range(uintptr_t start, uintptr_t end)
         {
-            return {reinterpret_cast<void*>(start), reinterpret_cast<void*>(end)};
+            return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
         }
 
-        inline AddressRange make_address_range(void* start, void* end)
+        inline AddressRange make_address_range(void *start, void *end)
         {
             return {start, end};
         }
-
 
         inline uint8_t get_type_size(VariableType v)
         {
@@ -41,10 +40,10 @@ namespace scrutiny
             return 1 << (static_cast<uint8_t>(v) & 0xF);
         }
 
-        inline size_t strnlen(const char* s, size_t maxlen)
+        inline size_t strnlen(const char *s, size_t maxlen)
         {
-            size_t n=0;
-            for(; n<maxlen; n++)
+            size_t n = 0;
+            for (; n < maxlen; n++)
             {
                 if (s[n] == '\0')
                 {
@@ -56,10 +55,10 @@ namespace scrutiny
         }
 
         // strncpy is not standard + non-standard implementation does shenanigans.
-        inline size_t strncpy(char* dst, const char* src, size_t maxlen)
+        inline size_t strncpy(char *dst, const char *src, size_t maxlen)
         {
-            size_t n=0;
-            for(; n<maxlen; n++)
+            size_t n = 0;
+            for (; n < maxlen; n++)
             {
                 dst[n] = src[n];
                 if (src[n] == '\0')
@@ -68,22 +67,22 @@ namespace scrutiny
                 }
             }
 
-            if (n>=maxlen)
+            if (n >= maxlen)
             {
-                dst[maxlen-1] = '\0';
+                dst[maxlen - 1] = '\0';
             }
             return n;
         }
 
-        //Taken from https://gist.github.com/tommyettinger/46a874533244883189143505d203312
-        class MulBerry32PRNG    
+        // Taken from https://gist.github.com/tommyettinger/46a874533244883189143505d203312
+        class MulBerry32PRNG
         {
-            public:
-            MulBerry32PRNG(uint32_t seed) : m_state(seed){}
-            MulBerry32PRNG() : m_state(0){}
+        public:
+            MulBerry32PRNG(uint32_t seed) : m_state(seed) {}
+            MulBerry32PRNG() : m_state(0) {}
 
-            void seed(uint32_t _seed){m_state = _seed;}
-            uint32_t get() 
+            void seed(uint32_t _seed) { m_state = _seed; }
+            uint32_t get()
             {
                 uint32_t z = m_state += 0x6D2B79F5;
                 z = (z ^ z >> 15) * (1 | z);
@@ -91,11 +90,10 @@ namespace scrutiny
                 return z ^ z >> 14;
             }
 
-            private:
+        private:
             uint32_t m_state;
         };
     }
 }
-
 
 #endif //__SCRUTINY_TOOLS_H__

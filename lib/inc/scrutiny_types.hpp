@@ -11,17 +11,17 @@
 
 #include "stdint.h"
 
-namespace scrutiny 
+namespace scrutiny
 {
     struct AddressRange
     {
-        void* start;
-        void* end;
+        void *start;
+        void *end;
     };
 
-	typedef unsigned int loop_id_t;
+    typedef unsigned int loop_id_t;
 
-    typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t* request_data, const uint16_t request_data_length, uint8_t* response_data, uint16_t* response_data_length, const uint16_t response_max_data_length);
+    typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
 
     enum class VariableTypeType
     {
@@ -43,7 +43,7 @@ namespace scrutiny
     };
 
     // This enum must match the definition in the python core module.
-    enum class VariableType 
+    enum class VariableType
     {
         sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),
         sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),
@@ -93,13 +93,13 @@ namespace scrutiny
 
     struct RuntimePublishedValue
     {
-        public:
-            uint16_t id;
-            VariableType type;
+    public:
+        uint16_t id;
+        VariableType type;
     };
 
-    typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType* outval);
-    typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType* inval);
+    typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType *outval);
+    typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType *inval);
 }
 
-#endif   //  ___SCRUTINY_TYPES_H___
+#endif //  ___SCRUTINY_TYPES_H___

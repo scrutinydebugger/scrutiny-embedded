@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "CMake",
+            "compileCommands": "${workspaceRoot}/build-dev/compile_commands.json",
+            "configurationProvider": "go2sh.cmake-integration"
+        }
+    ],
+    "version": 4
+}

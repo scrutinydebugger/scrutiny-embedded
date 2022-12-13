@@ -13,7 +13,7 @@
 
 namespace scrutiny
 {
-    void MainHandler::init(Config* config)
+    void MainHandler::init(Config *config)
     {
         m_processing_request = false;
         m_disconnect_pending = false;
@@ -22,8 +22,7 @@ namespace scrutiny
         m_comm_handler.init(
             m_config.m_rx_buffer, m_config.m_rx_buffer_size,
             m_config.m_tx_buffer, m_config.m_tx_buffer_size,
-            &m_timebase, m_config.prng_seed
-            );
+            &m_timebase, m_config.prng_seed);
 
         check_config();
         if (!m_enabled)
@@ -77,7 +76,7 @@ namespace scrutiny
         if (m_comm_handler.request_received() && !m_processing_request)
         {
             m_processing_request = true;
-            protocol::Response* response = m_comm_handler.prepare_response();
+            protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
             m_comm_handler.send_response(response);
@@ -99,13 +98,13 @@ namespace scrutiny
         }
     }
 
-    bool MainHandler::get_rpv(uint16_t id, RuntimePublishedValue* rpv)
+    bool MainHandler::get_rpv(uint16_t id, RuntimePublishedValue *rpv)
     {
         const uint16_t rpv_count = m_config.get_rpv_count();
         bool found = false;
-        for (uint16_t i=0; i<rpv_count; i++)    // if unset this count will be 0
+        for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
         {
-            if(m_config.get_rpvs_array()[i].id == id)
+            if (m_config.get_rpvs_array()[i].id == id)
             {
                 found = true;
                 *rpv = m_config.get_rpvs_array()[i];
@@ -123,8 +122,7 @@ namespace scrutiny
         return (found) ? rpv.type : VariableType::unknown;
     }
 
-
-    void MainHandler::process_request(const protocol::Request* request, protocol::Response* response)
+    void MainHandler::process_request(const protocol::Request *request, protocol::Response *response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
         response->reset();
@@ -171,11 +169,10 @@ namespace scrutiny
         }
     }
 
-
     // ============= [GetInfo] ============
-    protocol::ResponseCode MainHandler::process_get_info(const protocol::Request* request, protocol::Response* response)
+    protocol::ResponseCode MainHandler::process_get_info(const protocol::Request *request, protocol::Response *response)
     {
-        union 
+        union
         {
             struct
             {
@@ -203,190 +200,190 @@ namespace scrutiny
                 protocol::ResponseData::GetInfo::GetRPVCount response_data;
             } get_rpv_count;
 
-            struct 
+            struct
             {
-                const RuntimePublishedValue* rpvs;
+                const RuntimePublishedValue *rpvs;
                 protocol::RequestData::GetInfo::GetRPVDefinition request_data;
-                protocol::GetRPVDefinitionResponseEncoder* response_encoder;
+                protocol::GetRPVDefinitionResponseEncoder *response_encoder;
             } get_prv_def;
-            
+
         } stack;
 
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         switch (static_cast<protocol::GetInfo::Subfunction>(request->subfunction_id))
         {
-                // =========== [GetprotocolVersion] ==========
-            case protocol::GetInfo::Subfunction::GetprotocolVersion:
+            // =========== [GetprotocolVersion] ==========
+        case protocol::GetInfo::Subfunction::GetprotocolVersion:
+        {
+            stack.get_protocol_version.response_data.major = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
+            stack.get_protocol_version.response_data.minor = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
+            code = m_codec.encode_response_protocol_version(&stack.get_protocol_version.response_data, response);
+            break;
+        }
+
+            // =========== [GetSoftwareID] ==========
+        case protocol::GetInfo::Subfunction::GetSoftwareId:
+        {
+            code = m_codec.encode_response_software_id(response);
+            break;
+        }
+            // =========== [GetSupportedFeatures] ==========
+        case protocol::GetInfo::Subfunction::GetSupportedFeatures:
+        {
+            stack.get_supproted_features.response_data.memory_read = true;
+            stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
+            stack.get_supproted_features.response_data.datalog_acquire = false; // todo
+            stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
+
+            code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
+            break;
+        }
+            // =========== [GetSpecialMemoryRegionCount] ==========
+        case protocol::GetInfo::Subfunction::GetSpecialMemoryRegionCount:
+        {
+            stack.get_special_memory_region_count.response_data.nbr_readonly_region = m_config.readonly_ranges_count();
+            stack.get_special_memory_region_count.response_data.nbr_forbidden_region = m_config.forbidden_ranges_count();
+            code = m_codec.encode_response_special_memory_region_count(&stack.get_special_memory_region_count.response_data, response);
+            break;
+        }
+
+            // =========== [GetSpecialMemoryLocation] ==========
+        case protocol::GetInfo::Subfunction::GetSpecialMemoryLocation:
+        {
+            code = m_codec.decode_request_get_special_memory_region_location(request, &stack.get_special_memory_region_location.request_data);
+            if (code != protocol::ResponseCode::OK)
             {
-                stack.get_protocol_version.response_data.major = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-                stack.get_protocol_version.response_data.minor = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-                code = m_codec.encode_response_protocol_version(&stack.get_protocol_version.response_data, response);
                 break;
             }
 
-                // =========== [GetSoftwareID] ==========
-            case protocol::GetInfo::Subfunction::GetSoftwareId:
+            if (static_cast<protocol::GetInfo::MemoryRegionType>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::ReadOnly)
             {
-                code = m_codec.encode_response_software_id(response);
-                break;
-            }
-                // =========== [GetSupportedFeatures] ==========
-            case protocol::GetInfo::Subfunction::GetSupportedFeatures:
-            {
-                stack.get_supproted_features.response_data.memory_read = true;	
-                stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
-                stack.get_supproted_features.response_data.datalog_acquire = false;   // todo
-                stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
-
-                code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
-                break;
-            }
-                // =========== [GetSpecialMemoryRegionCount] ==========
-            case protocol::GetInfo::Subfunction::GetSpecialMemoryRegionCount:
-            {
-                stack.get_special_memory_region_count.response_data.nbr_readonly_region = m_config.readonly_ranges_count();
-                stack.get_special_memory_region_count.response_data.nbr_forbidden_region = m_config.forbidden_ranges_count();
-                code = m_codec.encode_response_special_memory_region_count(&stack.get_special_memory_region_count.response_data, response);
-                break;
-            }
-
-                // =========== [GetSpecialMemoryLocation] ==========
-            case protocol::GetInfo::Subfunction::GetSpecialMemoryLocation:
-            {
-                code = m_codec.decode_request_get_special_memory_region_location(request, &stack.get_special_memory_region_location.request_data);
-                if (code != protocol::ResponseCode::OK)
-                {
-                    break;
-                }
-
-                if (static_cast<protocol::GetInfo::MemoryRegionType>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::ReadOnly)
-                {
-                    if (!m_config.is_readonly_address_range_set())
-                    {
-                        code = protocol::ResponseCode::FailureToProceed;
-                        break;
-                    }
-
-                    if (stack.get_special_memory_region_location.request_data.region_index >= m_config.readonly_ranges_count())
-                    {
-                        code = protocol::ResponseCode::FailureToProceed;
-                        break;
-                    }
-
-                    const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
-                    stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
-                    stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
-                }
-                else if (static_cast<protocol::GetInfo::MemoryRegionType>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
-                {
-                    if (!m_config.is_forbidden_address_range_set())
-                    {
-                        code = protocol::ResponseCode::FailureToProceed;
-                        break;
-                    }
-
-                    if (stack.get_special_memory_region_location.request_data.region_index >= m_config.forbidden_ranges_count())
-                    {
-                        code = protocol::ResponseCode::FailureToProceed;
-                        break;
-                    }
-
-                    const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
-                    stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
-                    stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
-                }
-                else
-                {
-                    code = protocol::ResponseCode::InvalidRequest;
-                    break;
-                }
-
-                stack.get_special_memory_region_location.response_data.region_type = stack.get_special_memory_region_location.request_data.region_type;
-                stack.get_special_memory_region_location.response_data.region_index = stack.get_special_memory_region_location.request_data.region_index;
-
-                code = m_codec.encode_response_special_memory_region_location(&stack.get_special_memory_region_location.response_data, response);
-                break;
-            }
-                // =================================
-
-            case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesCount:
-            {
-                stack.get_rpv_count.response_data.count = m_config.get_rpv_count();
-                code = m_codec.encode_response_get_rpv_count(&stack.get_rpv_count.response_data, response);
-                break;
-            }
-                // =================================
-
-            case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition:
-            {
-                code = m_codec.decode_request_get_rpv_definition(request, &stack.get_prv_def.request_data);
-                if (code != protocol::ResponseCode::OK)
-                {
-                    break;
-                }
-
-                stack.get_prv_def.response_encoder = m_codec.encode_response_get_rpv_definition(response, m_comm_handler.tx_buffer_size());
-
-                if (stack.get_prv_def.request_data.start_index >= m_config.get_rpv_count())
+                if (!m_config.is_readonly_address_range_set())
                 {
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
 
-                if (stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count > m_config.get_rpv_count())
+                if (stack.get_special_memory_region_location.request_data.region_index >= m_config.readonly_ranges_count())
                 {
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
-                
-                
-                stack.get_prv_def.rpvs = m_config.get_rpvs_array();
-                for (int32_t i=stack.get_prv_def.request_data.start_index; i<stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count; i++)
+
+                const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
+                stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
+                stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
+            }
+            else if (static_cast<protocol::GetInfo::MemoryRegionType>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
+            {
+                if (!m_config.is_forbidden_address_range_set())
                 {
-                    stack.get_prv_def.response_encoder->write(&stack.get_prv_def.rpvs[i]);
-                    if (stack.get_prv_def.response_encoder->overflow())	// If it doesn't fit the transmit buffer
-                    {
-                        code = protocol::ResponseCode::Overflow;
-                        break;
-                    }
+                    code = protocol::ResponseCode::FailureToProceed;
+                    break;
                 }
 
-                break;
+                if (stack.get_special_memory_region_location.request_data.region_index >= m_config.forbidden_ranges_count())
+                {
+                    code = protocol::ResponseCode::FailureToProceed;
+                    break;
+                }
+
+                const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
+                stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
+                stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
-                // =================================
-            default:
+            else
             {
-                code = protocol::ResponseCode::UnsupportedFeature;
+                code = protocol::ResponseCode::InvalidRequest;
                 break;
             }
+
+            stack.get_special_memory_region_location.response_data.region_type = stack.get_special_memory_region_location.request_data.region_type;
+            stack.get_special_memory_region_location.response_data.region_index = stack.get_special_memory_region_location.request_data.region_index;
+
+            code = m_codec.encode_response_special_memory_region_location(&stack.get_special_memory_region_location.response_data, response);
+            break;
+        }
+            // =================================
+
+        case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesCount:
+        {
+            stack.get_rpv_count.response_data.count = m_config.get_rpv_count();
+            code = m_codec.encode_response_get_rpv_count(&stack.get_rpv_count.response_data, response);
+            break;
+        }
+            // =================================
+
+        case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition:
+        {
+            code = m_codec.decode_request_get_rpv_definition(request, &stack.get_prv_def.request_data);
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
+
+            stack.get_prv_def.response_encoder = m_codec.encode_response_get_rpv_definition(response, m_comm_handler.tx_buffer_size());
+
+            if (stack.get_prv_def.request_data.start_index >= m_config.get_rpv_count())
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            if (stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count > m_config.get_rpv_count())
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            stack.get_prv_def.rpvs = m_config.get_rpvs_array();
+            for (int32_t i = stack.get_prv_def.request_data.start_index; i < stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count; i++)
+            {
+                stack.get_prv_def.response_encoder->write(&stack.get_prv_def.rpvs[i]);
+                if (stack.get_prv_def.response_encoder->overflow()) // If it doesn't fit the transmit buffer
+                {
+                    code = protocol::ResponseCode::Overflow;
+                    break;
+                }
+            }
+
+            break;
+        }
+            // =================================
+        default:
+        {
+            code = protocol::ResponseCode::UnsupportedFeature;
+            break;
+        }
         }
 
         return code;
     }
 
     // ============= [CommControl] ============
-    protocol::ResponseCode MainHandler::process_comm_control(const protocol::Request* request, protocol::Response* response)
+    protocol::ResponseCode MainHandler::process_comm_control(const protocol::Request *request, protocol::Response *response)
     {
-        union 
+        union
         {
-            struct 
+            struct
             {
                 protocol::RequestData::CommControl::Discover request_data;
                 protocol::ResponseData::CommControl::Discover response_data;
             } discover;
 
-            struct {
+            struct
+            {
                 protocol::RequestData::CommControl::Connect request_data;
                 protocol::ResponseData::CommControl::Connect response_data;
             } connect;
 
-            struct 
+            struct
             {
                 protocol::ResponseData::CommControl::GetParams response_data;
             } get_params;
 
-            struct 
+            struct
             {
                 protocol::RequestData::CommControl::Heartbeat request_data;
                 protocol::ResponseData::CommControl::Heartbeat response_data;
@@ -402,159 +399,158 @@ namespace scrutiny
 
         switch (static_cast<protocol::CommControl::Subfunction>(request->subfunction_id))
         {
-                // =========== [Discover] ==========
-            case protocol::CommControl::Subfunction::Discover:
+            // =========== [Discover] ==========
+        case protocol::CommControl::Subfunction::Discover:
+        {
+            code = m_codec.decode_request_comm_discover(request, &stack.discover.request_data);
+            if (code != protocol::ResponseCode::OK)
+                break;
+
+            // Magic validation is done by the codec.
+            stack.discover.response_data.display_name = m_config.display_name;
+            stack.discover.response_data.display_name_length = static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
+
+            code = m_codec.encode_response_comm_discover(response, &stack.discover.response_data);
+            break;
+        }
+
+            // =========== [Heartbeat] ==========
+        case protocol::CommControl::Subfunction::Heartbeat:
+        {
+            code = m_codec.decode_request_comm_heartbeat(request, &stack.heartbeat.request_data);
+            if (code != protocol::ResponseCode::OK)
+                break;
+
+            if (stack.heartbeat.request_data.session_id != m_comm_handler.get_session_id())
             {
-                code = m_codec.decode_request_comm_discover(request, &stack.discover.request_data);
-                if (code != protocol::ResponseCode::OK)
-                    break;
-
-                // Magic validation is done by the codec.
-                stack.discover.response_data.display_name = m_config.display_name;
-                stack.discover.response_data.display_name_length = static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
-
-                code = m_codec.encode_response_comm_discover(response, &stack.discover.response_data);
+                code = protocol::ResponseCode::InvalidRequest;
                 break;
             }
 
-                // =========== [Heartbeat] ==========
-            case protocol::CommControl::Subfunction::Heartbeat:
+            const bool success = m_comm_handler.heartbeat(stack.heartbeat.request_data.challenge);
+            if (!success)
             {
-                code = m_codec.decode_request_comm_heartbeat(request, &stack.heartbeat.request_data);
-                if (code != protocol::ResponseCode::OK)
-                    break;
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
 
-                if (stack.heartbeat.request_data.session_id != m_comm_handler.get_session_id())
+            stack.heartbeat.response_data.session_id = m_comm_handler.get_session_id();
+            stack.heartbeat.response_data.challenge_response = ~stack.heartbeat.request_data.challenge;
+
+            code = m_codec.encode_response_comm_heartbeat(&stack.heartbeat.response_data, response);
+            break;
+        }
+
+            // =========== [GetParams] ==========
+        case protocol::CommControl::Subfunction::GetParams:
+        {
+            stack.get_params.response_data.data_tx_buffer_size = m_config.m_tx_buffer_size;
+            stack.get_params.response_data.data_rx_buffer_size = m_config.m_rx_buffer_size;
+            stack.get_params.response_data.max_bitrate = m_config.max_bitrate;
+            stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
+            stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TMEOUT_US;
+            stack.get_params.response_data.address_size = sizeof(void *);
+            code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
+            break;
+        }
+            // =========== [Connect] ==========
+        case protocol::CommControl::Subfunction::Connect:
+        {
+            code = m_codec.decode_request_comm_connect(request, &stack.connect.request_data);
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
+
+            if (m_comm_handler.is_connected())
+            {
+                code = protocol::ResponseCode::Busy;
+                break;
+            }
+
+            if (m_comm_handler.connect() == false)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            stack.connect.response_data.session_id = m_comm_handler.get_session_id();
+            memcpy(stack.connect.response_data.magic, protocol::CommControl::CONNECT_MAGIC, sizeof(protocol::CommControl::CONNECT_MAGIC));
+            code = m_codec.encode_response_comm_connect(&stack.connect.response_data, response);
+            break;
+        }
+
+            // =========== [Diconnect] ==========
+        case protocol::CommControl::Subfunction::Disconnect:
+        {
+            code = m_codec.decode_request_comm_disconnect(request, &stack.disconnect.request_data);
+            if (code != protocol::ResponseCode::OK)
+                break;
+
+            if (m_comm_handler.is_connected())
+            {
+                if (m_comm_handler.get_session_id() == stack.disconnect.request_data.session_id)
+                {
+                    m_disconnect_pending = true;
+                }
+                else
                 {
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-
-                const bool success = m_comm_handler.heartbeat(stack.heartbeat.request_data.challenge);
-                if (!success)
-                {
-                    code = protocol::ResponseCode::InvalidRequest;
-                    break;
-                }
-
-                stack.heartbeat.response_data.session_id = m_comm_handler.get_session_id();
-                stack.heartbeat.response_data.challenge_response = ~stack.heartbeat.request_data.challenge;
-
-                code = m_codec.encode_response_comm_heartbeat(&stack.heartbeat.response_data, response);
-                break;
             }
 
-                // =========== [GetParams] ==========
-            case protocol::CommControl::Subfunction::GetParams:
-            {
-                stack.get_params.response_data.data_tx_buffer_size = m_config.m_tx_buffer_size;
-                stack.get_params.response_data.data_rx_buffer_size = m_config.m_rx_buffer_size;
-                stack.get_params.response_data.max_bitrate = m_config.max_bitrate;
-                stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
-                stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TMEOUT_US;
-                stack.get_params.response_data.address_size = sizeof(void*);
-                code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
-                break;
-            }
-                // =========== [Connect] ==========
-            case protocol::CommControl::Subfunction::Connect:
-            {
-                code = m_codec.decode_request_comm_connect(request, &stack.connect.request_data);
-                if (code != protocol::ResponseCode::OK)
-                {
-                    break;
-                }
+            // empty data
+            code = protocol::ResponseCode::OK;
+            break;
+        }
 
-                if (m_comm_handler.is_connected())
-                {
-                    code = protocol::ResponseCode::Busy;
-                    break;
-                }
-
-                if (m_comm_handler.connect() == false)
-                {
-                    code = protocol::ResponseCode::FailureToProceed;
-                    break;
-                }
-
-                stack.connect.response_data.session_id = m_comm_handler.get_session_id();
-                memcpy(stack.connect.response_data.magic, protocol::CommControl::CONNECT_MAGIC, sizeof(protocol::CommControl::CONNECT_MAGIC));
-                code = m_codec.encode_response_comm_connect(&stack.connect.response_data, response);
-                break;
-            }
-
-                // =========== [Diconnect] ==========
-            case protocol::CommControl::Subfunction::Disconnect:
-            {
-                code = m_codec.decode_request_comm_disconnect(request, &stack.disconnect.request_data);
-                if (code != protocol::ResponseCode::OK)
-                    break;
-
-                if (m_comm_handler.is_connected())
-                {
-                    if (m_comm_handler.get_session_id() == stack.disconnect.request_data.session_id)
-                    {
-                        m_disconnect_pending = true;
-                    }
-                    else
-                    {
-                        code = protocol::ResponseCode::InvalidRequest;
-                        break;
-                    }
-                }
-
-                // empty data
-                code = protocol::ResponseCode::OK;
-                break;
-            }
-
-                // =================================
-            default:
-            {
-                code = protocol::ResponseCode::UnsupportedFeature;
-                break;
-            }
+            // =================================
+        default:
+        {
+            code = protocol::ResponseCode::UnsupportedFeature;
+            break;
+        }
         }
 
         return code;
     }
 
-
-    protocol::ResponseCode MainHandler::process_memory_control(const protocol::Request* request, protocol::Response* response)
+    protocol::ResponseCode MainHandler::process_memory_control(const protocol::Request *request, protocol::Response *response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
-        
+
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
-        union 
+        union
         {
-            struct 
+            struct
             {
-                protocol::ReadMemoryBlocksRequestParser* readmem_parser;
-                protocol::ReadMemoryBlocksResponseEncoder* readmem_encoder;
+                protocol::ReadMemoryBlocksRequestParser *readmem_parser;
+                protocol::ReadMemoryBlocksResponseEncoder *readmem_encoder;
                 protocol::MemoryBlock block;
             } read_mem;
 
             struct
             {
                 protocol::MemoryBlock block;
-                protocol::WriteMemoryBlocksRequestParser* writemem_parser;
-                protocol::WriteMemoryBlocksResponseEncoder* writemem_encoder;
+                protocol::WriteMemoryBlocksRequestParser *writemem_parser;
+                protocol::WriteMemoryBlocksResponseEncoder *writemem_encoder;
             } write_mem;
 
             struct
             {
-                protocol::ReadRPVRequestParser* readrpv_parser;
-                protocol::ReadRPVResponseEncoder* readrpv_encoder;
+                protocol::ReadRPVRequestParser *readrpv_parser;
+                protocol::ReadRPVResponseEncoder *readrpv_encoder;
 
                 RuntimePublishedValue rpv;
                 scrutiny::AnyType v;
                 uint16_t id;
             } read_rpv;
-            
+
             struct
             {
-                protocol::WriteRPVRequestParser* writerpv_parser;
-                protocol::WriteRPVResponseEncoder* writerpv_encoder;
+                protocol::WriteRPVRequestParser *writerpv_parser;
+                protocol::WriteRPVResponseEncoder *writerpv_encoder;
                 RuntimePublishedValue rpv;
                 scrutiny::AnyType v;
             } write_rpv;
@@ -563,131 +559,141 @@ namespace scrutiny
 
         switch (static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id))
         {
-                // =========== [Read] ==========
-            case protocol::MemoryControl::Subfunction::Read:
+            // =========== [Read] ==========
+        case protocol::MemoryControl::Subfunction::Read:
+        {
+            code = protocol::ResponseCode::OK;
+
+            stack.read_mem.readmem_parser = m_codec.decode_request_memory_control_read(request);
+            stack.read_mem.readmem_encoder = m_codec.encode_response_memory_control_read(response, m_comm_handler.tx_buffer_size());
+
+            // We avoid playing in memory unless we are 100% sure the request is good.
+            if (!stack.read_mem.readmem_parser->is_valid())
             {
-                code = protocol::ResponseCode::OK;
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
 
-                stack.read_mem.readmem_parser = m_codec.decode_request_memory_control_read(request);
-                stack.read_mem.readmem_encoder = m_codec.encode_response_memory_control_read(response, m_comm_handler.tx_buffer_size());
+            if (stack.read_mem.readmem_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+            {
+                code = protocol::ResponseCode::Overflow;
+                break;
+            }
 
-                // We avoid playing in memory unless we are 100% sure the request is good.
+            while (!stack.read_mem.readmem_parser->finished())
+            {
+                stack.read_mem.readmem_parser->next(&stack.read_mem.block);
+
                 if (!stack.read_mem.readmem_parser->is_valid())
                 {
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
 
-                if (stack.read_mem.readmem_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+                if (touches_forbidden_region(&stack.read_mem.block))
+                {
+                    code = protocol::ResponseCode::Forbidden;
+                    break;
+                }
+
+                stack.read_mem.readmem_encoder->write(&stack.read_mem.block);
+
+                if (stack.read_mem.readmem_encoder->overflow())
                 {
                     code = protocol::ResponseCode::Overflow;
                     break;
                 }
-                
-                while (!stack.read_mem.readmem_parser->finished())
-                {
-                    stack.read_mem.readmem_parser->next(& stack.read_mem.block);
+            }
+            break;
+        }
 
-                    if (!stack.read_mem.readmem_parser->is_valid())
-                    {
-                        code = protocol::ResponseCode::InvalidRequest;
-                        break;
-                    }
+            // =========== [Write] ==========
+        case protocol::MemoryControl::Subfunction::Write: // fall through
+        case protocol::MemoryControl::Subfunction::WriteMasked:
+        {
+            const bool masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
+            code = protocol::ResponseCode::OK;
 
-                    if (touches_forbidden_region(& stack.read_mem.block))
-                    {
-                        code = protocol::ResponseCode::Forbidden;
-                        break;
-                    }
-
-                    stack.read_mem.readmem_encoder->write(&stack.read_mem.block);
-
-                    if (stack.read_mem.readmem_encoder->overflow())
-                    {
-                        code = protocol::ResponseCode::Overflow;
-                        break;
-                    }
-                }
+            stack.write_mem.writemem_parser = m_codec.decode_request_memory_control_write(request, masked);
+            stack.write_mem.writemem_encoder = m_codec.encode_response_memory_control_write(response, m_comm_handler.tx_buffer_size());
+            if (!stack.write_mem.writemem_parser->is_valid())
+            {
+                code = protocol::ResponseCode::InvalidRequest;
                 break;
             }
 
-                // =========== [Write] ==========
-            case protocol::MemoryControl::Subfunction::Write:			// fall through
-            case protocol::MemoryControl::Subfunction::WriteMasked:
+            if (stack.write_mem.writemem_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
             {
-                const bool masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
-                code = protocol::ResponseCode::OK;
+                code = protocol::ResponseCode::Overflow;
+                break;
+            }
 
-                stack.write_mem.writemem_parser = m_codec.decode_request_memory_control_write(request, masked);
-                stack.write_mem.writemem_encoder = m_codec.encode_response_memory_control_write(response, m_comm_handler.tx_buffer_size());
+            while (!stack.write_mem.writemem_parser->finished())
+            {
+                stack.write_mem.writemem_parser->next(&stack.write_mem.block);
+
                 if (!stack.write_mem.writemem_parser->is_valid())
                 {
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
 
-                if (stack.write_mem.writemem_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+                if (touches_forbidden_region(&stack.write_mem.block))
                 {
-                    code = protocol::ResponseCode::Overflow;
+                    code = protocol::ResponseCode::Forbidden;
                     break;
                 }
 
-                while (!stack.write_mem.writemem_parser->finished())
+                if (touches_readonly_region(&stack.write_mem.block))
                 {
-                    stack.write_mem.writemem_parser->next(&stack.write_mem.block);
+                    code = protocol::ResponseCode::Forbidden;
+                    break;
+                }
 
-                    if (!stack.write_mem.writemem_parser->is_valid())
-                    {
-                        code = protocol::ResponseCode::InvalidRequest;
-                        break;
-                    }
+                stack.write_mem.writemem_encoder->write(&stack.write_mem.block);
+                // We don't check overflow here as we rely on the request parser to be right on the required buffer size.
 
-                    if (touches_forbidden_region(&stack.write_mem.block))
+                if (!masked)
+                {
+                    memcpy(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
+                }
+                else
+                {
+                    uint8_t temp;
+                    for (uint16_t i = 0; i < stack.write_mem.block.length; i++)
                     {
-                        code = protocol::ResponseCode::Forbidden;
-                        break;
-                    }
-
-                    if (touches_readonly_region(&stack.write_mem.block))
-                    {
-                        code = protocol::ResponseCode::Forbidden;
-                        break;
-                    }
-
-                    stack.write_mem.writemem_encoder->write(&stack.write_mem.block);
-                    // We don't check overflow here as we rely on the request parser to be right on the required buffer size.
-
-                    if (!masked)
-                    {
-                        memcpy(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
-                    }
-                    else
-                    {
-                        uint8_t temp;
-                        for (uint16_t i=0; i<stack.write_mem.block.length; i++)
-                        {
-                            temp = stack.write_mem.block.start_address[i];
-                            temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]); // Bit to 1
-                            temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
-                            stack.write_mem.block.start_address[i] = temp;
-                        }	
+                        temp = stack.write_mem.block.start_address[i];
+                        temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
+                        temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
+                        stack.write_mem.block.start_address[i] = temp;
                     }
                 }
+            }
+            break;
+        }
+
+        // =========== [Read RPV] ==========
+        case protocol::MemoryControl::Subfunction::ReadRPV:
+        {
+            code = protocol::ResponseCode::OK;
+            if (!m_config.is_read_published_values_configured())
+            {
+                code = protocol::ResponseCode::UnsupportedFeature;
                 break;
             }
 
-            // =========== [Read RPV] ==========
-            case protocol::MemoryControl::Subfunction::ReadRPV:
-            {
-                code = protocol::ResponseCode::OK;
-                if (!m_config.is_read_published_values_configured())
-                {
-                    code = protocol::ResponseCode::UnsupportedFeature;
-                    break;
-                }
+            stack.read_rpv.readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request);
+            stack.read_rpv.readrpv_encoder = m_codec.encode_response_memory_control_read_rpv(response, m_comm_handler.tx_buffer_size());
 
-                stack.read_rpv.readrpv_parser = m_codec.decode_request_memory_control_read_rpv(request );
-                stack.read_rpv.readrpv_encoder = m_codec.encode_response_memory_control_read_rpv(response, m_comm_handler.tx_buffer_size());
+            if (!stack.read_rpv.readrpv_parser->is_valid())
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
+
+            while (!stack.read_rpv.readrpv_parser->finished())
+            {
+                const bool ok_to_process = stack.read_rpv.readrpv_parser->next(&stack.read_rpv.id);
 
                 if (!stack.read_rpv.readrpv_parser->is_valid())
                 {
@@ -695,56 +701,55 @@ namespace scrutiny
                     break;
                 }
 
-
-                while (!stack.read_rpv.readrpv_parser->finished())
+                if (ok_to_process)
                 {
-                    const bool ok_to_process = stack.read_rpv.readrpv_parser->next(&stack.read_rpv.id);
-
-                    if (!stack.read_rpv.readrpv_parser->is_valid())
+                    const bool rpv_found = get_rpv(stack.read_rpv.id, &stack.read_rpv.rpv);
+                    if (!rpv_found)
                     {
-                        code = protocol::ResponseCode::InvalidRequest;
+                        code = protocol::ResponseCode::FailureToProceed;
                         break;
                     }
 
-                    if (ok_to_process)
+                    const bool callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v);
+                    if (!callback_success)
                     {
-                        const bool rpv_found = get_rpv(stack.read_rpv.id, &stack.read_rpv.rpv);
-                        if (!rpv_found)
-                        {
-                            code = protocol::ResponseCode::FailureToProceed;
-                            break;
-                        }
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
 
-                        const bool callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v);
-                        if (!callback_success)
-                        {
-                            code = protocol::ResponseCode::FailureToProceed;
-                            break;
-                        }
+                    stack.read_rpv.readrpv_encoder->write(&stack.read_rpv.rpv, stack.read_rpv.v);
 
-                        stack.read_rpv.readrpv_encoder->write(&stack.read_rpv.rpv, stack.read_rpv.v);
-
-                        if (stack.read_rpv.readrpv_encoder->overflow())
-                        {
-                            code = protocol::ResponseCode::Overflow;
-                            break;
-                        }
+                    if (stack.read_rpv.readrpv_encoder->overflow())
+                    {
+                        code = protocol::ResponseCode::Overflow;
+                        break;
                     }
                 }
+            }
+            break;
+        }
+
+        case protocol::MemoryControl::Subfunction::WriteRPV:
+        {
+            code = protocol::ResponseCode::OK;
+            if (!m_config.is_write_published_values_configured())
+            {
+                code = protocol::ResponseCode::UnsupportedFeature;
                 break;
             }
 
-            case protocol::MemoryControl::Subfunction::WriteRPV:
-            {
-                code = protocol::ResponseCode::OK;
-                if (!m_config.is_write_published_values_configured())
-                {
-                    code = protocol::ResponseCode::UnsupportedFeature;
-                    break;
-                }
+            stack.write_rpv.writerpv_parser = m_codec.decode_request_memory_control_write_rpv(request, this);
+            stack.write_rpv.writerpv_encoder = m_codec.encode_response_memory_control_write_rpv(response, m_comm_handler.tx_buffer_size());
 
-                stack.write_rpv.writerpv_parser = m_codec.decode_request_memory_control_write_rpv(request, this );
-                stack.write_rpv.writerpv_encoder = m_codec.encode_response_memory_control_write_rpv(response, m_comm_handler.tx_buffer_size());
+            if (!stack.write_rpv.writerpv_parser->is_valid())
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
+
+            while (!stack.write_rpv.writerpv_parser->finished())
+            {
+                const bool ok_to_process = stack.write_rpv.writerpv_parser->next(&stack.write_rpv.rpv, &stack.write_rpv.v);
 
                 if (!stack.write_rpv.writerpv_parser->is_valid())
                 {
@@ -752,53 +757,42 @@ namespace scrutiny
                     break;
                 }
 
-                while (!stack.write_rpv.writerpv_parser->finished())
+                if (!ok_to_process)
                 {
-                    const bool ok_to_process = stack.write_rpv.writerpv_parser->next(&stack.write_rpv.rpv, &stack.write_rpv.v);
-
-                    if (!stack.write_rpv.writerpv_parser->is_valid())
-                    {
-                        code = protocol::ResponseCode::InvalidRequest;
-                        break;
-                    }
-
-                    if (!ok_to_process)
-                    {
-                        continue;
-                    }
-
-                    const bool write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v);
-                    if (!write_success)
-                    {
-                        code = protocol::ResponseCode::FailureToProceed;
-                        break;
-                    }
-
-                    stack.write_rpv.writerpv_encoder->write(&stack.write_rpv.rpv);
-
-                    if (stack.write_rpv.writerpv_encoder->overflow())
-                    {
-                        code = protocol::ResponseCode::Overflow;
-                        break;
-                    }
+                    continue;
                 }
 
-                break;
+                const bool write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v);
+                if (!write_success)
+                {
+                    code = protocol::ResponseCode::FailureToProceed;
+                    break;
+                }
+
+                stack.write_rpv.writerpv_encoder->write(&stack.write_rpv.rpv);
+
+                if (stack.write_rpv.writerpv_encoder->overflow())
+                {
+                    code = protocol::ResponseCode::Overflow;
+                    break;
+                }
             }
 
-                // =================================
-            default:
-            {
-                code = protocol::ResponseCode::UnsupportedFeature;
-                break;
-            }
+            break;
+        }
+
+            // =================================
+        default:
+        {
+            code = protocol::ResponseCode::UnsupportedFeature;
+            break;
+        }
         }
 
         return code;
     }
 
-
-    bool MainHandler::touches_forbidden_region(const protocol::MemoryBlock* block)
+    bool MainHandler::touches_forbidden_region(const protocol::MemoryBlock *block)
     {
         if (!m_config.is_forbidden_address_range_set())
         {
@@ -810,7 +804,7 @@ namespace scrutiny
 
         for (unsigned int i = 0; i < m_config.forbidden_ranges_count(); i++)
         {
-            const AddressRange& range = m_config.forbidden_ranges()[i];
+            const AddressRange &range = m_config.forbidden_ranges()[i];
 
             if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
@@ -825,7 +819,7 @@ namespace scrutiny
         return false;
     }
 
-    bool MainHandler::touches_readonly_region(const protocol::MemoryBlock* block)
+    bool MainHandler::touches_readonly_region(const protocol::MemoryBlock *block)
     {
         if (!m_config.is_readonly_address_range_set())
         {
@@ -836,7 +830,7 @@ namespace scrutiny
         const uintptr_t block_end = block_start + block->length;
         for (unsigned int i = 0; i < m_config.readonly_ranges_count(); i++)
         {
-            const AddressRange& range = m_config.readonly_ranges()[i];
+            const AddressRange &range = m_config.readonly_ranges()[i];
 
             if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
@@ -851,14 +845,14 @@ namespace scrutiny
         return false;
     }
 
-    protocol::ResponseCode MainHandler::process_user_command(const protocol::Request* request, protocol::Response* response)
+    protocol::ResponseCode MainHandler::process_user_command(const protocol::Request *request, protocol::Response *response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         if (m_config.is_user_command_callback_set())
         {
             uint16_t response_data_length = 0;
-            //caling user callback;
+            // caling user callback;
             m_config.user_command_callback(request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
             if (response_data_length > m_comm_handler.tx_buffer_size())
             {

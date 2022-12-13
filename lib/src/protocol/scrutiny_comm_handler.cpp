@@ -19,7 +19,7 @@ namespace scrutiny
 
         uint32_t CommHandler::s_session_counter = 0;
 
-        void CommHandler::init(uint8_t* rx_buffer, uint16_t rx_buffer_size, uint8_t* tx_buffer, uint16_t tx_buffer_size, Timebase* timebase, uint32_t prng_seed)
+        void CommHandler::init(uint8_t *rx_buffer, uint16_t rx_buffer_size, uint8_t *tx_buffer, uint16_t tx_buffer_size, Timebase *timebase, uint32_t prng_seed)
         {
             m_rx_buffer = rx_buffer;
             m_rx_buffer_size = rx_buffer_size;
@@ -28,9 +28,9 @@ namespace scrutiny
             m_timebase = timebase;
             m_prng.seed(prng_seed);
             s_session_counter = m_prng.get();
-            m_active_request.data = m_rx_buffer;   // Half duplex comm. Share buffer
+            m_active_request.data = m_rx_buffer; // Half duplex comm. Share buffer
             m_active_request.data_max_length = m_rx_buffer_size;
-            m_active_response.data = m_tx_buffer;  // Half duplex comm. Share buffer
+            m_active_response.data = m_tx_buffer; // Half duplex comm. Share buffer
             m_active_response.data_max_length = m_tx_buffer_size;
             m_enabled = true;
 
@@ -44,17 +44,16 @@ namespace scrutiny
                 m_enabled = false;
             }
 
-
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t* data, uint16_t len)
+        void CommHandler::receive_data(uint8_t *data, uint16_t len)
         {
             uint16_t i = 0;
 
             if (m_enabled == false)
             {
-                m_rx_error=RxError::Disabled;
+                m_rx_error = RxError::Disabled;
                 return;
             }
 
@@ -65,7 +64,7 @@ namespace scrutiny
 
             // Handle rx timeouts. Start a new reception if no data for too long
             if (m_rx_state != RxFSMState::WaitForCommand && len != 0)
-            {	
+            {
                 if (m_timebase->has_expired(m_last_rx_timestamp, SCRUTINY_COMM_RX_TIMEOUT_US))
                 {
                     reset_rx();
@@ -217,7 +216,7 @@ namespace scrutiny
             bool must_process = false;
             if (m_session_active == false)
             {
-                if (received_discover_request() || received_connect_request())    // Check if we received a valid discover message
+                if (received_discover_request() || received_connect_request()) // Check if we received a valid discover message
                 {
                     must_process = true;
                 }
@@ -238,13 +237,13 @@ namespace scrutiny
             }
         }
 
-        Response* CommHandler::prepare_response()
+        Response *CommHandler::prepare_response()
         {
             m_active_response.reset();
             return &m_active_response;
         }
 
-        bool CommHandler::send_response(Response* response)
+        bool CommHandler::send_response(Response *response)
         {
             m_tx_error = TxError::None;
             if (m_enabled == false)
@@ -281,9 +280,9 @@ namespace scrutiny
             return true;
         }
 
-        uint16_t CommHandler::pop_data(uint8_t* buffer, uint16_t len)
+        uint16_t CommHandler::pop_data(uint8_t *buffer, uint16_t len)
         {
-            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF-9, "Cannot parse successfully with 16bits counters");
+            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
 
             if (m_state != State::Transmitting)
             {
@@ -325,21 +324,21 @@ namespace scrutiny
                 m_nbytes_sent++;
             }
 
-            if (m_nbytes_sent >= 5u && i<len)
+            if (m_nbytes_sent >= 5u && i < len)
             {
                 const uint16_t data_byte_sent = (m_nbytes_sent - 5);
                 if (data_byte_sent < m_active_response.data_length)
                 {
-                    const uint16_t remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent-5);
+                    const uint16_t remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent - 5);
                     const uint16_t user_request_remaining = (len - i);
-                    const uint16_t data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes;  // Don't read more than available.
+                    const uint16_t data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes; // Don't read more than available.
                     memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
 
                     i += data_bytes_to_copy;
                     m_nbytes_sent += data_bytes_to_copy;
                 }
 
-                const uint16_t crc_position = m_active_response.data_length + 5u;    // Will fit as per static_assert above.
+                const uint16_t crc_position = m_active_response.data_length + 5u; // Will fit as per static_assert above.
                 while (i < len)
                 {
                     if (m_nbytes_sent == crc_position)
@@ -360,7 +359,7 @@ namespace scrutiny
                     }
                     else
                     {
-                        break;  // Should never go here.
+                        break; // Should never go here.
                     }
                     m_nbytes_sent++;
                     i++;
@@ -423,7 +422,7 @@ namespace scrutiny
             {
                 if (m_timebase->has_expired(m_heartbeat_timestamp, SCRUTINY_COMM_HEARTBEAT_TMEOUT_US))
                 {
-                    reset();    // Disable and reset all internal vars
+                    reset(); // Disable and reset all internal vars
                 }
             }
         }
@@ -456,7 +455,7 @@ namespace scrutiny
             return m_nbytes_to_send - m_nbytes_sent;
         }
 
-        bool CommHandler::check_crc(const Request* req)
+        bool CommHandler::check_crc(const Request *req)
         {
             uint32_t crc = 0;
             uint8_t header_data[4];
@@ -469,7 +468,7 @@ namespace scrutiny
             return (crc == req->crc);
         }
 
-        void CommHandler::add_crc(Response* response)
+        void CommHandler::add_crc(Response *response)
         {
             if (response->data_length > m_tx_buffer_size)
                 return;
@@ -528,7 +527,6 @@ namespace scrutiny
             }
         }
 
-
         bool CommHandler::connect()
         {
             if (!m_enabled)
@@ -540,7 +538,6 @@ namespace scrutiny
             {
                 return false;
             }
-
 
             m_session_id = s_session_counter++;
             m_session_active = true;
@@ -560,6 +557,5 @@ namespace scrutiny
             reset_tx();
         }
 
-
-    }   // namespace protocol
-}   // namespace scrutiny
+    } // namespace protocol
+} // namespace scrutiny
