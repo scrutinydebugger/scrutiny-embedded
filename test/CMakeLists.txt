@@ -19,7 +19,6 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_timebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_tx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_comm_handler.cpp
