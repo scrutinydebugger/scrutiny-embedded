@@ -7,13 +7,13 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#include "protocol/scrutiny_protocol_tools.hpp"
-
+#include "scrutiny_common_codecs.hpp"
+#include "scrutiny_tools.hpp"
 #include <stdint.h>
 
 namespace scrutiny
 {
-    namespace protocol
+    namespace codecs
     {
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -104,5 +104,6 @@ namespace scrutiny
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
     }
 }

@@ -50,14 +50,6 @@ namespace scrutiny
             uint32_t crc;
         };
 
-        struct MemoryBlock
-        {
-            uint8_t *start_address;
-            uint16_t length;
-            uint8_t *source_data;
-            uint8_t *mask;
-        };
-
         enum class CommandId
         {
             GetInfo = 0x01,

@@ -54,7 +54,7 @@
         "lib/inc/protocol/scrutiny_protocol_definitions.hpp": {
             "docstring": "Defines Request/Rsponse objects and commands/subfunctions IDs.\n Not version specific"
         },
-        "lib/inc/protocol/scrutiny_protocol_tools.hpp": {
+        "lib/inc/protocol/scrutiny_tools.hpp": {
             "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
         },
         "lib/src/scrutiny_config.cpp": {
@@ -81,7 +81,7 @@
         "lib/src/protocol/scrutiny_protocol_definitions.cpp": {
             "docstring": "Instanciation of protocol definitions such as magic payload."
         },
-        "lib/src/protocol/scrutiny_protocol_tools.cpp": {
+        "lib/src/protocol/scrutiny_tools.cpp": {
             "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
         },
         "test/scrutiny_test.cpp": {

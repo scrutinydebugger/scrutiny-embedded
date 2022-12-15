@@ -9,11 +9,12 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_software_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_config.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_common_codecs.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_tools.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_comm_handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_codec_v1_0.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_definitions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_tools.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalog/scrutiny_datalogger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogger.cpp
     )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)

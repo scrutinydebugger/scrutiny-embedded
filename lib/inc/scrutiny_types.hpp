@@ -13,6 +13,12 @@
 
 namespace scrutiny
 {
+    enum class Endianness
+    {
+        LITTLE,
+        BIG
+    };
+
     struct AddressRange
     {
         void *start;
@@ -29,7 +35,8 @@ namespace scrutiny
         _uint = 1 << 4,
         _float = 2 << 4,
         _boolean = 3 << 4,
-        _cfloat = 4 << 4
+        _cfloat = 4 << 4,
+        _undef = 0xF << 4
     };
 
     enum class VariableTypeSize
@@ -39,7 +46,8 @@ namespace scrutiny
         _32 = 2,
         _64 = 3,
         _128 = 4,
-        _256 = 5
+        _256 = 5,
+        _undef = 0xF
     };
 
     // This enum must match the definition in the python core module.
@@ -100,6 +108,14 @@ namespace scrutiny
 
     typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType *outval);
     typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType *inval);
+
+    struct MemoryBlock
+    {
+        uint8_t *start_address;
+        uint16_t length;
+        uint8_t *source_data;
+        uint8_t *mask;
+    };
 }
 
 #endif //  ___SCRUTINY_TYPES_H___

@@ -14,12 +14,11 @@
 
 #include "scrutiny_types.hpp"
 
-#include <stdint.h>
-
 namespace scrutiny
 {
     namespace tools
     {
+
         inline AddressRange make_address_range(uintptr_t start, uintptr_t end)
         {
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
@@ -30,6 +29,12 @@ namespace scrutiny
             return {start, end};
         }
 
+        inline AddressRange make_address_range(void *start, size_t size)
+        {
+            size = (size == 0) ? 1 : size;
+            return {start, reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(start) + size - 1)};
+        }
+
         inline uint8_t get_type_size(VariableType v)
         {
             if (v == VariableType::unknown)
@@ -37,7 +42,42 @@ namespace scrutiny
                 return 0;
             }
 
-            return 1 << (static_cast<uint8_t>(v) & 0xF);
+            return 1 << (static_cast<unsigned int>(v) & 0xF);
+        }
+
+        inline uint8_t get_type_size(VariableTypeSize ts)
+        {
+            if (ts == VariableTypeSize::_undef)
+            {
+                return 0;
+            }
+
+            return 1 << (static_cast<unsigned int>(ts) & 0xF);
+        }
+
+        inline VariableTypeType get_var_type_type(VariableType v)
+        {
+            return static_cast<VariableTypeType>(static_cast<unsigned int>(v) & 0xF0);
+        }
+
+        inline VariableType make_type(VariableTypeType tt, VariableTypeSize ts)
+        {
+            return static_cast<VariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
+        }
+
+        inline bool is_float_type(VariableType v)
+        {
+            return get_var_type_type(v) == VariableTypeType::_float;
+        }
+
+        inline bool is_uint_type(VariableType v)
+        {
+            return get_var_type_type(v) == VariableTypeType::_uint;
+        }
+
+        inline bool is_sint_type(VariableType v)
+        {
+            return get_var_type_type(v) == VariableTypeType::_sint;
         }
 
         inline size_t strnlen(const char *s, size_t maxlen)
@@ -93,6 +133,8 @@ namespace scrutiny
         private:
             uint32_t m_state;
         };
+
+        VariableTypeSize get_required_type_size(uint8_t size);
     }
 }
 

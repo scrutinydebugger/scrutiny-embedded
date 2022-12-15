@@ -10,7 +10,8 @@
 
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
-
+#include "scrutiny_common_codecs.hpp"
+#include <bit>
 namespace scrutiny
 {
     void MainHandler::init(Config *config)
@@ -59,6 +60,160 @@ namespace scrutiny
         {
             m_enabled = false;
         }
+    }
+
+    bool MainHandler::fetch_variable(void *addr, VariableType variable_type, AnyType *val)
+    {
+        // We are making the assumption that the compiler will align all variables in the enum on the same starting byte.
+        // As far as I know, it should always be the case.
+        const uint8_t typesize = tools::get_type_size(variable_type);
+        MemoryBlock block;
+        block.start_address = reinterpret_cast<uint8_t *>(addr);
+        block.length = typesize;
+        if (touches_forbidden_region(&block))
+        {
+            memset(val, 0, sizeof(AnyType));
+            return false;
+        }
+        memcpy(val, addr, typesize);
+        return true;
+    }
+
+    bool MainHandler::fetch_variable_bitfield(void *addr, VariableTypeType var_tt, uint_fast8_t bitoffset, uint_fast8_t bitsize, AnyType *val, VariableType *output_type)
+    {
+        bool success = true;
+        const uint_fast8_t fetch_required_size = ((bitoffset + bitsize) >> 3) + 1;
+        const uint_fast8_t output_required_size = (bitsize >> 3) + 1;
+        const VariableTypeSize fetch_type_size = tools::get_required_type_size(fetch_required_size);
+        const VariableTypeSize output_type_size = tools::get_required_type_size(output_required_size);
+        const VariableType fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
+        const VariableType output_variable_type = tools::make_type(var_tt, output_type_size);
+
+        MemoryBlock block;
+        block.start_address = reinterpret_cast<uint8_t *>(addr);
+        block.length = tools::get_type_size(fetch_type_size);
+        if (touches_forbidden_region(&block))
+        {
+            success = false;
+        }
+        else if (bitsize == 0)
+        {
+            success = false;
+        }
+        else if (var_tt == VariableTypeType::_cfloat || var_tt == VariableTypeType::_float)
+        {
+            success = false; // Does not support float bitfields. todo: investigate if that can happen
+        }
+        else
+        {
+            fetch_variable(addr, fetch_variable_type, val);
+            if (fetch_type_size == VariableTypeSize::_8)
+            {
+                val->uint8 >>= bitoffset;
+            }
+            else if (fetch_type_size == VariableTypeSize::_16)
+            {
+                val->uint16 >>= bitoffset;
+            }
+            else if (fetch_type_size == VariableTypeSize::_32)
+            {
+                val->uint32 >>= bitoffset;
+            }
+            else if (fetch_type_size == VariableTypeSize::_64)
+            {
+                val->uint64 >>= bitoffset;
+            }
+            else
+            {
+                success = false;
+            }
+
+            if (success)
+            {
+                AnyType mask;
+                uint_fast8_t i;
+                if (output_type_size == VariableTypeSize::_8)
+                {
+                    mask.uint8 = 1;
+                    for (i = 1; i < bitsize; i++)
+                    {
+                        mask.uint8 |= (1 << i);
+                    }
+                    val->uint8 &= mask.uint8;
+                    if (var_tt == VariableTypeType::_sint)
+                    {
+                        if (val->uint8 >> (bitsize - 1))
+                        {
+                            val->uint8 |= (~mask.uint8);
+                        }
+                    }
+                }
+                else if (output_type_size == VariableTypeSize::_16)
+                {
+                    mask.uint16 = 0x1FF;
+                    for (i = 9; i < bitsize - 8; i++)
+                    {
+                        mask.uint16 |= (1 << i);
+                    }
+                    val->uint16 &= mask.uint16;
+                    if (var_tt == VariableTypeType::_sint)
+                    {
+                        if (val->uint16 >> (bitsize - 1))
+                        {
+                            val->uint16 |= (~mask.uint16);
+                        }
+                    }
+                }
+                else if (output_type_size == VariableTypeSize::_32)
+                {
+                    mask.uint32 = 0x1FFFF;
+                    for (i = 17; i < bitsize - 16; i++)
+                    {
+                        mask.uint32 |= (1 << i);
+                    }
+                    val->uint32 &= mask.uint32;
+                    if (var_tt == VariableTypeType::_sint)
+                    {
+                        if (val->uint32 >> (bitsize - 1))
+                        {
+                            val->uint32 |= (~mask.uint32);
+                        }
+                    }
+                }
+                else if (output_type_size == VariableTypeSize::_64)
+                {
+                    mask.uint64 = 0x1FFFFFFFF;
+                    for (i = 33; i < bitsize - 32; i++)
+                    {
+                        mask.uint64 |= (1 << i);
+                    }
+                    val->uint64 &= mask.uint64;
+                    if (var_tt == VariableTypeType::_sint)
+                    {
+                        if (val->uint64 >> (bitsize - 1))
+                        {
+                            val->uint64 |= (~mask.uint64);
+                        }
+                    }
+                }
+                else
+                {
+                    success = false;
+                }
+            }
+        }
+
+        if (!success)
+        {
+            *output_type = VariableType::unknown;
+            memset(val, 0, sizeof(AnyType));
+        }
+        else
+        {
+            *output_type = output_variable_type;
+        }
+
+        return success;
     }
 
     void MainHandler::process(const uint32_t timestep_us)
@@ -527,12 +682,12 @@ namespace scrutiny
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
                 protocol::ReadMemoryBlocksResponseEncoder *readmem_encoder;
-                protocol::MemoryBlock block;
+                MemoryBlock block;
             } read_mem;
 
             struct
             {
-                protocol::MemoryBlock block;
+                MemoryBlock block;
                 protocol::WriteMemoryBlocksRequestParser *writemem_parser;
                 protocol::WriteMemoryBlocksResponseEncoder *writemem_encoder;
             } write_mem;
@@ -792,7 +947,7 @@ namespace scrutiny
         return code;
     }
 
-    bool MainHandler::touches_forbidden_region(const protocol::MemoryBlock *block)
+    bool MainHandler::touches_forbidden_region(const MemoryBlock *block)
     {
         if (!m_config.is_forbidden_address_range_set())
         {
@@ -819,7 +974,7 @@ namespace scrutiny
         return false;
     }
 
-    bool MainHandler::touches_readonly_region(const protocol::MemoryBlock *block)
+    bool MainHandler::touches_readonly_region(const MemoryBlock *block)
     {
         if (!m_config.is_readonly_address_range_set())
         {
