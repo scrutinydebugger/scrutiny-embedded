@@ -16,6 +16,7 @@
 namespace scrutiny
 {
 #ifdef __AVR_ARCH__
+
     template <class T>
     class IPCMessage
     {
@@ -29,12 +30,20 @@ namespace scrutiny
 
         inline void commit(void)
         {
+            __asm__ __volatile__("cli" ::
+                                     : "memory");
             m_written = true;
+            __asm__ __volatile__("sei" ::
+                                     : "memory");
         }
 
         inline void clear(void)
         {
+            __asm__ __volatile__("cli" ::
+                                     : "memory");
             m_written = false;
+            __asm__ __volatile__("sei" ::
+                                     : "memory");
         }
 
         inline void set_data(const T &indata)
