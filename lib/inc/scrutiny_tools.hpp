@@ -18,7 +18,6 @@ namespace scrutiny
 {
     namespace tools
     {
-
         inline AddressRange make_address_range(const uintptr_t start, const uintptr_t end)
         {
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
@@ -66,6 +65,11 @@ namespace scrutiny
             {
                 return (ts == VariableTypeSize::_8) ? VariableType::boolean : VariableType::unknown;
             }
+            if (tt == VariableTypeType::_undef || ts == VariableTypeSize::_undef)
+            {
+                return VariableType::unknown;
+            }
+
             return static_cast<VariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 

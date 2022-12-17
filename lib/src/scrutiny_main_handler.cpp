@@ -11,6 +11,7 @@
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"
+
 namespace scrutiny
 {
     void MainHandler::init(const Config *config)
@@ -71,6 +72,12 @@ namespace scrutiny
             memset(val, 0, sizeof(AnyType));
             return false;
         }
+
+        if (typesize == 0 || typesize > sizeof(AnyType))
+        {
+            return false;
+        }
+
         memcpy(val, addr, typesize);
         return true;
     }
@@ -105,26 +112,29 @@ namespace scrutiny
         }
         else
         {
-            fetch_variable(addr, fetch_variable_type, val);
-            if (fetch_type_size == VariableTypeSize::_8)
+            success = fetch_variable(addr, fetch_variable_type, val);
+            if (success)
             {
-                val->uint8 >>= bitoffset;
-            }
-            else if (fetch_type_size == VariableTypeSize::_16)
-            {
-                val->uint16 >>= bitoffset;
-            }
-            else if (fetch_type_size == VariableTypeSize::_32)
-            {
-                val->uint32 >>= bitoffset;
-            }
-            else if (fetch_type_size == VariableTypeSize::_64)
-            {
-                val->uint64 >>= bitoffset;
-            }
-            else
-            {
-                success = false;
+                if (fetch_type_size == VariableTypeSize::_8)
+                {
+                    val->uint8 >>= bitoffset;
+                }
+                else if (fetch_type_size == VariableTypeSize::_16)
+                {
+                    val->uint16 >>= bitoffset;
+                }
+                else if (fetch_type_size == VariableTypeSize::_32)
+                {
+                    val->uint32 >>= bitoffset;
+                }
+                else if (fetch_type_size == VariableTypeSize::_64)
+                {
+                    val->uint64 >>= bitoffset;
+                }
+                else // Unsupported
+                {
+                    success = false;
+                }
             }
 
             if (success)
@@ -195,7 +205,7 @@ namespace scrutiny
                         }
                     }
                 }
-                else
+                else // Unsupported
                 {
                     success = false;
                 }
