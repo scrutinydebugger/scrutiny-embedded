@@ -61,11 +61,11 @@ pipeline {
                         }
                     }
                 }
-                stage('GCC - No Datalogging'){
+                stage('No Datalogging'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-datalogging -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
