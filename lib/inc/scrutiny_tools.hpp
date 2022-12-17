@@ -1,4 +1,4 @@
-//    scrutiny_tools.h
+//    scrutiny_tools.hpp
 //        Some simple tools used across the project
 //
 //   - License : MIT - See LICENSE file.
@@ -19,23 +19,23 @@ namespace scrutiny
     namespace tools
     {
 
-        inline AddressRange make_address_range(uintptr_t start, uintptr_t end)
+        inline AddressRange make_address_range(const uintptr_t start, const uintptr_t end)
         {
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
         }
 
-        inline AddressRange make_address_range(void *start, void *end)
+        inline AddressRange make_address_range(const void *start, const void *end)
         {
-            return {start, end};
+            return {const_cast<void *>(start), const_cast<void *>(end)};
         }
 
-        inline AddressRange make_address_range(void *start, size_t size)
+        inline AddressRange make_address_range(const void *start, size_t size)
         {
             size = (size == 0) ? 1 : size;
-            return {start, reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(start) + size - 1)};
+            return {const_cast<void *>(start), reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(start) + size - 1)};
         }
 
-        inline uint8_t get_type_size(VariableType v)
+        inline uint8_t get_type_size(const VariableType v)
         {
             if (v == VariableType::unknown)
             {
@@ -45,7 +45,7 @@ namespace scrutiny
             return 1 << (static_cast<unsigned int>(v) & 0xF);
         }
 
-        inline uint8_t get_type_size(VariableTypeSize ts)
+        inline uint8_t get_type_size(const VariableTypeSize ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -55,32 +55,36 @@ namespace scrutiny
             return 1 << (static_cast<unsigned int>(ts) & 0xF);
         }
 
-        inline VariableTypeType get_var_type_type(VariableType v)
+        inline VariableTypeType get_var_type_type(const VariableType v)
         {
             return static_cast<VariableTypeType>(static_cast<unsigned int>(v) & 0xF0);
         }
 
-        inline VariableType make_type(VariableTypeType tt, VariableTypeSize ts)
+        inline VariableType make_type(const VariableTypeType tt, const VariableTypeSize ts)
         {
+            if (tt == VariableTypeType::_boolean)
+            {
+                return (ts == VariableTypeSize::_8) ? VariableType::boolean : VariableType::unknown;
+            }
             return static_cast<VariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 
-        inline bool is_float_type(VariableType v)
+        inline bool is_float_type(const VariableType v)
         {
             return get_var_type_type(v) == VariableTypeType::_float;
         }
 
-        inline bool is_uint_type(VariableType v)
+        inline bool is_uint_type(const VariableType v)
         {
             return get_var_type_type(v) == VariableTypeType::_uint;
         }
 
-        inline bool is_sint_type(VariableType v)
+        inline bool is_sint_type(const VariableType v)
         {
             return get_var_type_type(v) == VariableTypeType::_sint;
         }
 
-        inline size_t strnlen(const char *s, size_t maxlen)
+        inline size_t strnlen(const char *const s, const size_t maxlen)
         {
             size_t n = 0;
             for (; n < maxlen; n++)
@@ -95,7 +99,7 @@ namespace scrutiny
         }
 
         // strncpy is not standard + non-standard implementation does shenanigans.
-        inline size_t strncpy(char *dst, const char *src, size_t maxlen)
+        inline size_t strncpy(char *const dst, const char *const src, const size_t maxlen)
         {
             size_t n = 0;
             for (; n < maxlen; n++)

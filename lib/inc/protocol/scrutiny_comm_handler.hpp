@@ -1,4 +1,4 @@
-//    scrutiny_comm_handler.h
+//    scrutiny_comm_handler.hpp
 //        Manage the tranport-ish layer of the communication protocol. Converts Request/Response
 //        to byte stream and validate CRC
 //
@@ -25,19 +25,19 @@ namespace scrutiny
         class CommHandler
         {
         public:
-            void init(uint8_t *rx_buffer, uint16_t rx_buffer_size, uint8_t *tx_buffer, uint16_t tx_buffer_size, Timebase *timebase, uint32_t prng_seed = 0);
+            void init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t prng_seed = 0);
             void receive_data(uint8_t *data, uint16_t len);
             bool send_response(Response *response);
             void reset();
             Response *prepare_response();
 
             uint16_t pop_data(uint8_t *buffer, uint16_t len);
-            uint16_t data_to_send();
+            uint16_t data_to_send() const;
 
-            bool check_crc(const Request *req);
-            void add_crc(Response *response);
+            bool check_crc(const Request *req) const;
+            void add_crc(Response *response) const;
 
-            bool heartbeat(uint16_t challenge);
+            bool heartbeat(const uint16_t challenge);
             void process();
             bool connect();
             void disconnect();
@@ -58,10 +58,10 @@ namespace scrutiny
                 reset();
                 m_enabled = false;
             }
-            inline bool is_connected() { return m_session_active; }
-            inline uint32_t get_session_id() { return m_session_id; }
-            inline uint16_t rx_buffer_size() { return m_rx_buffer_size; }
-            inline uint16_t tx_buffer_size() { return m_tx_buffer_size; }
+            inline bool is_connected() const { return m_session_active; }
+            inline uint32_t get_session_id() const { return m_session_id; }
+            inline uint16_t rx_buffer_size() const { return m_rx_buffer_size; }
+            inline uint16_t tx_buffer_size() const { return m_tx_buffer_size; }
 
         protected:
             void process_active_request();

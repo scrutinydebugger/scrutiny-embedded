@@ -14,8 +14,17 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_comm_handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_codec_v1_0.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_definitions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogger.cpp
+    
     )
+
+if (SCRUTINY_ENABLE_DATALOGGING)
+    target_sources(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/datalogging.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogging_conditions.cpp
+
+    )
+endif()
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 

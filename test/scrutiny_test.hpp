@@ -1,4 +1,4 @@
-//    scrutiny_test.h
+//    scrutiny_test.hpp
 //        Base class for CPP unit tests.
 //        All test should inherit this class.
 //         Includes bunch of helper for easy testing.

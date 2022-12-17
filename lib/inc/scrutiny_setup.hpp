@@ -1,4 +1,4 @@
-//    scrutiny_setup.h
+//    scrutiny_setup.hpp
 //        Compile-time configuration of embedded Scrutiny module.
 //        This configuration is global for the module and should be set once per project
 //
@@ -17,6 +17,9 @@
 #define SCRUTINY_PROTOCOL_VERSION_MINOR(v) (v & 0xFF)
 
 // ========== Parameters ==========
+#ifndef SCRUTINY_ENABLE_DATALOGGING
+#define SCRUTINY_ENABLE_DATALOGGING 1
+#endif
 
 #define SCRUTINY_COMM_RX_TIMEOUT_US 50000u                                 // Reset reception state machine when no data is received for that amount of time.
 #define SCRUTINY_COMM_HEARTBEAT_TMEOUT_US 5000000u                         // Disconnect session if no heartbeat request after this delay

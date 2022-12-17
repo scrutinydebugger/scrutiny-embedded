@@ -1,4 +1,4 @@
-//    scrutiny_protocol.h
+//    scrutiny_protocol.hpp
 //        Main include file for the scrutiny protocol
 //
 //   - License : MIT - See LICENSE file.

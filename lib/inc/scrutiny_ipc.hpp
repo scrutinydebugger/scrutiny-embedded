@@ -1,3 +1,11 @@
+//    scrutiny_ipc.hpp
+//        Some tools for inter-=process communications
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #ifndef ___SCRUTINY_IPC_H___
 #define ___SCRUTINY_IPC_H___
 

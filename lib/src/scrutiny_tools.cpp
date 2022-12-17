@@ -1,3 +1,11 @@
+//    scrutiny_tools.cpp
+//        Some tools used across the project
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #include <stdint.h>
 #include "scrutiny_types.hpp"
 #include "scrutiny_tools.hpp"
@@ -6,7 +14,7 @@ namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize get_required_type_size(uint_fast8_t newsize)
+        VariableTypeSize get_required_type_size(const uint_fast8_t newsize)
         {
             if (newsize <= 1)
             {

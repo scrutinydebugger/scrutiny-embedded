@@ -1,4 +1,4 @@
-//    scrutiny_types.h
+//    scrutiny_types.hpp
 //        Aliases on the types used by the Scrutiny project
 //
 //   - License : MIT - See LICENSE file.
@@ -92,6 +92,24 @@ namespace scrutiny
         int16_t sint16;
         int32_t sint32;
         int64_t sint64;
+
+        float float32;
+        double float64;
+
+        bool boolean;
+    };
+
+    union AnyTypeFast
+    {
+        uint_fast8_t uint8;
+        uint_fast16_t uint16;
+        uint_fast32_t uint32;
+        uint_fast64_t uint64;
+
+        int_fast8_t sint8;
+        int_fast16_t sint16;
+        int_fast32_t sint32;
+        int_fast64_t sint64;
 
         float float32;
         double float64;

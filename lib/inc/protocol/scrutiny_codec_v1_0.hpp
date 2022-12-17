@@ -1,4 +1,4 @@
-//    scrutiny_codec_v1_0.h
+//    scrutiny_codec_v1_0.hpp
 //        Definitions of encode/decode functions for the scrutiny protocol V1.0
 //
 //   - License : MIT - See LICENSE file.

@@ -1,4 +1,4 @@
-//    abstract_comm_channel.h
+//    abstract_comm_channel.hpp
 //        Define the interface for a communication channel used by the testapp to run the scrutiny
 //        embedded lib
 //

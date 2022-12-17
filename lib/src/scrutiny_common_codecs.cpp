@@ -1,6 +1,5 @@
-//    scrutiny_protocol_tools.cpp
-//        Some helpers for encoding data in a standardised way.
-//        similar to hton() and ntoh()
+//    scrutiny_common_codecs.cpp
+//        Some common encoding/decoding functions used across the project.
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -19,7 +18,7 @@ namespace scrutiny
 #pragma warning(push)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
-        uint8_t decode_address_big_endian(uint8_t *buf, uintptr_t *addr)
+        uint8_t decode_address_big_endian(const uint8_t *buf, uintptr_t *addr)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -59,16 +58,16 @@ namespace scrutiny
 #pragma warning(pop)
 #endif
 
-        uint8_t encode_address_big_endian(uint8_t *buf, void *ptr)
+        uint8_t encode_address_big_endian(uint8_t *buf, const void *addr)
         {
-            return encode_address_big_endian(buf, reinterpret_cast<uintptr_t>(ptr));
+            return encode_address_big_endian(buf, reinterpret_cast<uintptr_t>(addr));
         }
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
-        uint8_t encode_address_big_endian(uint8_t *buf, uintptr_t addr)
+        uint8_t encode_address_big_endian(uint8_t *buf, const uintptr_t addr)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");

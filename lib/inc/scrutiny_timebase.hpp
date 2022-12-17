@@ -1,4 +1,4 @@
-//    scrutiny_timebase.h
+//    scrutiny_timebase.hpp
 //        Minimalist helper to keep track of time
 //
 //   - License : MIT - See LICENSE file.
@@ -23,12 +23,12 @@ namespace scrutiny
             m_time_us += timestep_us;
         }
 
-        inline uint32_t get_timestamp()
+        inline uint32_t get_timestamp() const
         {
             return m_time_us;
         };
 
-        inline bool has_expired(uint32_t timestamp, uint32_t timeout_us)
+        inline bool has_expired(const uint32_t timestamp, const uint32_t timeout_us) const
         {
             bool expired = false;
             const uint32_t diff = m_time_us - timestamp;
@@ -40,7 +40,7 @@ namespace scrutiny
             return expired;
         }
 
-        inline void reset(uint32_t val = 0)
+        inline void reset(const uint32_t val = 0)
         {
             m_time_us = val;
         }

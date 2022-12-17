@@ -8,7 +8,9 @@
         "*.cpp",
         "*.hpp"
     ],
-    "exclude_patterns": [],
+    "exclude_patterns": [
+        "projects/platformio/*"
+    ],
     "license": "MIT - See LICENSE file",
     "project": "Scrutiny Debugger",
     "repo": "github.com/scrutinydebugger/scrutiny-embedded",
@@ -54,9 +56,6 @@
         "lib/inc/protocol/scrutiny_protocol_definitions.hpp": {
             "docstring": "Defines Request/Rsponse objects and commands/subfunctions IDs.\n Not version specific"
         },
-        "lib/inc/protocol/scrutiny_tools.hpp": {
-            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
-        },
         "lib/src/scrutiny_config.cpp": {
             "docstring": "Implementation of the run-time Scrutiny configuration"
         },
@@ -80,9 +79,6 @@
         },
         "lib/src/protocol/scrutiny_protocol_definitions.cpp": {
             "docstring": "Instanciation of protocol definitions such as magic payload."
-        },
-        "lib/src/protocol/scrutiny_tools.cpp": {
-            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
         },
         "test/scrutiny_test.cpp": {
             "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
@@ -161,6 +157,57 @@
         },
         "projects/testapp/src/comm_channels/win_serial_port_bridge.cpp": {
             "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
+        },
+        "lib/inc/scrutiny_common_codecs.hpp": {
+            "docstring": ""
+        },
+        "lib/inc/scrutiny_ipc.hpp": {
+            "docstring": "Some tools for inter-=process communications"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging.hpp": {
+            "docstring": "The datalogging main include"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_types.hpp": {
+            "docstring": "Types used across datalogging feature"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_conditions.hpp": {
+            "docstring": "The definition of the datalogging trigger conditions operators"
+        },
+        "lib/inc/datalogging/scrutiny_datalogger.hpp": {
+            "docstring": "The definition of the datalogger object that should exist in each loop"
+        },
+        "lib/src/scrutiny_tools.cpp": {
+            "docstring": "Some tools used across the project"
+        },
+        "lib/src/scrutiny_common_codecs.cpp": {
+            "docstring": "Some common encoding/decoding functions used across the project."
+        },
+        "lib/src/datalogging/scrutiny_datalogger.cpp": {
+            "docstring": "The implementation of the datalogger object that should exist in each loop "
+        },
+        "lib/src/datalogging/scrutiny_datalogging_conditions.cpp": {
+            "docstring": "The implementation of the datalogging trigger conditions operators"
+        },
+        "lib/src/datalogging/datalogging.cpp": {
+            "docstring": "Implementation of some datalogging features"
+        },
+        "projects/testapp/src/include_test.cpp": {
+            "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
+        },
+        "test/test_ipc.cpp": {
+            "docstring": "Test for the Inter-process communication tools"
+        },
+        "test/test_variable_fetching.cpp": {
+            "docstring": "Test the capacity to read a variable from the memory given the debugging info"
+        },
+        "test/test_types.cpp": {
+            "docstring": "Some tests dones on scrutiny types"
+        },
+        "test/commands/test_memory_control_rpv.cpp": {
+            "docstring": "Test the memory control command dedicated for Runtime Published Values"
+        },
+        "test/datalogging/test_fetch_operands.cpp": {
+            "docstring": "Test the capacity to decode an operand for log trigger"
         }
     }
 }

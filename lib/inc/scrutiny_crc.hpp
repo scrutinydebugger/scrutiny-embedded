@@ -1,4 +1,4 @@
-//    scrutiny_crc.h
+//    scrutiny_crc.hpp
 //        CRC calculation functions
 //
 //   - License : MIT - See LICENSE file.

@@ -1,4 +1,4 @@
-//    scrutiny_loop_handler.h
+//    scrutiny_loop_handler.hpp
 //        LoopHandler definition.
 //        Loop Handler is to be run in a specific time domain and will make some features available
 //        that depends on the execution requency such as embedded datalogging

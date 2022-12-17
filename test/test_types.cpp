@@ -1,3 +1,11 @@
+//    test_types.cpp
+//        Some tests dones on scrutiny types
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 #include "scrutiny.hpp"
 
@@ -57,4 +65,42 @@ TEST(TestTypes, TestTypeType)
     ASSERT_EQ(scrutiny::tools::get_var_type_type(scrutiny::VariableType::cfloat128), scrutiny::VariableTypeType::_cfloat);
     ASSERT_EQ(scrutiny::tools::get_var_type_type(scrutiny::VariableType::cfloat256), scrutiny::VariableTypeType::_cfloat);
     ASSERT_EQ(scrutiny::tools::get_var_type_type(scrutiny::VariableType::boolean), scrutiny::VariableTypeType::_boolean);
+}
+
+TEST(TestTypes, TestMakeType)
+{
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::sint8);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::sint16);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_32), scrutiny::VariableType::sint32);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_64), scrutiny::VariableType::sint64);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_128), scrutiny::VariableType::sint128);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_256), scrutiny::VariableType::sint256);
+
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::uint8);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::uint16);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_32), scrutiny::VariableType::uint32);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_64), scrutiny::VariableType::uint64);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_128), scrutiny::VariableType::uint128);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_256), scrutiny::VariableType::uint256);
+
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::float8);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::float16);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_32), scrutiny::VariableType::float32);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_64), scrutiny::VariableType::float64);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_128), scrutiny::VariableType::float128);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_256), scrutiny::VariableType::float256);
+
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::cfloat8);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::cfloat16);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_32), scrutiny::VariableType::cfloat32);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_64), scrutiny::VariableType::cfloat64);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_128), scrutiny::VariableType::cfloat128);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_256), scrutiny::VariableType::cfloat256);
+
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::boolean);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::unknown);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_32), scrutiny::VariableType::unknown);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_64), scrutiny::VariableType::unknown);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_128), scrutiny::VariableType::unknown);
+    ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_256), scrutiny::VariableType::unknown);
 }

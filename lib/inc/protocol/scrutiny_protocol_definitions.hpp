@@ -1,4 +1,4 @@
-//    scrutiny_protocol_definitions.h
+//    scrutiny_protocol_definitions.hpp
 //        Defines Request/Rsponse objects and commands/subfunctions IDs.
 //        Not version specific
 //

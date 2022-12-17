@@ -1,4 +1,4 @@
-//    scrutiny_config.h
+//    scrutiny_config.hpp
 //        Definition of a run-time configuration of the scrutiny module.
 //        To be filled in startup phase
 //
@@ -30,21 +30,21 @@ namespace scrutiny
         void set_readonly_address_range(const AddressRange *range, const uint8_t count);
         void set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb = nullptr, RpvWriteCallback wr_cb = nullptr);
 
-        inline bool is_user_command_callback_set() { return user_command_callback != nullptr; }
-        inline bool is_buffer_set() { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
-        inline bool is_forbidden_address_range_set() { return m_forbidden_address_ranges != nullptr; }
-        inline bool is_readonly_address_range_set() { return m_readonly_address_ranges != nullptr; }
-        inline bool is_read_published_values_configured() { return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
-        inline bool is_write_published_values_configured() { return (m_rpv_write_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_user_command_callback_set() const { return user_command_callback != nullptr; }
+        inline bool is_buffer_set() const { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
+        inline bool is_forbidden_address_range_set() const { return m_forbidden_address_ranges != nullptr; }
+        inline bool is_readonly_address_range_set() const { return m_readonly_address_ranges != nullptr; }
+        inline bool is_read_published_values_configured() const { return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_write_published_values_configured() const { return (m_rpv_write_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
 
-        inline const AddressRange *forbidden_ranges() { return m_forbidden_address_ranges; }
+        inline const AddressRange *forbidden_ranges() const { return m_forbidden_address_ranges; }
         inline uint8_t forbidden_ranges_count() const { return m_forbidden_range_count; }
-        inline const AddressRange *readonly_ranges() { return m_readonly_address_ranges; }
+        inline const AddressRange *readonly_ranges() const { return m_readonly_address_ranges; }
         inline uint8_t readonly_ranges_count() const { return m_readonly_range_count; }
         inline const RuntimePublishedValue *get_rpvs_array() const { return m_rpvs; }
         inline uint16_t get_rpv_count() const { return m_rpv_count; }
-        inline RpvReadCallback get_rpv_read_callback() { return m_rpv_read_callback; }
-        inline RpvWriteCallback get_rpv_write_callback() { return m_rpv_write_callback; }
+        inline RpvReadCallback get_rpv_read_callback() const { return m_rpv_read_callback; }
+        inline RpvWriteCallback get_rpv_write_callback() const { return m_rpv_write_callback; }
 
         uint32_t max_bitrate;
         user_command_callback_t user_command_callback;

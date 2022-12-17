@@ -1,4 +1,4 @@
-//    scrutiny.h
+//    scrutiny.hpp
 //        Main .h file to be included in a project
 //
 //   - License : MIT - See LICENSE file.
@@ -16,6 +16,10 @@
 #include "scrutiny_crc.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_tools.hpp"
+
+#if SCRUTINY_ENABLE_DATALOGGING
+#include "datalogging/scrutiny_datalogging.hpp"
+#endif
 
 #include "protocol/scrutiny_protocol.hpp"
 

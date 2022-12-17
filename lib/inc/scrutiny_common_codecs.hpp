@@ -1,3 +1,10 @@
+//    scrutiny_common_codecs.hpp
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #ifndef ___SCRUTINY_COMMON_CODECS_H___
 #define ___SCRUTINY_COMMON_CODECS_H___
 
@@ -123,9 +130,9 @@ namespace scrutiny
             return static_cast<uint16_t>(v);
         }
 
-        uint8_t decode_address_big_endian(uint8_t *buf, uintptr_t *addr);
-        uint8_t encode_address_big_endian(uint8_t *buf, void *ptr);
-        uint8_t encode_address_big_endian(uint8_t *buf, uintptr_t addr);
+        uint8_t decode_address_big_endian(const uint8_t *buf, uintptr_t *addr);
+        uint8_t encode_address_big_endian(uint8_t *buf, const void *ptr);
+        uint8_t encode_address_big_endian(uint8_t *buf, const uintptr_t addr);
     }
 }
 

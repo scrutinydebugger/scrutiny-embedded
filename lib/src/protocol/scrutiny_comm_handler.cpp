@@ -19,7 +19,7 @@ namespace scrutiny
 
         uint32_t CommHandler::s_session_counter = 0;
 
-        void CommHandler::init(uint8_t *rx_buffer, uint16_t rx_buffer_size, uint8_t *tx_buffer, uint16_t tx_buffer_size, Timebase *timebase, uint32_t prng_seed)
+        void CommHandler::init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t prng_seed)
         {
             m_rx_buffer = rx_buffer;
             m_rx_buffer_size = rx_buffer_size;
@@ -427,7 +427,7 @@ namespace scrutiny
             }
         }
 
-        bool CommHandler::heartbeat(uint16_t challenge)
+        bool CommHandler::heartbeat(const uint16_t challenge)
         {
             bool success = false;
             if (!m_session_active || !m_enabled)
@@ -445,7 +445,7 @@ namespace scrutiny
             return success;
         }
 
-        uint16_t CommHandler::data_to_send()
+        uint16_t CommHandler::data_to_send() const
         {
             if (m_state != State::Transmitting)
             {
@@ -455,7 +455,7 @@ namespace scrutiny
             return m_nbytes_to_send - m_nbytes_sent;
         }
 
-        bool CommHandler::check_crc(const Request *req)
+        bool CommHandler::check_crc(const Request *req) const
         {
             uint32_t crc = 0;
             uint8_t header_data[4];
@@ -468,7 +468,7 @@ namespace scrutiny
             return (crc == req->crc);
         }
 
-        void CommHandler::add_crc(Response *response)
+        void CommHandler::add_crc(Response *response) const
         {
             if (response->data_length > m_tx_buffer_size)
                 return;

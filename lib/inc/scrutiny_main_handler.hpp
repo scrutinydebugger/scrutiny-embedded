@@ -1,4 +1,4 @@
-//    scrutiny_main_handler.h
+//    scrutiny_main_handler.hpp
 //        The main scrutiny class to be manipulated by the user
 //
 //   - License : MIT - See LICENSE file.
@@ -23,22 +23,28 @@ namespace scrutiny
     {
 
     public:
-        void init(Config *config);
-        bool get_rpv(uint16_t id, RuntimePublishedValue *rpv);
-        VariableType get_rpv_type(uint16_t id);
+        void init(const Config *config);
+        bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
+        VariableType get_rpv_type(const uint16_t id) const;
 
         void process(const uint32_t timestep_us);
 
-        void process_request(const protocol::Request *request, protocol::Response *response);
-        protocol::ResponseCode process_get_info(const protocol::Request *request, protocol::Response *response);
-        protocol::ResponseCode process_comm_control(const protocol::Request *request, protocol::Response *response);
-        protocol::ResponseCode process_memory_control(const protocol::Request *request, protocol::Response *response);
-        protocol::ResponseCode process_user_command(const protocol::Request *request, protocol::Response *response);
+        void process_request(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
 
-        bool fetch_variable(void *addr, VariableType variable_type, AnyType *val);
-        bool fetch_variable_bitfield(void *addr, VariableTypeType var_tt, uint_fast8_t bitoffset, uint_fast8_t bitsize, AnyType *val, VariableType *output_type);
+        bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *const val) const;
+        bool fetch_variable_bitfield(
+            const void *addr,
+            const VariableTypeType var_tt,
+            const uint_fast8_t bitoffset,
+            const uint_fast8_t bitsize,
+            AnyType *val,
+            VariableType *output_type) const;
 
-        inline RpvReadCallback get_rpv_read_callback() { return m_config.get_rpv_read_callback(); }
+        inline RpvReadCallback get_rpv_read_callback() const { return m_config.get_rpv_read_callback(); }
 
         inline protocol::CommHandler *comm()
         {
@@ -48,8 +54,10 @@ namespace scrutiny
         inline Config *get_config() { return &m_config; }
 
     private:
-        bool touches_forbidden_region(const MemoryBlock *block);
-        bool touches_readonly_region(const MemoryBlock *block);
+        bool touches_forbidden_region(const MemoryBlock *block) const;
+        bool touches_forbidden_region(const void *addr_start, const size_t length) const;
+        bool touches_readonly_region(const MemoryBlock *block) const;
+        bool touches_readonly_region(const void *addr_start, const size_t length) const;
         void check_config();
 
         Timebase m_timebase;

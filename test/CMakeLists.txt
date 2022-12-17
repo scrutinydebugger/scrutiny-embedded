@@ -30,6 +30,13 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control_rpv.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     )
+
+if (SCRUTINY_ENABLE_DATALOGGING)
+    target_sources(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
+    )
+endif()
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

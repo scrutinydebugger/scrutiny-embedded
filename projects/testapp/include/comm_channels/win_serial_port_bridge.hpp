@@ -1,4 +1,4 @@
-//    win_serial_port_bridge.h
+//    win_serial_port_bridge.hpp
 //        Class that make a Windows Serial port available as a communication channel for the
 //        Testapp
 //

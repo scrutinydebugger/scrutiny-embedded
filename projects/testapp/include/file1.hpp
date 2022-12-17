@@ -1,4 +1,4 @@
-//    file1.h
+//    file1.hpp
 //        Placeholder file for variable extraction test
 //
 //   - License : MIT - See LICENSE file.

@@ -1,5 +1,5 @@
-//    test_memory_control.cpp
-//        Test the behaviour of the embedded module when MemoryControl commands are received
+//    test_memory_control_rpv.cpp
+//        Test the memory control command dedicated for Runtime Published Values
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
