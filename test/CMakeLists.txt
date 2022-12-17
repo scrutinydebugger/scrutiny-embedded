@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp
+    
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_tx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_comm_handler.cpp
@@ -30,10 +30,11 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control_rpv.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     )
-
+    
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp 
     )
 endif()
 

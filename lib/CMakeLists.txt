@@ -26,6 +26,15 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     )
 endif()
 
+
+if (${SCRUTINY_ENABLE_DATALOGGING})
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCRUTINY_ENABLE_DATALOGGING=1
+)
+else()
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCRUTINY_ENABLE_DATALOGGING=0
+)
+endif()
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 
 target_include_directories(${PROJECT_NAME}

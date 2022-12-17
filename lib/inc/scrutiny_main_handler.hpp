@@ -34,7 +34,7 @@ namespace scrutiny
         protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
-
+#if SCRUTINY_ENABLE_DATALOGGING
         bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *const val) const;
         bool fetch_variable_bitfield(
             const void *addr,
@@ -43,8 +43,11 @@ namespace scrutiny
             const uint_fast8_t bitsize,
             AnyType *val,
             VariableType *output_type) const;
-
-        inline RpvReadCallback get_rpv_read_callback() const { return m_config.get_rpv_read_callback(); }
+#endif
+        inline RpvReadCallback get_rpv_read_callback() const
+        {
+            return m_config.get_rpv_read_callback();
+        }
 
         inline protocol::CommHandler *comm()
         {

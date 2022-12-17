@@ -62,6 +62,7 @@ namespace scrutiny
         }
     }
 
+#if SCRUTINY_ENABLE_DATALOGGING
     bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
     {
         // We are making the assumption that the compiler will align all variables in the enum on the same starting byte.
@@ -135,79 +136,79 @@ namespace scrutiny
                 {
                     success = false;
                 }
-            }
 
-            if (success)
-            {
-                AnyTypeFast mask;
-                uint_fast8_t i;
-                if (output_type_size == VariableTypeSize::_8)
+                if (success)
                 {
-                    mask.uint8 = 1;
-                    for (i = 1; i < bitsize; i++)
+                    AnyTypeFast mask;
+                    uint_fast8_t i;
+                    if (output_type_size == VariableTypeSize::_8)
                     {
-                        mask.uint8 |= (static_cast<uint_fast8_t>(1) << i);
-                    }
-                    val->uint8 &= mask.uint8;
-                    if (var_tt == VariableTypeType::_sint)
-                    {
-                        if (val->uint8 >> (bitsize - 1))
+                        mask.uint8 = 1;
+                        for (i = 1; i < bitsize; i++)
                         {
-                            val->uint8 |= (~mask.uint8);
+                            mask.uint8 |= (static_cast<uint_fast8_t>(1) << i);
+                        }
+                        val->uint8 &= mask.uint8;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint8 >> (bitsize - 1))
+                            {
+                                val->uint8 |= (~mask.uint8);
+                            }
                         }
                     }
-                }
-                else if (output_type_size == VariableTypeSize::_16)
-                {
-                    mask.uint16 = 0x1FF;
-                    for (i = 9; i < bitsize; i++)
+                    else if (output_type_size == VariableTypeSize::_16)
                     {
-                        mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
-                    }
-                    val->uint16 &= mask.uint16;
-                    if (var_tt == VariableTypeType::_sint)
-                    {
-                        if (val->uint16 >> (bitsize - 1))
+                        mask.uint16 = 0x1FF;
+                        for (i = 9; i < bitsize; i++)
                         {
-                            val->uint16 |= (~mask.uint16);
+                            mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
+                        }
+                        val->uint16 &= mask.uint16;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint16 >> (bitsize - 1))
+                            {
+                                val->uint16 |= (~mask.uint16);
+                            }
                         }
                     }
-                }
-                else if (output_type_size == VariableTypeSize::_32)
-                {
-                    mask.uint32 = 0x1FFFF;
-                    for (i = 17; i < bitsize; i++)
+                    else if (output_type_size == VariableTypeSize::_32)
                     {
-                        mask.uint32 |= (static_cast<uint_fast32_t>(1) << i);
-                    }
-                    val->uint32 &= mask.uint32;
-                    if (var_tt == VariableTypeType::_sint)
-                    {
-                        if (val->uint32 >> (bitsize - 1))
+                        mask.uint32 = 0x1FFFF;
+                        for (i = 17; i < bitsize; i++)
                         {
-                            val->uint32 |= (~mask.uint32);
+                            mask.uint32 |= (static_cast<uint_fast32_t>(1) << i);
+                        }
+                        val->uint32 &= mask.uint32;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint32 >> (bitsize - 1))
+                            {
+                                val->uint32 |= (~mask.uint32);
+                            }
                         }
                     }
-                }
-                else if (output_type_size == VariableTypeSize::_64)
-                {
-                    mask.uint64 = 0x1FFFFFFFF;
-                    for (i = 33; i < bitsize; i++)
+                    else if (output_type_size == VariableTypeSize::_64)
                     {
-                        mask.uint64 |= (static_cast<uint_fast64_t>(1) << i);
-                    }
-                    val->uint64 &= mask.uint64;
-                    if (var_tt == VariableTypeType::_sint)
-                    {
-                        if (val->uint64 >> (bitsize - 1))
+                        mask.uint64 = 0x1FFFFFFFF;
+                        for (i = 33; i < bitsize; i++)
                         {
-                            val->uint64 |= (~mask.uint64);
+                            mask.uint64 |= (static_cast<uint_fast64_t>(1) << i);
+                        }
+                        val->uint64 &= mask.uint64;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint64 >> (bitsize - 1))
+                            {
+                                val->uint64 |= (~mask.uint64);
+                            }
                         }
                     }
-                }
-                else // Unsupported
-                {
-                    success = false;
+                    else // Unsupported
+                    {
+                        success = false;
+                    }
                 }
             }
         }
@@ -224,7 +225,7 @@ namespace scrutiny
 
         return success;
     }
-
+#endif
     void MainHandler::process(const uint32_t timestep_us)
     {
         if (!m_enabled)

@@ -8,3 +8,7 @@
 
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "scrutiny_ipc.hpp"
+
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif

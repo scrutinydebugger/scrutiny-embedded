@@ -9,6 +9,10 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif
+
 #include "datalogging/scrutiny_datalogging_types.hpp"
 
 namespace scrutiny
@@ -18,7 +22,7 @@ namespace scrutiny
         class DataLogger
         {
             void configure();
-            
+
         protected:
             uint8_t *m_buffer;
         };

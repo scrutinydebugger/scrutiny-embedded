@@ -9,6 +9,10 @@
 #ifndef ___SCRUTINY_DATALOGGING_CONDITIONS_H___
 #define ___SCRUTINY_DATALOGGING_CONDITIONS_H___
 
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif
+
 #include <stdarg.h>
 #include "datalogging/scrutiny_datalogging_types.hpp"
 

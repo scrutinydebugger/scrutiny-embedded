@@ -9,6 +9,10 @@
 #ifndef ___SCRUTINY_DATALOGGING_TYPES_H___
 #define ___SCRUTINY_DATALOGGING_TYPES_H___
 
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif
+
 #include "scrutiny_types.hpp"
 
 namespace scrutiny

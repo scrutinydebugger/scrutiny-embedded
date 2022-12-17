@@ -61,6 +61,35 @@ pipeline {
                         }
                     }
                 }
+                stage('GCC - No Datalogging'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=0 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
                 stage('AVR'){
                     agent {
                         dockerfile {

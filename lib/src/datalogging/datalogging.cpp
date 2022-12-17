@@ -9,6 +9,9 @@
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "string.h"
 
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif
 namespace scrutiny
 {
     namespace datalogging
