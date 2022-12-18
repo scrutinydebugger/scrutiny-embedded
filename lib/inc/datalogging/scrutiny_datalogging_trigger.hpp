@@ -1,4 +1,4 @@
-//    scrutiny_datalogging_conditions.hpp
+//    scrutiny_datalogging_trigger.hpp
 //        The definition of the datalogging trigger conditions operators
 //
 //   - License : MIT - See LICENSE file.
@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#ifndef ___SCRUTINY_DATALOGGING_CONDITIONS_H___
-#define ___SCRUTINY_DATALOGGING_CONDITIONS_H___
+#ifndef ___SCRUTINY_DATALOGGING_TRIGGER_H___
+#define ___SCRUTINY_DATALOGGING_TRIGGER_H___
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -20,7 +20,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        namespace conditions
+        namespace trigger
         {
 
             class BaseCondition

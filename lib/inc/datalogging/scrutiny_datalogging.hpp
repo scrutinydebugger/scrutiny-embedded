@@ -17,7 +17,7 @@
 
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogger.hpp"
-#include "datalogging/scrutiny_datalogging_conditions.hpp"
+#include "datalogging/scrutiny_datalogging_trigger.hpp"
 
 namespace scrutiny
 {

@@ -1,3 +1,11 @@
+//    test_trigger_conditions.cpp
+//        Test datalogging trigger conditions
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2022 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 #include <cstring>
 
@@ -66,22 +74,19 @@ using namespace scrutiny::datalogging;
 
 TEST_F(TestTriggerConditions, Equality)
 {
-    scrutiny::AnyType val;
-    scrutiny::VariableType vartype;
-
     float thevar = 0;
 
-    Operand op1;
+    Operand op1{};
     op1.type = OperandType::LITERAL;
     op1.data.literal.val = 10;
 
-    Operand op2;
-    op1.type = OperandType::VAR;
-    op1.data.var.addr = &thevar;
-    op1.data.var.datatype = scrutiny::VariableType::float32;
+    Operand op2{};
+    op2.type = OperandType::VAR;
+    op2.data.var.addr = &thevar;
+    op2.data.var.datatype = scrutiny::VariableType::float32;
 
-    conditions::EqualCondition cond;
-    EXPECT_FALSE(cond.evaluate(op1, op2));
+    trigger::EqualCondition cond;
+    EXPECT_FALSE(cond.evaluate(&scrutiny_handler, &op1, &op2));
     thevar = 10;
-    EXPECT_TRUE(cond.evaluate(op1, op2));
+    EXPECT_TRUE(cond.evaluate(&scrutiny_handler, &op1, &op2));
 }

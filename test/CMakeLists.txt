@@ -34,6 +34,7 @@ add_executable(${PROJECT_NAME}
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_trigger_conditions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp 
     )
 endif()
@@ -57,10 +58,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     endif()
 
 else()
-    # We don't require no-pie here. But we need scrutiny-embedded to have the same parameter has this project.
+    # We don't require no-pie here. But we need scrutiny-embedded to have the same parameter as this project.
     # So we need to set an explicit value, if we don't set no-pie or -pie (blank), cmake might chose to keep scrutiny-embedded
     # from cache, which might have no-pie because of testapp and decide to set -pie for this project; this will fail.
-    # So we use no-pie to have an explicit value, and it will avoir recompilation if we use the same has testapp.
+    # So we use no-pie to have an explicit value, and it will avoid recompilation if we use the same as testapp.
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(COMPILER_NO_PIE_OPTION "-fno-pie")

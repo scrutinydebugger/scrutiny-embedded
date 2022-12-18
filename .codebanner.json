@@ -170,7 +170,7 @@
         "lib/inc/datalogging/scrutiny_datalogging_types.hpp": {
             "docstring": "Types used across datalogging feature"
         },
-        "lib/inc/datalogging/scrutiny_datalogging_conditions.hpp": {
+        "lib/inc/datalogging/scrutiny_datalogging_trigger.hpp": {
             "docstring": "The definition of the datalogging trigger conditions operators"
         },
         "lib/inc/datalogging/scrutiny_datalogger.hpp": {
@@ -184,9 +184,6 @@
         },
         "lib/src/datalogging/scrutiny_datalogger.cpp": {
             "docstring": "The implementation of the datalogger object that should exist in each loop "
-        },
-        "lib/src/datalogging/scrutiny_datalogging_conditions.cpp": {
-            "docstring": "The implementation of the datalogging trigger conditions operators"
         },
         "lib/src/datalogging/datalogging.cpp": {
             "docstring": "Implementation of some datalogging features"
@@ -208,6 +205,12 @@
         },
         "test/datalogging/test_fetch_operands.cpp": {
             "docstring": "Test the capacity to decode an operand for log trigger"
+        },
+        "lib/src/datalogging/scrutiny_datalogging_trigger.cpp": {
+            "docstring": "The implementation of the datalogging trigger conditions operators"
+        },
+        "test/datalogging/test_trigger_conditions.cpp": {
+            "docstring": "Test datalogging trigger conditions"
         }
     }
 }
