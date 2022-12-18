@@ -224,7 +224,12 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     operand.data.varbit.bitoffset = 32;
     operand.data.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
+
+#if SCRUTINY_SUPPORT_64BITS
+    EXPECT_TRUE(success);
+#else
     EXPECT_FALSE(success);
+#endif
 
     operand.data.varbit.bitoffset = 0;
     operand.data.varbit.bitsize = 32;
@@ -234,12 +239,20 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     operand.data.varbit.bitoffset = 0;
     operand.data.varbit.bitsize = 33;
     success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
+#if SCRUTINY_SUPPORT_64BITS
+    EXPECT_TRUE(success);
+#else
     EXPECT_FALSE(success);
+#endif
 
     operand.data.varbit.bitoffset = 63;
     operand.data.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
+#if SCRUTINY_SUPPORT_64BITS
     EXPECT_TRUE(success);
+#else
+    EXPECT_FALSE(success);
+#endif
 
     operand.data.varbit.bitoffset = 64;
     operand.data.varbit.bitsize = 1;
@@ -249,7 +262,11 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     operand.data.varbit.bitoffset = 0;
     operand.data.varbit.bitsize = 64;
     success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
+#if SCRUTINY_SUPPORT_64BITS
     EXPECT_TRUE(success);
+#else
+    EXPECT_FALSE(success);
+#endif
 
     operand.data.varbit.bitoffset = 0;
     operand.data.varbit.bitsize = 65;

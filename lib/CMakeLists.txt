@@ -28,10 +28,22 @@ endif()
 
 
 if (${SCRUTINY_ENABLE_DATALOGGING})
-target_compile_definitions(${PROJECT_NAME} PRIVATE SCRUTINY_ENABLE_DATALOGGING=1
+message(STATUS "Scrutiny datalogging is ENABLED")
+target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_ENABLE_DATALOGGING=1
 )
 else()
-target_compile_definitions(${PROJECT_NAME} PRIVATE SCRUTINY_ENABLE_DATALOGGING=0
+message(STATUS "Scrutiny datalogging is DISABLED")
+target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_ENABLE_DATALOGGING=0
+)
+endif()
+
+if (${SCRUTINY_SUPPORT_64BITS})
+message(STATUS "Scrutiny support for 64bits is ENABLED")
+target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_SUPPORT_64BITS=1
+)
+else()
+message(STATUS "Scrutiny support for 64bits is DISABLED")
+target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_SUPPORT_64BITS=0
 )
 endif()
 

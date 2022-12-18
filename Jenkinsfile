@@ -65,7 +65,7 @@ pipeline {
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-datalogging -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-64bits-nodl -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -77,7 +77,7 @@ pipeline {
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
-                                SCRUTINY_ENABLE_64BITS=1 \
+                                SCRUTINY_SUPPORT_64BITS=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -95,7 +95,7 @@ pipeline {
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-datalogging_no_64 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-32bits-nodl -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -107,7 +107,7 @@ pipeline {
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
-                                SCRUTINY_ENABLE_64BITS=0 \
+                                SCRUTINY_SUPPORT_64BITS=0 \
                                 scripts/build.sh
                                 '''
                             }
@@ -125,7 +125,7 @@ pipeline {
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-gcc_32bits -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-32bits -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -137,7 +137,7 @@ pipeline {
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
-                                SCRUTINY_ENABLE_64BITS=0 \
+                                SCRUTINY_SUPPORT_64BITS=0 \
                                 scripts/build.sh
                                 '''
                             }
