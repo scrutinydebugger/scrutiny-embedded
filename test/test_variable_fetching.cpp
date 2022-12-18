@@ -168,7 +168,18 @@ TEST_F(TestVariableFetching, Bitfield)
     EXPECT_EQ(outval.sint16, data1.d);
     EXPECT_EQ(outtype, scrutiny::VariableType::sint16);
 
-    success = scrutiny_handler.fetch_variable_bitfield(some_buffer, scrutiny::VariableTypeType::_uint, 28, 17, &outval, &outtype);
+    success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[2], scrutiny::VariableTypeType::_uint, 28 - 16, 17, &outval, &outtype);
+    EXPECT_TRUE(success);
+    EXPECT_EQ(outval.uint32, data1.e);
+    EXPECT_EQ(outtype, scrutiny::VariableType::uint32);
+
+    success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[4], scrutiny::VariableTypeType::_sint, 45 - 32, 19, &outval, &outtype);
+    EXPECT_TRUE(success);
+    EXPECT_EQ(outval.sint32, data1.f);
+    EXPECT_EQ(outtype, scrutiny::VariableType::sint32);
+
+#if SCRUTINY_SUPPORT_64BITS
+    success = scrutiny_handler.fetch_variable_bitfield(&some_buffer, scrutiny::VariableTypeType::_uint, 28, 17, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint32, data1.e);
     EXPECT_EQ(outtype, scrutiny::VariableType::uint32);
@@ -177,6 +188,8 @@ TEST_F(TestVariableFetching, Bitfield)
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.sint32, data1.f);
     EXPECT_EQ(outtype, scrutiny::VariableType::sint32);
+#endif
+
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[8], scrutiny::VariableTypeType::_boolean, 2, 1, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.boolean, data1.b1);

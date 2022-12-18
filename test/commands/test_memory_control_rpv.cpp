@@ -298,15 +298,16 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     expected_encoding.insert({0x9000, {0x99}});
     expected_encoding.insert({0x9001, {0xA5, 0xA5}});
     expected_encoding.insert({0x9002, {0x99, 0x88, 0x77, 0x66}});
+    expected_encoding.insert({0x9004, {0xC0}});                   // -64
+    expected_encoding.insert({0x9005, {0x8A, 0xD0}});             // -30000
+    expected_encoding.insert({0x9006, {0xC4, 0x65, 0x36, 0x00}}); // -1 000 000 000
+    expected_encoding.insert({0x9008, {0x3f, 0xb9, 0x99, 0x9a}}); // 1.45
+
+#if SCRUTINY_SUPPORT_64BITS
     expected_encoding.insert({0x9003, {0xFF, 0xFF, 0x11, 0x11, 0x22, 0x22, 0x33, 0x33}});
-
-    expected_encoding.insert({0x9004, {0xC0}});                                           // -64
-    expected_encoding.insert({0x9005, {0x8A, 0xD0}});                                     // -30000
-    expected_encoding.insert({0x9006, {0xC4, 0x65, 0x36, 0x00}});                         // -1 000 000 000
     expected_encoding.insert({0x9007, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // -90 000 000 000
-
-    expected_encoding.insert({0x9008, {0x3f, 0xb9, 0x99, 0x9a}});                         // 1.45
     expected_encoding.insert({0x9009, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // -5.123
+#endif
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);

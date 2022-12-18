@@ -23,7 +23,6 @@
 
 #ifndef SCRUTINY_SUPPORT_64BITS
 #define SCRUTINY_SUPPORT_64BITS 1
-#error no defined
 #endif
 
 #define SCRUTINY_COMM_RX_TIMEOUT_US 50000u                                 // Reset reception state machine when no data is received for that amount of time.
