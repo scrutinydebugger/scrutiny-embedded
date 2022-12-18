@@ -134,13 +134,6 @@ namespace scrutiny
     constexpr VariableType BiggestFloat = VariableType::float32;
 #endif
 
-    union AnyTypeBiggest
-    {
-        int_biggest_t _sint;
-        uint_biggest_t _uint;
-        float_biggest_t _float;
-    };
-
     struct RuntimePublishedValue
     {
     public:

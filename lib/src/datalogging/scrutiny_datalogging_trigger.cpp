@@ -106,55 +106,11 @@ namespace scrutiny
                 // Remove some possibilities for the template below.
                 for (int i = 0; i < 2; i++)
                 {
-                    switch (optypes[i])
-                    {
-#if SCRUTINY_SUPPORT_64BITS
-                    case VariableType::float64:
-                        optypes[i] = VariableType::float32;
-                        opvals[i].float32 = static_cast<float>(opvals[i].float64);
-                        break;
-#endif
-                    case VariableType::boolean:
-                        optypes[i] = BiggestUint;
-                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].boolean));
-                        break;
-
-                    case VariableType::sint8:
-                        optypes[i] = BiggestSint;
-                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint8));
-                        break;
-
-                    case VariableType::sint16:
-                        optypes[i] = BiggestSint;
-                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint16));
-                        break;
-
-                    case VariableType::sint32:
-                        optypes[i] = BiggestSint;
-                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint32));
-                        break;
-
-                    case VariableType::uint8:
-                        optypes[i] = BiggestUint;
-                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint8));
-                        break;
-
-                    case VariableType::uint16:
-                        optypes[i] = BiggestUint;
-                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint16));
-                        break;
-
-                    case VariableType::uint32:
-                        optypes[i] = BiggestUint;
-                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint32));
-                        break;
-
-                    default:
-                        break;
-                    }
+                    tools::ConvertValueToBiggestFormat(&optypes[i], &opvals[i]);
                 }
 
-                // We only have to check float32, uint64 and sint64
+                // Now our values are stored either in a float32 or an integer of the biggest supported types.
+                // Number of type comparison will greatly be reduced
                 if (optypes[0] == VariableType::float32)
                 {
                     if (optypes[1] == VariableType::float32)

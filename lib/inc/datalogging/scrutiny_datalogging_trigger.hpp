@@ -22,6 +22,7 @@ namespace scrutiny
     {
         namespace trigger
         {
+            void ConvertValueToBiggestFormat(VariableType *vtype, AnyType *val);
 
             class BaseCondition
             {

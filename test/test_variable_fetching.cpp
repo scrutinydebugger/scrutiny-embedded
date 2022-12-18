@@ -179,6 +179,7 @@ TEST_F(TestVariableFetching, Bitfield)
     EXPECT_EQ(outtype, scrutiny::VariableType::sint32);
 
 #if SCRUTINY_SUPPORT_64BITS
+    // Same tests as above, but read from a different starting point that a 64bit machine could do
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer, scrutiny::VariableTypeType::_uint, 28, 17, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint32, data1.e);

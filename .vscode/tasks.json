@@ -4,11 +4,23 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Debug",
+            "label": "Build Debug - Full",
+            "type": "shell",
+            "command": "SCRUTINY_BUILD_TEST=1 SCRUTINY_BUILD_TESTAPP=1 CMAKE_BUILD_TYPE=Debug ${workspaceFolder}/scripts/build.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Debug (32 bits)",
             "type": "shell",
             "command": "SCRUTINY_BUILD_TEST=1 SCRUTINY_BUILD_TESTAPP=1 SCRUTINY_SUPPORT_64BITS=0 CMAKE_BUILD_TYPE=Debug ${workspaceFolder}/scripts/build.sh",
             "problemMatcher": []
         },
+        {
+            "label": "Build Debug (No datalogging)",
+            "type": "shell",
+            "command": "SCRUTINY_BUILD_TEST=1 SCRUTINY_BUILD_TESTAPP=1 SCRUTINY_ENABLE_DATALOGGING=0 CMAKE_BUILD_TYPE=Debug ${workspaceFolder}/scripts/build.sh",
+            "problemMatcher": []
+        },                
         {
             "label": "Build Release",
             "type": "shell",
