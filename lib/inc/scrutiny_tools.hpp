@@ -88,6 +88,67 @@ namespace scrutiny
             return get_var_type_type(v) == VariableTypeType::_sint;
         }
 
+#if SCRUTINY_SUPPORT_64BITS
+        inline int_biggest_t read_biggest_sint(const AnyType v)
+        {
+            return v.sint64;
+        }
+
+        inline int_biggest_t read_biggest_uint(const AnyType v)
+        {
+            return v.uint64;
+        }
+
+        inline int_biggest_t read_biggest_float(const AnyType v)
+        {
+            return v.float64;
+        }
+
+        inline void set_biggest_sint(AnyType &v, int_biggest_t val)
+        {
+            v.sint64 = val;
+        }
+
+        inline void set_biggest_uint(AnyType &v, uint_biggest_t val)
+        {
+            v.uint64 = val;
+        }
+
+        inline void set_biggest_float(AnyType &v, float_biggest_t val)
+        {
+            v.float64 = val;
+        }
+#else
+        inline int_biggest_t read_biggest_sint(const AnyType v)
+        {
+            return v.sint32;
+        }
+
+        inline int_biggest_t read_biggest_uint(const AnyType v)
+        {
+            return v.uint32;
+        }
+
+        inline int_biggest_t read_biggest_float(const AnyType v)
+        {
+            return v.float32;
+        }
+
+        inline void set_biggest_sint(AnyType &v, int_biggest_t val)
+        {
+            v.sint32 = val;
+        }
+
+        inline void set_biggest_uint(AnyType &v, uint_biggest_t val)
+        {
+            v.uint32 = val;
+        }
+
+        inline void set_biggest_float(AnyType &v, float_biggest_t val)
+        {
+            v.float32 = val;
+        }
+#endif
         inline size_t strnlen(const char *const s, const size_t maxlen)
         {
             size_t n = 0;

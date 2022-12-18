@@ -107,11 +107,7 @@ namespace scrutiny
         {
             success = false;
         }
-        else if (var_tt == VariableTypeType::_cfloat || var_tt == VariableTypeType::_float)
-        {
-            success = false;
-        }
-        else
+        else if (var_tt == VariableTypeType::_sint || var_tt == VariableTypeType::_uint || var_tt == VariableTypeType::_boolean)
         {
             success = fetch_variable(addr, fetch_variable_type, val);
             if (success)
@@ -128,10 +124,12 @@ namespace scrutiny
                 {
                     val->uint32 >>= bitoffset;
                 }
+#if SCRUTINY_SUPPORT_64BITS
                 else if (fetch_type_size == VariableTypeSize::_64)
                 {
                     val->uint64 >>= bitoffset;
                 }
+#endif
                 else // Unsupported
                 {
                     success = false;
@@ -189,6 +187,7 @@ namespace scrutiny
                             }
                         }
                     }
+#if SCRUTINY_SUPPORT_64BITS
                     else if (output_type_size == VariableTypeSize::_64)
                     {
                         mask.uint64 = 0x1FFFFFFFF;
@@ -205,6 +204,7 @@ namespace scrutiny
                             }
                         }
                     }
+#endif
                     else // Unsupported
                     {
                         success = false;

@@ -93,53 +93,60 @@ namespace scrutiny
                 VariableType optypes[2];
                 AnyType opvals[2];
 
-                datalogging::fetch_operand(mh, op1, &opvals[0], &optypes[0]);
-                datalogging::fetch_operand(mh, op2, &opvals[1], &optypes[1]);
+                if (datalogging::fetch_operand(mh, op1, &opvals[0], &optypes[0]) == false)
+                {
+                    return false;
+                }
+
+                if (datalogging::fetch_operand(mh, op2, &opvals[1], &optypes[1]) == false)
+                {
+                    return false;
+                }
 
                 // Remove some possibilities for the template below.
-                // If the union layout allows it, the compiler should be able to optimize this pretty well.
                 for (int i = 0; i < 2; i++)
                 {
                     switch (optypes[i])
                     {
+#if SCRUTINY_SUPPORT_64BITS
                     case VariableType::float64:
                         optypes[i] = VariableType::float32;
                         opvals[i].float32 = static_cast<float>(opvals[i].float64);
                         break;
-
+#endif
                     case VariableType::boolean:
-                        optypes[i] = VariableType::uint64;
-                        opvals[i].uint64 = static_cast<uint64_t>(opvals[i].boolean);
+                        optypes[i] = BiggestUint;
+                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].boolean));
                         break;
 
                     case VariableType::sint8:
-                        optypes[i] = VariableType::sint64;
-                        opvals[i].sint64 = static_cast<int64_t>(opvals[i].sint8);
+                        optypes[i] = BiggestSint;
+                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint8));
                         break;
 
                     case VariableType::sint16:
-                        optypes[i] = VariableType::sint64;
-                        opvals[i].sint64 = static_cast<int64_t>(opvals[i].sint16);
+                        optypes[i] = BiggestSint;
+                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint16));
                         break;
 
                     case VariableType::sint32:
-                        optypes[i] = VariableType::sint64;
-                        opvals[i].sint64 = static_cast<int64_t>(opvals[i].sint32);
+                        optypes[i] = BiggestSint;
+                        tools::set_biggest_sint(opvals[i], static_cast<uint_biggest_t>(opvals[i].sint32));
                         break;
 
                     case VariableType::uint8:
-                        optypes[i] = VariableType::uint64;
-                        opvals[i].uint64 = static_cast<uint64_t>(opvals[i].uint8);
+                        optypes[i] = BiggestUint;
+                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint8));
                         break;
 
                     case VariableType::uint16:
-                        optypes[i] = VariableType::uint64;
-                        opvals[i].uint64 = static_cast<uint64_t>(opvals[i].uint16);
+                        optypes[i] = BiggestUint;
+                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint16));
                         break;
 
                     case VariableType::uint32:
-                        optypes[i] = VariableType::uint64;
-                        opvals[i].uint64 = static_cast<uint64_t>(opvals[i].uint32);
+                        optypes[i] = BiggestUint;
+                        tools::set_biggest_uint(opvals[i], static_cast<uint_biggest_t>(opvals[i].uint32));
                         break;
 
                     default:
@@ -151,29 +158,47 @@ namespace scrutiny
                 if (optypes[0] == VariableType::float32)
                 {
                     if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(opvals[0].float32, opvals[1].float32);
-                    else if (optypes[1] == VariableType::sint64)
-                        return OPERATOR<float, float>::eval(opvals[0].float32, static_cast<float>(opvals[1].sint64));
-                    else if (optypes[1] == VariableType::uint64)
-                        return OPERATOR<float, float>::eval(opvals[0].float32, static_cast<float>(opvals[1].uint64));
+                        return OPERATOR<float, float>::eval(
+                            opvals[0].float32,
+                            opvals[1].float32);
+                    else if (optypes[1] == BiggestSint)
+                        return OPERATOR<float, float>::eval(
+                            opvals[0].float32,
+                            static_cast<float>(tools::read_biggest_sint(opvals[1])));
+                    else if (optypes[1] == BiggestUint)
+                        return OPERATOR<float, float>::eval(
+                            opvals[0].float32,
+                            static_cast<float>(tools::read_biggest_uint(opvals[1])));
                 }
-                else if (optypes[0] == VariableType::sint64)
+                else if (optypes[0] == BiggestSint)
                 {
                     if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(static_cast<float>(opvals[0].sint64), opvals[1].float32);
-                    else if (optypes[1] == VariableType::sint64)
-                        return OPERATOR<int64_t, int64_t>::eval(opvals[0].sint64, opvals[1].sint64);
-                    else if (optypes[1] == VariableType::uint64)
-                        return OPERATOR<int64_t, int64_t>::eval(opvals[0].sint64, static_cast<int64_t>(opvals[1].uint64));
+                        return OPERATOR<float, float>::eval(
+                            static_cast<float>(tools::read_biggest_sint(opvals[0])),
+                            opvals[1].float32);
+                    else if (optypes[1] == BiggestSint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                            tools::read_biggest_sint(opvals[0]),
+                            tools::read_biggest_sint(opvals[1]));
+                    else if (optypes[1] == BiggestUint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                            tools::read_biggest_sint(opvals[0]),
+                            static_cast<int_biggest_t>(tools::read_biggest_uint(opvals[1])));
                 }
-                else if (optypes[0] == VariableType::uint64)
+                else if (optypes[0] == BiggestUint)
                 {
                     if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(static_cast<float>(opvals[0].uint64), opvals[1].float32);
-                    else if (optypes[1] == VariableType::sint64)
-                        return OPERATOR<int64_t, int64_t>::eval(static_cast<int64_t>(opvals[0].uint64), opvals[1].sint64);
-                    else if (optypes[1] == VariableType::uint64)
-                        return OPERATOR<uint64_t, uint64_t>::eval(opvals[0].uint64, opvals[1].uint64);
+                        return OPERATOR<float, float>::eval(
+                            static_cast<float>(tools::read_biggest_uint(opvals[0])),
+                            opvals[1].float32);
+                    else if (optypes[1] == BiggestSint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                            static_cast<int_biggest_t>(tools::read_biggest_uint(opvals[0])),
+                            tools::read_biggest_sint(opvals[1]));
+                    else if (optypes[1] == BiggestUint)
+                        return OPERATOR<uint_biggest_t, uint_biggest_t>::eval(
+                            tools::read_biggest_uint(opvals[0]),
+                            tools::read_biggest_uint(opvals[1]));
                 }
 
                 return false;

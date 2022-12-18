@@ -337,7 +337,11 @@ namespace scrutiny
                 return;
             }
 
-            if (typesize == 1u || typesize == 2u || typesize == 4u || typesize == 8u)
+            if (typesize == 1u || typesize == 2u || typesize == 4u
+#if SCRUTINY_SUPPORT_64BITS
+                || typesize == 8u
+#endif
+            )
             {
                 codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
                 m_cursor += 2;
@@ -353,9 +357,11 @@ namespace scrutiny
                 case 4:
                     codecs::encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
                     break;
+#if SCRUTINY_SUPPORT_64BITS
                 case 8:
                     codecs::encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
                     break;
+#endif
                 default: // handled above
                     break;
                 }
@@ -514,9 +520,11 @@ namespace scrutiny
             case 4:
                 v->uint32 = codecs::decode_32_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
+#if SCRUTINY_SUPPORT_64BITS
             case 8:
                 v->uint64 = codecs::decode_64_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
+#endif
             default:
                 ok_to_process = false;
                 break;

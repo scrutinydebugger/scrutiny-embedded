@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('All') {
             parallel{
-                stage('GCC'){
+                stage('GCC Full'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
@@ -33,7 +33,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Clang'){
+                stage('Clang Full'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-clang'
@@ -61,7 +61,7 @@ pipeline {
                         }
                     }
                 }
-                stage('No Datalogging'){
+                stage('GCC 64bits - No Datalogging'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
@@ -77,6 +77,67 @@ pipeline {
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
+                                SCRUTINY_ENABLE_64BITS=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 32bits - No Datalogging'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-datalogging_no_64 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=0 \
+                                SCRUTINY_ENABLE_64BITS=0 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 32bits'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=no-gcc_32bits -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=1 \
+                                SCRUTINY_ENABLE_64BITS=0 \
                                 scripts/build.sh
                                 '''
                             }

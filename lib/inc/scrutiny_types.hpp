@@ -10,6 +10,7 @@
 #define ___SCRUTINY_TYPES_H___
 
 #include "stdint.h"
+#include "scrutiny_setup.hpp"
 
 namespace scrutiny
 {
@@ -56,28 +57,23 @@ namespace scrutiny
         sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),
         sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),
         sint32 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_32),
-        sint64 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_64),
-        sint128 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_128),
-        sint256 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_256),
         uint8 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_8),
         uint16 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_16),
         uint32 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_32),
-        uint64 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_64),
-        uint128 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_128),
-        uint256 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_256),
         float8 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_8),
         float16 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_16),
         float32 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_32),
-        float64 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_64),
-        float128 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_128),
-        float256 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_256),
         cfloat8 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_8),
         cfloat16 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_16),
         cfloat32 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_32),
-        cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64),
-        cfloat128 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_128),
-        cfloat256 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_256),
         boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8),
+
+#if SCRUTINY_SUPPORT_64BITS
+        uint64 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_64),
+        sint64 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_64),
+        float64 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_64),
+        cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64),
+#endif
         unknown = 0xFF
     };
 
@@ -86,17 +82,18 @@ namespace scrutiny
         uint8_t uint8;
         uint16_t uint16;
         uint32_t uint32;
-        uint64_t uint64;
 
         int8_t sint8;
         int16_t sint16;
         int32_t sint32;
-        int64_t sint64;
 
         float float32;
-        double float64;
-
         bool boolean;
+#if SCRUTINY_SUPPORT_64BITS
+        int64_t sint64;
+        uint64_t uint64;
+        double float64;
+#endif
     };
 
     union AnyTypeFast
@@ -104,17 +101,44 @@ namespace scrutiny
         uint_fast8_t uint8;
         uint_fast16_t uint16;
         uint_fast32_t uint32;
-        uint_fast64_t uint64;
 
         int_fast8_t sint8;
         int_fast16_t sint16;
         int_fast32_t sint32;
-        int_fast64_t sint64;
 
         float float32;
-        double float64;
-
         bool boolean;
+#if SCRUTINY_SUPPORT_64BITS
+        uint_fast64_t uint64;
+        int_fast64_t sint64;
+        double float64;
+#endif
+    };
+
+#if SCRUTINY_SUPPORT_64BITS
+    typedef uint64_t uint_biggest_t;
+    typedef int64_t int_biggest_t;
+    typedef double float_biggest_t;
+
+    constexpr VariableType BiggestUint = VariableType::uint64;
+    constexpr VariableType BiggestSint = VariableType::sint64;
+    constexpr VariableType BiggestFloat = VariableType::float64;
+
+#else
+    typedef uint32_t uint_biggest_t;
+    typedef int32_t int_biggest_t;
+    typedef float float_biggest_t;
+
+    constexpr VariableType BiggestUint = VariableType::uint32;
+    constexpr VariableType BiggestSint = VariableType::sint32;
+    constexpr VariableType BiggestFloat = VariableType::float32;
+#endif
+
+    union AnyTypeBiggest
+    {
+        int_biggest_t _sint;
+        uint_biggest_t _uint;
+        float_biggest_t _float;
     };
 
     struct RuntimePublishedValue

@@ -21,6 +21,10 @@
 #define SCRUTINY_ENABLE_DATALOGGING 1
 #endif
 
+#ifndef SCRUTINY_SUPPORT_64BITS
+#define SCRUTINY_SUPPORT_64BITS 0
+#endif
+
 #define SCRUTINY_COMM_RX_TIMEOUT_US 50000u                                 // Reset reception state machine when no data is received for that amount of time.
 #define SCRUTINY_COMM_HEARTBEAT_TMEOUT_US 5000000u                         // Disconnect session if no heartbeat request after this delay
 #define SCRUTINY_ACTUAL_PROTOCOL_VERSION SCRUTINY_PROTOCOL_VERSION(1u, 0u) // protocol version to use

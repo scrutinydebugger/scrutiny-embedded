@@ -65,10 +65,6 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint32 = 0x99887766;
     }
-    else if (rpv.id == 0x9003 && rpv.type == scrutiny::VariableType::uint64)
-    {
-        outval->uint64 = 0xFFFF111122223333;
-    }
     else if (rpv.id == 0x9004 && rpv.type == scrutiny::VariableType::sint8)
     {
         outval->sint8 = -64;
@@ -81,18 +77,25 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->sint32 = -1000000000;
     }
-    else if (rpv.id == 0x9007 && rpv.type == scrutiny::VariableType::sint64)
-    {
-        outval->sint64 = -90000000000;
-    }
     else if (rpv.id == 0x9008 && rpv.type == scrutiny::VariableType::float32)
     {
         outval->float32 = 1.45f;
+    }
+
+#if SCRUTINY_SUPPORT_64BITS
+    else if (rpv.id == 0x9003 && rpv.type == scrutiny::VariableType::uint64)
+    {
+        outval->uint64 = 0xFFFF111122223333;
+    }
+    else if (rpv.id == 0x9007 && rpv.type == scrutiny::VariableType::sint64)
+    {
+        outval->sint64 = -90000000000;
     }
     else if (rpv.id == 0x9009 && rpv.type == scrutiny::VariableType::float64)
     {
         outval->float64 = -5.123L;
     }
+#endif
 
     else
     {
@@ -110,27 +113,31 @@ struct AllTypeResult
         some_u8 = 0;
         some_u16 = 0;
         some_u32 = 0;
-        some_u64 = 0;
         some_s8 = 0;
         some_s16 = 0;
         some_s32 = 0;
-        some_s64 = 0;
         some_f32 = 0;
+#if SCRUTINY_SUPPORT_64BITS
+        some_u64 = 0;
+        some_s64 = 0;
         some_f64 = 0;
+#endif
     }
 
     uint8_t some_u8;
     uint16_t some_u16;
     uint32_t some_u32;
-    uint64_t some_u64;
 
     int8_t some_s8;
     int16_t some_s16;
     int32_t some_s32;
-    int64_t some_s64;
 
     float some_f32;
+#if SCRUTINY_SUPPORT_64BITS
+    uint64_t some_u64;
+    int64_t some_s64;
     double some_f64;
+#endif
 };
 static AllTypeResult dest_buffer_for_rpv_write;
 
@@ -148,11 +155,12 @@ static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const 
     {
         dest_buffer_for_rpv_write.some_u32 = inval->uint32;
     }
+#if SCRUTINY_SUPPORT_64BITS
     else if (rpv.id == 0x1003 && rpv.type == scrutiny::VariableType::uint64)
     {
         dest_buffer_for_rpv_write.some_u64 = inval->uint64;
     }
-
+#endif
     else if (rpv.id == 0x1004 && rpv.type == scrutiny::VariableType::sint8)
     {
         dest_buffer_for_rpv_write.some_s8 = inval->sint8;
@@ -165,19 +173,22 @@ static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const 
     {
         dest_buffer_for_rpv_write.some_s32 = inval->sint32;
     }
+#if SCRUTINY_SUPPORT_64BITS
     else if (rpv.id == 0x1007 && rpv.type == scrutiny::VariableType::sint64)
     {
         dest_buffer_for_rpv_write.some_s64 = inval->sint64;
     }
-
+#endif
     else if (rpv.id == 0x1008 && rpv.type == scrutiny::VariableType::float32)
     {
         dest_buffer_for_rpv_write.some_f32 = inval->float32;
     }
+#if SCRUTINY_SUPPORT_64BITS
     else if (rpv.id == 0x1009 && rpv.type == scrutiny::VariableType::float64)
     {
         dest_buffer_for_rpv_write.some_f64 = inval->float64;
     }
+#endif
     else
     {
         return false;
@@ -272,13 +283,16 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
         {0x9000, scrutiny::VariableType::uint8},
         {0x9001, scrutiny::VariableType::uint16},
         {0x9002, scrutiny::VariableType::uint32},
-        {0x9003, scrutiny::VariableType::uint64},
         {0x9004, scrutiny::VariableType::sint8},
         {0x9005, scrutiny::VariableType::sint16},
         {0x9006, scrutiny::VariableType::sint32},
-        {0x9007, scrutiny::VariableType::sint64},
         {0x9008, scrutiny::VariableType::float32},
-        {0x9009, scrutiny::VariableType::float64}};
+#if SCRUTINY_SUPPORT_64BITS
+        {0x9003, scrutiny::VariableType::uint64},
+        {0x9007, scrutiny::VariableType::sint64},
+        {0x9009, scrutiny::VariableType::float64},
+#endif
+    };
 
     std::map<uint16_t, std::vector<uint8_t>> expected_encoding;
     expected_encoding.insert({0x9000, {0x99}});
@@ -481,13 +495,16 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
         {0x1000, scrutiny::VariableType::uint8},
         {0x1001, scrutiny::VariableType::uint16},
         {0x1002, scrutiny::VariableType::uint32},
-        {0x1003, scrutiny::VariableType::uint64},
         {0x1004, scrutiny::VariableType::sint8},
         {0x1005, scrutiny::VariableType::sint16},
         {0x1006, scrutiny::VariableType::sint32},
-        {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}};
+#if SCRUTINY_SUPPORT_64BITS
+        {0x1003, scrutiny::VariableType::uint64},
+        {0x1007, scrutiny::VariableType::sint64},
+        {0x1009, scrutiny::VariableType::float64},
+#endif
+    };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
@@ -527,13 +544,16 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
         {0x1000, scrutiny::VariableType::uint8},
         {0x1001, scrutiny::VariableType::uint16},
         {0x1002, scrutiny::VariableType::uint32},
-        {0x1003, scrutiny::VariableType::uint64},
         {0x1004, scrutiny::VariableType::sint8},
         {0x1005, scrutiny::VariableType::sint16},
         {0x1006, scrutiny::VariableType::sint32},
-        {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}};
+#if SCRUTINY_SUPPORT_64BITS
+        {0x1003, scrutiny::VariableType::uint64},
+        {0x1007, scrutiny::VariableType::sint64},
+        {0x1009, scrutiny::VariableType::float64}
+#endif
+    };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
@@ -574,13 +594,16 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
         {0x1000, scrutiny::VariableType::uint8},
         {0x1001, scrutiny::VariableType::uint16},
         {0x1002, scrutiny::VariableType::uint32},
-        {0x1003, scrutiny::VariableType::uint64},
         {0x1004, scrutiny::VariableType::sint8},
         {0x1005, scrutiny::VariableType::sint16},
         {0x1006, scrutiny::VariableType::sint32},
-        {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}};
+#if SCRUTINY_SUPPORT_64BITS
+        {0x1003, scrutiny::VariableType::uint64},
+        {0x1007, scrutiny::VariableType::sint64},
+        {0x1009, scrutiny::VariableType::float64}
+#endif
+    };
 
     struct TestEntry
     {
@@ -591,17 +614,22 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 
     std::vector<TestEntry> vals_and_payload;
 
-    vals_and_payload.push_back({0x1000, scrutiny::VariableType::uint8, {0x55}});                                            // 4-6
-    vals_and_payload.push_back({0x1001, scrutiny::VariableType::uint16, {0xAB, 0xCD}});                                     // 7-10
-    vals_and_payload.push_back({0x1002, scrutiny::VariableType::uint32, {0x12, 0x34, 0x56, 0x78}});                         // 11-16
+    vals_and_payload.push_back({0x1000, scrutiny::VariableType::uint8, {0x55}});                    // 4-6
+    vals_and_payload.push_back({0x1001, scrutiny::VariableType::uint16, {0xAB, 0xCD}});             // 7-10
+    vals_and_payload.push_back({0x1002, scrutiny::VariableType::uint32, {0x12, 0x34, 0x56, 0x78}}); // 11-16
+#if SCRUTINY_SUPPORT_64BITS
     vals_and_payload.push_back({0x1003, scrutiny::VariableType::uint64, {0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10}}); // 17-24
-    vals_and_payload.push_back({0x1004, scrutiny::VariableType::sint8, {0xC0}});                                            // 25-27
-    vals_and_payload.push_back({0x1005, scrutiny::VariableType::sint16, {0x8A, 0xD0}});                                     // 28 - 31
-    vals_and_payload.push_back({0x1006, scrutiny::VariableType::sint32, {0xC4, 0x65, 0x36, 0x00}});                         // 32 - 37
+#endif
+    vals_and_payload.push_back({0x1004, scrutiny::VariableType::sint8, {0xC0}});                    // 25-27
+    vals_and_payload.push_back({0x1005, scrutiny::VariableType::sint16, {0x8A, 0xD0}});             // 28 - 31
+    vals_and_payload.push_back({0x1006, scrutiny::VariableType::sint32, {0xC4, 0x65, 0x36, 0x00}}); // 32 - 37
+#if SCRUTINY_SUPPORT_64BITS
     vals_and_payload.push_back({0x1007, scrutiny::VariableType::sint64, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // 38 - 47
-    vals_and_payload.push_back({0x1008, scrutiny::VariableType::sint32, {0x3f, 0xb9, 0x99, 0x9a}});                         // 48 - 53
+#endif
+    vals_and_payload.push_back({0x1008, scrutiny::VariableType::sint32, {0x3f, 0xb9, 0x99, 0x9a}}); // 48 - 53
+#if SCRUTINY_SUPPORT_64BITS
     vals_and_payload.push_back({0x1009, scrutiny::VariableType::sint64, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // 54 - 63
-
+#endif
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
@@ -663,13 +691,15 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u8, 0x55u);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u16, 0xABCDu);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u32, 0x12345678u);
-    EXPECT_EQ(dest_buffer_for_rpv_write.some_u64, 0xfedcba9876543210u);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s8, -64);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s16, -30000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s32, -1000000000);
-    EXPECT_EQ(dest_buffer_for_rpv_write.some_s64, -90000000000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_f32, 1.45f);
+#if SCRUTINY_SUPPORT_64BITS
+    EXPECT_EQ(dest_buffer_for_rpv_write.some_u64, 0xfedcba9876543210u);
+    EXPECT_EQ(dest_buffer_for_rpv_write.some_s64, -90000000000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_f64, -5.123);
+#endif
 }
 
 /*
@@ -688,13 +718,16 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         {0x1000, scrutiny::VariableType::uint8},
         {0x1001, scrutiny::VariableType::uint16},
         {0x1002, scrutiny::VariableType::uint32},
-        {0x1003, scrutiny::VariableType::uint64},
         {0x1004, scrutiny::VariableType::sint8},
         {0x1005, scrutiny::VariableType::sint16},
         {0x1006, scrutiny::VariableType::sint32},
-        {0x1007, scrutiny::VariableType::sint64},
         {0x1008, scrutiny::VariableType::float32},
-        {0x1009, scrutiny::VariableType::float64}};
+#if SCRUTINY_SUPPORT_64BITS
+        {0x1003, scrutiny::VariableType::uint64},
+        {0x1007, scrutiny::VariableType::sint64},
+        {0x1009, scrutiny::VariableType::float64},
+#endif
+    };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
     scrutiny_handler.init(&config);
