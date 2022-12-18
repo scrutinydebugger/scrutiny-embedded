@@ -46,7 +46,7 @@ namespace scrutiny
                                      : "memory");
         }
 
-        inline void set_data(const T &indata)
+        inline void send(const T &indata)
         {
             data = indata;
             commit();
@@ -89,13 +89,13 @@ namespace scrutiny
             m_written.store(false);
         }
 
-        inline void set_data(const T &indata)
+        inline void send(const T &indata)
         {
             data = indata;
             commit();
         }
 
-        inline void set_data(const T &&indata)
+        inline void send(const T &&indata)
         {
             data = std::move(indata);
             commit();
