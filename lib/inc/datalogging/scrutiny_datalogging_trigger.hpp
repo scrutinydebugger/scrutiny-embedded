@@ -25,50 +25,73 @@ namespace scrutiny
             class BaseCondition
             {
             public:
-                virtual bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const = 0;
+                virtual void reset() = 0;
+                virtual bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]) = 0;
                 virtual inline unsigned int get_operand_count(void) const { return 0; };
             };
 
             class EqualCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
             class NotEqualCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
             class GreaterThanCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
             class GreaterOrEqualThanCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
             class LessThanCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
             class LessOrEqualThanCondition : BaseCondition
             {
             public:
-                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                virtual void reset(){};
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class ChangeMoreThanCondition : BaseCondition
+            {
+            public:
+                virtual void reset()
+                {
+                    m_previous_val = 0.0f;
+                    m_initialized = false;
+                };
+                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                inline unsigned int get_operand_count(void) const { return 2; }
+
+            protected:
+                float m_previous_val;
+                bool m_initialized;
             };
 
         }

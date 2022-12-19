@@ -46,7 +46,7 @@ namespace scrutiny
                 convert_to_compare_type(&optypes[i], &opvals[i]);
             }
 
-            return m_active_condition->evaluate(optypes, reinterpret_cast<AnyTypeCompare *>(opvals));
+            return m_active_condition->evaluate(reinterpret_cast<VariableTypeCompare *>(optypes), reinterpret_cast<AnyTypeCompare *>(opvals));
         }
     }
 }

@@ -26,6 +26,13 @@ namespace scrutiny
             float _float;
         };
 
+        enum class VariableTypeCompare
+        {
+            _float = static_cast<int>(scrutiny::VariableType::float32),
+            _uint = static_cast<int>(scrutiny::BiggestUint),
+            _sint = static_cast<int>(scrutiny::BiggestSint)
+        };
+
         enum class OperandType
         {
             LITERAL,

@@ -74,7 +74,7 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
 {
     scrutiny::datalogging::trigger::EqualCondition cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::VariableType valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
 
     for (int i = 0; i < 2; i++)
     {
@@ -83,50 +83,148 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
 
         vals[op0]._float = 0.5f;
         vals[op1]._float = 0.6f;
-        valtypes[op0] = scrutiny::VariableType::float32;
-        valtypes[op1] = scrutiny::VariableType::float32;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._float = 0.5f;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
         vals[op0]._uint = 2;
         vals[op1]._float = 2.1f;
-        valtypes[op0] = scrutiny::BiggestUint;
-        valtypes[op1] = scrutiny::VariableType::float32;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._float = 2.0f;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._float = 2.1f;
-        valtypes[op0] = scrutiny::BiggestSint;
-        valtypes[op1] = scrutiny::VariableType::float32;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._float = 2.0f;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._uint = 3;
-        valtypes[op0] = scrutiny::BiggestSint;
-        valtypes[op1] = scrutiny::BiggestUint;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._uint = 2;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
         vals[op0]._uint = 2;
         vals[op1]._uint = 3;
-        valtypes[op0] = scrutiny::BiggestUint;
-        valtypes[op1] = scrutiny::BiggestUint;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._uint = 2;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._sint = 3;
-        valtypes[op0] = scrutiny::BiggestSint;
-        valtypes[op1] = scrutiny::BiggestSint;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
         EXPECT_FALSE(cond.evaluate(valtypes, vals));
         vals[op1]._sint = 2;
         EXPECT_TRUE(cond.evaluate(valtypes, vals));
     }
+}
+
+TEST_F(TestTriggerConditions, OperatorEQ)
+{
+    scrutiny::datalogging::trigger::EqualCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.4f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.5f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, OperatorNEQ)
+{
+    scrutiny::datalogging::trigger::NotEqualCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.5f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.4f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, OperatorGT)
+{
+    scrutiny::datalogging::trigger::GreaterThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.4f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.5f;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.6f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, OperatorGET)
+{
+    scrutiny::datalogging::trigger::GreaterOrEqualThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.4f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.5f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.6f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, OperatorLT)
+{
+    scrutiny::datalogging::trigger::LessThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.6f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.5f;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.4f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, OperatorLET)
+{
+    scrutiny::datalogging::trigger::LessOrEqualThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    vals[0]._float = 0.6f;
+    vals[1]._float = 0.5f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.5f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 0.4f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
 }
