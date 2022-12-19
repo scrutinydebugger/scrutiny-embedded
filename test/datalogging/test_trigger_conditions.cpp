@@ -70,23 +70,63 @@ protected:
     }
 };
 
-using namespace scrutiny::datalogging;
-
-TEST_F(TestTriggerConditions, Equality)
+TEST_F(TestTriggerConditions, Equality_AllTypes)
 {
-    float thevar = 0;
+    scrutiny::datalogging::trigger::EqualCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::VariableType valtypes[2];
 
-    Operand op1{};
-    op1.type = OperandType::LITERAL;
-    op1.data.literal.val = 10;
+    for (int i = 0; i < 2; i++)
+    {
+        const int op0 = (i == 0) ? 0 : 1;
+        const int op1 = (i == 0) ? 1 : 0;
 
-    Operand op2{};
-    op2.type = OperandType::VAR;
-    op2.data.var.addr = &thevar;
-    op2.data.var.datatype = scrutiny::VariableType::float32;
+        vals[op0]._float = 0.5f;
+        vals[op1]._float = 0.6f;
+        valtypes[op0] = scrutiny::VariableType::float32;
+        valtypes[op1] = scrutiny::VariableType::float32;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 0.5f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
 
-    trigger::EqualCondition cond;
-    EXPECT_FALSE(cond.evaluate(&scrutiny_handler, &op1, &op2));
-    thevar = 10;
-    EXPECT_TRUE(cond.evaluate(&scrutiny_handler, &op1, &op2));
+        vals[op0]._uint = 2;
+        vals[op1]._float = 2.1f;
+        valtypes[op0] = scrutiny::BiggestUint;
+        valtypes[op1] = scrutiny::VariableType::float32;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 2.0f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._float = 2.1f;
+        valtypes[op0] = scrutiny::BiggestSint;
+        valtypes[op1] = scrutiny::VariableType::float32;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 2.0f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._uint = 3;
+        valtypes[op0] = scrutiny::BiggestSint;
+        valtypes[op1] = scrutiny::BiggestUint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._uint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._uint = 2;
+        vals[op1]._uint = 3;
+        valtypes[op0] = scrutiny::BiggestUint;
+        valtypes[op1] = scrutiny::BiggestUint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._uint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._sint = 3;
+        valtypes[op0] = scrutiny::BiggestSint;
+        valtypes[op1] = scrutiny::BiggestSint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._sint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+    }
 }

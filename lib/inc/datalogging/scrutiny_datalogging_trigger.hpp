@@ -22,18 +22,53 @@ namespace scrutiny
     {
         namespace trigger
         {
-            void ConvertValueToBiggestFormat(VariableType *vtype, AnyType *val);
-
             class BaseCondition
             {
             public:
-                virtual bool evaluate(const MainHandler *const mh, const Operand *const op1, const Operand *const op2) const = 0;
+                virtual bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const = 0;
+                virtual inline unsigned int get_operand_count(void) const = 0;
             };
 
             class EqualCondition : BaseCondition
             {
             public:
-                bool evaluate(const MainHandler *const mh, const Operand *const op1, const Operand *const op2) const;
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class NotEqualCondition : BaseCondition
+            {
+            public:
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class GreaterThanCondition : BaseCondition
+            {
+            public:
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class GreaterOrEqualThanCondition : BaseCondition
+            {
+            public:
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class LessThanCondition : BaseCondition
+            {
+            public:
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
+            };
+
+            class LessOrEqualThanCondition : BaseCondition
+            {
+            public:
+                bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const;
+                inline unsigned int get_operand_count(void) const { return 2; }
             };
 
         }

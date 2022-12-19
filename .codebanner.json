@@ -211,6 +211,9 @@
         },
         "test/datalogging/test_trigger_conditions.cpp": {
             "docstring": "Test datalogging trigger conditions"
+        },
+        "test/datalogging/test_datalogging_types.cpp": {
+            "docstring": "Run some tests on datalogging types"
         }
     }
 }

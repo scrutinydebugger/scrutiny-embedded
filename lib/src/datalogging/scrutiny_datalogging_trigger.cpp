@@ -88,82 +88,71 @@ namespace scrutiny
             }
 
             template <template <class, class> class OPERATOR>
-            bool RelationalCompare(const MainHandler *const mh, const Operand *const op1, const Operand *const op2)
+            bool RelationalCompare(const VariableType operand_types[], const AnyTypeCompare operand_vals[])
             {
-                VariableType optypes[2];
-                AnyType opvals[2];
-
-                if (datalogging::fetch_operand(mh, op1, &opvals[0], &optypes[0]) == false)
-                {
-                    return false;
-                }
-
-                if (datalogging::fetch_operand(mh, op2, &opvals[1], &optypes[1]) == false)
-                {
-                    return false;
-                }
-
-                // Remove some possibilities for the template below.
-                for (int i = 0; i < 2; i++)
-                {
-                    tools::ConvertValueToBiggestFormat(&optypes[i], &opvals[i]);
-                }
-
                 // Now our values are stored either in a float32 or an integer of the biggest supported types.
                 // Number of type comparison will greatly be reduced
-                if (optypes[0] == VariableType::float32)
+                if (operand_types[0] == VariableType::float32)
                 {
-                    if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(
-                            opvals[0].float32,
-                            opvals[1].float32);
-                    else if (optypes[1] == BiggestSint)
-                        return OPERATOR<float, float>::eval(
-                            opvals[0].float32,
-                            static_cast<float>(tools::read_biggest_sint(opvals[1])));
-                    else if (optypes[1] == BiggestUint)
-                        return OPERATOR<float, float>::eval(
-                            opvals[0].float32,
-                            static_cast<float>(tools::read_biggest_uint(opvals[1])));
+                    if (operand_types[1] == VariableType::float32)
+                        return OPERATOR<float, float>::eval(operand_vals[0]._float, operand_vals[1]._float);
+                    else if (operand_types[1] == BiggestSint)
+                        return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._sint));
+                    else if (operand_types[1] == BiggestUint)
+                        return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._uint));
                 }
-                else if (optypes[0] == BiggestSint)
+                else if (operand_types[0] == BiggestSint)
                 {
-                    if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(
-                            static_cast<float>(tools::read_biggest_sint(opvals[0])),
-                            opvals[1].float32);
-                    else if (optypes[1] == BiggestSint)
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
-                            tools::read_biggest_sint(opvals[0]),
-                            tools::read_biggest_sint(opvals[1]));
-                    else if (optypes[1] == BiggestUint)
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
-                            tools::read_biggest_sint(opvals[0]),
-                            static_cast<int_biggest_t>(tools::read_biggest_uint(opvals[1])));
+                    if (operand_types[1] == VariableType::float32)
+                        return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._sint), operand_vals[1]._float);
+                    else if (operand_types[1] == BiggestSint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(operand_vals[0]._sint, operand_vals[1]._sint);
+                    else if (operand_types[1] == BiggestUint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(operand_vals[0]._sint, static_cast<int_biggest_t>(operand_vals[1]._uint));
                 }
-                else if (optypes[0] == BiggestUint)
+                else if (operand_types[0] == BiggestUint)
                 {
-                    if (optypes[1] == VariableType::float32)
-                        return OPERATOR<float, float>::eval(
-                            static_cast<float>(tools::read_biggest_uint(opvals[0])),
-                            opvals[1].float32);
-                    else if (optypes[1] == BiggestSint)
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
-                            static_cast<int_biggest_t>(tools::read_biggest_uint(opvals[0])),
-                            tools::read_biggest_sint(opvals[1]));
-                    else if (optypes[1] == BiggestUint)
-                        return OPERATOR<uint_biggest_t, uint_biggest_t>::eval(
-                            tools::read_biggest_uint(opvals[0]),
-                            tools::read_biggest_uint(opvals[1]));
+                    if (operand_types[1] == VariableType::float32)
+                        return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._uint), operand_vals[1]._float);
+                    else if (operand_types[1] == BiggestSint)
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(static_cast<int_biggest_t>(operand_vals[0]._uint), operand_vals[1]._sint);
+                    else if (operand_types[1] == BiggestUint)
+                        return OPERATOR<uint_biggest_t, uint_biggest_t>::eval(operand_vals[0]._uint, operand_vals[1]._uint);
                 }
 
                 return false;
             }
 
-            bool EqualCondition::evaluate(const MainHandler *const mh, const Operand *const op1, const Operand *const op2) const
+            bool EqualCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
             {
-                return RelationalCompare<relational_operators::eq>(mh, op1, op2);
+                return RelationalCompare<relational_operators::eq>(operand_types, operand_vals);
             }
+
+            bool NotEqualCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
+            {
+                return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
+            }
+
+            bool GreaterThanCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
+            {
+                return RelationalCompare<relational_operators::gt>(operand_types, operand_vals);
+            }
+
+            bool GreaterOrEqualThanCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
+            {
+                return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
+            }
+
+            bool LessThanCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
+            {
+                return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
+            }
+
+            bool LessOrEqualThanCondition::evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const
+            {
+                return RelationalCompare<relational_operators::let>(operand_types, operand_vals);
+            }
+
         }
     }
 }

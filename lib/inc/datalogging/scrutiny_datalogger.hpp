@@ -14,6 +14,8 @@
 #endif
 
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "datalogging/scrutiny_datalogging_trigger.hpp"
+#include "scrutiny_main_handler.hpp"
 
 namespace scrutiny
 {
@@ -21,10 +23,19 @@ namespace scrutiny
     {
         class DataLogger
         {
+        public:
+            static constexpr unsigned int MAX_OPERANDS = 2;
+
             void configure();
 
         protected:
+            bool check_trigger();
             uint8_t *m_buffer;
+            MainHandler *m_main_handler;
+            Operand m_operands[MAX_OPERANDS];
+            trigger::BaseCondition *m_active_condition;
+            bool m_configured;
+            
         };
     }
 }

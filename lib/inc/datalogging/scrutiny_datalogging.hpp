@@ -23,6 +23,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
+        void convert_to_compare_type(VariableType *vtype, AnyType *val);
         bool fetch_operand(const MainHandler *const main_handler, const Operand *const operand, AnyType *const val, VariableType *const variable_type);
     }
 }

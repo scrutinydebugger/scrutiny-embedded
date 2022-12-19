@@ -204,7 +204,6 @@ namespace scrutiny
         };
 
         VariableTypeSize get_required_type_size(uint8_t size);
-        void ConvertValueToBiggestFormat(VariableType *vtype, AnyType *val);
     }
 
 }

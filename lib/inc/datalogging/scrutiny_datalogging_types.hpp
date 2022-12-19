@@ -19,7 +19,12 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        typedef bool (*TriggerCondition)(...);
+        union AnyTypeCompare
+        {
+            uint_biggest_t _uint;
+            int_biggest_t _sint;
+            float _float;
+        };
 
         enum class OperandType
         {
@@ -58,14 +63,15 @@ namespace scrutiny
             OperandType type;
             OperandData data;
         };
-
-        struct Configuration
-        {
-            TriggerCondition condition;
-            uint8_t operand_count;
-            uint16_t decimation;
-            Operand *operands;
-        };
+        /*
+                struct Configuration
+                {
+                    trigger::BaseCondition condition;
+                    uint8_t operand_count;
+                    uint16_t decimation;
+                    Operand *operands;
+                };
+                */
     }
 }
 
