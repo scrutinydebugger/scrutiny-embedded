@@ -26,7 +26,7 @@ namespace scrutiny
             {
             public:
                 virtual bool evaluate(const VariableType operand_types[], const AnyTypeCompare operand_vals[]) const = 0;
-                virtual inline unsigned int get_operand_count(void) const = 0;
+                virtual inline unsigned int get_operand_count(void) const { return 0; };
             };
 
             class EqualCondition : BaseCondition
