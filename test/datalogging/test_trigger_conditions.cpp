@@ -70,67 +70,6 @@ protected:
     }
 };
 
-TEST_F(TestTriggerConditions, Equality_AllTypes)
-{
-    scrutiny::datalogging::trigger::EqualCondition cond;
-    scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
-
-    for (int i = 0; i < 2; i++)
-    {
-        const int op0 = (i == 0) ? 0 : 1;
-        const int op1 = (i == 0) ? 1 : 0;
-
-        vals[op0]._float = 0.5f;
-        vals[op1]._float = 0.6f;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._float = 0.5f;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-
-        vals[op0]._uint = 2;
-        vals[op1]._float = 2.1f;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._float = 2.0f;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-
-        vals[op0]._sint = 2;
-        vals[op1]._float = 2.1f;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._float = 2.0f;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-
-        vals[op0]._sint = 2;
-        vals[op1]._uint = 3;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._uint = 2;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-
-        vals[op0]._uint = 2;
-        vals[op1]._uint = 3;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._uint = 2;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-
-        vals[op0]._sint = 2;
-        vals[op1]._sint = 3;
-        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        EXPECT_FALSE(cond.evaluate(valtypes, vals));
-        vals[op1]._sint = 2;
-        EXPECT_TRUE(cond.evaluate(valtypes, vals));
-    }
-}
-
 TEST_F(TestTriggerConditions, OperatorEQ)
 {
     scrutiny::datalogging::trigger::EqualCondition cond;
@@ -226,5 +165,149 @@ TEST_F(TestTriggerConditions, OperatorLET)
     vals[0]._float = 0.5f;
     EXPECT_TRUE(cond.evaluate(valtypes, vals));
     vals[0]._float = 0.4f;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, Equality_AllTypes)
+{
+    scrutiny::datalogging::trigger::EqualCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+
+    for (int i = 0; i < 2; i++)
+    {
+        const int op0 = (i == 0) ? 0 : 1;
+        const int op1 = (i == 0) ? 1 : 0;
+
+        vals[op0]._float = 0.5f;
+        vals[op1]._float = 0.6f;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 0.5f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._uint = 2;
+        vals[op1]._float = 2.1f;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 2.0f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._float = 2.1f;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._float = 2.0f;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._uint = 3;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._uint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._uint = 2;
+        vals[op1]._uint = 3;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._uint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = 2;
+        vals[op1]._sint = 3;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+        vals[op1]._sint = 2;
+        EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+        vals[op0]._sint = -1;
+        vals[op1]._uint = static_cast<scrutiny::uint_biggest_t>(-1);
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    }
+}
+
+TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
+{
+    scrutiny::datalogging::trigger::LessThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    for (int i = 0; i < 2; i++)
+    {
+        const int op0 = (i == 0) ? 0 : 1;
+        const int op1 = (i == 0) ? 1 : 0;
+
+        bool truefalse = (i == 0) ? false : true;
+
+        vals[op0]._float = 1.0f;
+        vals[op1]._sint = -5;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        EXPECT_EQ(cond.evaluate(valtypes, vals), truefalse);
+        vals[op0]._float = -6;
+        EXPECT_EQ(cond.evaluate(valtypes, vals), !truefalse);
+
+        vals[op0]._float = -1.0f;
+        vals[op1]._uint = 0;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        EXPECT_EQ(cond.evaluate(valtypes, vals), !truefalse);
+
+        vals[op0]._sint = -6;
+        vals[op1]._sint = -5;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        EXPECT_EQ(cond.evaluate(valtypes, vals), !truefalse);
+
+        vals[op0]._uint = static_cast<scrutiny::uint_biggest_t>(-2);
+        vals[op1]._sint = -1;
+        valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
+        valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
+        EXPECT_EQ(cond.evaluate(valtypes, vals), truefalse);
+    }
+}
+
+TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
+{
+    scrutiny::datalogging::trigger::ChangeMoreThanCondition cond;
+    scrutiny::datalogging::AnyTypeCompare vals[2];
+    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    cond.reset();
+
+    vals[0]._float = 10.0;
+    vals[1]._float = 5.0;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+
+    vals[0]._float = 11.0;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+
+    vals[0]._float = 5.0;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+
+    vals[0]._float = 10.1;
+    EXPECT_TRUE(cond.evaluate(valtypes, vals));
+
+    cond.reset();
+    vals[0]._float = 10.0;
+    vals[1]._float = -5.0;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+
+    vals[0]._float = 20.0;
+    EXPECT_FALSE(cond.evaluate(valtypes, vals));
+    vals[0]._float = 14.9;
     EXPECT_TRUE(cond.evaluate(valtypes, vals));
 }

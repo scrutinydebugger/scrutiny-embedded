@@ -13,7 +13,7 @@
 #error "Not enabled"
 #endif
 
-#include <stdarg.h>
+#include <string.h>
 #include "datalogging/scrutiny_datalogging_types.hpp"
 
 namespace scrutiny
@@ -83,14 +83,14 @@ namespace scrutiny
             public:
                 virtual void reset()
                 {
-                    m_previous_val = 0.0f;
+                    memset(&m_previous_val, 0, sizeof(m_previous_val));
                     m_initialized = false;
                 };
                 bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
 
             protected:
-                float m_previous_val;
+                AnyTypeCompare m_previous_val;
                 bool m_initialized;
             };
 

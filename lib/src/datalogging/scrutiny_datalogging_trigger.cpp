@@ -90,34 +90,58 @@ namespace scrutiny
             template <template <class, class> class OPERATOR>
             bool RelationalCompare(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                constexpr uint_biggest_t UINT_2_INT_MAX = static_cast<uint_biggest_t>(-1) >> 1;
+
                 // Now our values are stored either in a float32 or an integer of the biggest supported types.
                 // Number of type comparison will greatly be reduced
                 if (operand_types[0] == VariableTypeCompare::_float)
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
+                    {
                         return OPERATOR<float, float>::eval(operand_vals[0]._float, operand_vals[1]._float);
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
+                    {
                         return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._sint));
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
+                    {
                         return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._uint));
+                    }
                 }
                 else if (operand_types[0] == VariableTypeCompare::_sint)
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
+                    {
                         return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._sint), operand_vals[1]._float);
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
+                    {
                         return OPERATOR<int_biggest_t, int_biggest_t>::eval(operand_vals[0]._sint, operand_vals[1]._sint);
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(operand_vals[0]._sint, static_cast<int_biggest_t>(operand_vals[1]._uint));
+                    {
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                            operand_vals[0]._sint,
+                            static_cast<int_biggest_t>((operand_vals[1]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[1]._uint));
+                    }
                 }
                 else if (operand_types[0] == VariableTypeCompare::_uint)
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
+                    {
                         return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._uint), operand_vals[1]._float);
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(static_cast<int_biggest_t>(operand_vals[0]._uint), operand_vals[1]._sint);
+                    {
+                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                            static_cast<int_biggest_t>((operand_vals[0]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[0]._uint),
+                            operand_vals[1]._sint);
+                    }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
+                    {
                         return OPERATOR<uint_biggest_t, uint_biggest_t>::eval(operand_vals[0]._uint, operand_vals[1]._uint);
+                    }
                 }
 
                 return false;
@@ -155,44 +179,67 @@ namespace scrutiny
 
             bool ChangeMoreThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
-                float float_val;
-
-                if (operand_types[0] == VariableTypeCompare::_float)
-                    float_val = static_cast<float>(operand_vals[0]._float);
-                else if (operand_types[0] == VariableTypeCompare::_uint)
-                    float_val = static_cast<float>(operand_vals[0]._uint);
-                else if (operand_types[0] == VariableTypeCompare::_sint)
-                    float_val = static_cast<float>(operand_vals[0]._sint);
-                else
-                    return false;
+                // We can reasonably make the assumption that the delta will be a human-sized value.
+                // Therefore, a float is adequate for it. Will avoid bloating this code for no reason
+                float delta = 0;
+                bool outval = false;
+                if (operand_types[1] == VariableTypeCompare::_float)
+                {
+                    delta = operand_vals[1]._float;
+                }
+                else if (operand_types[1] == VariableTypeCompare::_uint)
+                {
+                    delta = static_cast<float>(operand_vals[1]._uint);
+                }
+                else if (operand_types[1] == VariableTypeCompare::_sint)
+                {
+                    delta = static_cast<float>(operand_vals[1]._sint);
+                }
 
                 if (m_initialized == false)
                 {
                     m_initialized = true;
-                    m_previous_val = float_val;
                 }
                 else
                 {
-                    float delta = 0;
-
-                    if (operand_types[1] == VariableTypeCompare::_float)
-                        delta = static_cast<float>(operand_vals[1]._float);
-                    else if (operand_types[1] == VariableTypeCompare::_uint)
-                        delta = static_cast<float>(operand_vals[1]._uint);
-                    else if (operand_types[1] == VariableTypeCompare::_sint)
-                        delta = static_cast<float>(operand_vals[1]._sint);
-
-                    if (delta >= 0)
+                    if (operand_types[1] == VariableTypeCompare::_uint)
                     {
-                        return (float_val + delta > m_previous_val);
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._uint > m_previous_val._uint + static_cast<int_biggest_t>(delta));
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._uint < m_previous_val._uint + static_cast<int_biggest_t>(delta));
+                        }
                     }
-                    else
+                    else if (operand_types[1] == VariableTypeCompare::_sint)
                     {
-                        return (float_val + delta < m_previous_val);
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._sint > m_previous_val._sint + static_cast<int_biggest_t>(delta));
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._sint < m_previous_val._sint + static_cast<int_biggest_t>(delta));
+                        }
+                    }
+                    else if (operand_types[1] == VariableTypeCompare::_float)
+                    {
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._float > m_previous_val._float + delta);
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._float < m_previous_val._float + delta);
+                        }
                     }
                 }
 
-                return false;
+                memcpy(&m_previous_val, &operand_vals[0], sizeof(m_previous_val));
+
+                return outval;
             }
         }
     }
