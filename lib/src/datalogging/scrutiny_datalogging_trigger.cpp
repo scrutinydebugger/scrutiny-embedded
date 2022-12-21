@@ -147,37 +147,43 @@ namespace scrutiny
                 return false;
             }
 
-            bool EqualCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool EqualCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::eq>(operand_types, operand_vals);
             }
 
-            bool NotEqualCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool NotEqualCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
             }
 
-            bool GreaterThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool GreaterThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::gt>(operand_types, operand_vals);
             }
 
-            bool GreaterOrEqualThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool GreaterOrEqualThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
             }
 
-            bool LessThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool LessThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
             }
 
-            bool LessOrEqualThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool LessOrEqualThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
+                static_cast<void>(data);
                 return RelationalCompare<relational_operators::let>(operand_types, operand_vals);
             }
 
-            bool ChangeMoreThanCondition::evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool ChangeMoreThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
             {
                 // We can reasonably make the assumption that the delta will be a human-sized value.
                 // Therefore, a float is adequate for it. Will avoid bloating this code for no reason
@@ -195,49 +201,53 @@ namespace scrutiny
                 {
                     delta = static_cast<float>(operand_vals[1]._sint);
                 }
-
-                if (m_initialized == false)
+                else
                 {
-                    m_initialized = true;
+                    return false;
+                }
+
+                if (data->cmt.initialized)
+                {
+                    if (operand_types[0] == VariableTypeCompare::_uint)
+                    {
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._uint > data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._uint < data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
+                        }
+                    }
+                    else if (operand_types[0] == VariableTypeCompare::_sint)
+                    {
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._sint > data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._sint < data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
+                        }
+                    }
+                    else if (operand_types[0] == VariableTypeCompare::_float)
+                    {
+                        if (delta >= 0)
+                        {
+                            outval = (operand_vals[0]._float > data->cmt.previous_val._float + delta);
+                        }
+                        else
+                        {
+                            outval = (operand_vals[0]._float < data->cmt.previous_val._float + delta);
+                        }
+                    }
                 }
                 else
                 {
-                    if (operand_types[1] == VariableTypeCompare::_uint)
-                    {
-                        if (delta >= 0)
-                        {
-                            outval = (operand_vals[0]._uint > m_previous_val._uint + static_cast<int_biggest_t>(delta));
-                        }
-                        else
-                        {
-                            outval = (operand_vals[0]._uint < m_previous_val._uint + static_cast<int_biggest_t>(delta));
-                        }
-                    }
-                    else if (operand_types[1] == VariableTypeCompare::_sint)
-                    {
-                        if (delta >= 0)
-                        {
-                            outval = (operand_vals[0]._sint > m_previous_val._sint + static_cast<int_biggest_t>(delta));
-                        }
-                        else
-                        {
-                            outval = (operand_vals[0]._sint < m_previous_val._sint + static_cast<int_biggest_t>(delta));
-                        }
-                    }
-                    else if (operand_types[1] == VariableTypeCompare::_float)
-                    {
-                        if (delta >= 0)
-                        {
-                            outval = (operand_vals[0]._float > m_previous_val._float + delta);
-                        }
-                        else
-                        {
-                            outval = (operand_vals[0]._float < m_previous_val._float + delta);
-                        }
-                    }
+                    data->cmt.initialized = true;
                 }
 
-                memcpy(&m_previous_val, &operand_vals[0], sizeof(m_previous_val));
+                memcpy(&data->cmt.previous_val, &operand_vals[0], sizeof(data->cmt.previous_val));
 
                 return outval;
             }

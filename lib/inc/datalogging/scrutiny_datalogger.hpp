@@ -24,18 +24,23 @@ namespace scrutiny
         class DataLogger
         {
         public:
-            static constexpr unsigned int MAX_OPERANDS = 2;
-
-            void configure();
+            void init(MainHandler *main_handler);
+            void configure(datalogging::Configuration *config);
+            bool check_trigger(Timebase *timebase);
 
         protected:
-            bool check_trigger();
             uint8_t *m_buffer;
             MainHandler *m_main_handler;
-            Operand m_operands[MAX_OPERANDS];
-            trigger::BaseCondition *m_active_condition;
+
+            trigger::BaseCondition *m_active_trigger_condition_instance;
             bool m_configured;
-            
+            Configuration m_config;
+            struct
+            {
+                bool previous_val;
+                uint32_t rising_edge_timestamp;
+                trigger::ConditionSet conditions;
+            } m_trigger;
         };
     }
 }

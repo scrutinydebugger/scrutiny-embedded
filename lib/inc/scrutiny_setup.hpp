@@ -29,6 +29,10 @@
 #define SCRUTINY_COMM_HEARTBEAT_TMEOUT_US 5000000u                         // Disconnect session if no heartbeat request after this delay
 #define SCRUTINY_ACTUAL_PROTOCOL_VERSION SCRUTINY_PROTOCOL_VERSION(1u, 0u) // protocol version to use
 
+#if SCRUTINY_ENABLE_DATALOGGING
+#define SCRUTINY_DATALOGGING_MAX_BLOCK 32
+#endif
+
 // ================================
 
 // ========================= Sanity check =====================

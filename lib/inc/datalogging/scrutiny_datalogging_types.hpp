@@ -15,10 +15,14 @@
 
 #include "scrutiny_types.hpp"
 
+#include "string.h"
+
 namespace scrutiny
 {
     namespace datalogging
     {
+        constexpr unsigned int MAX_OPERANDS = 2;
+
         union AnyTypeCompare
         {
             uint_biggest_t _uint;
@@ -70,15 +74,62 @@ namespace scrutiny
             OperandType type;
             OperandData data;
         };
-        /*
-                struct Configuration
+
+        enum class SupportedTriggerConditions
+        {
+            Equal,
+            NotEqual,
+            LessThan,
+            LessOrEqualThan,
+            GreaterThan,
+            GreaterOrEqualThan,
+            ChangeMoreThan
+        };
+
+        struct TriggerConfig
+        {
+            void copy_from(TriggerConfig *other)
+            {
+                for (unsigned int i = 0; i < MAX_OPERANDS; i++)
                 {
-                    trigger::BaseCondition condition;
-                    uint8_t operand_count;
-                    uint16_t decimation;
-                    Operand *operands;
-                };
-                */
+                    memcpy(&operands[i], &other->operands[i], sizeof(Operand));
+                }
+
+                condition = other->condition;
+                operand_count = other->operand_count;
+                hold_time_us = other->hold_time_us;
+            }
+
+            SupportedTriggerConditions condition;
+            uint8_t operand_count;
+            uint32_t hold_time_us;
+            Operand operands[MAX_OPERANDS];
+        };
+
+        struct Configuration
+        {
+            void copy_from(Configuration *other)
+            {
+                block_count = other->block_count;
+                decimation = other->decimation;
+                trigger.copy_from(&other->trigger);
+                if (block_count <= SCRUTINY_DATALOGGING_MAX_BLOCK)
+                {
+                    for (unsigned int i = 0; i < block_count; i++)
+                    {
+                        memblocks[i] = other->memblocks[i];
+                        blocksizes[i] = other->blocksizes[i];
+                    }
+                }
+            }
+
+            void *memblocks[SCRUTINY_DATALOGGING_MAX_BLOCK];
+            uint16_t blocksizes[SCRUTINY_DATALOGGING_MAX_BLOCK];
+            uint8_t block_count;
+            uint16_t decimation;
+            TriggerConfig trigger;
+        };
+
     }
 }
 

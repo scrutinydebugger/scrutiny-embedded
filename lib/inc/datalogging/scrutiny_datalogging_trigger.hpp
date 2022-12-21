@@ -22,76 +22,92 @@ namespace scrutiny
     {
         namespace trigger
         {
+            struct ConditionSharedData
+            {
+                struct
+                {
+                    AnyTypeCompare previous_val;
+                    bool initialized;
+                } cmt;
+            };
+
             class BaseCondition
             {
             public:
-                virtual void reset() = 0;
-                virtual bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]) = 0;
+                virtual void reset(ConditionSharedData *data) { static_cast<void>(data); };
+                virtual bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]) = 0;
                 virtual inline unsigned int get_operand_count(void) const { return 0; };
             };
 
-            class EqualCondition : BaseCondition
+            class EqualCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class NotEqualCondition : BaseCondition
+            class NotEqualCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class GreaterThanCondition : BaseCondition
+            class GreaterThanCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class GreaterOrEqualThanCondition : BaseCondition
+            class GreaterOrEqualThanCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class LessThanCondition : BaseCondition
+            class LessThanCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class LessOrEqualThanCondition : BaseCondition
+            class LessOrEqualThanCondition : public BaseCondition
             {
             public:
-                virtual void reset(){};
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
-            class ChangeMoreThanCondition : BaseCondition
+            class ChangeMoreThanCondition : public BaseCondition
             {
             public:
-                virtual void reset()
+                virtual void reset(ConditionSharedData *data)
                 {
-                    memset(&m_previous_val, 0, sizeof(m_previous_val));
-                    m_initialized = false;
+                    memset(&data->cmt.previous_val, 0, sizeof(data->cmt.previous_val));
+                    data->cmt.initialized = false;
                 };
-                bool evaluate(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
                 inline unsigned int get_operand_count(void) const { return 2; }
+            };
 
-            protected:
-                AnyTypeCompare m_previous_val;
-                bool m_initialized;
+            class ConditionSet
+            {
+            public:
+                EqualCondition eq;
+                NotEqualCondition neq;
+                GreaterThanCondition gt;
+                GreaterOrEqualThanCondition get;
+                LessThanCondition lt;
+                LessOrEqualThanCondition let;
+                ChangeMoreThanCondition cmt;
+
+                inline ConditionSharedData *data() { return &m_data; };
+
+            private:
+                ConditionSharedData m_data;
             };
 
         }

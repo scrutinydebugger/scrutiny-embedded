@@ -36,6 +36,7 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_trigger_conditions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_datalogging_types.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_datalogger.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp 
     )
 endif()
