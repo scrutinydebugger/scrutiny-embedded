@@ -98,8 +98,8 @@ TEST_F(TestDatalogger, TriggerBasics)
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
-    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
-    dlconfig.items_to_log[0].memory.address = &logged_var;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].data.memory.address = &logged_var;
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 0;
     dlconfig.trigger.operand_count = 2;
@@ -135,8 +135,8 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
-    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
-    dlconfig.items_to_log[0].memory.address = &logged_var;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].data.memory.address = &logged_var;
 
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 100;
@@ -171,8 +171,8 @@ TEST_F(TestDatalogger, BasicAcquisition)
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
-    dlconfig.items_to_log[0].memory.size = sizeof(my_var);
-    dlconfig.items_to_log[0].memory.address = &my_var;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(my_var);
+    dlconfig.items_to_log[0].data.memory.address = &my_var;
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 100;
     dlconfig.trigger.operand_count = 2;

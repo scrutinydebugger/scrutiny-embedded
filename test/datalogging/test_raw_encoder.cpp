@@ -63,12 +63,12 @@ TEST_F(TestRawEncoder, BasicEncoding)
     dlconfig.items_count = 2;
 
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
-    dlconfig.items_to_log[0].memory.size = sizeof(var1);
-    dlconfig.items_to_log[0].memory.address = &var1;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].data.memory.address = &var1;
 
     dlconfig.items_to_log[1].type = datalogging::LoggableType::MEMORY;
-    dlconfig.items_to_log[1].memory.size = sizeof(var2);
-    dlconfig.items_to_log[1].memory.address = &var2;
+    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].data.memory.address = &var2;
 
     encoder.init();
 

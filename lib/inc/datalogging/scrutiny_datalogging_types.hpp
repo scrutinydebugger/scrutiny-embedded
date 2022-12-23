@@ -130,7 +130,7 @@ namespace scrutiny
                 {
                     uint16_t id;
                 } rpv;
-            };
+            } data;
         };
 
         struct Configuration

@@ -70,8 +70,8 @@ namespace scrutiny
             {
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
                 {
-                    m_main_handler->read_memory(&m_buffer[cursor], m_config->items_to_log[i].memory.address, m_config->items_to_log[i].memory.size);
-                    cursor += m_config->items_to_log[i].memory.size;
+                    m_main_handler->read_memory(&m_buffer[cursor], m_config->items_to_log[i].data.memory.address, m_config->items_to_log[i].data.memory.size);
+                    cursor += m_config->items_to_log[i].data.memory.size;
                 }
             }
 
@@ -98,11 +98,11 @@ namespace scrutiny
             {
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
                 {
-                    m_entry_size += m_config->items_to_log[i].memory.size;
+                    m_entry_size += m_config->items_to_log[i].data.memory.size;
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::RPV)
                 {
-                    const scrutiny::VariableType rpv_type = m_main_handler->get_rpv_type(m_config->items_to_log[i].rpv.id);
+                    const scrutiny::VariableType rpv_type = m_main_handler->get_rpv_type(m_config->items_to_log[i].data.rpv.id);
                     m_entry_size += tools::get_type_size(rpv_type);
                 }
             }
