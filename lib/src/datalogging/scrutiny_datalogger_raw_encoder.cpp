@@ -66,7 +66,7 @@ namespace scrutiny
             }
 
             m_next_entry_write_index++;
-            if (m_next_entry_write_index > m_max_entries)
+            if (m_next_entry_write_index >= m_max_entries)
             {
                 m_full = true;
                 m_next_entry_write_index = 0;

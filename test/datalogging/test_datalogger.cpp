@@ -32,6 +32,7 @@ public:
     }
 
 protected:
+    void check_canaries();
     Timebase tb;
     MainHandler scrutiny_handler;
     Config config;
@@ -57,7 +58,9 @@ protected:
         {0x1234, VariableType::uint32},
         {0x5678, VariableType::float32}};
 
+    uint8_t buffer_canary_1[512];
     uint8_t dlbuffer[128];
+    uint8_t buffer_canary_2[512];
 
     virtual void SetUp()
     {
@@ -68,8 +71,24 @@ protected:
 
         scrutiny_handler.init(&config);
         datalogger.init(&scrutiny_handler, &tb);
+
+        memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
+        memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
     }
 };
+
+void TestDatalogger::check_canaries()
+{
+    for (size_t i = 0; i < sizeof(buffer_canary_1); i++)
+    {
+        ASSERT_EQ(buffer_canary_1[i], 0xAA) << "Overflow before buffer at i=" << i;
+    }
+
+    for (size_t i = 0; i < sizeof(buffer_canary_2); i++)
+    {
+        ASSERT_EQ(buffer_canary_2[i], 0x55) << "Overflow after buffer at i=" << i;
+    }
+}
 
 TEST_F(TestDatalogger, TriggerBasics)
 {
@@ -103,6 +122,8 @@ TEST_F(TestDatalogger, TriggerBasics)
     EXPECT_FALSE(datalogger.check_trigger());
     my_var = 3.1415926f;
     EXPECT_TRUE(datalogger.check_trigger());
+
+    check_canaries();
 }
 
 TEST_F(TestDatalogger, TriggerHoldTime)
@@ -137,6 +158,8 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     EXPECT_FALSE(datalogger.check_trigger());
     tb.step(1);
     EXPECT_TRUE(datalogger.check_trigger());
+
+    check_canaries();
 }
 
 TEST_F(TestDatalogger, BasicAcquisition)
@@ -186,4 +209,6 @@ TEST_F(TestDatalogger, BasicAcquisition)
         my_var += 1.0;
     }
     EXPECT_TRUE(datalogger.data_acquired());
+
+    check_canaries();
 }
