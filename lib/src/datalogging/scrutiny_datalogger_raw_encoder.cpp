@@ -52,7 +52,7 @@ namespace scrutiny
             if (m_next_entry_write_index == m_first_valid_entry_index && m_full)
             {
                 m_first_valid_entry_index++;
-                if (m_first_valid_entry_index > m_max_entries)
+                if (m_first_valid_entry_index >= m_max_entries)
                 {
                     m_first_valid_entry_index = 0;
                 }
