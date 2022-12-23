@@ -11,16 +11,47 @@ class TestRawEncoder : public ScrutinyTest
 {
 public:
     TestRawEncoder() : ScrutinyTest(),
-                       encoder(dlbuffer, sizeof(dlbuffer), &dlconfig)
+                       encoder(&scrutiny_handler, dlbuffer, sizeof(dlbuffer), &dlconfig)
     {
     }
 
 protected:
+    void check_canaries();
+
+    MainHandler scrutiny_handler;
+    Config config;
     datalogging::Configuration dlconfig;
     datalogging::RawFormatEncoder encoder;
 
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
+
+    uint8_t buffer_canary_1[512];
     uint8_t dlbuffer[128];
+    uint8_t buffer_canary_2[512];
+
+    virtual void SetUp()
+    {
+        config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
+        scrutiny_handler.init(&config);
+
+        memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
+        memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
+    }
 };
+
+void TestRawEncoder::check_canaries()
+{
+    for (size_t i = 0; i < sizeof(buffer_canary_1); i++)
+    {
+        ASSERT_EQ(buffer_canary_1[i], 0xAA) << "Overflow before buffer at i=" << i;
+    }
+
+    for (size_t i = 0; i < sizeof(buffer_canary_2); i++)
+    {
+        ASSERT_EQ(buffer_canary_2[i], 0x55) << "Overflow after buffer at i=" << i;
+    }
+}
 
 TEST_F(TestRawEncoder, BasicEncoding)
 {
@@ -29,11 +60,15 @@ TEST_F(TestRawEncoder, BasicEncoding)
     float var1;
     uint32_t var2;
 
-    dlconfig.block_count = 2;
-    dlconfig.memblocks[0] = &var1;
-    dlconfig.memblocks[1] = &var2;
-    dlconfig.blocksizes[0] = sizeof(var1);
-    dlconfig.blocksizes[1] = sizeof(var2);
+    dlconfig.items_count = 2;
+
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].memory.address = &var1;
+
+    dlconfig.items_to_log[1].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[1].memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].memory.address = &var2;
 
     encoder.init();
 

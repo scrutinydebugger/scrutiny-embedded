@@ -27,7 +27,7 @@ class TestDatalogger : public ScrutinyTest
 {
 public:
     TestDatalogger() : ScrutinyTest(),
-                       datalogger(dlbuffer, sizeof(dlbuffer))
+                       datalogger(&scrutiny_handler, dlbuffer, sizeof(dlbuffer))
     {
     }
 
@@ -70,7 +70,7 @@ protected:
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);
-        datalogger.init(&scrutiny_handler, &tb);
+        datalogger.init(&tb);
 
         memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
         memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
@@ -96,9 +96,10 @@ TEST_F(TestDatalogger, TriggerBasics)
     float logged_var = 0.0;
 
     datalogging::Configuration dlconfig;
-    dlconfig.block_count = 1;
-    dlconfig.blocksizes[0] = sizeof(logged_var);
-    dlconfig.memblocks[0] = &logged_var;
+    dlconfig.items_count = 1;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].memory.address = &logged_var;
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 0;
     dlconfig.trigger.operand_count = 2;
@@ -132,9 +133,10 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     float logged_var = 0.0;
 
     datalogging::Configuration dlconfig;
-    dlconfig.block_count = 1;
-    dlconfig.blocksizes[0] = sizeof(logged_var);
-    dlconfig.memblocks[0] = &logged_var;
+    dlconfig.items_count = 1;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].memory.address = &logged_var;
 
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 100;
@@ -167,9 +169,10 @@ TEST_F(TestDatalogger, BasicAcquisition)
     float my_var = 0.0;
 
     datalogging::Configuration dlconfig;
-    dlconfig.block_count = 1;
-    dlconfig.memblocks[0] = &my_var;
-    dlconfig.blocksizes[0] = sizeof(float);
+    dlconfig.items_count = 1;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].memory.size = sizeof(my_var);
+    dlconfig.items_to_log[0].memory.address = &my_var;
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 100;
     dlconfig.trigger.operand_count = 2;

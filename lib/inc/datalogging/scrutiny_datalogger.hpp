@@ -47,13 +47,20 @@ namespace scrutiny
             };
 
         public:
-            DataLogger(uint8_t *const buffer, const uint32_t buffer_size) : m_buffer(buffer),
-                                                                            m_buffer_size(buffer_size),
-                                                                            m_encoder(buffer, buffer_size, &m_config)
+            DataLogger(MainHandler *main_handler,
+                       uint8_t *const buffer,
+                       const uint32_t buffer_size) : m_main_handler(main_handler),
+                                                     m_buffer(buffer),
+                                                     m_buffer_size(buffer_size),
+                                                     m_encoder(
+                                                         main_handler,
+                                                         buffer,
+                                                         buffer_size,
+                                                         &m_config)
 
             {
             }
-            void init(MainHandler *main_handler, Timebase *timebase);
+            void init(Timebase *timebase);
             void configure(datalogging::Configuration *config);
             void process(void);
             void reset(void);
@@ -71,10 +78,10 @@ namespace scrutiny
             uint16_t read_next_entry_size(uint32_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
+            MainHandler *const m_main_handler;
             uint8_t *const m_buffer;
             const uint32_t m_buffer_size;
 
-            MainHandler *m_main_handler;
             Timebase *m_timebase;
             State m_state;
             bool m_trigger_point_stamped;

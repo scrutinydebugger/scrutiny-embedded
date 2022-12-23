@@ -18,9 +18,8 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(MainHandler *main_handler, Timebase *timebase)
+        void DataLogger::init(Timebase *timebase)
         {
-            m_main_handler = main_handler;
             m_timebase = timebase;
 
             reset();
@@ -51,7 +50,7 @@ namespace scrutiny
 
             m_config.copy_from(config);
 
-            if (m_config.block_count > SCRUTINY_DATALOGGING_MAX_BLOCK || m_config.block_count == 0)
+            if (m_config.items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL || m_config.items_count == 0)
             {
                 m_state = State::ERROR;
                 return;

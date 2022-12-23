@@ -63,26 +63,52 @@ namespace scrutiny
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
+
+    /// @brief Copy memory from src to dst (makes a memcpy) but respect the forbodden region constraints given by the user.
+    /// @param dst Destination buffer
+    /// @param src Source buffer
+    /// @param size Number of bytes to copy
+    /// @return true on success. False on failure
+    bool MainHandler::read_memory(void *dst, const void *src, const uint32_t size) const
     {
-        // We are making the assumption that the compiler will align all variables in the enum on the same starting byte.
-        // As far as I know, it should always be the case.
-        const uint8_t typesize = tools::get_type_size(variable_type);
-        if (touches_forbidden_region(addr, typesize))
+        if (touches_forbidden_region(src, size))
         {
-            memset(val, 0, sizeof(AnyType));
             return false;
         }
 
+        memcpy(dst, src, size);
+        return true;
+    }
+
+    /// @brief Reads a variable from the memory
+    /// @param addr Location of the variable in memory
+    /// @param variable_type Type of variable to read
+    /// @param val The output structure that supports all types.
+    /// @return true on success. False on failure
+    bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
+    {
+        uint8_t typesize = tools::get_type_size(variable_type);
         if (typesize == 0 || typesize > sizeof(AnyType))
         {
             return false;
         }
 
-        memcpy(val, addr, typesize);
+        if (read_memory(val, addr, typesize) == false)
+        {
+            memset(val, 0, sizeof(AnyType));
+            return false;
+        }
         return true;
     }
 
+    /// @brief Reads a bitfield variable from the memory
+    /// @param addr Location of the variable in memory
+    /// @param var_tt Variable Type Type (no size in type). (uint, sint, float, etc.)
+    /// @param bitoffset Offset of the start of the data
+    /// @param bitsize Size of the data to read
+    /// @param val The output structure that supports all types.
+    /// @param output_type The type of the data read. The size is adjusted to be as small as possible.
+    /// @return true on success. False on failure
     bool MainHandler::fetch_variable_bitfield(
         const void *addr,
         const VariableTypeType var_tt,

@@ -11,6 +11,7 @@
 
 #include "stdint.h"
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_main_handler.hpp"
 
 namespace scrutiny
 {
@@ -38,12 +39,14 @@ namespace scrutiny
 
         public:
             static constexpr EncodingType ENCODING = EncodingType::RAW;
-            RawFormatEncoder(uint8_t *buffer,
+            RawFormatEncoder(MainHandler *main_handler,
+                             uint8_t *buffer,
                              uint32_t buffer_size,
                              datalogging::Configuration *config) : m_buffer(buffer),
                                                                    m_buffer_size(buffer_size),
                                                                    m_config(config),
-                                                                   m_reader(this)
+                                                                   m_reader(this),
+                                                                   m_main_handler(main_handler)
             {
             }
 
@@ -52,8 +55,8 @@ namespace scrutiny
             inline void reset_write_counter(void) { m_write_counter = 0; }
             inline uint32_t get_write_counter(void) const { return m_write_counter; }
             inline datalogging::EncodingType get_encoding(void) const { return ENCODING; }
-            inline uint32_t get_read_cursor(void) const { return m_first_valid_entry_index * m_blocksize_sum; }
-            inline uint32_t get_write_cursor(void) const { return m_next_entry_write_index * m_blocksize_sum; }
+            inline uint32_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
+            inline uint32_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
 
             RawFormatReader *get_reader(void)
             {
@@ -66,12 +69,13 @@ namespace scrutiny
             const uint32_t m_buffer_size;
             const datalogging::Configuration *m_config;
             RawFormatReader m_reader;
+            MainHandler *const m_main_handler;
 
             uint32_t m_max_entries;
             uint32_t m_next_entry_write_index;
             uint32_t m_first_valid_entry_index;
             uint32_t m_write_counter;
-            uint16_t m_blocksize_sum;
+            uint16_t m_entry_size;
             uint32_t m_entries_count;
             bool m_full;
         };

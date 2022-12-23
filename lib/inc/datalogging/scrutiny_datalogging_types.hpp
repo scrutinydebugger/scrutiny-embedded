@@ -111,28 +111,48 @@ namespace scrutiny
             Operand operands[MAX_OPERANDS];
         };
 
+        enum class LoggableType
+        {
+            MEMORY,
+            RPV
+        };
+        struct LoggableItem
+        {
+            LoggableType type;
+            union
+            {
+                struct
+                {
+                    void *address;
+                    uint16_t size;
+                } memory;
+                struct
+                {
+                    uint16_t id;
+                } rpv;
+            };
+        };
+
         struct Configuration
         {
             void copy_from(Configuration *other)
             {
-                block_count = other->block_count;
+                items_count = other->items_count;
                 decimation = other->decimation;
                 decimation = other->probe_location;
                 decimation = other->timeout_us;
                 trigger.copy_from(&other->trigger);
-                if (block_count <= SCRUTINY_DATALOGGING_MAX_BLOCK)
+                if (items_count <= SCRUTINY_DATALOGGING_MAX_SIGNAL)
                 {
-                    for (unsigned int i = 0; i < block_count; i++)
+                    for (unsigned int i = 0; i < items_count; i++)
                     {
-                        memblocks[i] = other->memblocks[i];
-                        blocksizes[i] = other->blocksizes[i];
+                        memcpy(&items_to_log[i], &other->items_to_log[i], sizeof(LoggableItem));
                     }
                 }
             }
 
-            void *memblocks[SCRUTINY_DATALOGGING_MAX_BLOCK];
-            uint16_t blocksizes[SCRUTINY_DATALOGGING_MAX_BLOCK];
-            uint8_t block_count;
+            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL];
+            uint8_t items_count;
             uint16_t decimation;
             uint8_t probe_location;
             uint32_t timeout_us;

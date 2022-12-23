@@ -35,7 +35,8 @@ namespace scrutiny
         protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
 #if SCRUTINY_ENABLE_DATALOGGING
-        bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *const val) const;
+        bool read_memory(void *dst, const void *src, const uint32_t size) const;
+        bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const;
         bool fetch_variable_bitfield(
             const void *addr,
             const VariableTypeType var_tt,
