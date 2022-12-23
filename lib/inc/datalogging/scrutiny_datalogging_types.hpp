@@ -23,6 +23,11 @@ namespace scrutiny
     {
         constexpr unsigned int MAX_OPERANDS = 2;
 
+        enum class EncodingType
+        {
+            RAW
+        };
+
         union AnyTypeCompare
         {
             uint_biggest_t _uint;
@@ -112,6 +117,8 @@ namespace scrutiny
             {
                 block_count = other->block_count;
                 decimation = other->decimation;
+                decimation = other->probe_location;
+                decimation = other->timeout_us;
                 trigger.copy_from(&other->trigger);
                 if (block_count <= SCRUTINY_DATALOGGING_MAX_BLOCK)
                 {
@@ -127,6 +134,8 @@ namespace scrutiny
             uint16_t blocksizes[SCRUTINY_DATALOGGING_MAX_BLOCK];
             uint8_t block_count;
             uint16_t decimation;
+            uint8_t probe_location;
+            uint32_t timeout_us;
             TriggerConfig trigger;
         };
 

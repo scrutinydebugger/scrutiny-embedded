@@ -25,6 +25,12 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
 
 class TestDatalogger : public ScrutinyTest
 {
+public:
+    TestDatalogger() : ScrutinyTest(),
+                       datalogger(dlbuffer, sizeof(dlbuffer))
+    {
+    }
+
 protected:
     Timebase tb;
     MainHandler scrutiny_handler;
@@ -51,6 +57,8 @@ protected:
         {0x1234, VariableType::uint32},
         {0x5678, VariableType::float32}};
 
+    uint8_t dlbuffer[128];
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
@@ -59,16 +67,19 @@ protected:
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);
-        datalogger.init(&scrutiny_handler);
+        datalogger.init(&scrutiny_handler, &tb);
     }
 };
 
 TEST_F(TestDatalogger, TriggerBasics)
 {
     float my_var = 0.0;
+    float logged_var = 0.0;
 
     datalogging::Configuration dlconfig;
-    dlconfig.block_count = 0;
+    dlconfig.block_count = 1;
+    dlconfig.blocksizes[0] = sizeof(logged_var);
+    dlconfig.memblocks[0] = &logged_var;
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 0;
     dlconfig.trigger.operand_count = 2;
@@ -83,17 +94,27 @@ TEST_F(TestDatalogger, TriggerBasics)
 
     datalogger.configure(&dlconfig);
 
-    EXPECT_FALSE(datalogger.check_trigger(&tb));
+    EXPECT_FALSE(datalogger.check_trigger());
     my_var = 3.1415926f;
-    EXPECT_TRUE(datalogger.check_trigger(&tb));
+    EXPECT_FALSE(datalogger.check_trigger());
+
+    datalogger.arm_trigger();
+    my_var = 0;
+    EXPECT_FALSE(datalogger.check_trigger());
+    my_var = 3.1415926f;
+    EXPECT_TRUE(datalogger.check_trigger());
 }
 
 TEST_F(TestDatalogger, TriggerHoldTime)
 {
     float my_var = 0.0;
+    float logged_var = 0.0;
 
     datalogging::Configuration dlconfig;
-    dlconfig.block_count = 0;
+    dlconfig.block_count = 1;
+    dlconfig.blocksizes[0] = sizeof(logged_var);
+    dlconfig.memblocks[0] = &logged_var;
+
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_us = 100;
     dlconfig.trigger.operand_count = 2;
@@ -107,12 +128,62 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
     datalogger.configure(&dlconfig);
+    datalogger.arm_trigger();
 
-    EXPECT_FALSE(datalogger.check_trigger(&tb));
+    EXPECT_FALSE(datalogger.check_trigger());
     my_var = 3.1415926f;
-    EXPECT_FALSE(datalogger.check_trigger(&tb));
+    EXPECT_FALSE(datalogger.check_trigger());
     tb.step(99);
-    EXPECT_FALSE(datalogger.check_trigger(&tb));
+    EXPECT_FALSE(datalogger.check_trigger());
     tb.step(1);
-    EXPECT_TRUE(datalogger.check_trigger(&tb));
+    EXPECT_TRUE(datalogger.check_trigger());
+}
+
+TEST_F(TestDatalogger, BasicAcquisition)
+{
+    float my_var = 0.0;
+
+    datalogging::Configuration dlconfig;
+    dlconfig.block_count = 1;
+    dlconfig.memblocks[0] = &my_var;
+    dlconfig.blocksizes[0] = sizeof(float);
+    dlconfig.decimation = 1;
+    dlconfig.trigger.hold_time_us = 100;
+    dlconfig.trigger.operand_count = 2;
+    dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::GreaterThan;
+
+    dlconfig.trigger.operands[0].type = datalogging::OperandType::VAR;
+    dlconfig.trigger.operands[0].data.var.addr = &my_var;
+    dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
+
+    dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
+    dlconfig.trigger.operands[1].data.literal.val = 100;
+
+    datalogger.configure(&dlconfig);
+
+    datalogger.process();
+    tb.step(100);
+    datalogger.process();
+    tb.step(100);
+    EXPECT_FALSE(datalogger.data_acquired());
+
+    my_var = 200.0f;
+
+    for (unsigned int i = 0; i < 100; i++)
+    {
+        datalogger.process();
+        tb.step(100);
+        my_var += 1.0;
+    }
+    EXPECT_FALSE(datalogger.data_acquired());
+
+    datalogger.arm_trigger();
+
+    for (unsigned int i = 0; i < 100; i++)
+    {
+        datalogger.process();
+        tb.step(100);
+        my_var += 1.0;
+    }
+    EXPECT_TRUE(datalogger.data_acquired());
 }

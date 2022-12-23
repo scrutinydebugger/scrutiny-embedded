@@ -18,64 +18,173 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(MainHandler *main_handler)
+        void DataLogger::init(MainHandler *main_handler, Timebase *timebase)
         {
             m_main_handler = main_handler;
-            m_configured = false;
+            m_timebase = timebase;
+
+            reset();
+        }
+
+        void DataLogger::reset(void)
+        {
+
+            m_state = State::IDLE;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
+            m_trigger_point_stamped = false;
+
+            m_trigger_cursor_location = 0;
+            m_trigger_timestamp = 0;
+            m_remaining_data_to_write = 0;
         }
 
         void DataLogger::configure(datalogging::Configuration *config)
         {
-            m_configured = true;
+            if (m_state != State::IDLE)
+            {
+                reset();
+            }
+
+            m_trigger.previous_val = false;
+            m_trigger.rising_edge_timestamp = 0;
+
             m_config.copy_from(config);
+
+            if (m_config.block_count > SCRUTINY_DATALOGGING_MAX_BLOCK || m_config.block_count == 0)
+            {
+                m_state = State::ERROR;
+                return;
+            }
 
             switch (m_config.trigger.condition)
             {
             case SupportedTriggerConditions::Equal:
-                m_active_trigger_condition_instance = &m_trigger.conditions.eq;
+                m_trigger.active_condition = &m_trigger.conditions.eq;
                 break;
             case SupportedTriggerConditions::NotEqual:
-                m_active_trigger_condition_instance = &m_trigger.conditions.neq;
+                m_trigger.active_condition = &m_trigger.conditions.neq;
                 break;
             case SupportedTriggerConditions::LessThan:
-                m_active_trigger_condition_instance = &m_trigger.conditions.lt;
+                m_trigger.active_condition = &m_trigger.conditions.lt;
                 break;
             case SupportedTriggerConditions::LessOrEqualThan:
-                m_active_trigger_condition_instance = &m_trigger.conditions.let;
+                m_trigger.active_condition = &m_trigger.conditions.let;
                 break;
             case SupportedTriggerConditions::GreaterThan:
-                m_active_trigger_condition_instance = &m_trigger.conditions.gt;
+                m_trigger.active_condition = &m_trigger.conditions.gt;
                 break;
             case SupportedTriggerConditions::GreaterOrEqualThan:
-                m_active_trigger_condition_instance = &m_trigger.conditions.get;
+                m_trigger.active_condition = &m_trigger.conditions.get;
                 break;
             case SupportedTriggerConditions::ChangeMoreThan:
-                m_active_trigger_condition_instance = &m_trigger.conditions.cmt;
+                m_trigger.active_condition = &m_trigger.conditions.cmt;
                 break;
             default:
-                m_configured = false;
+                m_state = State::ERROR;
             }
 
-            if (m_configured)
+            if (m_state != State::ERROR)
             {
-                m_active_trigger_condition_instance->reset(m_trigger.conditions.data());
+                m_trigger.active_condition->reset(m_trigger.conditions.data());
+                m_encoder.init();
+                m_state = State::CONFIGURED;
             }
         }
 
-        bool DataLogger::check_trigger(Timebase *timebase)
+        void DataLogger::arm_trigger(void)
+        {
+            if (m_state == State::CONFIGURED)
+            {
+                m_state = State::ARMED;
+            }
+        }
+
+        void DataLogger::process(void)
+        {
+
+            switch (m_state)
+            {
+            case State::IDLE:
+            case State::ERROR:
+            case State::ACQUISITION_COMPLETED:
+                break;
+            case State::CONFIGURED:
+                process_acquisition();
+                break;
+            case State::ARMED:
+                process_acquisition();
+
+                if (check_trigger())
+                {
+                    if (!m_trigger_point_stamped)
+                    {
+                        stamp_trigger_point();
+                    }
+                }
+
+                if (acquisition_completed())
+                {
+                    m_state = State::ACQUISITION_COMPLETED;
+                }
+                break;
+            }
+        }
+
+        void DataLogger::stamp_trigger_point(void)
+        {
+            m_trigger_point_stamped = true;
+            m_trigger_cursor_location = m_encoder.get_write_cursor();
+            m_trigger_timestamp = m_timebase->get_timestamp();
+            m_encoder.reset_write_counter();
+
+            const uint64_t multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
+            m_remaining_data_to_write = static_cast<uint32_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
+
+            if (m_remaining_data_to_write > m_buffer_size)
+            {
+                m_remaining_data_to_write = m_buffer_size;
+            }
+        }
+
+        bool DataLogger::acquisition_completed(void)
+        {
+            if (m_trigger_point_stamped)
+            {
+                if (m_config.timeout_us > 0)
+                {
+                    if (m_timebase->has_expired(m_trigger_timestamp, m_config.timeout_us))
+                    {
+                        return true;
+                    }
+                }
+
+                if (m_encoder.get_write_counter() >= m_remaining_data_to_write)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        void DataLogger::process_acquisition(void)
+        {
+            m_encoder.encode_next_entry();
+        }
+
+        bool DataLogger::check_trigger(void)
         {
             static_assert(MAX_OPERANDS >= 2, "Expect at least 2 operands for relational comparison");
-            bool outval = false;
-            AnyType opvals[MAX_OPERANDS];
-            VariableType optypes[MAX_OPERANDS];
-            if (!m_configured)
+            if (m_state != State::ARMED)
             {
                 return false;
             }
 
-            const unsigned int nb_operand = m_active_trigger_condition_instance->get_operand_count();
+            bool outval = false;
+            AnyType opvals[MAX_OPERANDS];
+            VariableType optypes[MAX_OPERANDS];
+            const unsigned int nb_operand = m_trigger.active_condition->get_operand_count();
 
             if (nb_operand > MAX_OPERANDS)
             {
@@ -91,7 +200,7 @@ namespace scrutiny
                 convert_to_compare_type(&optypes[i], &opvals[i]);
             }
 
-            bool condition_result = m_active_trigger_condition_instance->evaluate(
+            bool condition_result = m_trigger.active_condition->evaluate(
                 m_trigger.conditions.data(),
                 reinterpret_cast<VariableTypeCompare *>(optypes),
                 reinterpret_cast<AnyTypeCompare *>(opvals));
@@ -100,17 +209,15 @@ namespace scrutiny
             {
                 if (m_trigger.previous_val == false)
                 {
-                    m_trigger.rising_edge_timestamp = timebase->get_timestamp();
+                    m_trigger.rising_edge_timestamp = m_timebase->get_timestamp();
                 }
 
-                if (timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_us))
+                if (m_timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_us))
                 {
                     outval = true;
                 }
             }
-
             m_trigger.previous_val = condition_result;
-
             return outval;
         }
     }
