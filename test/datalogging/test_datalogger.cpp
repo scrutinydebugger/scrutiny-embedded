@@ -379,8 +379,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian(data[trigger_location][2].data());
 
         // Validate position of trigger and end of graph. Allow a margin of 2 (1 entry because decimation=2)
-        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << "probe_location = " << static_cast<uint32_t>(probe_location);
-        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 3) << "probe_location = " << static_cast<uint32_t>(probe_location);
-        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << "probe_location = " << static_cast<uint32_t>(probe_location);
+        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
+        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 3) << error_msg;
+        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
     }
 }
