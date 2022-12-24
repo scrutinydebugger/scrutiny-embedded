@@ -104,5 +104,35 @@ namespace scrutiny
 #pragma warning(pop)
 #endif
 
+        uint8_t encode_anytype_big_endian(const AnyType *val, const VariableType vartype, uint8_t *buffer)
+        {
+            const uint8_t typesize = tools::get_type_size(vartype);
+            return encode_anytype_big_endian(val, typesize, buffer);
+        }
+
+        uint8_t encode_anytype_big_endian(const AnyType *val, const uint8_t typesize, uint8_t *buffer)
+        {
+
+            switch (typesize)
+            {
+            case 1:
+                *buffer = val->uint8;
+                break;
+            case 2:
+                codecs::encode_16_bits_big_endian(val->uint16, buffer);
+                break;
+            case 4:
+                codecs::encode_32_bits_big_endian(val->uint32, buffer);
+                break;
+#if SCRUTINY_SUPPORT_64BITS
+            case 8:
+                codecs::encode_64_bits_big_endian(val->uint64, buffer);
+                break;
+#endif
+            default: // handled above
+                return 0;
+            }
+            return typesize;
+        }
     }
 }

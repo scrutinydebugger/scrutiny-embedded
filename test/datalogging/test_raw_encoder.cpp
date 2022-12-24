@@ -84,29 +84,32 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     datalogging::RawFormatReader *reader = encoder.get_reader();
 
+    // Chunk 1
     reader->read(dst_buffer, sizeof(dst_buffer));
     var1 = 1.0f;
     var2 = 0x1111;
-    memcpy(&compare_buf[0], &var1, 4);
-    memcpy(&compare_buf[4], &var2, 4);
+    scrutiny::codecs::encode_32_bits_big_endian(3, compare_buf);
+    memcpy(&compare_buf[4], &var1, 4);
+    memcpy(&compare_buf[8], &var2, 2);
+    EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
+
+    // Chunk 2
+    reader->read(dst_buffer, sizeof(dst_buffer));
+    memcpy(&compare_buf[0], &(reinterpret_cast<uint8_t *>(&var2)[2]), 2);
     var1 = 2.0f;
     var2 = 0x2222;
-    memcpy(&compare_buf[8], &var1, 2);
-
+    memcpy(&compare_buf[2], &var1, 4);
+    memcpy(&compare_buf[6], &var2, 4);
     EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
 
+    // Chunk 3
     reader->read(dst_buffer, sizeof(dst_buffer));
-    memcpy(&compare_buf[0], &(reinterpret_cast<uint8_t *>(&var1)[2]), 2);
-    memcpy(&compare_buf[2], &var2, 4);
     var1 = 3.0f;
-    memcpy(&compare_buf[6], &var1, 4);
-
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
-
-    reader->read(dst_buffer, sizeof(dst_buffer));
     var2 = 0x3333;
-    memcpy(&compare_buf[0], &var2, 4);
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, 4);
+    memcpy(&compare_buf[0], &var1, 4);
+    memcpy(&compare_buf[4], &var2, 4);
+
+    EXPECT_BUF_EQ(dst_buffer, compare_buf, 8);
 }
 
 #endif

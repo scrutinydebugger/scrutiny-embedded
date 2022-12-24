@@ -26,11 +26,18 @@ namespace scrutiny
             {
             }
             uint32_t read(uint8_t *buffer, const uint32_t max_size);
+            inline bool finished(void) { return m_finished; }
             void reset(void);
+            inline bool error(void) const { return m_error; }
+            inline uint32_t get_entry_count(void) const;
 
         protected:
             const RawFormatEncoder *const m_encoder;
             uint32_t m_read_cursor;
+            bool m_finished;
+            bool m_count_written;
+            bool m_error;
+            bool m_read_started = false;
         };
 
         class RawFormatEncoder
@@ -57,6 +64,9 @@ namespace scrutiny
             inline datalogging::EncodingType get_encoding(void) const { return ENCODING; }
             inline uint32_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
             inline uint32_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
+            inline bool error(void) const { return m_error; }
+            inline uint32_t get_entry_count(void) const { return m_entries_count; }
+            inline uint32_t get_buffer_effective_end(void) const { return m_entry_size * m_entries_count; }
 
             RawFormatReader *get_reader(void)
             {
@@ -78,7 +88,10 @@ namespace scrutiny
             uint16_t m_entry_size;
             uint32_t m_entries_count;
             bool m_full;
+            bool m_error;
         };
+
+        uint32_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
     }
 }
 

@@ -12,7 +12,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-void ScrutinyTest::add_crc(uint8_t* data, uint16_t data_len)
+void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
 {
     uint32_t crc = scrutiny::crc32(data, data_len);
     data[data_len] = (crc >> 24) & 0xFF;
@@ -21,7 +21,7 @@ void ScrutinyTest::add_crc(uint8_t* data, uint16_t data_len)
     data[data_len + 3] = (crc >> 0) & 0xFF;
 }
 
-void ScrutinyTest::add_crc(scrutiny::protocol::Response* response)
+void ScrutinyTest::add_crc(scrutiny::protocol::Response *response)
 {
     uint8_t header[5];
     header[0] = response->command_id;
@@ -34,7 +34,7 @@ void ScrutinyTest::add_crc(scrutiny::protocol::Response* response)
     response->crc = scrutiny::crc32(response->data, response->data_length, crc);
 }
 
-void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
+void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 {
     for (uint32_t i = 0; i < length; i++)
     {
@@ -42,22 +42,37 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
     }
 }
 
-::testing::AssertionResult ScrutinyTest::COMPARE_BUF(const uint8_t* candidate, const uint8_t* expected, const uint32_t size)
+::testing::AssertionResult ScrutinyTest::COMPARE_BUF(const uint8_t *candidate, const uint8_t *expected, const uint32_t size)
 {
     for (uint32_t i = 0; i < size; ++i)
     {
         if (expected[i] != candidate[i])
         {
             return ::testing::AssertionFailure() << "candidate[" << i
-                << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
-                << "] (" << static_cast<uint32_t>(expected[i]) << ")";
+                                                 << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
+                                                 << "] (" << static_cast<uint32_t>(expected[i]) << ")";
         }
     }
 
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t* buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code)
+::testing::AssertionResult ScrutinyTest::CHECK_SET(const uint8_t *buffer, const uint8_t val, const uint32_t size)
+{
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        if (buffer[i] != val)
+        {
+            return ::testing::AssertionFailure() << "buffer[" << i
+                                                 << "] (" << static_cast<uint32_t>(buffer[i]) << ") != expected[" << i
+                                                 << "] (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+
+    return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
@@ -79,21 +94,20 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
         return ::testing::AssertionFailure() << "Wrong command length. Got " << static_cast<uint32_t>(length) << " but expected 0";
     }
 
-
     return ::testing::AssertionSuccess();
 }
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4127)   // Get rid of constexpr always true condition warning.
-#endif 
+#pragma warning(push)
+#pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
+#endif
 
-unsigned int ScrutinyTest::encode_addr(uint8_t* buffer, void* addr)
+unsigned int ScrutinyTest::encode_addr(uint8_t *buffer, void *addr)
 {
     std::uintptr_t ptr = reinterpret_cast<std::uintptr_t>(addr);
     constexpr unsigned int addr_size = sizeof(ptr);
 
-    unsigned int i = addr_size-1;
+    unsigned int i = addr_size - 1;
 
     if (addr_size >= 1)
     {
@@ -123,9 +137,5 @@ unsigned int ScrutinyTest::encode_addr(uint8_t* buffer, void* addr)
 }
 
 #if defined(_MSC_VER)
-    #pragma warning(pop)
-#endif 
-
-
-
-
+#pragma warning(pop)
+#endif

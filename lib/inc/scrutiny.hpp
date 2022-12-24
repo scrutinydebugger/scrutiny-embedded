@@ -12,6 +12,7 @@
 #include "scrutiny_types.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
+#include "scrutiny_common_codecs.hpp"
 #include "scrutiny_timebase.hpp"
 #include "scrutiny_crc.hpp"
 #include "scrutiny_main_handler.hpp"

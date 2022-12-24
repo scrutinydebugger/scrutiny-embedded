@@ -345,27 +345,7 @@ namespace scrutiny
             {
                 codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
                 m_cursor += 2;
-
-                switch (typesize)
-                {
-                case 1:
-                    m_buffer[m_cursor] = v.uint8;
-                    break;
-                case 2:
-                    codecs::encode_16_bits_big_endian(v.uint16, &m_buffer[m_cursor]);
-                    break;
-                case 4:
-                    codecs::encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
-                    break;
-#if SCRUTINY_SUPPORT_64BITS
-                case 8:
-                    codecs::encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
-                    break;
-#endif
-                default: // handled above
-                    break;
-                }
-
+                codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
                 m_cursor += typesize;
                 m_response->data_length = m_cursor;
             }

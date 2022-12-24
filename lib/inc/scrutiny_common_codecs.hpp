@@ -9,6 +9,7 @@
 #define ___SCRUTINY_COMMON_CODECS_H___
 
 #include <stdint.h>
+#include "scrutiny_types.hpp"
 
 namespace scrutiny
 {
@@ -133,6 +134,9 @@ namespace scrutiny
         uint8_t decode_address_big_endian(const uint8_t *buf, uintptr_t *addr);
         uint8_t encode_address_big_endian(uint8_t *buf, const void *ptr);
         uint8_t encode_address_big_endian(uint8_t *buf, const uintptr_t addr);
+
+        uint8_t encode_anytype_big_endian(const scrutiny::AnyType *val, const VariableType vartype, uint8_t *buffer);
+        uint8_t encode_anytype_big_endian(const scrutiny::AnyType *val, const uint8_t typesize, uint8_t *buffer);
     }
 }
 

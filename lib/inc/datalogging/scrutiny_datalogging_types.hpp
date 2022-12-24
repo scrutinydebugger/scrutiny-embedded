@@ -139,8 +139,8 @@ namespace scrutiny
             {
                 items_count = other->items_count;
                 decimation = other->decimation;
-                decimation = other->probe_location;
-                decimation = other->timeout_us;
+                probe_location = other->probe_location;
+                timeout_us = other->timeout_us;
                 trigger.copy_from(&other->trigger);
                 if (items_count <= SCRUTINY_DATALOGGING_MAX_SIGNAL)
                 {

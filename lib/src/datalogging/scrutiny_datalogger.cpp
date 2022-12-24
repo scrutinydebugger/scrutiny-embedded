@@ -47,6 +47,7 @@ namespace scrutiny
 
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
+            m_decimation_counter = 0;
 
             m_config.copy_from(config);
 
@@ -109,24 +110,31 @@ namespace scrutiny
             case State::ACQUISITION_COMPLETED:
                 break;
             case State::CONFIGURED:
-                process_acquisition();
-                break;
             case State::ARMED:
-                process_acquisition();
-
-                if (check_trigger())
+                if (m_encoder.error())
                 {
-                    if (!m_trigger_point_stamped)
+                    m_state = State::ERROR;
+                }
+                else
+                {
+                    process_acquisition();
+                    if (m_state == State::ARMED)
                     {
-                        stamp_trigger_point();
-                    }
-                }
+                        if (check_trigger())
+                        {
+                            if (!m_trigger_point_stamped)
+                            {
+                                stamp_trigger_point();
+                            }
+                        }
 
-                if (acquisition_completed())
-                {
-                    m_state = State::ACQUISITION_COMPLETED;
+                        if (acquisition_completed())
+                        {
+                            m_state = State::ACQUISITION_COMPLETED;
+                        }
+                    }
+                    break;
                 }
-                break;
             }
         }
 
@@ -169,7 +177,12 @@ namespace scrutiny
 
         void DataLogger::process_acquisition(void)
         {
-            m_encoder.encode_next_entry();
+            // todo : Handle stop
+            if (++m_decimation_counter >= m_config.decimation)
+            {
+                m_encoder.encode_next_entry();
+                m_decimation_counter = 0;
+            }
         }
 
         bool DataLogger::check_trigger(void)

@@ -43,8 +43,4 @@
 #error Unsupported protocol version
 #endif
 
-#if SCRUTINY_TX_BUFFER_SIZE > 0xFFFF || SCRUTINY_RX_BUFFER_SIZE > 0xFFFF
-#error Scrutiny protocol is limited to 16bits data length
-#endif
-
 #endif // ___SCRUTINY_H___

@@ -69,6 +69,7 @@ namespace scrutiny
             void arm_trigger(void);
 
             bool check_trigger(void);
+            inline DataReader *get_reader() { return m_encoder.get_reader(); }
 
         protected:
             void process_acquisition(void);
@@ -91,6 +92,7 @@ namespace scrutiny
 
             Configuration m_config;
             DataEncoder m_encoder;
+            uint16_t m_decimation_counter;
 
             struct
             {
