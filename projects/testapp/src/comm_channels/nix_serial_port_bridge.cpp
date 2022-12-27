@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include <system_error>
 
 #include <errno.h>
