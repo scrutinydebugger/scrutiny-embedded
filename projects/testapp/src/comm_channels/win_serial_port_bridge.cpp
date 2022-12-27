@@ -19,6 +19,7 @@
 
 #include <windows.h>
 #include <winbase.h>
+#include <cstring>
 #include <string>
 #include <system_error>
 #include <fileapi.h>
@@ -39,7 +40,8 @@ void WinSerialPortBridge::start()
         throw_system_error(std::string("Cannot open port ") + comport);
     }
 
-    DCB serial_params = {0};
+    DCB serial_params;
+    std::memset(&serial_params, 0, sizeof(DCB));
     serial_params.DCBlength = sizeof(serial_params);
 
     BOOL HResult;

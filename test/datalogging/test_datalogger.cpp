@@ -373,8 +373,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
                 EXPECT_EQ(check_var1 - check_last_var1, 2.0f) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_var2 - check_last_var2, -2) << "i=" << i << "," << error_msg;
-                EXPECT_EQ(check_rpv1000 - check_last_rpv1000, 2) << "i=" << i << "," << error_msg;
-                EXPECT_EQ(check_time - check_last_time, 20) << "i=" << i << "," << error_msg; // 2*10us
+                EXPECT_EQ(check_rpv1000 - check_last_rpv1000, 2u) << "i=" << i << "," << error_msg;
+                EXPECT_EQ(check_time - check_last_time, 20u) << "i=" << i << "," << error_msg; // 2*10us
             }
         }
 

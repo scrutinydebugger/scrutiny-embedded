@@ -99,7 +99,7 @@ namespace scrutiny
             return v.uint64;
         }
 
-        inline int_biggest_t read_biggest_float(const AnyType v)
+        inline double read_biggest_float(const AnyType v)
         {
             return v.float64;
         }
@@ -129,7 +129,7 @@ namespace scrutiny
             return v.uint32;
         }
 
-        inline int_biggest_t read_biggest_float(const AnyType v)
+        inline float read_biggest_float(const AnyType v)
         {
             return v.float32;
         }

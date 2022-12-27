@@ -6,6 +6,8 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
+#include "scrutiny_setup.hpp"
+
 #if SCRUTINY_BUILD_WINDOWS
 #error "This file cannot be compiled under Windows"
 #endif

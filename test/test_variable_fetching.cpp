@@ -49,7 +49,7 @@ TEST_F(TestVariableFetching, RandomFetch)
 {
     uint8_t some_buffer[32];
 
-    float f32 = 1.2345;
+    float f32 = 1.2345f;
     double f64 = 3.1415926;
     uint16_t u16 = 0x1234;
     bool b = true;

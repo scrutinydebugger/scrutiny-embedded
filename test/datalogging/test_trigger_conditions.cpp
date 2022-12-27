@@ -284,8 +284,8 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
     cond.cmt.reset(cond.data());
 
     // Test positive change
-    vals[0]._float = 10.0;
-    vals[1]._float = 5.0; // Positive change of 5.0
+    vals[0]._float = 10.0f;
+    vals[1]._float = 5.0f; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
 
@@ -293,37 +293,37 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 5.0; // Negative change has no effect
+    vals[0]._float = 5.0f; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 10.1;
+    vals[0]._float = 10.1f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 20.0;
+    vals[0]._float = 20.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 30.0;
+    vals[0]._float = 30.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     // Test negative change
     cond.cmt.reset(cond.data());
-    vals[0]._float = 10.0;
-    vals[1]._float = -5.0; // NEgative change of 5.0
+    vals[0]._float = 10.0f;
+    vals[1]._float = -5.0f; // NEgative change of 5.0
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 20.0; // Positive change has no effect
+    vals[0]._float = 20.0f; // Positive change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 14.9;
+    vals[0]._float = 14.9f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 14.0;
+    vals[0]._float = 14.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 5.0;
+    vals[0]._float = 5.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = -5.0;
+    vals[0]._float = -5.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 }
 
@@ -336,7 +336,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     // ===== Float - Sint
     cond.cmt.reset(cond.data());
     // Test positive change
-    vals[0]._float = 10.0;
+    vals[0]._float = 10.0f;
     vals[1]._sint = 5; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_sint;
@@ -345,43 +345,43 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 5.0; // Negative change has no effect
+    vals[0]._float = 5.0f; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 10.1;
+    vals[0]._float = 10.1f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 20.0;
+    vals[0]._float = 20.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 30.0;
+    vals[0]._float = 30.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     // Test negative change
     cond.cmt.reset(cond.data());
-    vals[0]._float = 10.0;
+    vals[0]._float = 10.0f;
     vals[1]._sint = -5; // NEgative change of 5.0
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 20.0; // Positive change has no effect
+    vals[0]._float = 20.0f; // Positive change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 14.9;
+    vals[0]._float = 14.9f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 14.0;
+    vals[0]._float = 14.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 5.0;
+    vals[0]._float = 5.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = -5.0;
+    vals[0]._float = -5.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     // ===== Float - Uint
     cond.cmt.reset(cond.data());
     // Test positive change
-    vals[0]._float = 10.0;
+    vals[0]._float = 10.0f;
     vals[1]._uint = 5; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_uint;
@@ -390,19 +390,19 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 5.0; // Negative change has no effect
+    vals[0]._float = 5.0f; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._float = 10.1;
+    vals[0]._float = 10.1f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 11.0;
+    vals[0]._float = 11.0f;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 20.0;
+    vals[0]._float = 20.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._float = 30.0;
+    vals[0]._float = 30.0f;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     // ===== Uint - Uint
@@ -420,7 +420,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     vals[0]._uint += 1;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._uint += -10; // Negative change has no effect
+    vals[0]._uint -= 10; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     vals[0]._uint += 6;
@@ -449,7 +449,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     ;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._uint += -10; // Negative change has no effect
+    vals[0]._uint -= 10; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     vals[0]._uint += 6;
@@ -470,13 +470,13 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
 
     vals[0]._uint += 20; // Positive change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._uint += -6;
+    vals[0]._uint -= 6;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._uint += -4;
+    vals[0]._uint -= 4;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._uint += -100;
+    vals[0]._uint -= 100;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    vals[0]._uint += -10;
+    vals[0]._uint -= 10;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     // ===== Sint - Sint
@@ -496,7 +496,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     ;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._sint += -10; // Negative change has no effect
+    vals[0]._sint -= 10; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     vals[0]._sint += 6;
@@ -543,7 +543,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     ;
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
-    vals[0]._uint += -10; // Negative change has no effect
+    vals[0]._uint -= 10; // Negative change has no effect
     EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
 
     vals[0]._uint += 6;

@@ -14,6 +14,7 @@
 #include <cstdint>
 
 #if SCRUTINY_BUILD_WINDOWS
+#include <windows.h>
 WSAData UdpBridge::wsa_data;
 #else
 #include <fcntl.h> // For non-blocking

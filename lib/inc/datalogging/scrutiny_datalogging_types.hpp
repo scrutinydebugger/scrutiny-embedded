@@ -125,7 +125,7 @@ namespace scrutiny
                 struct
                 {
                     void *address;
-                    uint16_t size;
+                    uint8_t size;
                 } memory;
                 struct
                 {

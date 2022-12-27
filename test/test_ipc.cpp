@@ -44,11 +44,11 @@ TEST(TestIPC, Basic)
 
     msg.send(local_data);
     EXPECT_TRUE(msg.has_content());
-    EXPECT_EQ(msg.data.u32, 444);
+    EXPECT_EQ(msg.data.u32, 444u);
     EXPECT_EQ(msg.data.e, SomeEnum::VAL2);
 
     SomeData local_data2 = msg.pop();
-    EXPECT_EQ(local_data2.u32, 444);
+    EXPECT_EQ(local_data2.u32, 444u);
     EXPECT_EQ(local_data2.e, SomeEnum::VAL2);
 
     EXPECT_FALSE(msg.has_content());
