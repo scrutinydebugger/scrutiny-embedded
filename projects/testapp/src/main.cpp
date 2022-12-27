@@ -13,8 +13,9 @@
 #include "abstract_comm_channel.hpp"
 #include "udp_bridge.hpp"
 
-#if defined(_WIN32)
+#if SCRUTINY_BUILD_WINDOWS
 #include "win_serial_port_bridge.hpp"
+#include <windows.h>
 using SerialPortBridge = WinSerialPortBridge;
 #else
 #include "nix_serial_port_bridge.hpp"
@@ -263,17 +264,20 @@ void init_all_values()
     rpvStorage.rpv_id_1000 = -10;
     rpvStorage.rpv_id_1001 = -30000;
     rpvStorage.rpv_id_1002 = 0xABCDEF;
-    rpvStorage.rpv_id_1003 = 0xAABBCCDDEEFF;
     rpvStorage.rpv_id_2000 = 0xABu;
     rpvStorage.rpv_id_2001 = 0x1234u;
     rpvStorage.rpv_id_2002 = 0x12345678u;
-    rpvStorage.rpv_id_2003 = 0x111111111111u;
     rpvStorage.rpv_id_3000 = 3.1415926f;
-    rpvStorage.rpv_id_3001 = 2.71828;
     rpvStorage.rpv_id_4000 = true;
 
     rpvStorage.rpv_id_5000 = false;
     rpvStorage.rpv_id_5001 = 0;
+
+#if SCRUTINY_SUPPORT_64BITS
+    rpvStorage.rpv_id_1003 = 0xAABBCCDDEEFF;
+    rpvStorage.rpv_id_2003 = 0x111111111111u;
+    rpvStorage.rpv_id_3001 = 2.71828;
+#endif
 }
 
 void process_interactive_data()
@@ -349,7 +353,11 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             }
 
             scrutiny_handler.process(timestep);
+#if SCRUTINY_BUILD_WINDOWS
+            Sleep(10);
+#else
             this_thread::sleep_for(chrono::milliseconds(10));
+#endif
             last_timestamp = now_timestamp;
         }
     }

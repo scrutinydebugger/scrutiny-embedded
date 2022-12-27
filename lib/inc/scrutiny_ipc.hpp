@@ -9,13 +9,13 @@
 #ifndef ___SCRUTINY_IPC_H___
 #define ___SCRUTINY_IPC_H___
 
-#ifndef __AVR_ARCH__
+#if !SCRUTINY_BUILD_AVR_GCC
 #include <atomic>
 #include <utility>
 #endif
 namespace scrutiny
 {
-#ifdef __AVR_ARCH__
+#if SCRUTINY_BUILD_AVR_GCC
 
     template <class T>
     class IPCMessage

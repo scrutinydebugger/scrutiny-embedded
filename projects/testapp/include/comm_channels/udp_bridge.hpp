@@ -11,7 +11,7 @@
 
 #include <system_error>
 
-#if defined(_WIN32)
+#if SCRUTINY_BUILD_WINDOWS
 #include <winsock2.h>
 #else
 #include <sys/socket.h>
@@ -19,8 +19,7 @@
 #include <unistd.h>
 #endif
 
-
-#if defined(_WIN32)
+#if SCRUTINY_BUILD_WINDOWS
 #define ISVALIDSOCKET(s) ((s) != INVALID_SOCKET)
 #define CLOSESOCKET(s) closesocket(s)
 #define GETSOCKETERRNO() (WSAGetLastError())
@@ -44,27 +43,25 @@ public:
     static void global_init();
     static void global_close();
 
-    void send(const uint8_t* buffer, int len, int flags = 0);
-    int receive(uint8_t* buffer, int len, int flags = 0);
-    
+    void send(const uint8_t *buffer, int len, int flags = 0);
+    int receive(uint8_t *buffer, int len, int flags = 0);
+
     virtual void start();
     virtual void stop();
-    virtual void send(const uint8_t* buffer, int len) {send(buffer, len, 0);}
-    virtual int receive(uint8_t* buffer, int len) {return receive(buffer, len, 0);}
-    
+    virtual void send(const uint8_t *buffer, int len) { send(buffer, len, 0); }
+    virtual int receive(uint8_t *buffer, int len) { return receive(buffer, len, 0); }
+
     void set_nonblocking();
-    static void throw_system_error(const char* msg);
+    static void throw_system_error(const char *msg);
 
 private:
     uint16_t m_port;
-    SOCKET m_sock;                // SOCKET = int for linux, SOCKET for windows
-    SOCKADDR m_last_packet_addr;  // SOCKADDR = sockaddr for linux, SOCKADDR for windows
+    SOCKET m_sock;               // SOCKET = int for linux, SOCKET for windows
+    SOCKADDR m_last_packet_addr; // SOCKADDR = sockaddr for linux, SOCKADDR for windows
 
-#if defined(_WIN32)
+#if SCRUTINY_BUILD_WINDOWS
     static WSAData wsa_data;
 #endif
-
 };
 
-
-#endif  // ___UDP_BRIDGE_H___
+#endif // ___UDP_BRIDGE_H___

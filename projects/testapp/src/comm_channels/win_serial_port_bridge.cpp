@@ -7,7 +7,9 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
-#if  !defined(_WIN32)
+#include "scrutiny_setup.hpp"
+
+#if !SCRUTINY_BUILD_WINDOWS
 #error "File designed for windows"
 #endif
 
@@ -21,12 +23,10 @@
 #include <system_error>
 #include <fileapi.h>
 
-WinSerialPortBridge::WinSerialPortBridge(const std::string& port_name, uint32_t baudrate) : 
-    m_port_name(port_name),
-    m_baudrate(baudrate),
-    m_serial_handle(INVALID_HANDLE_VALUE)
+WinSerialPortBridge::WinSerialPortBridge(const std::string &port_name, uint32_t baudrate) : m_port_name(port_name),
+                                                                                            m_baudrate(baudrate),
+                                                                                            m_serial_handle(INVALID_HANDLE_VALUE)
 {
-    
 }
 
 void WinSerialPortBridge::start()
@@ -39,7 +39,7 @@ void WinSerialPortBridge::start()
         throw_system_error(std::string("Cannot open port ") + comport);
     }
 
-    DCB serial_params = { 0 };
+    DCB serial_params = {0};
     serial_params.DCBlength = sizeof(serial_params);
 
     BOOL HResult;
@@ -62,7 +62,7 @@ void WinSerialPortBridge::start()
         throw_system_error("Cannot open port. SetCommState failed");
     }
 
-    HResult = PurgeComm(m_serial_handle, PURGE_RXABORT |  PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+    HResult = PurgeComm(m_serial_handle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
     if (HResult == FALSE)
     {
         stop();
@@ -70,9 +70,8 @@ void WinSerialPortBridge::start()
     }
 }
 
-
 void WinSerialPortBridge::stop()
-{   
+{
     if (m_serial_handle != INVALID_HANDLE_VALUE)
     {
         CloseHandle(m_serial_handle);
@@ -86,9 +85,9 @@ void WinSerialPortBridge::throw_system_error(const std::string &msg)
     throw std::system_error(GetLastError(), std::system_category(), msg.c_str());
 }
 
-int WinSerialPortBridge::receive(uint8_t* buffer, int len)
+int WinSerialPortBridge::receive(uint8_t *buffer, int len)
 {
-    DWORD nbRead=0;
+    DWORD nbRead = 0;
     BOOL HResult;
     if (m_serial_handle != INVALID_HANDLE_VALUE)
     {
@@ -103,7 +102,7 @@ int WinSerialPortBridge::receive(uint8_t* buffer, int len)
     return static_cast<int>(nbRead);
 }
 
-void WinSerialPortBridge::send(const uint8_t* buffer, int len)
+void WinSerialPortBridge::send(const uint8_t *buffer, int len)
 {
     BOOL HResult;
 
@@ -116,8 +115,6 @@ void WinSerialPortBridge::send(const uint8_t* buffer, int len)
             throw_system_error("Cannot write port");
         }
 
-        FlushFileBuffers(m_serial_handle);  // Do not check result as this may fail on virtual driver.
+        FlushFileBuffers(m_serial_handle); // Do not check result as this may fail on virtual driver.
     }
 }
-
-

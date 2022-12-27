@@ -38,9 +38,27 @@
 
 // ================================
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) || defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
+#define SCRUTINY_BUILD_WINDOWS 1
+#else
+#define SCRUTINY_BUILD_WINDOWS 0
+#endif
+
+#define SCRUTINY_BUILD_NON_WINDOWS (!SCRUTINY_BUILD_WINDOWS)
+
+#if defined(__AVR_ARCH__)
+#define SCRUTINY_BUILD_AVR_GCC 1
+#else
+#define SCRUTINY_BUILD_AVR_GCC 0
+#endif
+
 // ========================= Sanity check =====================
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION != SCRUTINY_PROTOCOL_VERSION(1, 0) // Only v1.0 for now.
 #error Unsupported protocol version
+#endif
+
+#if SCRUTINY_BUILD_WINDOWS && SCRUTINY_BUILD_AVR_GCC
+#error Bad detection of build environment
 #endif
 
 #endif // ___SCRUTINY_H___
