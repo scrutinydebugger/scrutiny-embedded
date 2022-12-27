@@ -3,10 +3,14 @@ set -euo pipefail
 
 APP_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
 
+if which cygpath > /dev/null 2>&1 ; then
+APP_ROOT=$(cygpath -w "$APP_ROOT")
+fi
+
+set -x 
+
 BUILD_CONTEXT="${BUILD_CONTEXT:-dev}"
 BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"
-
-set -x
 
 mkdir -p "$BUILD_DIR"
 
