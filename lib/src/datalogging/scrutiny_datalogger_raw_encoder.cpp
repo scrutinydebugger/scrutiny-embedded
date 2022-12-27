@@ -115,6 +115,11 @@ namespace scrutiny
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
+                {
+                    codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
+                    cursor += sizeof(scrutiny::timestamp_t);
+                }
             }
 
             if (!m_full)
@@ -133,7 +138,7 @@ namespace scrutiny
         }
 
         /// @brief  Init the encoder
-        void RawFormatEncoder::init()
+        void RawFormatEncoder::init(Timebase *timebase)
         {
             m_error = false;
             reset_write_counter();
@@ -142,6 +147,7 @@ namespace scrutiny
             m_entry_size = 0;
             m_entries_count = 0;
             m_full = false;
+            m_timebase = timebase;
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
                 if (m_error)
@@ -165,6 +171,10 @@ namespace scrutiny
                     {
                         elem_size = tools::get_type_size(rpv.type);
                     }
+                }
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
+                {
+                    elem_size = sizeof(scrutiny::timestamp_t);
                 }
 
                 if (elem_size == 0 && !m_error)

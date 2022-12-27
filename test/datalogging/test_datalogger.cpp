@@ -229,7 +229,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     float trigger_val = 0.0f;
 
     datalogging::Configuration dlconfig;
-    dlconfig.items_count = 3;
+    dlconfig.items_count = 4;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
     dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
     dlconfig.items_to_log[0].data.memory.address = &var1;
@@ -240,6 +240,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
     dlconfig.items_to_log[2].type = datalogging::LoggableType::RPV;
     dlconfig.items_to_log[2].data.rpv.id = 0x1000;
+
+    dlconfig.items_to_log[3].type = datalogging::LoggableType::TIME;
 
     dlconfig.decimation = 2;
 
@@ -353,7 +355,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         for (size_t i = 0; i < data.size(); i++)
         {
             vector<vector<uint8_t>> entry = data[i];
-            ASSERT_EQ(entry.size(), 3);
+            ASSERT_EQ(entry.size(), 4);
             if (i > 0)
             {
                 vector<vector<uint8_t>> last_entry = data[i - 1];
@@ -366,9 +368,13 @@ TEST_F(TestDatalogger, ComplexAcquisition)
                 uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian(entry[2].data());
                 uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian(last_entry[2].data());
 
+                uint32_t check_time = codecs::decode_32_bits_big_endian(entry[3].data());
+                uint32_t check_last_time = codecs::decode_32_bits_big_endian(last_entry[3].data());
+
                 EXPECT_EQ(check_var1 - check_last_var1, 2.0f) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_var2 - check_last_var2, -2) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_rpv1000 - check_last_rpv1000, 2) << "i=" << i << "," << error_msg;
+                EXPECT_EQ(check_time - check_last_time, 20) << "i=" << i << "," << error_msg; // 2*10us
             }
         }
 

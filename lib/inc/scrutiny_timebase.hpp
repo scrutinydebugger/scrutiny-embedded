@@ -13,6 +13,7 @@
 
 namespace scrutiny
 {
+    typedef uint32_t timestamp_t;
     class Timebase
     {
     public:
@@ -28,10 +29,10 @@ namespace scrutiny
             return m_time_us;
         };
 
-        inline bool has_expired(const uint32_t timestamp, const uint32_t timeout_us) const
+        inline bool has_expired(const timestamp_t timestamp, const timestamp_t timeout_us) const
         {
             bool expired = false;
-            const uint32_t diff = m_time_us - timestamp;
+            const timestamp_t diff = m_time_us - timestamp;
             if (diff >= timeout_us)
             {
                 expired = true;
@@ -40,13 +41,18 @@ namespace scrutiny
             return expired;
         }
 
-        inline void reset(const uint32_t val = 0)
+        inline timestamp_t elapsed_since(const timestamp_t timestamp)
+        {
+            return m_time_us - timestamp;
+        }
+
+        inline void reset(const timestamp_t val = 0)
         {
             m_time_us = val;
         }
 
     protected:
-        uint32_t m_time_us;
+        timestamp_t m_time_us;
     };
 }
 

@@ -114,7 +114,8 @@ namespace scrutiny
         enum class LoggableType
         {
             MEMORY,
-            RPV
+            RPV,
+            TIME
         };
         struct LoggableItem
         {
@@ -130,6 +131,9 @@ namespace scrutiny
                 {
                     uint16_t id;
                 } rpv;
+                struct
+                {
+                } time;
             } data;
         };
 

@@ -57,7 +57,7 @@ namespace scrutiny
             {
             }
 
-            void init();
+            void init(Timebase *timebase);
             void encode_next_entry(void);
             inline void reset_write_counter(void) { m_write_counter = 0; }
             inline uint32_t get_write_counter(void) const { return m_write_counter; }
@@ -80,6 +80,7 @@ namespace scrutiny
             const datalogging::Configuration *m_config;
             RawFormatReader m_reader;
             MainHandler *const m_main_handler;
+            Timebase *m_timebase;
 
             uint32_t m_max_entries;
             uint32_t m_next_entry_write_index;

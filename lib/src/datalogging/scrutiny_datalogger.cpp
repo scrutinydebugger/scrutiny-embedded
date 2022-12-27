@@ -87,7 +87,7 @@ namespace scrutiny
             if (m_state != State::ERROR)
             {
                 m_trigger.active_condition->reset(m_trigger.conditions.data());
-                m_encoder.init();
+                m_encoder.init(m_timebase);
                 m_state = State::CONFIGURED;
             }
         }

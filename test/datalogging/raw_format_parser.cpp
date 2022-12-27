@@ -37,6 +37,10 @@ void RawFormatParser::parse(void)
         {
             elem_size = scrutiny::tools::get_type_size(m_main_handler->get_rpv_type(m_config->items_to_log[i].data.rpv.id));
         }
+        else if (m_config->items_to_log[i].type == scrutiny::datalogging::LoggableType::TIME)
+        {
+            elem_size = sizeof(scrutiny::timestamp_t);
+        }
 
         if (elem_size == 0)
         {
@@ -72,6 +76,10 @@ void RawFormatParser::parse(void)
             else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::RPV)
             {
                 elem_size = scrutiny::tools::get_type_size(m_main_handler->get_rpv_type(m_config->items_to_log[j].data.rpv.id));
+            }
+            else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::TIME)
+            {
+                elem_size = sizeof(scrutiny::timestamp_t);
             }
 
             if (elem_size == 0)
