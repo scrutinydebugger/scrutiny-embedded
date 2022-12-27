@@ -1,0 +1,19 @@
+{
+    "/alias/rpv5000(enable)" : {
+        "target" : "/rpv/x5000"
+    },
+    "/alias/rpv5001(counter)" : {
+        "target" : "/rpv/x5001"
+    },
+    "/alias/enable_var" : {
+        "target" : "/static/main.cpp/process_interactive_data()/enable"
+    },
+    "/alias/counter_var" : {
+        "target" : "/static/main.cpp/process_interactive_data()/counter"
+    },
+    "/alias/counter_var_x2+1000" : {
+        "target" : "/static/main.cpp/process_interactive_data()/counter",
+        "gain" : 2,
+        "offset" : 1000
+    }
+}

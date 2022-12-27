@@ -82,7 +82,10 @@ scrutiny::RuntimePublishedValue rpvs[] = {
 
     {0x3000, scrutiny::VariableType::float32},
     {0x3001, scrutiny::VariableType::float64},
-    {0x4000, scrutiny::VariableType::boolean}
+    {0x4000, scrutiny::VariableType::boolean},
+    
+    {0x5000, scrutiny::VariableType::boolean},
+    {0x5001, scrutiny::VariableType::uint16}
 };
 
 struct {
@@ -100,6 +103,9 @@ struct {
     double rpv_id_3001;
 
     bool rpv_id_4000;
+
+    bool rpv_id_5000;
+    uint16_t rpv_id_5001;
 } rpvStorage;
 
 bool TestAppRPVReadCallback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType* outval)
@@ -116,6 +122,8 @@ bool TestAppRPVReadCallback(const scrutiny::RuntimePublishedValue rpv, scrutiny:
     else if (rpv.id == 0x3000) {outval->float32 = rpvStorage.rpv_id_3000;}
     else if (rpv.id == 0x3001) {outval->float64 = rpvStorage.rpv_id_3001;}
     else if (rpv.id == 0x4000) {outval->boolean = rpvStorage.rpv_id_4000;}
+    else if (rpv.id == 0x5000) {outval->boolean = rpvStorage.rpv_id_5000;}
+    else if (rpv.id == 0x5001) {outval->uint16 = rpvStorage.rpv_id_5001;}
     else {ok =false;}
     
     return ok;
@@ -136,6 +144,8 @@ bool TestAppRPVWriteCallback(const scrutiny::RuntimePublishedValue rpv, const sc
     else if (rpv.id == 0x3000) {rpvStorage.rpv_id_3000 = inval->float32;}
     else if (rpv.id == 0x3001) {rpvStorage.rpv_id_3001 = inval->float64;}
     else if (rpv.id == 0x4000) {rpvStorage.rpv_id_4000 = inval->boolean;}
+    else if (rpv.id == 0x5000) {rpvStorage.rpv_id_5000 = inval->boolean;}
+    else if (rpv.id == 0x5001) {rpvStorage.rpv_id_5001 = inval->uint16;}
     else {ok =false;}
     
     return ok;
@@ -162,6 +172,26 @@ void init_all_values()
     rpvStorage.rpv_id_3000 = 3.1415926f;
     rpvStorage.rpv_id_3001 = 2.71828;
     rpvStorage.rpv_id_4000 = true;
+    
+    rpvStorage.rpv_id_5000 = false;
+    rpvStorage.rpv_id_5001 = 0;
+}
+
+
+void process_interactive_data()
+{
+    static bool enable=false;
+    static uint16_t counter = 0;
+
+    if ( rpvStorage.rpv_id_5000)
+    {
+        rpvStorage.rpv_id_5001++;
+    }
+
+    if (enable)
+    {
+        counter++;
+    }
 }
 
 void process_scrutiny_lib(AbstractCommChannel* channel)
@@ -187,6 +217,7 @@ void process_scrutiny_lib(AbstractCommChannel* channel)
         int len_received = 0;
         while (true)
         {
+            process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
             uint32_t timestep = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
