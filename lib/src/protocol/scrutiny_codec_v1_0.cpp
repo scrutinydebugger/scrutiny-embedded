@@ -619,6 +619,9 @@ namespace scrutiny
             if (response_data->user_command)
                 response->data[0] |= 0x10;
 
+            if (response_data->_64bits)
+                response->data[0] |= 0x08;
+
             response->data_length = 1;
             return ResponseCode::OK;
         }

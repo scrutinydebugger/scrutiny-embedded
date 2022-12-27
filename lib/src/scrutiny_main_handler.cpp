@@ -430,6 +430,11 @@ namespace scrutiny
             stack.get_supproted_features.response_data.datalogging = false;
 #endif
             stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
+#if SCRUTINY_SUPPORT_64BITS
+            stack.get_supproted_features.response_data._64bits = true;
+#else
+            stack.get_supproted_features.response_data._64bits = false;
+#endif
 
             code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
             break;

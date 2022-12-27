@@ -367,7 +367,6 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
 
-
 void dummy_callback(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length)
 {
     static_cast<void>(subfunction);
@@ -412,6 +411,10 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
         {
             expected_response[5] |= 0x10; // User command
         }
+
+#if SCRUTINY_SUPPORT_64BITS
+        expected_response[5] |= 0x08;
+#endif
 
         add_crc(expected_response, sizeof(expected_response) - 4);
 
