@@ -424,7 +424,11 @@ namespace scrutiny
         {
             stack.get_supproted_features.response_data.memory_read = true;
             stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
-            stack.get_supproted_features.response_data.datalog_acquire = false; // todo
+#if SCRUTINY_ENABLE_DATALOGGING
+            stack.get_supproted_features.response_data.datalogging = true;
+#else
+            stack.get_supproted_features.response_data.datalogging = false;
+#endif
             stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
 
             code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
@@ -804,6 +808,12 @@ namespace scrutiny
         {
             const bool masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
             code = protocol::ResponseCode::OK;
+
+            if (m_config.memory_write_enable == false)
+            {
+                code = protocol::ResponseCode::Forbidden;
+                break;
+            }
 
             stack.write_mem.writemem_parser = m_codec.decode_request_memory_control_write(request, masked);
             stack.write_mem.writemem_encoder = m_codec.encode_response_memory_control_write(response, m_comm_handler.tx_buffer_size());

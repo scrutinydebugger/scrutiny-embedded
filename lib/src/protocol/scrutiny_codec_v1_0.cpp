@@ -355,7 +355,6 @@ namespace scrutiny
         {
             m_cursor = 0;
             m_overflow = false;
-            m_unsupported_type = false;
         }
 
         //==============================================================
@@ -608,14 +607,17 @@ namespace scrutiny
             }
 
             response->data[0] = 0x00;
-            if (response_data->memory_write)
+            if (response_data->memory_read)
                 response->data[0] |= 0x80;
 
-            if (response_data->datalog_acquire)
+            if (response_data->memory_write)
                 response->data[0] |= 0x40;
 
-            if (response_data->user_command)
+            if (response_data->datalogging)
                 response->data[0] |= 0x20;
+
+            if (response_data->user_command)
+                response->data[0] |= 0x10;
 
             response->data_length = 1;
             return ResponseCode::OK;

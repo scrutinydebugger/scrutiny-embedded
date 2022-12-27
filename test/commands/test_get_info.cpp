@@ -366,3 +366,64 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
+
+
+void dummy_callback(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length)
+{
+    static_cast<void>(subfunction);
+    static_cast<void>(request_data);
+    static_cast<void>(request_data_length);
+    static_cast<void>(response_data);
+    static_cast<void>(response_data_length);
+    static_cast<void>(response_max_data_length);
+}
+
+TEST_F(TestGetInfo, TestSupportedFeatures)
+{
+    for (int i = 0; i < 2; i++)
+    {
+
+        config.memory_write_enable = (i == 0) ? true : false;
+        config.user_command_callback = (i == 0) ? nullptr : dummy_callback;
+        scrutiny_handler.init(&config);
+        scrutiny_handler.comm()->connect();
+
+        uint8_t tx_buffer[32];
+
+        // Make request
+        uint8_t request_data[8] = {1, 3, 0, 0};
+        add_crc(request_data, sizeof(request_data) - 4);
+
+        // Make expected response
+        uint8_t expected_response[9 + 1] = {0x81, 3, 0, 0, 1};
+        expected_response[5] = 0;
+        expected_response[5] |= 0x80; // memory read
+
+        if (config.memory_write_enable)
+        {
+            expected_response[5] |= 0x40; // memory write
+        }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        expected_response[5] |= 0x20;
+#endif
+
+        if (config.user_command_callback != nullptr)
+        {
+            expected_response[5] |= 0x10; // User command
+        }
+
+        add_crc(expected_response, sizeof(expected_response) - 4);
+
+        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.process(0);
+
+        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        ASSERT_LT(n_to_read, sizeof(tx_buffer)) << "i=" << static_cast<uint32_t>(i);
+        EXPECT_EQ(n_to_read, sizeof(expected_response)) << "i=" << static_cast<uint32_t>(i);
+
+        uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        EXPECT_EQ(nread, n_to_read) << "i=" << static_cast<uint32_t>(i);
+        ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response)) << "i=" << static_cast<uint32_t>(i);
+    }
+}

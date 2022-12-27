@@ -133,7 +133,6 @@ namespace scrutiny
             uint16_t m_cursor;
             uint16_t m_size_limit;
             bool m_overflow;
-            bool m_unsupported_type;
         };
 
         class ReadRPVRequestParser
@@ -169,7 +168,6 @@ namespace scrutiny
             uint16_t m_cursor;
             uint16_t m_size_limit;
             bool m_overflow;
-            bool m_unsupported_type;
         };
 
         class WriteRPVRequestParser
@@ -204,8 +202,9 @@ namespace scrutiny
                 {
                     bool memory_read;
                     bool memory_write;
-                    bool datalog_acquire;
+                    bool datalogging;
                     bool user_command;
+                    bool _64bits;
                 };
 
                 struct GetSpecialMemoryRegionCount
