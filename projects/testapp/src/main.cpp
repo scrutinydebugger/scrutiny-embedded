@@ -80,7 +80,7 @@ scrutiny::RuntimePublishedValue rpvs[] = {
     {0x4000, scrutiny::VariableType::boolean},
 
     {0x5000, scrutiny::VariableType::boolean},
-    {0x5001, scrutiny::VariableType::uint16}
+    {0x5001, scrutiny::VariableType::uint16},
 
 #if SCRUTINY_SUPPORT_64BITS
     {0x1003, scrutiny::VariableType::sint64},
@@ -95,20 +95,21 @@ struct
     int8_t rpv_id_1000;
     int16_t rpv_id_1001;
     int32_t rpv_id_1002;
-    int64_t rpv_id_1003;
 
     uint8_t rpv_id_2000;
     uint16_t rpv_id_2001;
     uint32_t rpv_id_2002;
-    uint64_t rpv_id_2003;
 
     float rpv_id_3000;
-    double rpv_id_3001;
-
     bool rpv_id_4000;
-
     bool rpv_id_5000;
     uint16_t rpv_id_5001;
+
+#if SCRUTINY_SUPPORT_64BITS
+    int64_t rpv_id_1003;
+    uint64_t rpv_id_2003;
+    double rpv_id_3001;
+#endif
 } rpvStorage;
 
 bool TestAppRPVReadCallback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
