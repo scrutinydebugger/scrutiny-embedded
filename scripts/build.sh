@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. >/dev/null 2>&1 && pwd )"
 
-if which cygpath > /dev/null 2>&1 ; then
+if [[ $(uname -s) == CYGWIN* ]];then
 APP_ROOT=$(cygpath -w "$APP_ROOT")
 fi
 
