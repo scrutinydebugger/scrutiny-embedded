@@ -117,7 +117,7 @@ namespace scrutiny
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
                 {
-                    codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
+                    codecs::encode_32_bits_big_endian(m_timebase_for_log->get_timestamp(), &m_buffer[cursor]);
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }
@@ -138,10 +138,10 @@ namespace scrutiny
         }
 
         /// @brief  Init the encoder
-        void RawFormatEncoder::init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size)
+        void RawFormatEncoder::init(MainHandler *main_handler, Timebase *timebase_for_log, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size)
         {
             m_main_handler = main_handler;
-            m_timebase = timebase;
+            m_timebase_for_log = timebase_for_log;
             m_config = config;
             m_buffer = buffer;
             m_buffer_size = buffer_size;
@@ -159,6 +159,11 @@ namespace scrutiny
             m_entries_count = 0;
             m_full = false;
             m_max_entries = 0;
+
+            if (m_buffer == nullptr || m_buffer_size == 0)
+            {
+                m_error = true;
+            }
 
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {

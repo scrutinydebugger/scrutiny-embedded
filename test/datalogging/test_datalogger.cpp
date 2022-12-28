@@ -112,7 +112,7 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
-    datalogger.configure(&dlconfig);
+    datalogger.configure(&dlconfig, &tb);
 
     EXPECT_FALSE(datalogger.check_trigger());
     my_var = 3.1415926f;
@@ -150,7 +150,7 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
-    datalogger.configure(&dlconfig);
+    datalogger.configure(&dlconfig, &tb);
     datalogger.arm_trigger();
 
     EXPECT_FALSE(datalogger.check_trigger());
@@ -185,7 +185,7 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 100;
 
-    datalogger.configure(&dlconfig);
+    datalogger.configure(&dlconfig, &tb);
 
     datalogger.process();
     tb.step(100);
@@ -259,7 +259,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         probe_location = static_cast<uint8_t>(probe_loop);
         dlconfig.probe_location = probe_location;
         std::string error_msg = "probe_location="s + std::to_string(probe_location);
-        datalogger.configure(&dlconfig);
+        datalogger.configure(&dlconfig, &tb);
 
         datalogger.process();
         tb.step(10);

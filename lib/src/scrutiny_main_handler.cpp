@@ -36,6 +36,10 @@ namespace scrutiny
         {
             m_enabled = false;
         }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        m_datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size);
+#endif
     }
 
     void MainHandler::check_config()

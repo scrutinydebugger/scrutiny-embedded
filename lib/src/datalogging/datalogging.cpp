@@ -7,6 +7,8 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include "datalogging/scrutiny_datalogging.hpp"
+#include "scrutiny_tools.hpp"
+#include "scrutiny_main_handler.hpp"
 #include "string.h"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0

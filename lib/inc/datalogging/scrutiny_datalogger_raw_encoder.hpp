@@ -11,10 +11,11 @@
 
 #include "stdint.h"
 #include "datalogging/scrutiny_datalogging_types.hpp"
-#include "scrutiny_main_handler.hpp"
+#include "scrutiny_timebase.hpp"
 
 namespace scrutiny
 {
+    class MainHandler;
     namespace datalogging
     {
         class RawFormatEncoder;
@@ -74,7 +75,7 @@ namespace scrutiny
             const datalogging::Configuration *m_config;
             RawFormatReader m_reader;
             MainHandler *m_main_handler;
-            Timebase *m_timebase;
+            Timebase *m_timebase_for_log;
 
             uint32_t m_max_entries;
             uint32_t m_next_entry_write_index;

@@ -22,8 +22,6 @@ namespace scrutiny
         {
             m_timebase = timebase;
             m_main_handler = main_handler;
-            m_timebase = timebase;
-            m_buffer = buffer;
             m_buffer_size = buffer_size;
 
             m_encoder.init(main_handler, timebase, &m_config, buffer, buffer_size);
@@ -44,13 +42,14 @@ namespace scrutiny
             m_remaining_data_to_write = 0;
         }
 
-        void DataLogger::configure(datalogging::Configuration *config)
+        void DataLogger::configure(datalogging::Configuration *config, Timebase *timebase_for_log)
         {
             if (m_state != State::IDLE)
             {
                 reset();
             }
 
+            m_timebase_for_log = timebase_for_log;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
             m_decimation_counter = 0;

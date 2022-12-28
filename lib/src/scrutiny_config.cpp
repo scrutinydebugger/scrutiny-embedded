@@ -34,6 +34,11 @@ namespace scrutiny
         user_command_callback = nullptr;
         prng_seed = 0;
         memory_write_enable = true;
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        m_datalogger_buffer = nullptr;
+        m_datalogger_buffer_size = 0;
+#endif
     }
 
     void Config::set_buffers(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size)
@@ -63,4 +68,12 @@ namespace scrutiny
         m_rpv_read_callback = rd_cb;
         m_rpv_write_callback = wr_cb;
     }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+    void Config::set_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size)
+    {
+        m_datalogger_buffer = datalogger_buffer;
+        m_datalogger_buffer_size = datalogger_buffer_size;
+    }
+#endif
 }

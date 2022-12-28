@@ -17,6 +17,10 @@
 #include "protocol/scrutiny_protocol.hpp"
 #include "scrutiny_config.hpp"
 
+#if SCRUTINY_ENABLE_DATALOGGING
+#include "datalogging/scrutiny_datalogging.hpp"
+#endif
+
 namespace scrutiny
 {
     class MainHandler
@@ -72,6 +76,10 @@ namespace scrutiny
         bool m_enabled;
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec;
+#endif
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        datalogging::DataLogger m_datalogger;
 #endif
     };
 }

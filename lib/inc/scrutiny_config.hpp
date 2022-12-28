@@ -29,8 +29,13 @@ namespace scrutiny
         void set_forbidden_address_range(const AddressRange *range, const uint8_t count);
         void set_readonly_address_range(const AddressRange *range, const uint8_t count);
         void set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb = nullptr, RpvWriteCallback wr_cb = nullptr);
-
-        inline bool is_user_command_callback_set() const { return user_command_callback != nullptr; }
+#if SCRUTINY_ENABLE_DATALOGGING
+        void set_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
+#endif
+        inline bool is_user_command_callback_set() const
+        {
+            return user_command_callback != nullptr;
+        }
         inline bool is_buffer_set() const { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
         inline bool is_forbidden_address_range_set() const { return m_forbidden_address_ranges != nullptr; }
         inline bool is_readonly_address_range_set() const { return m_readonly_address_ranges != nullptr; }
@@ -65,6 +70,11 @@ namespace scrutiny
         uint16_t m_rpv_count;
         RpvReadCallback m_rpv_read_callback;
         RpvWriteCallback m_rpv_write_callback;
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        uint8_t *m_datalogger_buffer;
+        uint32_t m_datalogger_buffer_size;
+#endif
     };
 }
 

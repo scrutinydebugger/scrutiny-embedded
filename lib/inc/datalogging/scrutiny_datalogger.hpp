@@ -15,7 +15,7 @@
 
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
-#include "scrutiny_main_handler.hpp"
+#include "scrutiny_timebase.hpp"
 
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
 #include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
@@ -32,6 +32,8 @@ namespace scrutiny
 
 namespace scrutiny
 {
+    class MainHandler;
+
     namespace datalogging
     {
 
@@ -48,7 +50,7 @@ namespace scrutiny
 
         public:
             void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size);
-            void configure(datalogging::Configuration *config);
+            void configure(datalogging::Configuration *config, Timebase *timebase_for_log);
             void process(void);
             void reset(void);
 
@@ -67,10 +69,10 @@ namespace scrutiny
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
             MainHandler *m_main_handler;
-            uint8_t *m_buffer;
             uint32_t m_buffer_size;
 
             Timebase *m_timebase;
+            Timebase *m_timebase_for_log;
             State m_state;
             bool m_trigger_point_stamped;
             uint32_t m_trigger_timestamp;

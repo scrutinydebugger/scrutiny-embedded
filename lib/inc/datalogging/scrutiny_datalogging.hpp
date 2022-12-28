@@ -13,14 +13,13 @@
 #error "Not enabled"
 #endif
 
-#include "scrutiny_main_handler.hpp"
-
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 
 namespace scrutiny
 {
+    class MainHandler;
     namespace datalogging
     {
         void convert_to_compare_type(VariableType *vtype, AnyType *val);
