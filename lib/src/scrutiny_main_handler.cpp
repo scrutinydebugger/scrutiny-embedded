@@ -255,6 +255,11 @@ namespace scrutiny
 
         return success;
     }
+
+    void MainHandler::process_datalogging(void)
+    {
+    }
+
 #endif
     void MainHandler::process(const uint32_t timestep_us)
     {
@@ -263,10 +268,16 @@ namespace scrutiny
             m_processing_request = false;
             m_disconnect_pending = false;
             m_comm_handler.reset();
+#if SCRUTINY_ENABLE_DATALOGGING
+            m_datalogger.reset();
+#endif
             return;
         }
         m_timebase.step(timestep_us);
         m_comm_handler.process();
+#if SCRUTINY_ENABLE_DATALOGGING
+        process_datalogging();
+#endif
 
         if (m_comm_handler.request_received() && !m_processing_request)
         {
@@ -429,7 +440,7 @@ namespace scrutiny
             stack.get_supproted_features.response_data.memory_read = true;
             stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
 #if SCRUTINY_ENABLE_DATALOGGING
-            stack.get_supproted_features.response_data.datalogging = true;
+            stack.get_supproted_features.response_data.datalogging = m_config.is_datalogging_configured();
 #else
             stack.get_supproted_features.response_data.datalogging = false;
 #endif

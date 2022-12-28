@@ -19,7 +19,7 @@ namespace scrutiny
     public:
         Timebase() : m_time_us(0) {}
 
-        inline void step(const uint32_t timestep_us)
+        inline void step(const timestamp_t timestep_us)
         {
             m_time_us += timestep_us;
         }

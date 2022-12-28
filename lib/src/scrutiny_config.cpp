@@ -8,6 +8,7 @@
 
 #include "scrutiny_config.hpp"
 #include "scrutiny_tools.hpp"
+#include "scrutiny_loop_handler.hpp"
 #include <string.h>
 
 namespace scrutiny
@@ -34,6 +35,8 @@ namespace scrutiny
         user_command_callback = nullptr;
         prng_seed = 0;
         memory_write_enable = true;
+        m_loops = nullptr;
+        m_loop_count = 0;
 
 #if SCRUTINY_ENABLE_DATALOGGING
         m_datalogger_buffer = nullptr;
@@ -69,8 +72,14 @@ namespace scrutiny
         m_rpv_write_callback = wr_cb;
     }
 
+    void Config::set_loops(LoopHandler *loops, uint8_t loop_count)
+    {
+        m_loops = loops;
+        m_loop_count = loop_count;
+    }
+
 #if SCRUTINY_ENABLE_DATALOGGING
-    void Config::set_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size)
+    void Config::set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size)
     {
         m_datalogger_buffer = datalogger_buffer;
         m_datalogger_buffer_size = datalogger_buffer_size;

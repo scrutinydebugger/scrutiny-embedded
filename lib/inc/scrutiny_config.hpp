@@ -12,6 +12,7 @@
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
+#include "scrutiny_loop_handler.hpp"
 
 namespace scrutiny
 {
@@ -29,27 +30,38 @@ namespace scrutiny
         void set_forbidden_address_range(const AddressRange *range, const uint8_t count);
         void set_readonly_address_range(const AddressRange *range, const uint8_t count);
         void set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb = nullptr, RpvWriteCallback wr_cb = nullptr);
+        void set_loops(LoopHandler *loops, uint8_t loop_count);
 #if SCRUTINY_ENABLE_DATALOGGING
-        void set_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
+        void set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
 #endif
-        inline bool is_user_command_callback_set() const
+        inline bool is_user_command_callback_set(void) const
         {
             return user_command_callback != nullptr;
         }
-        inline bool is_buffer_set() const { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
-        inline bool is_forbidden_address_range_set() const { return m_forbidden_address_ranges != nullptr; }
-        inline bool is_readonly_address_range_set() const { return m_readonly_address_ranges != nullptr; }
-        inline bool is_read_published_values_configured() const { return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
-        inline bool is_write_published_values_configured() const { return (m_rpv_write_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_buffer_set(void) const { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
+        inline bool is_forbidden_address_range_set(void) const { return m_forbidden_address_ranges != nullptr; }
+        inline bool is_readonly_address_range_set(void) const { return m_readonly_address_ranges != nullptr; }
+        inline bool is_read_published_values_configured(void) const { return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_write_published_values_configured(void) const { return (m_rpv_write_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_loop_handlers_configured(void) const { return m_loops != nullptr && m_loop_count > 0; }
+#if SCRUTINY_ENABLE_DATALOGGING
+        inline bool is_datalogging_configured(void) const
+        {
+            return (m_datalogger_buffer != nullptr && m_datalogger_buffer_size != 0);
+        };
+#endif
 
-        inline const AddressRange *forbidden_ranges() const { return m_forbidden_address_ranges; }
-        inline uint8_t forbidden_ranges_count() const { return m_forbidden_range_count; }
-        inline const AddressRange *readonly_ranges() const { return m_readonly_address_ranges; }
-        inline uint8_t readonly_ranges_count() const { return m_readonly_range_count; }
-        inline const RuntimePublishedValue *get_rpvs_array() const { return m_rpvs; }
-        inline uint16_t get_rpv_count() const { return m_rpv_count; }
-        inline RpvReadCallback get_rpv_read_callback() const { return m_rpv_read_callback; }
-        inline RpvWriteCallback get_rpv_write_callback() const { return m_rpv_write_callback; }
+        inline const AddressRange *forbidden_ranges() const
+        {
+            return m_forbidden_address_ranges;
+        }
+        inline uint8_t forbidden_ranges_count(void) const { return m_forbidden_range_count; }
+        inline const AddressRange *readonly_ranges(void) const { return m_readonly_address_ranges; }
+        inline uint8_t readonly_ranges_count(void) const { return m_readonly_range_count; }
+        inline const RuntimePublishedValue *get_rpvs_array(void) const { return m_rpvs; }
+        inline uint16_t get_rpv_count(void) const { return m_rpv_count; }
+        inline RpvReadCallback get_rpv_read_callback(void) const { return m_rpv_read_callback; }
+        inline RpvWriteCallback get_rpv_write_callback(void) const { return m_rpv_write_callback; }
 
         uint32_t max_bitrate;
         user_command_callback_t user_command_callback;
@@ -70,6 +82,8 @@ namespace scrutiny
         uint16_t m_rpv_count;
         RpvReadCallback m_rpv_read_callback;
         RpvWriteCallback m_rpv_write_callback;
+        LoopHandler *m_loops;
+        uint8_t m_loop_count;
 
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t *m_datalogger_buffer;

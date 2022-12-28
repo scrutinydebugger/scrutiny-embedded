@@ -379,11 +379,17 @@ void dummy_callback(const uint8_t subfunction, const uint8_t *request_data, cons
 
 TEST_F(TestGetInfo, TestSupportedFeatures)
 {
+
     for (int i = 0; i < 2; i++)
     {
 
         config.memory_write_enable = (i == 0) ? true : false;
         config.user_command_callback = (i == 0) ? nullptr : dummy_callback;
+#if SCRUTINY_ENABLE_DATALOGGING
+        uint8_t dl_buffer[128];
+        config.set_datalogging_buffers(dl_buffer, sizeof(dl_buffer));
+#endif
+
         scrutiny_handler.init(&config);
         scrutiny_handler.comm()->connect();
 

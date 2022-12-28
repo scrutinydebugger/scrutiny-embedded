@@ -39,6 +39,7 @@ namespace scrutiny
         protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
 #if SCRUTINY_ENABLE_DATALOGGING
+        void process_datalogging(void);
         bool read_memory(void *dst, const void *src, const uint32_t size) const;
         bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const;
         bool fetch_variable_bitfield(
@@ -49,24 +50,24 @@ namespace scrutiny
             AnyType *val,
             VariableType *output_type) const;
 #endif
-        inline RpvReadCallback get_rpv_read_callback() const
+        inline RpvReadCallback get_rpv_read_callback(void) const
         {
             return m_config.get_rpv_read_callback();
         }
 
-        inline protocol::CommHandler *comm()
+        inline protocol::CommHandler *comm(void)
         {
             return &m_comm_handler;
         }
 
-        inline Config *get_config() { return &m_config; }
+        inline Config *get_config(void) { return &m_config; }
 
     private:
         bool touches_forbidden_region(const MemoryBlock *block) const;
         bool touches_forbidden_region(const void *addr_start, const size_t length) const;
         bool touches_readonly_region(const MemoryBlock *block) const;
         bool touches_readonly_region(const void *addr_start, const size_t length) const;
-        void check_config();
+        void check_config(void);
 
         Timebase m_timebase;
         protocol::CommHandler m_comm_handler;
