@@ -9,12 +9,6 @@ using namespace scrutiny;
 
 class TestRawEncoder : public ScrutinyTest
 {
-public:
-    TestRawEncoder() : ScrutinyTest(),
-                       encoder(&scrutiny_handler, dlbuffer, sizeof(dlbuffer), &dlconfig)
-    {
-    }
-
 protected:
     void check_canaries();
 
@@ -73,7 +67,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     dlconfig.items_to_log[2].type = datalogging::LoggableType::TIME;
 
-    encoder.init(&timebase);
+    encoder.init(&scrutiny_handler, &timebase, &dlconfig, dlbuffer, sizeof(dlbuffer));
     timebase.reset();
 
     var1 = 1.0f;

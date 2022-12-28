@@ -138,16 +138,28 @@ namespace scrutiny
         }
 
         /// @brief  Init the encoder
-        void RawFormatEncoder::init(Timebase *timebase)
+        void RawFormatEncoder::init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size)
         {
-            m_error = false;
+            m_main_handler = main_handler;
+            m_timebase = timebase;
+            m_config = config;
+            m_buffer = buffer;
+            m_buffer_size = buffer_size;
+
+            reset();
+        }
+
+        void RawFormatEncoder::reset(void)
+        {
             reset_write_counter();
+            m_error = false;
             m_next_entry_write_index = 0;
             m_first_valid_entry_index = 0;
             m_entry_size = 0;
             m_entries_count = 0;
             m_full = false;
-            m_timebase = timebase;
+            m_max_entries = 0;
+
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
                 if (m_error)
@@ -186,8 +198,14 @@ namespace scrutiny
                     m_entry_size += elem_size;
                 }
             }
-
-            m_max_entries = m_buffer_size / m_entry_size;
+            if (m_entry_size > 0)
+            {
+                m_max_entries = m_buffer_size / m_entry_size;
+            }
+            else
+            {
+                m_error = true;
+            }
         }
     }
 }

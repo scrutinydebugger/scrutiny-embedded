@@ -46,19 +46,13 @@ namespace scrutiny
 
         public:
             static constexpr EncodingType ENCODING = EncodingType::RAW;
-            RawFormatEncoder(MainHandler *main_handler,
-                             uint8_t *buffer,
-                             uint32_t buffer_size,
-                             datalogging::Configuration *config) : m_buffer(buffer),
-                                                                   m_buffer_size(buffer_size),
-                                                                   m_config(config),
-                                                                   m_reader(this),
-                                                                   m_main_handler(main_handler)
+            RawFormatEncoder() : m_reader(this)
             {
             }
 
-            void init(Timebase *timebase);
+            void init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size);
             void encode_next_entry(void);
+            void reset(void);
             inline void reset_write_counter(void) { m_write_counter = 0; }
             inline uint32_t get_write_counter(void) const { return m_write_counter; }
             inline datalogging::EncodingType get_encoding(void) const { return ENCODING; }
@@ -75,11 +69,11 @@ namespace scrutiny
             };
 
         protected:
-            uint8_t *const m_buffer;
-            const uint32_t m_buffer_size;
+            uint8_t *m_buffer;
+            uint32_t m_buffer_size;
             const datalogging::Configuration *m_config;
             RawFormatReader m_reader;
-            MainHandler *const m_main_handler;
+            MainHandler *m_main_handler;
             Timebase *m_timebase;
 
             uint32_t m_max_entries;

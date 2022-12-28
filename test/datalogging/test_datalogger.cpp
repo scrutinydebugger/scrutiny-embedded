@@ -37,12 +37,6 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
 
 class TestDatalogger : public ScrutinyTest
 {
-public:
-    TestDatalogger() : ScrutinyTest(),
-                       datalogger(&scrutiny_handler, dlbuffer, sizeof(dlbuffer))
-    {
-    }
-
 protected:
     void check_canaries();
     Timebase tb;
@@ -83,7 +77,7 @@ protected:
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);
-        datalogger.init(&tb);
+        datalogger.init(&scrutiny_handler, &tb, dlbuffer, sizeof(dlbuffer));
 
         memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
         memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));

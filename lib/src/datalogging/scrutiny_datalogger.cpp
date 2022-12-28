@@ -18,9 +18,15 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(Timebase *timebase)
+        void DataLogger::init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size)
         {
             m_timebase = timebase;
+            m_main_handler = main_handler;
+            m_timebase = timebase;
+            m_buffer = buffer;
+            m_buffer_size = buffer_size;
+
+            m_encoder.init(main_handler, timebase, &m_config, buffer, buffer_size);
 
             reset();
         }
@@ -87,7 +93,7 @@ namespace scrutiny
             if (m_state != State::ERROR)
             {
                 m_trigger.active_condition->reset(m_trigger.conditions.data());
-                m_encoder.init(m_timebase);
+                m_encoder.reset();
                 m_state = State::CONFIGURED;
             }
         }
