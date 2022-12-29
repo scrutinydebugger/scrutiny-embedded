@@ -44,10 +44,10 @@ namespace scrutiny
 
         enum class OperandType
         {
-            LITERAL,
-            VAR,
-            VARBIT,
-            RPV
+            LITERAL = 0,
+            VAR = 1,
+            VARBIT = 2,
+            RPV = 3
         };
 
         union OperandData
@@ -82,13 +82,14 @@ namespace scrutiny
 
         enum class SupportedTriggerConditions
         {
-            Equal,
-            NotEqual,
-            LessThan,
-            LessOrEqualThan,
-            GreaterThan,
-            GreaterOrEqualThan,
-            ChangeMoreThan
+            AlwaysTrue = 0,
+            Equal = 1,
+            NotEqual = 2,
+            LessThan = 3,
+            LessOrEqualThan = 4,
+            GreaterThan = 5,
+            GreaterOrEqualThan = 6,
+            ChangeMoreThan = 7
         };
 
         struct TriggerConfig

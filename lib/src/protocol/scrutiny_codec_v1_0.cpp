@@ -899,17 +899,88 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        ResponseCode CodecV1_0::encode_datalogging_buffer_size(const uint32_t buffer_size, Response *response)
+        ResponseCode CodecV1_0::encode_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response)
         {
             constexpr uint16_t datalen = sizeof(uint32_t);
             if (datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
-            codecs::encode_32_bits_big_endian(buffer_size, &response->data[0]);
+            codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[0]);
             response->data_length = datalen;
 
             return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::decode_datalogging_configure_request(
+            const Request *request,
+            RequestData::DataLogControl::Configure *request_data,
+            datalogging::Configuration *config)
+        {
+            if (request->data_length < 14)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            request_data->loop_id = static_cast<loop_id_t>(request->data[0]);
+
+            config->decimation = codecs::decode_16_bits_big_endian(&request->data[1]);
+            config->probe_location = request->data[3];
+            config->timeout_us = codecs::decode_32_bits_big_endian(&request->data[4]);
+            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(request->data[8]);
+            config->trigger.hold_time_us = codecs::decode_32_bits_big_endian(&request->data[9]);
+            config->trigger.operand_count = request->data[13];
+
+            if (config->trigger.operand_count > datalogging::MAX_OPERANDS)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            uint16_t cursor = 14;
+            for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
+            {
+                if (request->data_length < cursor + 1)
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+
+                const datalogging::OperandType optype = static_cast<datalogging::OperandType>(request->data[cursor]);
+                config->trigger.operands[i].type = optype;
+                cursor++;
+
+                switch (optype)
+                {
+                case datalogging::OperandType::LITERAL:
+                {
+                    if (request->data_length < cursor + sizeof(float))
+                    {
+                    }
+                    config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian(&request->data[cursor]);
+                    break;
+                }
+                case datalogging::OperandType::RPV:
+                {
+
+                    break;
+                }
+                case datalogging::OperandType::VAR:
+                {
+
+                    break;
+                }
+                case datalogging::OperandType::VARBIT:
+                {
+
+                    break;
+                }
+                default:
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+                }
+            }
+
+            return ResponseCode::FailureToProceed;
         }
 #endif
     }

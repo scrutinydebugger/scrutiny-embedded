@@ -44,14 +44,14 @@ TEST_F(TestDatalogControl, TestUnsupported)
 
     uint8_t tx_buffer[32];
 
-    for (uint16_t i = 0; i <= 255; i++)
+    for (uint16_t i = 0; i <= 255u; i++)
     {
         const uint8_t subfn = static_cast<uint8_t>(i);
         uint8_t request_data[8] = {5, subfn, 0, 0};
         add_crc(request_data, sizeof(request_data) - 4);
 
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
-        scrutiny_handler.process(0);
+        scrutiny_handler.process(0); 
 
         uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));

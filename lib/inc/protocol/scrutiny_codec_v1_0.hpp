@@ -13,6 +13,7 @@
 #include "scrutiny_protocol_definitions.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
 
 namespace scrutiny
 {
@@ -254,6 +255,14 @@ namespace scrutiny
                     uint32_t session_id;
                 };
             }
+
+            namespace DataLogControl
+            {
+                struct GetBufferSize
+                {
+                    uint32_t buffer_size;
+                };
+            }
         }
 
         namespace RequestData
@@ -296,6 +305,15 @@ namespace scrutiny
                     uint32_t session_id;
                 };
             }
+
+            namespace DataLogControl
+            {
+                struct Configure
+                {
+                    loop_id_t loop_id;
+                    // Rest is directly written to datalogger config. So not in this struct.
+                };
+            }
         }
 
         class CodecV1_0
@@ -335,7 +353,11 @@ namespace scrutiny
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *response, const uint16_t max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode encode_datalogging_buffer_size(const uint32_t buffer_size, Response *response);
+            ResponseCode encode_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response);
+            ResponseCode decode_datalogging_configure_request(
+                const Request *request,
+                RequestData::DataLogControl::Configure *request_data,
+                datalogging::Configuration *config);
 #endif
 
         protected:

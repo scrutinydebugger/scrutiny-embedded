@@ -100,6 +100,8 @@ namespace scrutiny
             DataloggingError error;
             bool data_available;
             bool request_arm_trigger;
+            bool request_ownership_release;
+            bool pending_ownership_release;
         } m_datalogging;
 
 #endif

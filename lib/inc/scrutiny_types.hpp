@@ -26,7 +26,7 @@ namespace scrutiny
         void *end;
     };
 
-    typedef unsigned int loop_id_t;
+    typedef uint_fast8_t loop_id_t;
 
     typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
 
@@ -51,7 +51,7 @@ namespace scrutiny
         _undef = 0xF
     };
 
-    // This enum must match the definition in the python core module.
+    /// @brief  Represent a datatype. Must match the python core module enum
     enum class VariableType
     {
         sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),

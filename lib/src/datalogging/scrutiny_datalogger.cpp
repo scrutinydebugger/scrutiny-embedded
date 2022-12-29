@@ -42,7 +42,7 @@ namespace scrutiny
             m_remaining_data_to_write = 0;
         }
 
-        void DataLogger::configure(datalogging::Configuration *config, Timebase *timebase_for_log)
+        void DataLogger::configure(Timebase *timebase_for_log)
         {
             if (m_state != State::IDLE)
             {
@@ -54,9 +54,13 @@ namespace scrutiny
             m_trigger.rising_edge_timestamp = 0;
             m_decimation_counter = 0;
 
-            m_config.copy_from(config);
-
             if (m_config.items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL || m_config.items_count == 0)
+            {
+                m_state = State::ERROR;
+                return;
+            }
+
+            if (m_config.trigger.operand_count > datalogging::MAX_OPERANDS)
             {
                 m_state = State::ERROR;
                 return;

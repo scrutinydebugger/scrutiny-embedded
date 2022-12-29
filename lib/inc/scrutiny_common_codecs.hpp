@@ -9,6 +9,7 @@
 #define ___SCRUTINY_COMMON_CODECS_H___
 
 #include <stdint.h>
+#include <string.h>
 #include "scrutiny_types.hpp"
 
 namespace scrutiny
@@ -91,6 +92,15 @@ namespace scrutiny
             return static_cast<uint32_t>(v);
         }
 
+        inline float decode_float_big_endian(const uint8_t *buff)
+        {
+            static_assert(sizeof(float) == 4, "Expect float to be 4 bytes");
+            const uint32_t temp = decode_32_bits_big_endian(buff);
+            float v;
+            memcpy(&v, &temp, sizeof(float));
+            return v;
+        }
+
         inline uint16_t decode_16_bits_big_endian(const uint8_t *buff)
         {
             uint_fast16_t v = 0;
@@ -121,6 +131,15 @@ namespace scrutiny
             v |= ((static_cast<uint_fast32_t>(buff[1]) << 8) & 0x0000FF00u);
             v |= ((static_cast<uint_fast32_t>(buff[0]) << 0) & 0x000000FFu);
             return static_cast<uint32_t>(v);
+        }
+
+        inline float decode_float_little_endian(const uint8_t *buff)
+        {
+            static_assert(sizeof(float) == 4, "Expect float to be 4 bytes");
+            const uint32_t temp = decode_32_bits_little_endian(buff);
+            float v;
+            memcpy(&v, &temp, sizeof(float));
+            return v;
         }
 
         inline uint16_t decode_16_bits_little_endian(const uint8_t *buff)

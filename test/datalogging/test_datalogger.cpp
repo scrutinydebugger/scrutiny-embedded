@@ -101,6 +101,8 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
     dlconfig.items_to_log[0].data.memory.address = &logged_var;
     dlconfig.decimation = 1;
+    dlconfig.timeout_us = 0;
+    dlconfig.probe_location = 128;
     dlconfig.trigger.hold_time_us = 0;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
@@ -112,7 +114,8 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
-    datalogger.configure(&dlconfig, &tb);
+    datalogger.config()->copy_from(&dlconfig);
+    datalogger.configure(&tb);
 
     EXPECT_FALSE(datalogger.check_trigger());
     my_var = 3.1415926f;
@@ -139,6 +142,8 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.items_to_log[0].data.memory.address = &logged_var;
 
     dlconfig.decimation = 1;
+    dlconfig.timeout_us = 0;
+    dlconfig.probe_location = 128;
     dlconfig.trigger.hold_time_us = 100;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
@@ -150,7 +155,8 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
-    datalogger.configure(&dlconfig, &tb);
+    datalogger.config()->copy_from(&dlconfig);
+    datalogger.configure(&tb);
     datalogger.arm_trigger();
 
     EXPECT_FALSE(datalogger.check_trigger());
@@ -174,6 +180,8 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.items_to_log[0].data.memory.size = sizeof(my_var);
     dlconfig.items_to_log[0].data.memory.address = &my_var;
     dlconfig.decimation = 2;
+    dlconfig.timeout_us = 0;
+    dlconfig.probe_location = 128;
     dlconfig.trigger.hold_time_us = 100;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::GreaterThan;
@@ -185,7 +193,8 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 100;
 
-    datalogger.configure(&dlconfig, &tb);
+    datalogger.config()->copy_from(&dlconfig);
+    datalogger.configure(&tb);
 
     datalogger.process();
     tb.step(100);
@@ -259,7 +268,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         probe_location = static_cast<uint8_t>(probe_loop);
         dlconfig.probe_location = probe_location;
         std::string error_msg = "probe_location="s + std::to_string(probe_location);
-        datalogger.configure(&dlconfig, &tb);
+        datalogger.config()->copy_from(&dlconfig);
+        datalogger.configure(&tb);
 
         datalogger.process();
         tb.step(10);

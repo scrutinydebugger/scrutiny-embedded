@@ -50,7 +50,7 @@ namespace scrutiny
 
         public:
             void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size);
-            void configure(datalogging::Configuration *config, Timebase *timebase_for_log);
+            void configure(Timebase *timebase_for_log);
             void process(void);
             void reset(void);
 
@@ -58,7 +58,8 @@ namespace scrutiny
             void arm_trigger(void);
 
             bool check_trigger(void);
-            inline DataReader *get_reader() { return m_encoder.get_reader(); }
+            inline DataReader *get_reader(void) { return m_encoder.get_reader(); }
+            inline Configuration *config(void) { return &m_config; }
 
         protected:
             void process_acquisition(void);

@@ -40,7 +40,13 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
         m_datalogging.datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size);
+        m_datalogging.owner = nullptr;
+        m_datalogging.new_owner = nullptr;
         m_datalogging.error = DataloggingError::NoError;
+        m_datalogging.data_available = false;
+        m_datalogging.request_arm_trigger = false;
+        m_datalogging.request_ownership_release = false;
+        m_datalogging.pending_ownership_release = false;
 #endif
     }
 
@@ -278,6 +284,7 @@ namespace scrutiny
             m_datalogging.owner = nullptr;
             m_datalogging.datalogger.reset();
             m_datalogging.data_available = false;
+            m_datalogging.pending_ownership_release = false;
             break;
         case LoopHandler::Loop2MainMessageID::DATALOGGER_DATA_ACQUIRED:
             if (sender != m_datalogging.owner)
@@ -317,11 +324,18 @@ namespace scrutiny
         }
         else
         {
-            if (m_datalogging.request_arm_trigger)
+            if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
             {
-                if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+                LoopHandler::Main2LoopMessage msg;
+                if (m_datalogging.request_ownership_release)
                 {
-                    LoopHandler::Main2LoopMessage msg;
+                    msg.message_id = LoopHandler::Main2LoopMessageID::RELEASE_DATALOGGER_OWNERSHIP;
+                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_ownership_release = false;
+                    m_datalogging.pending_ownership_release = true;
+                }
+                else if (m_datalogging.request_arm_trigger)
+                {
                     msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_ARM_TRIGGER;
                     m_datalogging.new_owner->ipc_main2loop()->send(msg);
                     m_datalogging.request_arm_trigger = false;
@@ -373,6 +387,7 @@ namespace scrutiny
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
+            // todo : Timeout if process_again to often
             if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::ProcessAgain)
             {
                 m_processing_request = false;
@@ -1211,6 +1226,19 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
     protocol::ResponseCode MainHandler::process_datalog_control(const protocol::Request *const request, protocol::Response *const response)
     {
+        union
+        {
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetBufferSize response_data;
+            } get_buffer_size;
+
+            struct
+            {
+                protocol::RequestData::DataLogControl::Configure request_data;
+            } configure;
+        } stack;
+
         if (!m_config.is_datalogging_configured())
         {
             return protocol::ResponseCode::UnsupportedFeature;
@@ -1222,7 +1250,39 @@ namespace scrutiny
 
         case protocol::DataLogControl::Subfunction::GetBufferSize:
         {
-            code = m_codec.encode_datalogging_buffer_size(m_config.m_datalogger_buffer_size, response);
+            stack.get_buffer_size.response_data.buffer_size = m_config.m_datalogger_buffer_size;
+            code = m_codec.encode_datalogging_buffer_size(&stack.get_buffer_size.response_data, response);
+            break;
+        }
+
+        case protocol::DataLogControl::Subfunction::ConfigureDatalog:
+        {
+            if (m_datalogging.owner != nullptr)
+            {
+                if (!m_datalogging.pending_ownership_release)
+                {
+                    m_datalogging.request_ownership_release = true;
+                }
+                code = protocol::ResponseCode::ProcessAgain;
+                break;
+            }
+
+            code = m_codec.decode_datalogging_configure_request(request, &stack.configure.request_data, m_datalogging.datalogger.config());
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
+
+            if (stack.configure.request_data.loop_id >= m_config.m_loop_count)
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
+
+            LoopHandler *const loop = m_config.m_loops[stack.configure.request_data.loop_id];
+            m_datalogging.datalogger.configure(loop->get_timebase());
+            m_datalogging.new_owner = loop;
+
             break;
         }
 
