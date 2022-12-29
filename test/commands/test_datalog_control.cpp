@@ -1,11 +1,3 @@
-//    test_user_command.cpp
-//        Test the behaviour of the embedded module when UserCommand commands are received
-//
-//   - License : MIT - See LICENSE file.
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
-//
-//   Copyright (c) 2021-2022 Scrutiny Debugger
-
 #include <gtest/gtest.h>
 #include <cstring>
 

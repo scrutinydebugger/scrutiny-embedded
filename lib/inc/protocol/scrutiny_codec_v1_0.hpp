@@ -13,8 +13,9 @@
 #include "scrutiny_protocol_definitions.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
+#if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging_types.hpp"
-
+#endif
 namespace scrutiny
 {
     class MainHandler;
