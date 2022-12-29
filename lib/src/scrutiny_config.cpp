@@ -72,7 +72,7 @@ namespace scrutiny
         m_rpv_write_callback = wr_cb;
     }
 
-    void Config::set_loops(LoopHandler *loops, uint8_t loop_count)
+    void Config::set_loops(LoopHandler **loops, uint8_t loop_count)
     {
         m_loops = loops;
         m_loop_count = loop_count;

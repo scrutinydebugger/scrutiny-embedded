@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_memory_control_rpv.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_datalog_control.cpp
     )
     
 if (SCRUTINY_ENABLE_DATALOGGING)

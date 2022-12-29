@@ -32,14 +32,17 @@ namespace scrutiny
         VariableType get_rpv_type(const uint16_t id) const;
 
         void process(const uint32_t timestep_us);
-
+        void process_loops(void);
         void process_request(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
+
 #if SCRUTINY_ENABLE_DATALOGGING
-        void process_datalogging(void);
+        protocol::ResponseCode process_datalog_control(const protocol::Request *const request, protocol::Response *const response);
+        void process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg);
+        void process_datalogging_logic(void);
         bool read_memory(void *dst, const void *src, const uint32_t size) const;
         bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const;
         bool fetch_variable_bitfield(
@@ -80,7 +83,25 @@ namespace scrutiny
 #endif
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        datalogging::DataLogger m_datalogger;
+        enum class DataloggingError
+        {
+            NoError,
+            UnexpectedRelease,
+            UnexpectedClaim,
+            UnexpectedData
+
+        };
+        struct
+        {
+
+            datalogging::DataLogger datalogger;
+            LoopHandler *owner;
+            LoopHandler *new_owner;
+            DataloggingError error;
+            bool data_available;
+            bool request_arm_trigger;
+        } m_datalogging;
+
 #endif
     };
 }

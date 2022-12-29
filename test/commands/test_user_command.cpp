@@ -64,10 +64,10 @@ TEST_F(TestUserCommand, TestCommandCalled)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8 + 3] = {5, 0xAA, 0, 3, 0x12, 0x34, 0x56};
+    uint8_t request_data[8 + 3] = {4, 0xAA, 0, 3, 0x12, 0x34, 0x56};
     add_crc(request_data, sizeof(request_data) - 4);
 
-    uint8_t expected_response[9 + 4] = {0x85, 0xAA, 0, 0, 4, 0x11, 0x22, 0x33, 0x44};
+    uint8_t expected_response[9 + 4] = {0x84, 0xAA, 0, 0, 4, 0x11, 0x22, 0x33, 0x44};
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -90,7 +90,7 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8] = {5, 0, 0, 0};
+    uint8_t request_data[8] = {4, 0, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -112,7 +112,7 @@ TEST_F(TestUserCommand, TestNoCallback)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8] = {5, 0, 0, 0};
+    uint8_t request_data[8] = {4, 0, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));

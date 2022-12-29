@@ -30,7 +30,7 @@ namespace scrutiny
         void set_forbidden_address_range(const AddressRange *range, const uint8_t count);
         void set_readonly_address_range(const AddressRange *range, const uint8_t count);
         void set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb = nullptr, RpvWriteCallback wr_cb = nullptr);
-        void set_loops(LoopHandler *loops, uint8_t loop_count);
+        void set_loops(LoopHandler **loops, uint8_t loop_count);
 #if SCRUTINY_ENABLE_DATALOGGING
         void set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
 #endif
@@ -82,7 +82,7 @@ namespace scrutiny
         uint16_t m_rpv_count;
         RpvReadCallback m_rpv_read_callback;
         RpvWriteCallback m_rpv_write_callback;
-        LoopHandler *m_loops;
+        LoopHandler **m_loops;
         uint8_t m_loop_count;
 
 #if SCRUTINY_ENABLE_DATALOGGING

@@ -334,6 +334,10 @@ namespace scrutiny
             WriteRPVRequestParser *decode_request_memory_control_write_rpv(const Request *request, MainHandler *main_handler);
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *response, const uint16_t max_size);
 
+#if SCRUTINY_ENABLE_DATALOGGING
+            ResponseCode encode_datalogging_buffer_size(const uint32_t buffer_size, Response *response);
+#endif
+
         protected:
             union
             {

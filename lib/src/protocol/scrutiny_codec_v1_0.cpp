@@ -897,5 +897,20 @@ namespace scrutiny
             parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
             return &parsers.m_memory_control_write_rpv_parser;
         }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        ResponseCode CodecV1_0::encode_datalogging_buffer_size(const uint32_t buffer_size, Response *response)
+        {
+            constexpr uint16_t datalen = sizeof(uint32_t);
+            if (datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            codecs::encode_32_bits_big_endian(buffer_size, &response->data[0]);
+            response->data_length = datalen;
+
+            return ResponseCode::OK;
+        }
+#endif
     }
 }

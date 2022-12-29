@@ -11,6 +11,7 @@
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"
+#include "scrutiny_loop_handler.hpp"
 
 namespace scrutiny
 {
@@ -38,7 +39,8 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        m_datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size);
+        m_datalogging.datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size);
+        m_datalogging.error = DataloggingError::NoError;
 #endif
     }
 
@@ -256,11 +258,96 @@ namespace scrutiny
         return success;
     }
 
-    void MainHandler::process_datalogging(void)
+    void MainHandler::process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg)
     {
+        switch (msg->message_id)
+        {
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_TAKEN:
+            if (m_datalogging.owner != nullptr)
+            {
+                m_datalogging.error = DataloggingError::UnexpectedClaim;
+            }
+            m_datalogging.owner = sender;
+            break;
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_RELEASED:
+            if (sender != m_datalogging.owner)
+            {
+                m_datalogging.error = DataloggingError::UnexpectedRelease;
+            }
+
+            m_datalogging.owner = nullptr;
+            m_datalogging.datalogger.reset();
+            m_datalogging.data_available = false;
+            break;
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_DATA_ACQUIRED:
+            if (sender != m_datalogging.owner)
+            {
+                m_datalogging.error = DataloggingError::UnexpectedData;
+            }
+            else
+            {
+                m_datalogging.data_available = true;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    void MainHandler::process_datalogging_logic(void)
+    {
+        if (m_datalogging.error != DataloggingError::NoError)
+        {
+            return;
+        }
+
+        if (m_datalogging.owner == nullptr) // no owner
+        {
+            if (m_datalogging.new_owner != nullptr)
+            {
+                if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+                {
+                    LoopHandler::Main2LoopMessage msg;
+                    msg.message_id = LoopHandler::Main2LoopMessageID::TAKE_DATALOGGER_OWNERSHIP;
+                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.new_owner = nullptr;
+                }
+            }
+
+            m_datalogging.request_arm_trigger = false;
+        }
+        else
+        {
+            if (m_datalogging.request_arm_trigger)
+            {
+                if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+                {
+                    LoopHandler::Main2LoopMessage msg;
+                    msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_ARM_TRIGGER;
+                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_arm_trigger = false;
+                }
+            }
+        }
     }
 
 #endif
+
+    void MainHandler::process_loops(void)
+    {
+        for (uint_fast8_t i = 0; i < m_config.m_loop_count; i++)
+        {
+            LoopHandler *const loop = m_config.m_loops[i];
+            if (loop->ipc_loop2main()->has_content())
+            {
+                LoopHandler::Loop2MainMessage msg = loop->ipc_loop2main()->pop();
+                static_cast<void>(msg);
+#if SCRUTINY_ENABLE_DATALOGGING
+                process_datalogging_loop_msg(loop, &msg);
+#endif
+            }
+        }
+    }
+
     void MainHandler::process(const uint32_t timestep_us)
     {
         if (!m_enabled)
@@ -269,28 +356,43 @@ namespace scrutiny
             m_disconnect_pending = false;
             m_comm_handler.reset();
 #if SCRUTINY_ENABLE_DATALOGGING
-            m_datalogger.reset();
+            m_datalogging.datalogger.reset();
 #endif
             return;
         }
         m_timebase.step(timestep_us);
         m_comm_handler.process();
+        process_loops();
 #if SCRUTINY_ENABLE_DATALOGGING
-        process_datalogging();
+        process_datalogging_logic();
 #endif
 
         if (m_comm_handler.request_received() && !m_processing_request)
         {
-            m_processing_request = true;
+
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
-            m_comm_handler.send_response(response);
+            if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::ProcessAgain)
+            {
+                m_processing_request = false;
+                // comm handler will stay in standby until we process the request. Data in rx buffer is guaranteed to stay valid until then
+            }
+            else if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::NoResponseToSend)
+            {
+                m_processing_request = true;
+                // Will not be transmitting, therefore automatically wait for next request
+            }
+            else
+            {
+                m_processing_request = true;
+                m_comm_handler.send_response(response);
+            }
         }
 
         if (m_processing_request)
         {
-            if (!m_comm_handler.transmitting())
+            if (!m_comm_handler.transmitting()) // Will be false if NoResponseToSend or if finished transmitting
             {
                 m_comm_handler.wait_next_request(); // Allow reception of next request
                 m_processing_request = false;
@@ -353,9 +455,12 @@ namespace scrutiny
             code = process_memory_control(request, response);
             break;
 
+#if SCRUTINY_ENABLE_DATALOGGING
             // ============= [DataLogControl] ===========
         case protocol::CommandId::DataLogControl:
+            code = process_datalog_control(request, response);
             break;
+#endif
 
             // ============= [UserCommand] ===========
         case protocol::CommandId::UserCommand:
@@ -1102,4 +1207,31 @@ namespace scrutiny
 
         return code;
     }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+    protocol::ResponseCode MainHandler::process_datalog_control(const protocol::Request *const request, protocol::Response *const response)
+    {
+        if (!m_config.is_datalogging_configured())
+        {
+            return protocol::ResponseCode::UnsupportedFeature;
+        }
+
+        protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
+        switch (static_cast<protocol::DataLogControl::Subfunction>(request->subfunction_id))
+        {
+
+        case protocol::DataLogControl::Subfunction::GetBufferSize:
+        {
+            code = m_codec.encode_datalogging_buffer_size(m_config.m_datalogger_buffer_size, response);
+            break;
+        }
+
+        default:
+        {
+            code = protocol::ResponseCode::UnsupportedFeature;
+        }
+        }
+        return code;
+    }
+#endif
 }

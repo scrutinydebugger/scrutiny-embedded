@@ -23,34 +23,6 @@
 namespace scrutiny
 {
 
-    enum class Main2LoopMessageID
-    {
-#if SCRUTINY_ENABLE_DATALOGGING
-        RELEASE_DATALOGGER_OWNERSHIP,
-        TAKE_DATALOGGER_OWNERSHIP,
-        DATALOGGER_ARM_TRIGGER
-#endif
-    };
-
-    enum class Loop2MainMessageID
-    {
-#if SCRUTINY_ENABLE_DATALOGGING
-        DATALOGGER_OWNERSHIP_TAKEN,
-        DATALOGGER_OWNERSHIP_RELEASED,
-        DATALOGGER_DATA_ACQUIRED
-#endif
-    };
-
-    struct Main2LoopMessage
-    {
-        Main2LoopMessageID message_id;
-    };
-
-    struct Loop2MainMessage
-    {
-        Loop2MainMessageID message_id;
-    };
-
     enum class LoopType
     {
         FIXED_FREQ,
@@ -60,6 +32,34 @@ namespace scrutiny
     class LoopHandler
     {
     public:
+        enum class Main2LoopMessageID
+        {
+#if SCRUTINY_ENABLE_DATALOGGING
+            RELEASE_DATALOGGER_OWNERSHIP,
+            TAKE_DATALOGGER_OWNERSHIP,
+            DATALOGGER_ARM_TRIGGER
+#endif
+        };
+
+        enum class Loop2MainMessageID
+        {
+#if SCRUTINY_ENABLE_DATALOGGING
+            DATALOGGER_OWNERSHIP_TAKEN,
+            DATALOGGER_OWNERSHIP_RELEASED,
+            DATALOGGER_DATA_ACQUIRED
+#endif
+        };
+
+        struct Main2LoopMessage
+        {
+            Main2LoopMessageID message_id;
+        };
+
+        struct Loop2MainMessage
+        {
+            Loop2MainMessageID message_id;
+        };
+
         void init(void);
         virtual inline LoopType loop_type(void) const = 0;
         void process_common(timestamp_t timestep_us);

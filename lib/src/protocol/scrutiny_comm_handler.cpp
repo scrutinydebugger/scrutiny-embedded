@@ -211,7 +211,7 @@ namespace scrutiny
             }
         }
 
-        void CommHandler::process_active_request()
+        void CommHandler::process_active_request(void)
         {
             bool must_process = false;
             if (m_session_active == false)
@@ -237,7 +237,7 @@ namespace scrutiny
             }
         }
 
-        Response *CommHandler::prepare_response()
+        Response *CommHandler::prepare_response(void)
         {
             m_active_response.reset();
             return &m_active_response;
@@ -375,7 +375,7 @@ namespace scrutiny
         }
 
         // Check if the last request received is a valid "Comm Discover request".
-        bool CommHandler::received_discover_request()
+        bool CommHandler::received_discover_request(void)
         {
             if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
             {
@@ -401,7 +401,7 @@ namespace scrutiny
         }
 
         // Check if the last request received is a valid "Comm Discover request".
-        bool CommHandler::received_connect_request()
+        bool CommHandler::received_connect_request(void)
         {
             if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
             {
@@ -416,7 +416,7 @@ namespace scrutiny
             return true;
         }
 
-        void CommHandler::process()
+        void CommHandler::process(void)
         {
             if (m_session_active)
             {
@@ -445,7 +445,7 @@ namespace scrutiny
             return success;
         }
 
-        uint16_t CommHandler::data_to_send() const
+        uint16_t CommHandler::data_to_send(void) const
         {
             if (m_state != State::Transmitting)
             {
@@ -484,7 +484,7 @@ namespace scrutiny
             response->crc = scrutiny::crc32(response->data, response->data_length, crc);
         }
 
-        void CommHandler::reset()
+        void CommHandler::reset(void)
         {
             m_state = State::Idle;
             m_heartbeat_timestamp = m_timebase->get_timestamp();
@@ -497,7 +497,7 @@ namespace scrutiny
             reset_tx();
         }
 
-        void CommHandler::reset_rx()
+        void CommHandler::reset_rx(void)
         {
             m_active_request.reset();
             m_rx_state = RxFSMState::WaitForCommand;
@@ -514,7 +514,7 @@ namespace scrutiny
             }
         }
 
-        void CommHandler::reset_tx()
+        void CommHandler::reset_tx(void)
         {
             m_active_response.reset();
             m_nbytes_to_send = 0;
@@ -527,7 +527,7 @@ namespace scrutiny
             }
         }
 
-        bool CommHandler::connect()
+        bool CommHandler::connect(void)
         {
             if (!m_enabled)
             {
@@ -548,7 +548,7 @@ namespace scrutiny
             return true;
         }
 
-        void CommHandler::disconnect()
+        void CommHandler::disconnect(void)
         {
             m_session_id = 0;
             m_session_active = false;

@@ -55,8 +55,8 @@ namespace scrutiny
             GetInfo = 0x01,
             CommControl = 0x02,
             MemoryControl = 0x03,
-            DataLogControl = 0x04,
-            UserCommand = 0x05
+            UserCommand = 0x04,
+            DataLogControl = 0x05
         };
 
         enum class ResponseCode
@@ -67,7 +67,9 @@ namespace scrutiny
             Overflow = 3,
             Busy = 4,
             FailureToProceed = 5,
-            Forbidden = 6
+            Forbidden = 6,
+            NoResponseToSend = 0xFE,
+            ProcessAgain = 0xFF
         };
 
         enum class RxError
@@ -135,6 +137,22 @@ namespace scrutiny
                 WriteMasked = 3,
                 ReadRPV = 4,
                 WriteRPV = 5
+            };
+        }
+
+        namespace DataLogControl
+        {
+            enum class Subfunction
+            {
+                GetAvailableTarget,
+                GetBufferSize,
+                GetSamplingRates,
+                ConfigureDatalog,
+                ListRecordings,
+                ReadRecordings,
+                ArmLog,
+                DisarmLog,
+                GetLogStatus,
             };
         }
 
