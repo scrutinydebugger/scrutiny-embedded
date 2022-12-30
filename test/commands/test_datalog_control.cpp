@@ -40,9 +40,9 @@ protected:
         {0x8888, VariableType::float32}};
 
     TestDatalogControl() : ScrutinyTest(), fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US) {}
-
+#if SCRUTINY_ENABLE_DATALOGGING
     uint16_t encode_datalogger_config(loop_id_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer);
-
+#endif
     virtual void SetUp()
     {
         loops[0] = &fixed_freq_loop;
