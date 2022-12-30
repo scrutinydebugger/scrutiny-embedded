@@ -14,6 +14,12 @@
 
 #include "scrutiny_types.hpp"
 
+#if !SCRUTINY_BUILD_AVR_GCC
+#include <cmath>
+#else
+#include <string.h>
+#endif
+
 namespace scrutiny
 {
     namespace tools
@@ -72,6 +78,8 @@ namespace scrutiny
 
             return static_cast<VariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
+
+        bool is_supported_type(VariableType vt);
 
         inline bool is_float_type(const VariableType v)
         {
@@ -181,6 +189,19 @@ namespace scrutiny
                 dst[maxlen - 1] = '\0';
             }
             return n;
+        }
+
+        inline bool is_float_finite(float val)
+        {
+#if SCRUTINY_BUILD_AVR_GCC
+            static_assert(sizeof(float) == 4, "Expect float to be 32 bits");
+            uint32_t uv;
+            memcpy(&uv, &val, 4);
+            uint16_t exponent = (uv >> 23) & 0xFF;
+            return exponent != 0xFF;
+#else
+            return std::isfinite(val);
+#endif
         }
 
         // Taken from https://gist.github.com/tommyettinger/46a874533244883189143505d203312

@@ -12,11 +12,13 @@
 
 #include "scrutiny_software_id.hpp"
 
+// ========== Definitions ==========
 #define SCRUTINY_PROTOCOL_VERSION(MAJOR, MINOR) ((((MAJOR) << 8) & 0xFF00) | ((MINOR)&0xFF))
 #define SCRUTINY_PROTOCOL_VERSION_MAJOR(v) ((v >> 8) & 0xFF)
 #define SCRUTINY_PROTOCOL_VERSION_MINOR(v) (v & 0xFF)
 
 #define SCRUTINY_DATALOGGING_ENCODING_RAW 0
+// =================================
 
 // ========== Parameters ==========
 #ifndef SCRUTINY_ENABLE_DATALOGGING
@@ -39,6 +41,19 @@
 
 // ================================
 
+// ========== Macros ==========
+// These can be replaced by intrinsics if availables on the platform
+#define SCRUTINY_ABS(x) ((x) >= 0) ? (x) : (-(x))
+#define SCRUTINY_MIN(x, y) ((x) < (y)) ? (x) : (y)
+#define SCRUTINY_MAX(x, y) ((x) > (y)) ? (x) : (y)
+
+#define SCRUTINY_FABS(x) SCRUTINY_ABS(x)
+#define SCRUTINY_FMIN(x, y) SCRUTINY_MIN(x, y)
+#define SCRUTINY_FMAX(x, y) SCRUTINY_MAX(x, y)
+
+// ================================
+
+// ========== Platform detection ==========
 #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) || defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
 #define SCRUTINY_BUILD_WINDOWS 1
 #else
@@ -52,6 +67,7 @@
 #else
 #define SCRUTINY_BUILD_AVR_GCC 0
 #endif
+// ======================================
 
 // ========================= Sanity check =====================
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION != SCRUTINY_PROTOCOL_VERSION(1, 0) // Only v1.0 for now.

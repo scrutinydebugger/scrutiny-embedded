@@ -45,5 +45,42 @@ namespace scrutiny
                 return VariableTypeSize::_undef;
             }
         }
+
+        bool is_supported_type(VariableType vt)
+        {
+            VariableTypeType tt = get_var_type_type(vt);
+            uint8_t ts = get_type_size(vt);
+
+            if (ts == 0)
+            {
+                return false;
+            }
+
+#if SCRUTINY_SUPPORT_64BITS
+
+            if (ts > 8)
+            {
+                return false;
+            }
+#else
+            if (ts > 4)
+            {
+                return false;
+            }
+#endif
+
+            if (tt == VariableTypeType::_boolean)
+            {
+                return (ts == 1);
+            }
+            else if (tt == VariableTypeType::_float)
+            {
+                return (ts == 4 || ts == 8);
+            }
+            else
+            {
+                return (tt == VariableTypeType::_uint || tt == VariableTypeType::_sint);
+            }
+        }
     }
 }

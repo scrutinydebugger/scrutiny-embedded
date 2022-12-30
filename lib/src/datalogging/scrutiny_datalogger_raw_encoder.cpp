@@ -1,10 +1,8 @@
 #include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_common_codecs.hpp"
+#include "scrutiny_setup.hpp"
 
-#ifndef MIN
-#define MIN(a, b) ((a) < (b)) ? (a) : (b)
-#endif
 namespace scrutiny
 {
     namespace datalogging
@@ -46,7 +44,7 @@ namespace scrutiny
                 const uint32_t new_max = max_size - output_size;
                 const uint32_t right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
                 transfer_size = right_hand_start_point - m_read_cursor;
-                transfer_size = MIN(transfer_size, new_max);
+                transfer_size = SCRUTINY_MIN(transfer_size, new_max);
                 memcpy(&buffer[output_size], &m_encoder->m_buffer[m_read_cursor], transfer_size);
                 m_read_cursor += transfer_size;
                 m_read_started = true;
@@ -110,8 +108,8 @@ namespace scrutiny
                     AnyType outval;
                     const uint16_t rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    const uint8_t typesize = tools::get_type_size(rpv.type);
-                    m_main_handler->get_rpv_read_callback()(rpv, &outval);
+                    const uint8_t typesize = tools::get_type_size(rpv.type); // Should be supproted. We rely on datalogger::configure
+                    m_main_handler->get_rpv_read_callback()(rpv, &outval);   // We assume that this is not nullptr. We rely on datalogger::configure
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }

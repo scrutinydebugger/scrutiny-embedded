@@ -17,6 +17,8 @@
 
 #include "string.h"
 
+static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
+
 namespace scrutiny
 {
     namespace datalogging

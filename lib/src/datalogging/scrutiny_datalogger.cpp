@@ -9,6 +9,8 @@
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "scrutiny_ipc.hpp"
+#include "scrutiny_tools.hpp"
+#include "scrutiny_main_handler.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -40,6 +42,7 @@ namespace scrutiny
             m_trigger_cursor_location = 0;
             m_trigger_timestamp = 0;
             m_remaining_data_to_write = 0;
+            m_config_valid = false;
         }
 
         void DataLogger::configure(Timebase *timebase_for_log)
@@ -49,6 +52,7 @@ namespace scrutiny
                 reset();
             }
 
+            m_config_valid = true;
             m_timebase_for_log = timebase_for_log;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
@@ -56,54 +60,139 @@ namespace scrutiny
 
             if (m_config.items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL || m_config.items_count == 0)
             {
-                m_state = State::ERROR;
-                return;
+                m_config_valid = false;
             }
 
             if (m_config.trigger.operand_count > datalogging::MAX_OPERANDS)
             {
-                m_state = State::ERROR;
-                return;
+                m_config_valid = false;
             }
 
-            switch (m_config.trigger.condition)
+            if (m_config_valid)
             {
-            case SupportedTriggerConditions::AlwaysTrue:
-                m_trigger.active_condition = &m_trigger.conditions.always_true;
-                break;
-            case SupportedTriggerConditions::Equal:
-                m_trigger.active_condition = &m_trigger.conditions.eq;
-                break;
-            case SupportedTriggerConditions::NotEqual:
-                m_trigger.active_condition = &m_trigger.conditions.neq;
-                break;
-            case SupportedTriggerConditions::LessThan:
-                m_trigger.active_condition = &m_trigger.conditions.lt;
-                break;
-            case SupportedTriggerConditions::LessOrEqualThan:
-                m_trigger.active_condition = &m_trigger.conditions.let;
-                break;
-            case SupportedTriggerConditions::GreaterThan:
-                m_trigger.active_condition = &m_trigger.conditions.gt;
-                break;
-            case SupportedTriggerConditions::GreaterOrEqualThan:
-                m_trigger.active_condition = &m_trigger.conditions.get;
-                break;
-            case SupportedTriggerConditions::ChangeMoreThan:
-                m_trigger.active_condition = &m_trigger.conditions.cmt;
-                break;
-            case SupportedTriggerConditions::IsWithin:
-                m_trigger.active_condition = &m_trigger.conditions.within;
-                break;
-            default:
-                m_state = State::ERROR;
+                switch (m_config.trigger.condition)
+                {
+                case SupportedTriggerConditions::AlwaysTrue:
+                    m_trigger.active_condition = &m_trigger.conditions.always_true;
+                    break;
+                case SupportedTriggerConditions::Equal:
+                    m_trigger.active_condition = &m_trigger.conditions.eq;
+                    break;
+                case SupportedTriggerConditions::NotEqual:
+                    m_trigger.active_condition = &m_trigger.conditions.neq;
+                    break;
+                case SupportedTriggerConditions::LessThan:
+                    m_trigger.active_condition = &m_trigger.conditions.lt;
+                    break;
+                case SupportedTriggerConditions::LessOrEqualThan:
+                    m_trigger.active_condition = &m_trigger.conditions.let;
+                    break;
+                case SupportedTriggerConditions::GreaterThan:
+                    m_trigger.active_condition = &m_trigger.conditions.gt;
+                    break;
+                case SupportedTriggerConditions::GreaterOrEqualThan:
+                    m_trigger.active_condition = &m_trigger.conditions.get;
+                    break;
+                case SupportedTriggerConditions::ChangeMoreThan:
+                    m_trigger.active_condition = &m_trigger.conditions.cmt;
+                    break;
+                case SupportedTriggerConditions::IsWithin:
+                    m_trigger.active_condition = &m_trigger.conditions.within;
+                    break;
+                default:
+                    m_config_valid = false;
+                }
             }
 
-            if (m_state != State::ERROR)
+            if (m_config_valid)
+            {
+                if (m_config.trigger.operand_count != m_trigger.active_condition->get_operand_count())
+                {
+                    m_config_valid = false;
+                }
+            }
+
+            for (uint8_t i = 0; i < m_config.trigger.operand_count; i++)
+            {
+                if (m_config.trigger.operands[i].type == OperandType::LITERAL)
+                {
+                    if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+                }
+                else if (m_config.trigger.operands[i].type == OperandType::RPV)
+                {
+                    if (!m_main_handler->get_config()->is_read_published_values_configured())
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+
+                    if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].data.rpv.id))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+                }
+                else if (m_config.trigger.operands[i].type == OperandType::VAR)
+                {
+                    if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+                }
+                else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
+                {
+                    if (m_config.trigger.operands[i].data.varbit.bitoffset > 63 || m_config.trigger.operands[i].data.varbit.bitsize > 64)
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+
+                    if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+
+                    if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize > tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+                }
+            }
+
+            for (uint8_t i = 0; i < m_config.items_count; i++)
+            {
+                if (m_config.items_to_log[i].type == LoggableType::RPV)
+                {
+                    if (!m_main_handler->get_config()->is_read_published_values_configured())
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+
+                    if (!m_main_handler->rpv_exists(m_config.items_to_log[i].data.rpv.id))
+                    {
+                        m_config_valid = false;
+                        break;
+                    }
+                }
+            }
+
+            if (m_config_valid)
             {
                 m_trigger.active_condition->reset(m_trigger.conditions.data());
                 m_encoder.reset();
                 m_state = State::CONFIGURED;
+            }
+            else
+            {
+                m_state = State::ERROR;
             }
         }
 

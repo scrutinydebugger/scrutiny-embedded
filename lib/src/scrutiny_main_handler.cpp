@@ -73,6 +73,14 @@ namespace scrutiny
         {
             m_enabled = false;
         }
+
+        for (uint32_t i = 0; i < m_config.m_rpv_count; i++)
+        {
+            if (!tools::is_supported_type(m_config.m_rpvs[i].type))
+            {
+                m_enabled = false;
+            }
+        }
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -1338,7 +1346,7 @@ namespace scrutiny
                 else if (config->trigger.operands[i].type == datalogging::OperandType::RPV)
                 {
 
-                    if (!rpv_exists(config->trigger.operands[i].data.rpv.id))
+                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->trigger.operands[i].data.rpv.id))
                     {
                         code = protocol::ResponseCode::FailureToProceed;
                         break;
@@ -1358,7 +1366,7 @@ namespace scrutiny
                 }
                 else if (config->items_to_log[i].type == datalogging::LoggableType::RPV)
                 {
-                    if (!rpv_exists(config->items_to_log[i].data.rpv.id))
+                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].data.rpv.id))
                     {
                         code = protocol::ResponseCode::FailureToProceed;
                         break;
@@ -1373,7 +1381,15 @@ namespace scrutiny
 
             LoopHandler *const loop = m_config.m_loops[stack.configure.request_data.loop_id];
             m_datalogging.datalogger.configure(loop->get_timebase()); // Expect config object to be set
-            m_datalogging.new_owner = loop;                           // Will trigger a request for ownership
+
+            if (m_datalogging.datalogger.config_valid())
+            {
+                m_datalogging.new_owner = loop; // Will trigger a request for ownership
+            }
+            else
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+            }
             break;
         }
 
@@ -1382,6 +1398,15 @@ namespace scrutiny
             code = protocol::ResponseCode::UnsupportedFeature;
         }
         }
+
+        if (static_cast<protocol::DataLogControl::Subfunction>(request->subfunction_id) == protocol::DataLogControl::Subfunction::ConfigureDatalog)
+        {
+            if (code != protocol::ResponseCode::OK && code != protocol::ResponseCode::ProcessAgain)
+            {
+                m_datalogging.datalogger.reset();
+            }
+        }
+
         return code;
     }
 #endif

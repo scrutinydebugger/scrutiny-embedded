@@ -41,6 +41,10 @@ namespace scrutiny
         protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
 
 #if SCRUTINY_ENABLE_DATALOGGING
+        inline bool datalogging_error(void) const
+        {
+            return m_datalogging.datalogger.in_error() || m_datalogging.error != DataloggingError::NoError;
+        }
         protocol::ResponseCode process_datalog_control(const protocol::Request *const request, protocol::Response *const response);
         void process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg);
         void process_datalogging_logic(void);
@@ -93,7 +97,6 @@ namespace scrutiny
             UnexpectedRelease,
             UnexpectedClaim,
             UnexpectedData
-
         };
 
         struct

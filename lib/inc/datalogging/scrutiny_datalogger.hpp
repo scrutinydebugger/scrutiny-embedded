@@ -60,6 +60,8 @@ namespace scrutiny
             bool check_trigger(void);
             inline DataReader *get_reader(void) { return m_encoder.get_reader(); }
             inline Configuration *config(void) { return &m_config; }
+            inline bool in_error(void) const { return m_state == State::ERROR; }
+            inline bool config_valid(void) const { return m_config_valid; }
 
         protected:
             void process_acquisition(void);
@@ -81,6 +83,7 @@ namespace scrutiny
             uint32_t m_remaining_data_to_write;
 
             Configuration m_config;
+            bool m_config_valid;
             DataEncoder m_encoder;
             uint16_t m_decimation_counter;
 

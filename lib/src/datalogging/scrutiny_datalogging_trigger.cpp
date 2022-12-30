@@ -6,20 +6,16 @@
 //
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
+#include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
-
 #include "string.h"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
-#endif
-
-#ifndef ABS
-#define ABS(x) ((x) >= 0) ? (x) : (-(x))
 #endif
 
 namespace scrutiny
@@ -264,7 +260,6 @@ namespace scrutiny
 
                 for (uint_fast8_t i = 0; i < 3; i++)
                 {
-
                     if (operand_types[0] == VariableTypeCompare::_uint)
                     {
                         operands_vals_float[i] = static_cast<float>(operand_vals[i]._uint);
@@ -277,9 +272,13 @@ namespace scrutiny
                     {
                         operands_vals_float[i] = operand_vals[i]._float;
                     }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                const float diffabs = ABS(operands_vals_float[0] - operands_vals_float[1]);
-                const float margin = ABS(operands_vals_float[2]);
+                const float diffabs = SCRUTINY_FABS(operands_vals_float[0] - operands_vals_float[1]);
+                const float margin = SCRUTINY_FABS(operands_vals_float[2]);
                 return diffabs <= margin;
             }
 
