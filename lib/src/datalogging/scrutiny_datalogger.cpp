@@ -115,7 +115,6 @@ namespace scrutiny
                         if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
                         {
                             m_config_valid = false;
-                            break;
                         }
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::RPV)
@@ -123,13 +122,11 @@ namespace scrutiny
                         if (!m_main_handler->get_config()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
-                            break;
                         }
 
                         if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].data.rpv.id))
                         {
                             m_config_valid = false;
-                            break;
                         }
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::VAR)
@@ -137,7 +134,6 @@ namespace scrutiny
                         if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
-                            break;
                         }
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
@@ -145,25 +141,21 @@ namespace scrutiny
                         if (m_config.trigger.operands[i].data.varbit.bitoffset > 63 || m_config.trigger.operands[i].data.varbit.bitsize > 64)
                         {
                             m_config_valid = false;
-                            break;
                         }
 
                         if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
-                            break;
                         }
 
                         if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize > tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
-                            break;
                         }
                     }
                     else
                     {
                         m_config_valid = false;
-                        break;
                     }
                 }
 
@@ -174,13 +166,11 @@ namespace scrutiny
                         if (!m_main_handler->get_config()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
-                            break;
                         }
 
                         if (!m_main_handler->rpv_exists(m_config.items_to_log[i].data.rpv.id))
                         {
                             m_config_valid = false;
-                            break;
                         }
                     }
                     else if (m_config.items_to_log[i].type == LoggableType::MEMORY)
@@ -194,7 +184,6 @@ namespace scrutiny
                     else
                     {
                         m_config_valid = false;
-                        break;
                     }
                 }
             }
