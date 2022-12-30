@@ -233,7 +233,7 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_address_big_endian(&m_buffer[m_cursor], memblock->start_address);
+            codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
             m_cursor += addr_size;
             codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             m_cursor += 2;
@@ -269,7 +269,7 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_address_big_endian(&m_buffer[m_cursor], memblock->start_address);
+            codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
             m_cursor += addr_size;
             codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             m_cursor += 2;
@@ -590,8 +590,8 @@ namespace scrutiny
 
             response->data[0] = static_cast<uint8_t>(response_data->region_type);
             response->data[1] = response_data->region_index;
-            codecs::encode_address_big_endian(&response->data[2], response_data->start);
-            codecs::encode_address_big_endian(&response->data[2 + addr_size], response_data->end);
+            codecs::encode_address_big_endian(response_data->start, &response->data[2]);
+            codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
             response->data_length = 1 + 1 + addr_size + addr_size;
 
             return ResponseCode::OK;
@@ -954,23 +954,43 @@ namespace scrutiny
                 {
                     if (request->data_length < cursor + sizeof(float))
                     {
+                        return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian(&request->data[cursor]);
+                    cursor += sizeof(float);
                     break;
                 }
                 case datalogging::OperandType::RPV:
                 {
-
+                    if (request->data_length < cursor + sizeof(uint16_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    cursor += sizeof(uint16_t);
                     break;
                 }
                 case datalogging::OperandType::VAR:
                 {
-
+                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType>(request->data[cursor++]);
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
                     break;
                 }
                 case datalogging::OperandType::VARBIT:
                 {
+                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
 
+                    config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType>(request->data[cursor++]);
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
+                    config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++];
+                    config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++];
                     break;
                 }
                 default:
@@ -980,7 +1000,67 @@ namespace scrutiny
                 }
             }
 
-            return ResponseCode::FailureToProceed;
+            if (request->data_length < cursor + sizeof(uint8_t))
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            config->items_count = request->data[cursor++];
+
+            if (config->items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            for (uint_fast8_t i = 0; i < config->items_count; i++)
+            {
+                if (request->data_length < cursor + sizeof(uint8_t))
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+
+                config->items_to_log[i].type = static_cast<datalogging::LoggableType>(request->data[cursor++]);
+
+                switch (config->items_to_log[i].type)
+                {
+                case datalogging::LoggableType::MEMORY:
+                {
+                    if (request->data_length < cursor + sizeof(void *) + sizeof(uint8_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
+                    config->items_to_log[i].data.memory.size = request->data[cursor++];
+                    break;
+                }
+                case datalogging::LoggableType::RPV:
+                {
+                    if (request->data_length < cursor + sizeof(uint16_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+
+                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    cursor += sizeof(uint16_t);
+                    break;
+                }
+                case datalogging::LoggableType::TIME:
+                {
+                    break;
+                }
+                default:
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+                }
+            }
+
+            if (cursor != request->data_length)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            return ResponseCode::OK;
         }
 #endif
     }

@@ -29,6 +29,7 @@ namespace scrutiny
     public:
         void init(const Config *config);
         bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
+        bool rpv_exists(const uint16_t id) const;
         VariableType get_rpv_type(const uint16_t id) const;
 
         void process(const uint32_t timestep_us);
@@ -52,6 +53,7 @@ namespace scrutiny
             const uint_fast8_t bitsize,
             AnyType *val,
             VariableType *output_type) const;
+        inline datalogging::DataLogger *datalogger(void) { return &m_datalogging.datalogger; }
 #endif
         inline RpvReadCallback get_rpv_read_callback(void) const
         {
@@ -78,6 +80,8 @@ namespace scrutiny
         bool m_disconnect_pending;
         Config m_config;
         bool m_enabled;
+        bool m_process_again_timestamp_taken;
+        timestamp_t m_process_again_timestamp;
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec;
 #endif
@@ -91,6 +95,7 @@ namespace scrutiny
             UnexpectedData
 
         };
+
         struct
         {
 

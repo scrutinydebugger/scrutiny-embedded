@@ -9,6 +9,7 @@
 //   Copyright (c) 2021-2022 Scrutiny Debugger
 
 #include <cstdint>
+#include <string>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
@@ -86,7 +87,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<uint32_t>(buffer[2]) << " but expected " << static_cast<uint32_t>(code);
+        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode>(buffer[2]) << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
@@ -139,3 +140,48 @@ unsigned int ScrutinyTest::encode_addr(uint8_t *buffer, void *addr)
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
+namespace scrutiny
+{
+    namespace protocol
+    {
+        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode val)
+        {
+            switch (val)
+            {
+            case scrutiny::protocol::ResponseCode::OK:
+                out << "OK";
+                break;
+            case scrutiny::protocol::ResponseCode::Busy:
+                out << "Busy";
+                break;
+            case scrutiny::protocol::ResponseCode::FailureToProceed:
+                out << "FailureToProceed";
+                break;
+            case scrutiny::protocol::ResponseCode::Forbidden:
+                out << "Forbidden";
+                break;
+            case scrutiny::protocol::ResponseCode::InvalidRequest:
+                out << "InvalidRequest";
+                break;
+            case scrutiny::protocol::ResponseCode::NoResponseToSend:
+                out << "NoResponseToSend";
+                break;
+            case scrutiny::protocol::ResponseCode::Overflow:
+                out << "Overflow";
+                break;
+            case scrutiny::protocol::ResponseCode::ProcessAgain:
+                out << "ProcessAgain";
+                break;
+            case scrutiny::protocol::ResponseCode::UnsupportedFeature:
+                out << "UnsupportedFeature";
+                break;
+            default:
+                out << "Unknown";
+                break;
+            }
+
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+}

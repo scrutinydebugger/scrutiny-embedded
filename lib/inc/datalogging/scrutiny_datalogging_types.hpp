@@ -22,6 +22,7 @@ namespace scrutiny
     namespace datalogging
     {
         constexpr unsigned int MAX_OPERANDS = 2;
+        static_assert(MAX_OPERANDS < 255, "Too many operands. uint8 must be enough for iteration.");
 
         enum class EncodingType
         {

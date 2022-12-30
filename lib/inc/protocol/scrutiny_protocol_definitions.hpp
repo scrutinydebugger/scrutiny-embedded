@@ -144,15 +144,15 @@ namespace scrutiny
         {
             enum class Subfunction
             {
-                GetAvailableTarget,
-                GetBufferSize,
-                GetSamplingRates,
-                ConfigureDatalog,
-                ListRecordings,
-                ReadRecordings,
-                ArmLog,
-                DisarmLog,
-                GetLogStatus,
+                GetAvailableTarget = 1,
+                GetBufferSize = 2,
+                GetSamplingRates = 3,
+                ConfigureDatalog = 4,
+                ListRecordings = 5,
+                ReadRecordings = 6,
+                ArmLog = 7,
+                DisarmLog = 8,
+                GetLogStatus = 9,
             };
         }
 

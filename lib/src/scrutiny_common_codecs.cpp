@@ -58,16 +58,16 @@ namespace scrutiny
 #pragma warning(pop)
 #endif
 
-        uint8_t encode_address_big_endian(uint8_t *buf, const void *addr)
+        uint8_t encode_address_big_endian(const void *addr, uint8_t *buf)
         {
-            return encode_address_big_endian(buf, reinterpret_cast<uintptr_t>(addr));
+            return encode_address_big_endian(reinterpret_cast<uintptr_t>(addr), buf);
         }
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
-        uint8_t encode_address_big_endian(uint8_t *buf, const uintptr_t addr)
+        uint8_t encode_address_big_endian(const uintptr_t addr, uint8_t *buf)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");

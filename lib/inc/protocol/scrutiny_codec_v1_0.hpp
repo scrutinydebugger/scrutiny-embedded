@@ -13,6 +13,7 @@
 #include "scrutiny_protocol_definitions.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
+
 #if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #endif
@@ -257,6 +258,7 @@ namespace scrutiny
                 };
             }
 
+#if SCRUTINY_ENABLE_DATALOGGING
             namespace DataLogControl
             {
                 struct GetBufferSize
@@ -264,6 +266,7 @@ namespace scrutiny
                     uint32_t buffer_size;
                 };
             }
+#endif
         }
 
         namespace RequestData
@@ -307,6 +310,7 @@ namespace scrutiny
                 };
             }
 
+#if SCRUTINY_ENABLE_DATALOGGING
             namespace DataLogControl
             {
                 struct Configure
@@ -315,6 +319,7 @@ namespace scrutiny
                     // Rest is directly written to datalogger config. So not in this struct.
                 };
             }
+#endif
         }
 
         class CodecV1_0

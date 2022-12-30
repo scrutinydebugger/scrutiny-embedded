@@ -14,10 +14,10 @@
 
 #include "scrutiny.hpp"
 
-#define ASSERT_BUF_EQ(a, b, size) ASSERT_TRUE(COMPARE_BUF(a, b, size))
-#define EXPECT_BUF_EQ(a, b, size) EXPECT_TRUE(COMPARE_BUF(a, b, size))
-#define ASSERT_BUF_SET(a, val, size) ASSERT_TRUE(CHECK_SET(a, val, size))
-#define EXPECT_BUF_SET(a, val, size) EXPECT_TRUE(CHECK_SET(a, val, size))
+#define ASSERT_BUF_EQ(candidate, expected, size) ASSERT_TRUE(COMPARE_BUF(candidate, expected, size))
+#define EXPECT_BUF_EQ(candidate, expected, size) EXPECT_TRUE(COMPARE_BUF(candidate, expected, size))
+#define ASSERT_BUF_SET(buffer, val, size) ASSERT_TRUE(CHECK_SET(buffer, val, size))
+#define EXPECT_BUF_SET(buffer, val, size) EXPECT_TRUE(CHECK_SET(buffer, val, size))
 
 class ScrutinyTest : public ::testing::Test
 {
@@ -31,3 +31,11 @@ protected:
     ::testing::AssertionResult CHECK_SET(const uint8_t *buffer, const uint8_t val, const uint32_t size);
     ::testing::AssertionResult IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code);
 };
+
+namespace scrutiny
+{
+    namespace protocol
+    {
+        std::ostream &operator<<(std::ostream &out, ResponseCode val);
+    }
+}

@@ -19,6 +19,7 @@ namespace scrutiny
     {
         m_processing_request = false;
         m_disconnect_pending = false;
+        m_process_again_timestamp_taken = false;
         m_config = *config;
 
         m_comm_handler.init(
@@ -387,16 +388,30 @@ namespace scrutiny
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
-            // todo : Timeout if process_again to often
             if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::ProcessAgain)
             {
                 m_processing_request = false;
+                if (!m_process_again_timestamp_taken)
+                {
+                    m_process_again_timestamp = m_timebase.get_timestamp();
+                    m_process_again_timestamp_taken = true;
+                }
+                else
+                {
+                    if (m_timebase.has_expired(m_process_again_timestamp, SCRUTINY_REQUEST_MAX_PROCESS_TIME_US))
+                    {
+                        // Set only response code. All other fields are set in process_request()
+                        response->response_code = static_cast<uint8_t>(protocol::ResponseCode::FailureToProceed);
+                        m_comm_handler.send_response(response);
+                        m_processing_request = true;
+                    }
+                }
                 // comm handler will stay in standby until we process the request. Data in rx buffer is guaranteed to stay valid until then
             }
             else if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::NoResponseToSend)
             {
                 m_processing_request = true;
-                // Will not be transmitting, therefore automatically wait for next request
+                // Will not be transmitting, therefore automatically wait for next request below
             }
             else
             {
@@ -411,6 +426,7 @@ namespace scrutiny
             {
                 m_comm_handler.wait_next_request(); // Allow reception of next request
                 m_processing_request = false;
+                m_process_again_timestamp_taken = false;
 
                 if (m_disconnect_pending)
                 {
@@ -419,6 +435,22 @@ namespace scrutiny
                 }
             }
         }
+    }
+
+    bool MainHandler::rpv_exists(const uint16_t id) const
+    {
+        const uint16_t rpv_count = m_config.get_rpv_count();
+        bool found = false;
+        for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
+        {
+            if (m_config.get_rpvs_array()[i].id == id)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        return found;
     }
 
     bool MainHandler::get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const
@@ -1236,6 +1268,7 @@ namespace scrutiny
             struct
             {
                 protocol::RequestData::DataLogControl::Configure request_data;
+                datalogging::Configuration *dlconfig;
             } configure;
         } stack;
 
@@ -1257,6 +1290,7 @@ namespace scrutiny
 
         case protocol::DataLogControl::Subfunction::ConfigureDatalog:
         {
+            // Make sure the datalogger is released before writing the config object to avoid race conditions.
             if (m_datalogging.owner != nullptr)
             {
                 if (!m_datalogging.pending_ownership_release)
@@ -1275,14 +1309,71 @@ namespace scrutiny
 
             if (stack.configure.request_data.loop_id >= m_config.m_loop_count)
             {
-                code = protocol::ResponseCode::InvalidRequest;
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            const datalogging::Configuration *const config = m_datalogging.datalogger.config();
+
+            for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
+            {
+                if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
+                {
+                    if (touches_forbidden_region(config->trigger.operands[i].data.var.addr, tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->trigger.operands[i].type == datalogging::OperandType::VARBIT)
+                {
+                    if (touches_forbidden_region(
+                            config->trigger.operands[i].data.varbit.addr,
+                            config->trigger.operands[i].data.varbit.bitoffset + config->trigger.operands[i].data.varbit.bitsize))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->trigger.operands[i].type == datalogging::OperandType::RPV)
+                {
+
+                    if (!rpv_exists(config->trigger.operands[i].data.rpv.id))
+                    {
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+                }
+            }
+
+            for (uint_fast8_t i = 0; i < config->items_count; i++)
+            {
+                if (config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                {
+                    if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                {
+                    if (!rpv_exists(config->items_to_log[i].data.rpv.id))
+                    {
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+                }
+            }
+
+            if (code != protocol::ResponseCode::OK)
+            {
                 break;
             }
 
             LoopHandler *const loop = m_config.m_loops[stack.configure.request_data.loop_id];
-            m_datalogging.datalogger.configure(loop->get_timebase());
-            m_datalogging.new_owner = loop;
-
+            m_datalogging.datalogger.configure(loop->get_timebase()); // Expect config object to be set
+            m_datalogging.new_owner = loop;                           // Will trigger a request for ownership
             break;
         }
 
