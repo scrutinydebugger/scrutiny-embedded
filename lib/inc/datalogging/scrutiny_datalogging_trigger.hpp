@@ -93,6 +93,20 @@ namespace scrutiny
                 inline unsigned int get_operand_count(void) const { return 2; }
             };
 
+            class IsWithinCondition : public BaseCondition
+            {
+            public:
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                inline unsigned int get_operand_count(void) const { return 3; }
+            };
+
+            class AlwaysTrueCondition : public BaseCondition
+            {
+            public:
+                bool evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[]);
+                inline unsigned int get_operand_count(void) const { return 0; }
+            };
+
             class ConditionSet
             {
             public:
@@ -103,8 +117,14 @@ namespace scrutiny
                 LessThanCondition lt;
                 LessOrEqualThanCondition let;
                 ChangeMoreThanCondition cmt;
+                IsWithinCondition within;
+                AlwaysTrueCondition always_true;
 
-                inline ConditionSharedData *data() { return &m_data; };
+                inline ConditionSharedData *
+                data()
+                {
+                    return &m_data;
+                };
 
             private:
                 ConditionSharedData m_data;

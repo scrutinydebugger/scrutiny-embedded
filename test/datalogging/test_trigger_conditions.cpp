@@ -70,9 +70,14 @@ protected:
     }
 };
 
+TEST_F(TestTriggerConditions, AlwaysTrue)
+{
+    scrutiny::datalogging::trigger::ConditionSet cond;
+    EXPECT_TRUE(cond.always_true.evaluate(cond.data(), nullptr, nullptr));
+}
+
 TEST_F(TestTriggerConditions, OperatorEQ)
 {
-    // scrutiny::datalogging::trigger::EqualCondition cond;
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare valtypes[2];
@@ -554,4 +559,34 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
     vals[0]._uint += 6;
     EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+}
+
+TEST_F(TestTriggerConditions, IsWithin)
+{
+    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::AnyTypeCompare vals[3];
+    scrutiny::datalogging::VariableTypeCompare valtypes[3];
+
+    cond.within.reset(cond.data());
+    // Test positive change
+    vals[0]._float = 10.0f;
+    vals[1]._float = 5.0f;
+    vals[2]._float = 1.0f;
+    valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
+    valtypes[2] = scrutiny::datalogging::VariableTypeCompare::_float;
+
+    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+
+    vals[1]._float = 11.01f;
+    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+
+    vals[1]._float = 11.00f;
+    EXPECT_TRUE(cond.within.evaluate(cond.data(), valtypes, vals));
+
+    vals[1]._float = 8.99f;
+    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+
+    vals[1]._float = 9.0f;
+    EXPECT_TRUE(cond.within.evaluate(cond.data(), valtypes, vals));
 }

@@ -209,6 +209,7 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
 
     uint8_t request_data[128] = {5, 4};
     uint16_t payload_size = encode_datalogger_config(loop_id, &refconfig, &request_data[4]);
+    ASSERT_GT(sizeof(request_data), payload_size + 8);
     request_data[2] = (payload_size >> 8) & 0xFF;
     request_data[3] = payload_size & 0xFF;
 

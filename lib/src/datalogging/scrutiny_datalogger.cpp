@@ -68,6 +68,9 @@ namespace scrutiny
 
             switch (m_config.trigger.condition)
             {
+            case SupportedTriggerConditions::AlwaysTrue:
+                m_trigger.active_condition = &m_trigger.conditions.always_true;
+                break;
             case SupportedTriggerConditions::Equal:
                 m_trigger.active_condition = &m_trigger.conditions.eq;
                 break;
@@ -88,6 +91,9 @@ namespace scrutiny
                 break;
             case SupportedTriggerConditions::ChangeMoreThan:
                 m_trigger.active_condition = &m_trigger.conditions.cmt;
+                break;
+            case SupportedTriggerConditions::IsWithin:
+                m_trigger.active_condition = &m_trigger.conditions.within;
                 break;
             default:
                 m_state = State::ERROR;

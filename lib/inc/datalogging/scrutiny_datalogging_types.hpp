@@ -21,7 +21,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        constexpr unsigned int MAX_OPERANDS = 2;
+        constexpr unsigned int MAX_OPERANDS = 4;
         static_assert(MAX_OPERANDS < 255, "Too many operands. uint8 must be enough for iteration.");
 
         enum class EncodingType
@@ -90,7 +90,8 @@ namespace scrutiny
             LessOrEqualThan = 4,
             GreaterThan = 5,
             GreaterOrEqualThan = 6,
-            ChangeMoreThan = 7
+            ChangeMoreThan = 7,
+            IsWithin = 8
         };
 
         struct TriggerConfig

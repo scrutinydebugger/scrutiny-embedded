@@ -17,6 +17,11 @@
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
 #endif
+
+#ifndef ABS
+#define ABS(x) ((x) >= 0) ? (x) : (-(x))
+#endif
+
 namespace scrutiny
 {
     namespace datalogging
@@ -250,6 +255,40 @@ namespace scrutiny
                 memcpy(&data->cmt.previous_val, &operand_vals[0], sizeof(data->cmt.previous_val));
 
                 return outval;
+            }
+
+            bool IsWithinCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            {
+                static_cast<void>(data);
+                float operands_vals_float[3];
+
+                for (uint_fast8_t i = 0; i < 3; i++)
+                {
+
+                    if (operand_types[0] == VariableTypeCompare::_uint)
+                    {
+                        operands_vals_float[i] = static_cast<float>(operand_vals[i]._uint);
+                    }
+                    else if (operand_types[0] == VariableTypeCompare::_uint)
+                    {
+                        operands_vals_float[i] = static_cast<float>(operand_vals[i]._sint);
+                    }
+                    else if (operand_types[0] == VariableTypeCompare::_float)
+                    {
+                        operands_vals_float[i] = operand_vals[i]._float;
+                    }
+                }
+                const float diffabs = ABS(operands_vals_float[0] - operands_vals_float[1]);
+                const float margin = ABS(operands_vals_float[2]);
+                return diffabs <= margin;
+            }
+
+            bool AlwaysTrueCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            {
+                static_cast<void>(data);
+                static_cast<void>(operand_types);
+                static_cast<void>(operand_vals);
+                return true;
             }
         }
     }
