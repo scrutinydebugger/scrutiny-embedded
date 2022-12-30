@@ -164,6 +164,11 @@ namespace scrutiny
                         break;
                     }
                 }
+                else
+                {
+                    m_config_valid = false;
+                    break;
+                }
             }
 
             for (uint8_t i = 0; i < m_config.items_count; i++)
@@ -181,6 +186,19 @@ namespace scrutiny
                         m_config_valid = false;
                         break;
                     }
+                }
+                else if (m_config.items_to_log[i].type == LoggableType::MEMORY)
+                {
+                    // Nothing to validate
+                }
+                else if (m_config.items_to_log[i].type == LoggableType::TIME)
+                {
+                    // Nothing to validate
+                }
+                else
+                {
+                    m_config_valid = false;
+                    break;
                 }
             }
 
