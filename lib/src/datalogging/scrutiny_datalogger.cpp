@@ -68,137 +68,134 @@ namespace scrutiny
                 m_config_valid = false;
             }
 
-            if (m_config_valid)
+            switch (m_config.trigger.condition)
             {
-                switch (m_config.trigger.condition)
-                {
-                case SupportedTriggerConditions::AlwaysTrue:
-                    m_trigger.active_condition = &m_trigger.conditions.always_true;
-                    break;
-                case SupportedTriggerConditions::Equal:
-                    m_trigger.active_condition = &m_trigger.conditions.eq;
-                    break;
-                case SupportedTriggerConditions::NotEqual:
-                    m_trigger.active_condition = &m_trigger.conditions.neq;
-                    break;
-                case SupportedTriggerConditions::LessThan:
-                    m_trigger.active_condition = &m_trigger.conditions.lt;
-                    break;
-                case SupportedTriggerConditions::LessOrEqualThan:
-                    m_trigger.active_condition = &m_trigger.conditions.let;
-                    break;
-                case SupportedTriggerConditions::GreaterThan:
-                    m_trigger.active_condition = &m_trigger.conditions.gt;
-                    break;
-                case SupportedTriggerConditions::GreaterOrEqualThan:
-                    m_trigger.active_condition = &m_trigger.conditions.get;
-                    break;
-                case SupportedTriggerConditions::ChangeMoreThan:
-                    m_trigger.active_condition = &m_trigger.conditions.cmt;
-                    break;
-                case SupportedTriggerConditions::IsWithin:
-                    m_trigger.active_condition = &m_trigger.conditions.within;
-                    break;
-                default:
-                    m_config_valid = false;
-                }
+            case SupportedTriggerConditions::AlwaysTrue:
+                m_trigger.active_condition = &m_trigger.conditions.always_true;
+                break;
+            case SupportedTriggerConditions::Equal:
+                m_trigger.active_condition = &m_trigger.conditions.eq;
+                break;
+            case SupportedTriggerConditions::NotEqual:
+                m_trigger.active_condition = &m_trigger.conditions.neq;
+                break;
+            case SupportedTriggerConditions::LessThan:
+                m_trigger.active_condition = &m_trigger.conditions.lt;
+                break;
+            case SupportedTriggerConditions::LessOrEqualThan:
+                m_trigger.active_condition = &m_trigger.conditions.let;
+                break;
+            case SupportedTriggerConditions::GreaterThan:
+                m_trigger.active_condition = &m_trigger.conditions.gt;
+                break;
+            case SupportedTriggerConditions::GreaterOrEqualThan:
+                m_trigger.active_condition = &m_trigger.conditions.get;
+                break;
+            case SupportedTriggerConditions::ChangeMoreThan:
+                m_trigger.active_condition = &m_trigger.conditions.cmt;
+                break;
+            case SupportedTriggerConditions::IsWithin:
+                m_trigger.active_condition = &m_trigger.conditions.within;
+                break;
+            default:
+                m_config_valid = false;
+            }
+
+            if (m_config.trigger.operand_count != m_trigger.active_condition->get_operand_count())
+            {
+                m_config_valid = false;
             }
 
             if (m_config_valid)
             {
-                if (m_config.trigger.operand_count != m_trigger.active_condition->get_operand_count())
+                for (uint8_t i = 0; i < m_config.trigger.operand_count; i++)
                 {
-                    m_config_valid = false;
-                }
-            }
+                    if (m_config.trigger.operands[i].type == OperandType::LITERAL)
+                    {
+                        if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
+                    }
+                    else if (m_config.trigger.operands[i].type == OperandType::RPV)
+                    {
+                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
 
-            for (uint8_t i = 0; i < m_config.trigger.operand_count; i++)
-            {
-                if (m_config.trigger.operands[i].type == OperandType::LITERAL)
-                {
-                    if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
-                    {
-                        m_config_valid = false;
-                        break;
+                        if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].data.rpv.id))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
                     }
-                }
-                else if (m_config.trigger.operands[i].type == OperandType::RPV)
-                {
-                    if (!m_main_handler->get_config()->is_read_published_values_configured())
+                    else if (m_config.trigger.operands[i].type == OperandType::VAR)
                     {
-                        m_config_valid = false;
-                        break;
+                        if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
                     }
+                    else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
+                    {
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset > 63 || m_config.trigger.operands[i].data.varbit.bitsize > 64)
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
 
-                    if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].data.rpv.id))
-                    {
-                        m_config_valid = false;
-                        break;
-                    }
-                }
-                else if (m_config.trigger.operands[i].type == OperandType::VAR)
-                {
-                    if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
-                    {
-                        m_config_valid = false;
-                        break;
-                    }
-                }
-                else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
-                {
-                    if (m_config.trigger.operands[i].data.varbit.bitoffset > 63 || m_config.trigger.operands[i].data.varbit.bitsize > 64)
-                    {
-                        m_config_valid = false;
-                        break;
-                    }
+                        if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
 
-                    if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize > tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
+                    }
+                    else
                     {
                         m_config_valid = false;
                         break;
                     }
+                }
 
-                    if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize > tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
-                    {
-                        m_config_valid = false;
-                        break;
-                    }
-                }
-                else
+                for (uint8_t i = 0; i < m_config.items_count; i++)
                 {
-                    m_config_valid = false;
-                    break;
-                }
-            }
+                    if (m_config.items_to_log[i].type == LoggableType::RPV)
+                    {
+                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
 
-            for (uint8_t i = 0; i < m_config.items_count; i++)
-            {
-                if (m_config.items_to_log[i].type == LoggableType::RPV)
-                {
-                    if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        if (!m_main_handler->rpv_exists(m_config.items_to_log[i].data.rpv.id))
+                        {
+                            m_config_valid = false;
+                            break;
+                        }
+                    }
+                    else if (m_config.items_to_log[i].type == LoggableType::MEMORY)
+                    {
+                        // Nothing to validate
+                    }
+                    else if (m_config.items_to_log[i].type == LoggableType::TIME)
+                    {
+                        // Nothing to validate
+                    }
+                    else
                     {
                         m_config_valid = false;
                         break;
                     }
-
-                    if (!m_main_handler->rpv_exists(m_config.items_to_log[i].data.rpv.id))
-                    {
-                        m_config_valid = false;
-                        break;
-                    }
-                }
-                else if (m_config.items_to_log[i].type == LoggableType::MEMORY)
-                {
-                    // Nothing to validate
-                }
-                else if (m_config.items_to_log[i].type == LoggableType::TIME)
-                {
-                    // Nothing to validate
-                }
-                else
-                {
-                    m_config_valid = false;
-                    break;
                 }
             }
 
