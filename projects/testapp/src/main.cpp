@@ -306,7 +306,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.max_bitrate = 100000;
     config.display_name = "TestApp Executable";
-    config.prng_seed = 0xdeadbeef;
+    config.session_counter_seed = 0xdeadbeef;
     scrutiny_handler.init(&config);
 
     chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;

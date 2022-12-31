@@ -25,7 +25,7 @@ namespace scrutiny
         class CommHandler
         {
         public:
-            void init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t prng_seed = 0);
+            void init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t session_counter_seed = 0);
             void receive_data(uint8_t *data, uint16_t len);
             bool send_response(Response *response);
             void reset();
@@ -91,7 +91,6 @@ namespace scrutiny
             void reset_tx();
 
             Timebase *m_timebase;
-            tools::MulBerry32PRNG m_prng;
             State m_state;
             bool m_enabled;
             uint32_t m_session_id;

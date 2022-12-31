@@ -10,16 +10,18 @@
 
 #include "scrutiny_loop_handler.hpp"
 #include "scrutiny_timebase.hpp"
+#include "scrutiny_main_handler.hpp"
 
 namespace scrutiny
 {
-    void LoopHandler::init(void)
+    void LoopHandler::init(MainHandler *main_handler)
     {
         m_main2loop_msg.clear();
         m_loop2main_msg.clear();
 #if SCRUTINY_ENABLE_DATALOGGING
         m_owns_datalogger = false;
         m_datalogger_data_acquired = false;
+        m_datalogger = main_handler->datalogger();
 #endif
     }
 

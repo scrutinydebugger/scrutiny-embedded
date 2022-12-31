@@ -25,7 +25,7 @@ namespace scrutiny
         m_comm_handler.init(
             m_config.m_rx_buffer, m_config.m_rx_buffer_size,
             m_config.m_tx_buffer, m_config.m_tx_buffer_size,
-            &m_timebase, m_config.prng_seed);
+            &m_timebase, m_config.session_counter_seed);
 
         check_config();
         if (!m_enabled)
@@ -33,10 +33,15 @@ namespace scrutiny
             m_comm_handler.disable();
         }
 
-        // If there's an init error witht he comm handler, we disable as well.
+        // If there's an init error with the comm handler, we disable as well.
         if (!m_comm_handler.is_enabled())
         {
             m_enabled = false;
+        }
+
+        for (uint16_t i = 0; i < m_config.m_loop_count; i++)
+        {
+            m_config.m_loops[i]->init(this);
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -333,20 +338,20 @@ namespace scrutiny
         }
         else
         {
-            if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+            if (!m_datalogging.owner->ipc_main2loop()->has_content())
             {
                 LoopHandler::Main2LoopMessage msg;
                 if (m_datalogging.request_ownership_release)
                 {
                     msg.message_id = LoopHandler::Main2LoopMessageID::RELEASE_DATALOGGER_OWNERSHIP;
-                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
                     m_datalogging.request_ownership_release = false;
                     m_datalogging.pending_ownership_release = true;
                 }
                 else if (m_datalogging.request_arm_trigger)
                 {
                     msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_ARM_TRIGGER;
-                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
                     m_datalogging.request_arm_trigger = false;
                 }
             }

@@ -19,15 +19,14 @@ namespace scrutiny
 
         uint32_t CommHandler::s_session_counter = 0;
 
-        void CommHandler::init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t prng_seed)
+        void CommHandler::init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t session_counter_seed)
         {
             m_rx_buffer = rx_buffer;
             m_rx_buffer_size = rx_buffer_size;
             m_tx_buffer = tx_buffer;
             m_tx_buffer_size = tx_buffer_size;
             m_timebase = timebase;
-            m_prng.seed(prng_seed);
-            s_session_counter = m_prng.get();
+            s_session_counter = session_counter_seed;
             m_active_request.data = m_rx_buffer; // Half duplex comm. Share buffer
             m_active_request.data_max_length = m_rx_buffer_size;
             m_active_response.data = m_tx_buffer; // Half duplex comm. Share buffer

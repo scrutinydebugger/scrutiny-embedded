@@ -22,6 +22,7 @@
 
 namespace scrutiny
 {
+    class MainHandler;
 
     enum class LoopType
     {
@@ -31,6 +32,8 @@ namespace scrutiny
 
     class LoopHandler
     {
+        friend class scrutiny::MainHandler;
+
     public:
         enum class Main2LoopMessageID
         {
@@ -60,22 +63,41 @@ namespace scrutiny
             Loop2MainMessageID message_id;
         };
 
-        void init(void);
+        /// @brief Returns the loop type: Fixed frequency or variable frequency
         virtual inline LoopType loop_type(void) const = 0;
-        void process_common(timestamp_t timestep_us);
+
+        /// @brief Return the timebase used by the Loop Handler
         inline Timebase *get_timebase(void) { return &m_timebase; }
 
+        /// @brief Returns the IPC object to send a message to the Loop Handler
         inline scrutiny::IPCMessage<Main2LoopMessage> *ipc_main2loop(void) { return &m_main2loop_msg; }
+
+        /// @brief Returns the IPC object to receive a message from the Loop Handler
         inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void) { return &m_loop2main_msg; }
+#if SCRUTINY_ENABLE_DATALOGGING
+        inline bool owns_datalogger(void) const
+        {
+            return m_owns_datalogger;
+        }
+#endif
 
     protected:
+        /// @brief Initialize the Loop Handler
+        void init(MainHandler *main_handler);
+        void process_common(timestamp_t timestep_us);
+
         Timebase m_timebase;
+        /// @brief  Atomic message transferred from the Main Handler to the Loop Handler
         scrutiny::IPCMessage<Main2LoopMessage> m_main2loop_msg;
+        /// @brief  Atomic message transferred from the Loop Handler to the Main Handler
         scrutiny::IPCMessage<Loop2MainMessage> m_loop2main_msg;
 
 #if SCRUTINY_ENABLE_DATALOGGING
+        /// @brief A pointer to the datalogger object part of the Main Handler
         datalogging::DataLogger *m_datalogger;
+        /// @brief TElls wehter this loop is the owner of the datalogger
         bool m_owns_datalogger;
+        /// @brief Indicates if data has been acquired and ready to be downlaoded or saved
         bool m_datalogger_data_acquired;
 #endif
     };

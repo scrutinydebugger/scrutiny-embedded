@@ -43,6 +43,7 @@ namespace scrutiny
             m_trigger_timestamp = 0;
             m_remaining_data_to_write = 0;
             m_config_valid = false;
+            m_manual_trigger = false;
         }
 
         void DataLogger::configure(Timebase *timebase_for_log)
@@ -311,33 +312,43 @@ namespace scrutiny
                 return false;
             }
 
-            for (unsigned int i = 0; i < nb_operand; i++)
+            if (m_manual_trigger)
             {
-                if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &opvals[i], &optypes[i]) == false)
-                {
-                    return false;
-                }
-                convert_to_compare_type(&optypes[i], &opvals[i]);
+                m_manual_trigger = false;
+                outval = true;
+                m_trigger.previous_val = true;
             }
-
-            bool condition_result = m_trigger.active_condition->evaluate(
-                m_trigger.conditions.data(),
-                reinterpret_cast<VariableTypeCompare *>(optypes),
-                reinterpret_cast<AnyTypeCompare *>(opvals));
-
-            if (condition_result)
+            else
             {
-                if (m_trigger.previous_val == false)
+
+                for (unsigned int i = 0; i < nb_operand; i++)
                 {
-                    m_trigger.rising_edge_timestamp = m_timebase->get_timestamp();
+                    if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &opvals[i], &optypes[i]) == false)
+                    {
+                        return false;
+                    }
+                    convert_to_compare_type(&optypes[i], &opvals[i]);
                 }
 
-                if (m_timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_us))
+                bool condition_result = m_trigger.active_condition->evaluate(
+                    m_trigger.conditions.data(),
+                    reinterpret_cast<VariableTypeCompare *>(optypes),
+                    reinterpret_cast<AnyTypeCompare *>(opvals));
+
+                if (condition_result)
                 {
-                    outval = true;
+                    if (m_trigger.previous_val == false)
+                    {
+                        m_trigger.rising_edge_timestamp = m_timebase->get_timestamp();
+                    }
+
+                    if (m_timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_us))
+                    {
+                        outval = true;
+                    }
                 }
+                m_trigger.previous_val = condition_result;
             }
-            m_trigger.previous_val = condition_result;
             return outval;
         }
     }

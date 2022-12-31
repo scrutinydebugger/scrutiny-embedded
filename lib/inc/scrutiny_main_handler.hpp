@@ -31,23 +31,18 @@ namespace scrutiny
         bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
         bool rpv_exists(const uint16_t id) const;
         VariableType get_rpv_type(const uint16_t id) const;
-
         void process(const uint32_t timestep_us);
-        void process_loops(void);
-        void process_request(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
 
 #if SCRUTINY_ENABLE_DATALOGGING
+        inline bool datalogging_data_available(void) const
+        {
+            return m_datalogging.data_available;
+        }
         inline bool datalogging_error(void) const
         {
             return m_datalogging.datalogger.in_error() || m_datalogging.error != DataloggingError::NoError;
         }
-        protocol::ResponseCode process_datalog_control(const protocol::Request *const request, protocol::Response *const response);
-        void process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg);
-        void process_datalogging_logic(void);
+
         bool read_memory(void *dst, const void *src, const uint32_t size) const;
         bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const;
         bool fetch_variable_bitfield(
@@ -72,6 +67,18 @@ namespace scrutiny
         inline Config *get_config(void) { return &m_config; }
 
     private:
+        void process_loops(void);
+        void process_request(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
+        protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        protocol::ResponseCode process_datalog_control(const protocol::Request *const request, protocol::Response *const response);
+        void process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg);
+        void process_datalogging_logic(void);
+#endif
         bool touches_forbidden_region(const MemoryBlock *block) const;
         bool touches_forbidden_region(const void *addr_start, const size_t length) const;
         bool touches_readonly_region(const MemoryBlock *block) const;

@@ -19,15 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-===========
-
-- MulBerry32 PRNG located at tommyettinger/mulberry32.c is lcensed as follow:
-
-    """
-    Written in 2017 by Tommy Ettinger (tommy.ettinger@gmail.com)
-    To the extent possible under law, the author has dedicated all copyright
-    and related and neighboring rights to this software to the public domain
-    worldwide. This software is distributed without any warranty.
-    See <http://creativecommons.org/publicdomain/zero/1.0/>. 
-    """

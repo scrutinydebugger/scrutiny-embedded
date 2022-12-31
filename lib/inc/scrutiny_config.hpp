@@ -65,7 +65,7 @@ namespace scrutiny
 
         uint32_t max_bitrate;
         user_command_callback_t user_command_callback;
-        uint32_t prng_seed;
+        uint32_t session_counter_seed;
         const char *display_name;
         bool memory_write_enable;
 

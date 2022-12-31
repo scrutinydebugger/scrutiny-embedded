@@ -33,7 +33,7 @@ namespace scrutiny
         display_name = "";
         max_bitrate = 0;
         user_command_callback = nullptr;
-        prng_seed = 0;
+        session_counter_seed = 0;
         memory_write_enable = true;
         m_loops = nullptr;
         m_loop_count = 0;

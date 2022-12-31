@@ -62,6 +62,13 @@ namespace scrutiny
             inline Configuration *config(void) { return &m_config; }
             inline bool in_error(void) const { return m_state == State::ERROR; }
             inline bool config_valid(void) const { return m_config_valid; }
+            void force_trigger(void)
+            {
+                if (m_state == State::ARMED)
+                {
+                    m_manual_trigger = true;
+                }
+            }
 
         protected:
             void process_acquisition(void);
@@ -81,6 +88,7 @@ namespace scrutiny
             uint32_t m_trigger_timestamp;
             uint32_t m_trigger_cursor_location;
             uint32_t m_remaining_data_to_write;
+            bool m_manual_trigger;
 
             Configuration m_config;
             bool m_config_valid;
