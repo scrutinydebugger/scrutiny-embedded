@@ -22,6 +22,8 @@ namespace scrutiny
         m_owns_datalogger = false;
         m_datalogger_data_acquired = false;
         m_datalogger = main_handler->datalogger();
+#else
+        static_cast<void>(main_handler);
 #endif
     }
 
