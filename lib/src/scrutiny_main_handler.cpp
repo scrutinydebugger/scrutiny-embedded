@@ -578,6 +578,17 @@ namespace scrutiny
                 protocol::GetRPVDefinitionResponseEncoder *response_encoder;
             } get_prv_def;
 
+            struct
+            {
+                protocol::ResponseData::GetInfo::GetLoopCount response_data;
+            } get_loop_count;
+
+            struct
+            {
+                protocol::RequestData::GetInfo::GetLoopDefinition request_data;
+                protocol::ResponseData::GetInfo::GetLoopDefinition response_data;
+            } get_loop_def;
+
         } stack;
 
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
@@ -731,6 +742,41 @@ namespace scrutiny
             break;
         }
             // =================================
+
+        case protocol::GetInfo::Subfunction::GetLoopCount:
+        {
+            stack.get_loop_count.response_data.count = m_config.m_loop_count; // Should be 0 if not set by user.
+            code = m_codec.encode_response_get_loop_count(&stack.get_loop_count.response_data, response);
+            break;
+        }
+
+        case protocol::GetInfo::Subfunction::GetLoopDefinition:
+        {
+            m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
+            const uint8_t loop_id = stack.get_loop_def.request_data.loop_id;
+            if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
+            {
+                return code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            const LoopType loop_type = m_config.m_loops[loop_id]->loop_type();
+            stack.get_loop_def.response_data.loop_id = loop_id;
+            stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
+            if (loop_type == LoopType::FIXED_FREQ)
+            {
+                stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_us = m_config.m_loops[loop_id]->get_timestep_us();
+            }
+
+            const char *const loop_name = m_config.m_loops[loop_id]->get_name();
+            const uint8_t loop_name_length = tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH);
+            stack.get_loop_def.response_data.loop_name_length = loop_name_length;
+            stack.get_loop_def.response_data.loop_name = loop_name;
+
+            code = m_codec.encode_response_get_loop_definition(&stack.get_loop_def.response_data, response);
+            break;
+        }
+
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;
@@ -1300,7 +1346,6 @@ namespace scrutiny
             code = m_codec.encode_datalogging_buffer_size(&stack.get_buffer_size.response_data, response);
             break;
         }
-
         case protocol::DataLogControl::Subfunction::ConfigureDatalog:
         {
             // Make sure the datalogger is released before writing the config object to avoid race conditions.

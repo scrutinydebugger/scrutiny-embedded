@@ -103,7 +103,9 @@ namespace scrutiny
                 GetSpecialMemoryRegionCount = 4,
                 GetSpecialMemoryLocation = 5,
                 GetRuntimePublishedValuesCount = 6,
-                GetRuntimePublishedValuesDefinition = 7
+                GetRuntimePublishedValuesDefinition = 7,
+                GetLoopCount = 8,
+                GetLoopDefinition = 9
             };
 
             enum class MemoryRegionType
@@ -144,9 +146,9 @@ namespace scrutiny
         {
             enum class Subfunction
             {
-                GetAvailableTarget = 1,
-                GetBufferSize = 2,
-                GetSamplingRates = 3,
+                GetBufferSize = 1,
+                GetLoopCount = 2,
+                GetLoopDefinition = 3,
                 ConfigureDatalog = 4,
                 ListRecordings = 5,
                 ReadRecordings = 6,

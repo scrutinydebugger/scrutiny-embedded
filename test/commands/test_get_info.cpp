@@ -22,10 +22,23 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
+    scrutiny::LoopHandler *loops[2];
+
+    scrutiny::FixedFrequencyLoopHandler fixed_freq_loop;
+    scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
+
+    TestGetInfo() : ScrutinyTest(), fixed_freq_loop(0x12345678, "Loop1"),
+                    variable_freq_loop("Loop2") {}
+
     virtual void SetUp()
     {
 
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
+
+        loops[0] = &fixed_freq_loop;
+        loops[1] = &variable_freq_loop;
+        config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
+
         scrutiny_handler.init(&config);
         scrutiny_handler.comm()->connect();
     }
@@ -435,4 +448,125 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
         EXPECT_EQ(nread, n_to_read) << "i=" << static_cast<uint32_t>(i);
         ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response)) << "i=" << static_cast<uint32_t>(i);
     }
+}
+
+TEST_F(TestGetInfo, TestGetLoopCount)
+{
+    uint8_t tx_buffer[32];
+
+    uint8_t request_data[8] = {1, 8, 0, 0};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Make expected response
+    uint8_t expected_response[9 + 1] = {0x81, 8, 0, 0, 1};
+    expected_response[5] = 2; // 2 loops
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+TEST_F(TestGetInfo, TestGetLoopCountNoLoopSet)
+{
+    scrutiny::Config empty_config;
+    empty_config.set_buffers(_tx_buffer, sizeof(_tx_buffer), _rx_buffer, sizeof(_rx_buffer));
+    scrutiny_handler.init(&empty_config);
+    scrutiny_handler.comm()->connect();
+
+    uint8_t tx_buffer[32];
+
+    uint8_t request_data[8] = {1, 8, 0, 0};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Make expected response
+    uint8_t expected_response[9 + 1] = {0x81, 8, 0, 0, 1};
+    expected_response[5] = 0; // 2 loops
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
+{
+    std::string loop_name = "Loop1";
+    uint8_t tx_buffer[32];
+
+    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 0};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    /*
+        ID : 1
+        type: 1
+        timestep : 4 (only if fixed)
+        name length : 1
+        name : 0-32 (5)
+    */
+
+    // Make expected response
+    uint8_t expected_response[9 + 12] = {0x81, 9, 0, 0, 12};
+    expected_response[5] = 0; // loop ID
+    expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
+    scrutiny::codecs::encode_32_bits_big_endian(0x12345678, &expected_response[7]);
+    expected_response[11] = loop_name.length();
+    strcpy(reinterpret_cast<char *>(&expected_response[12]), loop_name.c_str());
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
+{
+    std::string loop_name = "Loop2";
+    uint8_t tx_buffer[32];
+
+    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 1};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    /*
+        ID : 1
+        type: 1
+        name length : 1
+        name : 0-32 (5)
+    */
+
+    // Make expected response
+    uint8_t expected_response[9 + 8] = {0x81, 9, 0, 0, 8};
+    expected_response[5] = 1; // loop ID
+    expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::VARIABLE_FREQ);
+    expected_response[7] = loop_name.length();
+    strcpy(reinterpret_cast<char *>(&expected_response[8]), loop_name.c_str());
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }

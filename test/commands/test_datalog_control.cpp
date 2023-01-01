@@ -40,12 +40,13 @@ protected:
     RuntimePublishedValue rpvs[1] = {
         {0x8888, VariableType::float32}};
 
-    TestDatalogControl() : ScrutinyTest(), fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US) {}
+    TestDatalogControl() : ScrutinyTest(), fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
+                           variable_freq_loop("Loop2") {}
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    uint16_t encode_datalogger_config(loop_id_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size);
+    uint16_t encode_datalogger_config(uint8_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
-    void test_configure(loop_id_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
+    void test_configure(uint8_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
 
     float m_some_var_operand1 = 0;
     float m_some_var_logged1 = 0;
@@ -98,7 +99,7 @@ TEST_F(TestDatalogControl, TestUnsupported)
 }
 #else
 
-uint16_t TestDatalogControl::encode_datalogger_config(loop_id_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size)
+uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size)
 {
     uint32_t cursor = 0;
     if (max_size < 1 + 2 + 1 + 4 + 1 + 4 + 1)
@@ -225,7 +226,7 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     return refconfig;
 }
 
-void TestDatalogControl::test_configure(loop_id_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
+void TestDatalogControl::test_configure(uint8_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
 {
     uint8_t request_data[1024] = {5, 4};
     uint16_t payload_size = encode_datalogger_config(loop_id, &refconfig, &request_data[4], sizeof(request_data));
@@ -264,11 +265,11 @@ TEST_F(TestDatalogControl, TestGetBufferSize)
     uint8_t tx_buffer[32];
     uint32_t buffer_size = sizeof(dlbuffer);
 
-    uint8_t request_data[8] = {5, 2, 0, 0};
+    uint8_t request_data[8] = {5, 1, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 4] = {0x85, 2, 0, 0, 4};
+    uint8_t expected_response[9 + 4] = {0x85, 1, 0, 0, 4};
     expected_response[5] = static_cast<uint8_t>((buffer_size >> 24) & 0xFF);
     expected_response[6] = static_cast<uint8_t>((buffer_size >> 16) & 0xFF);
     expected_response[7] = static_cast<uint8_t>((buffer_size >> 8) & 0xFF);
@@ -288,7 +289,7 @@ TEST_F(TestDatalogControl, TestGetBufferSize)
 
 TEST_F(TestDatalogControl, TestConfigureValid1)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
 
     test_configure(loop_id, refconfig, protocol::ResponseCode::OK);
@@ -319,14 +320,14 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
 
 TEST_F(TestDatalogControl, TestConfigureBadLoopID)
 {
-    constexpr loop_id_t loop_id = 2; // This loop does not exists
+    constexpr uint8_t loop_id = 2; // This loop does not exists
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     test_configure(loop_id, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
     test_configure(loop_id, refconfig, protocol::ResponseCode::Overflow);
@@ -334,7 +335,7 @@ TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
 
 TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.trigger.operand_count = datalogging::MAX_OPERANDS + 1;
     test_configure(loop_id, refconfig, protocol::ResponseCode::Overflow);
@@ -342,7 +343,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
 
 TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.trigger.operand_count = 0; // Doesn'T match the condition set
     test_configure(loop_id, refconfig, protocol::ResponseCode::InvalidRequest);
@@ -357,7 +358,7 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
         std::numeric_limits<float>::signaling_NaN(),
         0.0f / 0.0f};
 
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
     {
         std::string errpr_msg = std::string("i=") + std::to_string(i);
@@ -370,7 +371,7 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
 
 TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.trigger.operands[0].type = datalogging::OperandType::RPV;
     refconfig.trigger.operands[0].data.rpv.id = 0x9999; // doesn't exist
@@ -380,7 +381,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
 
 TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
-    constexpr loop_id_t loop_id = 1;
+    constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.items_to_log[0].type = datalogging::LoggableType::RPV;
     refconfig.items_to_log[0].data.rpv.id = 0x9999; // doesn't exist

@@ -63,8 +63,12 @@ namespace scrutiny
             Loop2MainMessageID message_id;
         };
 
+        LoopHandler(const char *name = nullptr) : m_name(name) {}
+
         /// @brief Returns the loop type: Fixed frequency or variable frequency
         virtual inline LoopType loop_type(void) const = 0;
+
+        virtual inline uint32_t get_timestep_us(void) const = 0;
 
         /// @brief Return the timebase used by the Loop Handler
         inline Timebase *get_timebase(void) { return &m_timebase; }
@@ -74,6 +78,9 @@ namespace scrutiny
 
         /// @brief Returns the IPC object to receive a message from the Loop Handler
         inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void) { return &m_loop2main_msg; }
+
+        /// @brief Returns the name of the loop. May be nullptr if not set.
+        inline const char *get_name(void) const { return m_name; }
 #if SCRUTINY_ENABLE_DATALOGGING
         inline bool owns_datalogger(void) const
         {
@@ -91,6 +98,7 @@ namespace scrutiny
         scrutiny::IPCMessage<Main2LoopMessage> m_main2loop_msg;
         /// @brief  Atomic message transferred from the Loop Handler to the Main Handler
         scrutiny::IPCMessage<Loop2MainMessage> m_loop2main_msg;
+        const char *m_name;
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
@@ -105,11 +113,13 @@ namespace scrutiny
     class FixedFrequencyLoopHandler : public LoopHandler
     {
     public:
-        FixedFrequencyLoopHandler(timestamp_t timestep_us) : m_timestep_us(timestep_us)
+        FixedFrequencyLoopHandler(timestamp_t timestep_us, const char *name = nullptr) : LoopHandler(name),
+                                                                                         m_timestep_us(timestep_us)
         {
         }
         void process(void);
         virtual inline LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
+        virtual inline uint32_t get_timestep_us(void) const { return m_timestep_us; }
 
     protected:
         const uint32_t m_timestep_us;
@@ -118,6 +128,10 @@ namespace scrutiny
     class VariableFrequencyLoopHandler : public LoopHandler
     {
     public:
+        VariableFrequencyLoopHandler(const char *name = nullptr) : LoopHandler(name)
+        {
+        }
+        virtual inline uint32_t get_timestep_us(void) const { return 0; }
         void process(timestamp_t timestep_us);
         virtual inline LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
     };

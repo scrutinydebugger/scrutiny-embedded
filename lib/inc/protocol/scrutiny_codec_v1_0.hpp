@@ -26,6 +26,7 @@ namespace scrutiny
         constexpr unsigned int REQUEST_OVERHEAD = 8;
         constexpr unsigned int RESPONSE_OVERHEAD = 9;
         constexpr unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
+        constexpr unsigned int MAX_LOOP_NAME_LENGTH = 32;
         constexpr unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
         constexpr unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
         constexpr uint16_t BUFFER_OVERFLOW_MARGIN = 16; // This margin let us detect overflow in comm with less calculations.
@@ -228,6 +229,27 @@ namespace scrutiny
                 {
                     uint16_t count;
                 };
+
+                struct GetLoopCount
+                {
+                    uint8_t count;
+                };
+
+                struct GetLoopDefinition
+                {
+                    uint8_t loop_id;
+                    uint8_t loop_type;
+                    union
+                    {
+                        struct
+                        {
+                            uint32_t timestep_us;
+                        } fixed_freq;
+                    } loop_type_specific;
+
+                    uint8_t loop_name_length;
+                    const char *loop_name;
+                };
             }
 
             namespace CommControl
@@ -284,6 +306,16 @@ namespace scrutiny
                     uint16_t start_index;
                     uint16_t count;
                 };
+
+                struct GetLoopCount
+                {
+                    uint8_t loop_count;
+                };
+
+                struct GetLoopDefinition
+                {
+                    uint8_t loop_id;
+                };
             }
 
             namespace CommControl
@@ -315,7 +347,7 @@ namespace scrutiny
             {
                 struct Configure
                 {
-                    loop_id_t loop_id;
+                    uint8_t loop_id;
                     // Rest is directly written to datalogger config. So not in this struct.
                 };
             }
@@ -331,6 +363,8 @@ namespace scrutiny
             ResponseCode encode_response_special_memory_region_location(const ResponseData::GetInfo::GetSpecialMemoryRegionLocation *response_data, Response *response);
             ResponseCode encode_response_supported_features(const ResponseData::GetInfo::GetSupportedFeatures *response_data, Response *response);
             ResponseCode encode_response_get_rpv_count(const ResponseData::GetInfo::GetRPVCount *response_data, Response *response);
+            ResponseCode encode_response_get_loop_count(const ResponseData::GetInfo::GetLoopCount *response_data, Response *response);
+            ResponseCode encode_response_get_loop_definition(const ResponseData::GetInfo::GetLoopDefinition *response_data, Response *response);
 
             ResponseCode encode_response_comm_discover(Response *response, const ResponseData::CommControl::Discover *response_data);
             ResponseCode encode_response_comm_heartbeat(const ResponseData::CommControl::Heartbeat *response_data, Response *response);
@@ -339,6 +373,7 @@ namespace scrutiny
 
             ResponseCode decode_request_get_special_memory_region_location(const Request *request, RequestData::GetInfo::GetSpecialMemoryRegionLocation *request_data);
             ResponseCode decode_request_get_rpv_definition(const Request *request, RequestData::GetInfo::GetRPVDefinition *request_data);
+            ResponseCode decode_request_get_loop_definition(const Request *request, RequestData::GetInfo::GetLoopDefinition *request_data);
 
             ResponseCode decode_request_comm_discover(const Request *request, RequestData::CommControl::Discover *request_data);
             ResponseCode decode_request_comm_heartbeat(const Request *request, RequestData::CommControl::Heartbeat *request_data);

@@ -26,8 +26,6 @@ namespace scrutiny
         void *end;
     };
 
-    typedef uint_fast8_t loop_id_t;
-
     typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
 
     enum class VariableTypeType

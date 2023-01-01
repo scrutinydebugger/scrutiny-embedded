@@ -652,6 +652,69 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
+        ResponseCode CodecV1_0::decode_request_get_loop_definition(const Request *request, RequestData::GetInfo::GetLoopDefinition *request_data)
+        {
+            constexpr uint16_t loop_id_len = sizeof(request_data->loop_id);
+            constexpr uint16_t datalen = loop_id_len;
+
+            if (request->data_length != datalen)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            request_data->loop_id = request->data[0];
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_get_loop_definition(const ResponseData::GetInfo::GetLoopDefinition *response_data, Response *response)
+        {
+            constexpr uint16_t loop_id_size = sizeof(response_data->loop_id);
+            constexpr uint16_t loop_type_size = sizeof(response_data->loop_type);
+            constexpr uint16_t timestep_us_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_us);
+            constexpr uint16_t name_length_size = sizeof(response_data->loop_name_length);
+
+            constexpr uint16_t minimum_size = loop_id_size + loop_type_size + name_length_size;
+
+            if (response->data_max_length < minimum_size)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            response->data[0] = response_data->loop_id;
+            response->data[1] = response_data->loop_type;
+
+            uint16_t cursor = 2;
+            switch (static_cast<scrutiny::LoopType>(response_data->loop_type))
+            {
+            case scrutiny::LoopType::FIXED_FREQ:
+                if (cursor + timestep_us_size > response->data_max_length)
+                {
+                    return ResponseCode::Overflow;
+                }
+                cursor += codecs::encode_32_bits_big_endian(response_data->loop_type_specific.fixed_freq.timestep_us, &response->data[cursor]);
+                break;
+            case scrutiny::LoopType::VARIABLE_FREQ:
+                break;
+            default:
+                return ResponseCode::FailureToProceed;
+            }
+
+            uint8_t loop_name_length = response_data->loop_name_length;
+            loop_name_length = (loop_name_length > MAX_LOOP_NAME_LENGTH) ? MAX_LOOP_NAME_LENGTH : loop_name_length;
+
+            if (cursor + name_length_size + loop_name_length > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            response->data[cursor++] = response_data->loop_name_length;
+            memcpy(&response->data[cursor], response_data->loop_name, loop_name_length);
+            cursor += loop_name_length;
+
+            response->data_length = cursor;
+            return ResponseCode::OK;
+        }
+
         ResponseCode CodecV1_0::encode_response_get_rpv_count(const ResponseData::GetInfo::GetRPVCount *response_data, Response *response)
         {
             constexpr uint16_t count_size = sizeof(response_data->count);
@@ -662,6 +725,20 @@ namespace scrutiny
             }
 
             codecs::encode_16_bits_big_endian(response_data->count, &response->data[0]);
+            response->data_length = datalen;
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_get_loop_count(const ResponseData::GetInfo::GetLoopCount *response_data, Response *response)
+        {
+            constexpr uint16_t count_size = sizeof(response_data->count);
+            constexpr uint16_t datalen = count_size;
+            if (datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            codecs::encode_8_bits(response_data->count, &response->data[0]);
             response->data_length = datalen;
             return ResponseCode::OK;
         }
@@ -922,7 +999,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->loop_id = static_cast<loop_id_t>(request->data[0]);
+            request_data->loop_id = request->data[0];
 
             config->decimation = codecs::decode_16_bits_big_endian(&request->data[1]);
             config->probe_location = request->data[3];
