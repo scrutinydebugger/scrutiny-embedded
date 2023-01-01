@@ -66,9 +66,9 @@ namespace scrutiny
         LoopHandler(const char *name = nullptr) : m_name(name) {}
 
         /// @brief Returns the loop type: Fixed frequency or variable frequency
-        virtual inline LoopType loop_type(void) const = 0;
+        virtual LoopType loop_type(void) const = 0;
 
-        virtual inline uint32_t get_timestep_us(void) const = 0;
+        virtual uint32_t get_timestep_us(void) const = 0;
 
         /// @brief Return the timebase used by the Loop Handler
         inline Timebase *get_timebase(void) { return &m_timebase; }
@@ -118,8 +118,8 @@ namespace scrutiny
         {
         }
         void process(void);
-        virtual inline LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
-        virtual inline uint32_t get_timestep_us(void) const { return m_timestep_us; }
+        virtual LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
+        virtual uint32_t get_timestep_us(void) const { return m_timestep_us; }
 
     protected:
         const uint32_t m_timestep_us;
@@ -131,9 +131,9 @@ namespace scrutiny
         VariableFrequencyLoopHandler(const char *name = nullptr) : LoopHandler(name)
         {
         }
-        virtual inline uint32_t get_timestep_us(void) const { return 0; }
+        virtual uint32_t get_timestep_us(void) const { return 0; }
         void process(timestamp_t timestep_us);
-        virtual inline LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
+        virtual LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
     };
 }
 
