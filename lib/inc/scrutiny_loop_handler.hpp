@@ -40,7 +40,8 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
             RELEASE_DATALOGGER_OWNERSHIP,
             TAKE_DATALOGGER_OWNERSHIP,
-            DATALOGGER_ARM_TRIGGER
+            DATALOGGER_ARM_TRIGGER,
+            DATALOGGER_DISARM_TRIGGER
 #endif
         };
 

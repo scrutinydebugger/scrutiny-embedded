@@ -203,9 +203,17 @@ namespace scrutiny
 
         void DataLogger::arm_trigger(void)
         {
-            if (m_state == State::CONFIGURED)
+            if (m_state == State::CONFIGURED || m_state == State::ACQUISITION_COMPLETED)
             {
                 m_state = State::ARMED;
+            }
+        }
+
+        void DataLogger::disarm_trigger(void)
+        {
+            if (m_state == State::ARMED || m_state == State::ACQUISITION_COMPLETED)
+            {
+                m_state = State::CONFIGURED;
             }
         }
 

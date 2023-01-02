@@ -147,14 +147,12 @@ namespace scrutiny
             enum class Subfunction
             {
                 GetBufferSize = 1,
-                GetLoopCount = 2,
-                GetLoopDefinition = 3,
-                ConfigureDatalog = 4,
-                ListRecordings = 5,
-                ReadRecordings = 6,
-                ArmLog = 7,
-                DisarmLog = 8,
-                GetLogStatus = 9,
+                ConfigureDatalog = 2,
+                ArmTrigger = 3,
+                DisarmTrigger = 4,
+                // ListRecordings = 5,
+                // ReadRecordings = 6,
+                // GetLogStatus = 9,
             };
         }
 

@@ -53,6 +53,7 @@ namespace scrutiny
         m_datalogging.request_arm_trigger = false;
         m_datalogging.request_ownership_release = false;
         m_datalogging.pending_ownership_release = false;
+        m_datalogging.request_disarm_trigger = false;
 #endif
     }
 
@@ -334,7 +335,9 @@ namespace scrutiny
                 }
             }
 
+            // No message from loop that can move these back to false.
             m_datalogging.request_arm_trigger = false;
+            m_datalogging.request_disarm_trigger = false;
         }
         else
         {
@@ -353,6 +356,12 @@ namespace scrutiny
                     msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_ARM_TRIGGER;
                     m_datalogging.owner->ipc_main2loop()->send(msg);
                     m_datalogging.request_arm_trigger = false;
+                }
+                else if (m_datalogging.request_disarm_trigger)
+                {
+                    msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_DISARM_TRIGGER;
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_disarm_trigger = false;
                 }
             }
         }
@@ -448,6 +457,11 @@ namespace scrutiny
                 }
             }
         }
+
+        process_loops();
+#if SCRUTINY_ENABLE_DATALOGGING
+        process_datalogging_logic();
+#endif
     }
 
     bool MainHandler::rpv_exists(const uint16_t id) const
@@ -1443,6 +1457,38 @@ namespace scrutiny
             break;
         }
 
+        case protocol::DataLogControl::Subfunction::ArmTrigger:
+        {
+
+            if (m_datalogging.owner == nullptr || m_datalogging.pending_ownership_release)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            // Do not wait on feedback from loop here on purpose
+            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            m_datalogging.request_arm_trigger = true;
+            code = protocol::ResponseCode::OK;
+
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::DisarmTrigger:
+        {
+
+            if (m_datalogging.owner == nullptr || m_datalogging.pending_ownership_release)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            // Do not wait on feedback from loop here on purpose
+            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            m_datalogging.request_disarm_trigger = true;
+            code = protocol::ResponseCode::OK;
+
+            break;
+        }
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;

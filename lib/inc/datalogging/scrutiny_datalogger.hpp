@@ -55,7 +55,9 @@ namespace scrutiny
             void reset(void);
 
             inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
+            inline bool armed(void) const { return m_state == State::ARMED; }
             void arm_trigger(void);
+            void disarm_trigger(void);
 
             bool check_trigger(void);
             inline DataReader *get_reader(void) { return m_encoder.get_reader(); }

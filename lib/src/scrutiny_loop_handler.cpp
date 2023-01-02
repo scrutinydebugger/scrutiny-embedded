@@ -52,6 +52,12 @@ namespace scrutiny
                     m_datalogger->arm_trigger();
                 }
                 break;
+            case Main2LoopMessageID::DATALOGGER_DISARM_TRIGGER:
+                if (m_owns_datalogger)
+                {
+                    m_datalogger->disarm_trigger();
+                }
+                break;
             case Main2LoopMessageID::RELEASE_DATALOGGER_OWNERSHIP:
                 if (m_owns_datalogger)
                 {

@@ -228,7 +228,7 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
 
 void TestDatalogControl::test_configure(uint8_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
 {
-    uint8_t request_data[1024] = {5, 4};
+    uint8_t request_data[1024] = {5, 2};
     uint16_t payload_size = encode_datalogger_config(loop_id, &refconfig, &request_data[4], sizeof(request_data));
     ASSERT_GT(sizeof(request_data), payload_size + 8) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
@@ -248,7 +248,7 @@ void TestDatalogControl::test_configure(uint8_t loop_id, datalogging::Configurat
 
         scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
         scrutiny_handler.process(0);
-        EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 4, expected_code)) << error_msg;
+        EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 2, expected_code)) << error_msg;
     }
     if (expected_code == protocol::ResponseCode::OK)
     {
@@ -454,6 +454,80 @@ TEST_F(TestDatalogControl, TestOwnerMechanism)
     EXPECT_FALSE(scrutiny_handler.datalogging_data_available());
     scrutiny_handler.process(1); // Receive the IPC message here
     EXPECT_TRUE(scrutiny_handler.datalogging_data_available());
+}
+
+TEST_F(TestDatalogControl, TestArmTriggerNotConfigured)
+{
+    uint8_t tx_buffer[32];
+
+    uint8_t request_data[8] = {5, 3, 0, 0};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+
+    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 3, protocol::ResponseCode::FailureToProceed));
+    EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
+    fixed_freq_loop.process();
+    EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
+}
+
+TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
+{
+    uint8_t tx_buffer[32];
+    uint16_t n_to_read;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    test_configure(0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                // Accept ownership
+    scrutiny_handler.process(0);
+
+    // Arm trigger
+    uint8_t arm_request_data[8] = {5, 3, 0, 0};
+    add_crc(arm_request_data, sizeof(arm_request_data) - 4);
+
+    uint8_t arm_expected_response[9] = {0x85, 3, 0, 0, 0};
+    add_crc(arm_expected_response, sizeof(arm_expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(arm_request_data, sizeof(arm_request_data));
+    scrutiny_handler.process(0);
+
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+    EXPECT_BUF_EQ(tx_buffer, arm_expected_response, sizeof(arm_expected_response));
+    EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
+    fixed_freq_loop.process();
+    EXPECT_TRUE(scrutiny_handler.datalogger()->armed());
+
+    // Disarm trigger
+    uint8_t disarm_request_data[8] = {5, 4, 0, 0};
+    add_crc(disarm_request_data, sizeof(disarm_request_data) - 4);
+
+    uint8_t diarm_expected_response[9] = {0x85, 4, 0, 0, 0};
+    add_crc(diarm_expected_response, sizeof(diarm_expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(disarm_request_data, sizeof(disarm_request_data));
+    scrutiny_handler.process(0);
+
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+    EXPECT_BUF_EQ(tx_buffer, diarm_expected_response, sizeof(diarm_expected_response));
+    EXPECT_TRUE(scrutiny_handler.datalogger()->armed()); // Still true
+    fixed_freq_loop.process();
+    EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
 }
 
 #endif
