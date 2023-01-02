@@ -150,9 +150,9 @@ namespace scrutiny
                 ConfigureDatalog = 2,
                 ArmTrigger = 3,
                 DisarmTrigger = 4,
+                GetStatus = 5,
                 // ListRecordings = 5,
                 // ReadRecordings = 6,
-                // GetLogStatus = 9,
             };
         }
 

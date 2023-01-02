@@ -287,7 +287,13 @@ namespace scrutiny
                 {
                     uint32_t buffer_size;
                 };
+
+                struct GetStatus
+                {
+                    uint8_t state;
+                };
             }
+
 #endif
         }
 
@@ -394,7 +400,8 @@ namespace scrutiny
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *response, const uint16_t max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode encode_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response);
+            ResponseCode encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response);
+            ResponseCode encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response);
             ResponseCode decode_datalogging_configure_request(
                 const Request *request,
                 RequestData::DataLogControl::Configure *request_data,

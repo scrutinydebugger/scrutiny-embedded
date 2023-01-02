@@ -185,3 +185,37 @@ namespace scrutiny
         }
     }
 }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+namespace scrutiny
+{
+    namespace datalogging
+    {
+        std::ostream &operator<<(std::ostream &out, DataLogger::State val)
+        {
+            switch (val)
+            {
+            case DataLogger::State::IDLE:
+                out << "IDLE";
+                break;
+            case DataLogger::State::ARMED:
+                out << "ARMED";
+                break;
+            case DataLogger::State::CONFIGURED:
+                out << "CONFIGURED";
+                break;
+            case DataLogger::State::ACQUISITION_COMPLETED:
+                out << "ACQUISITION_COMPLETED";
+                break;
+            case DataLogger::State::ERROR:
+                out << "ERROR";
+                break;
+            default:
+                out << "UNKNOWN";
+            }
+
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+}
+#endif

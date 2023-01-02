@@ -50,7 +50,8 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
             DATALOGGER_OWNERSHIP_TAKEN,
             DATALOGGER_OWNERSHIP_RELEASED,
-            DATALOGGER_DATA_ACQUIRED
+            DATALOGGER_DATA_ACQUIRED,
+            DATALOGGER_STATUS_UPDATE
 #endif
         };
 
@@ -62,6 +63,15 @@ namespace scrutiny
         struct Loop2MainMessage
         {
             Loop2MainMessageID message_id;
+            union
+            {
+#if SCRUTINY_ENABLE_DATALOGGING
+                struct
+                {
+                    datalogging::DataLogger::State state;
+                } datalogger_status_update;
+#endif
+            } data;
         };
 
         LoopHandler(const char *name = nullptr) : m_name(name) {}

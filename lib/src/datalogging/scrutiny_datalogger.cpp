@@ -294,7 +294,6 @@ namespace scrutiny
 
         void DataLogger::process_acquisition(void)
         {
-            // todo : Handle stop
             if (++m_decimation_counter >= m_config.decimation)
             {
                 m_encoder.encode_next_entry();

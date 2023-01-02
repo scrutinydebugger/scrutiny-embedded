@@ -39,6 +39,7 @@ namespace scrutiny
 
         class DataLogger
         {
+        public:
             enum class State
             {
                 IDLE,
@@ -48,7 +49,6 @@ namespace scrutiny
                 ERROR
             };
 
-        public:
             void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size);
             void configure(Timebase *timebase_for_log);
             void process(void);
@@ -56,6 +56,7 @@ namespace scrutiny
 
             inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
             inline bool armed(void) const { return m_state == State::ARMED; }
+            inline DataLogger::State get_state(void) const { return m_state; }
             void arm_trigger(void);
             void disarm_trigger(void);
 

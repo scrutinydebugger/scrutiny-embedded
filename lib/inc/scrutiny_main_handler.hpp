@@ -34,13 +34,22 @@ namespace scrutiny
         void process(const uint32_t timestep_us);
 
 #if SCRUTINY_ENABLE_DATALOGGING
+        /// @brief Returns the state of the datalogger. Thread safe
+        inline datalogging::DataLogger::State get_datalogger_state(void) const
+        {
+            return m_datalogging.datalogger_state_thread_safe;
+        }
+
+        /// @brief  Returns true if the datalogger has data available. Thread safe
         inline bool datalogging_data_available(void) const
         {
-            return m_datalogging.data_available;
+            return m_datalogging.data_available; // Thread safe.
         }
+
+        /// @brief Returns true if the datalogger is in an error state. Thread safe
         inline bool datalogging_error(void) const
         {
-            return m_datalogging.datalogger.in_error() || m_datalogging.error != DataloggingError::NoError;
+            return (m_datalogging.datalogger_state_thread_safe == datalogging::DataLogger::State::ERROR) || m_datalogging.error != DataloggingError::NoError;
         }
 
         bool read_memory(void *dst, const void *src, const uint32_t size) const;
@@ -59,10 +68,7 @@ namespace scrutiny
             return m_config.get_rpv_read_callback();
         }
 
-        inline protocol::CommHandler *comm(void)
-        {
-            return &m_comm_handler;
-        }
+        inline protocol::CommHandler *comm(void) { return &m_comm_handler; }
 
         inline Config *get_config(void) { return &m_config; }
 
@@ -110,6 +116,7 @@ namespace scrutiny
         {
 
             datalogging::DataLogger datalogger;
+            datalogging::DataLogger::State datalogger_state_thread_safe;
             LoopHandler *owner;
             LoopHandler *new_owner;
             DataloggingError error;

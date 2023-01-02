@@ -54,6 +54,8 @@ namespace scrutiny
         m_datalogging.request_ownership_release = false;
         m_datalogging.pending_ownership_release = false;
         m_datalogging.request_disarm_trigger = false;
+
+        m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
 #endif
     }
 
@@ -284,13 +286,16 @@ namespace scrutiny
         switch (msg->message_id)
         {
         case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_TAKEN:
+        {
             if (m_datalogging.owner != nullptr)
             {
                 m_datalogging.error = DataloggingError::UnexpectedClaim;
             }
             m_datalogging.owner = sender;
             break;
+        }
         case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_RELEASED:
+        {
             if (sender != m_datalogging.owner)
             {
                 m_datalogging.error = DataloggingError::UnexpectedRelease;
@@ -301,7 +306,10 @@ namespace scrutiny
             m_datalogging.data_available = false;
             m_datalogging.pending_ownership_release = false;
             break;
+        }
         case LoopHandler::Loop2MainMessageID::DATALOGGER_DATA_ACQUIRED:
+        {
+
             if (sender != m_datalogging.owner)
             {
                 m_datalogging.error = DataloggingError::UnexpectedData;
@@ -310,7 +318,14 @@ namespace scrutiny
             {
                 m_datalogging.data_available = true;
             }
+
             break;
+        }
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_STATUS_UPDATE:
+        {
+            m_datalogging.datalogger_state_thread_safe = msg->data.datalogger_status_update.state;
+            break;
+        }
         default:
             break;
         }
@@ -324,6 +339,9 @@ namespace scrutiny
 
         if (m_datalogging.owner == nullptr) // no owner
         {
+            // No owner, can read directly. Otherwise will be updated by an IPC message
+            m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
+
             if (m_datalogging.new_owner != nullptr)
             {
                 if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
@@ -1343,6 +1361,11 @@ namespace scrutiny
                 protocol::RequestData::DataLogControl::Configure request_data;
                 datalogging::Configuration *dlconfig;
             } configure;
+
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetStatus response_data;
+            } get_status;
         } stack;
 
         if (!m_config.is_datalogging_configured())
@@ -1357,7 +1380,7 @@ namespace scrutiny
         case protocol::DataLogControl::Subfunction::GetBufferSize:
         {
             stack.get_buffer_size.response_data.buffer_size = m_config.m_datalogger_buffer_size;
-            code = m_codec.encode_datalogging_buffer_size(&stack.get_buffer_size.response_data, response);
+            code = m_codec.encode_response_datalogging_buffer_size(&stack.get_buffer_size.response_data, response);
             break;
         }
         case protocol::DataLogControl::Subfunction::ConfigureDatalog:
@@ -1487,6 +1510,12 @@ namespace scrutiny
             m_datalogging.request_disarm_trigger = true;
             code = protocol::ResponseCode::OK;
 
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::GetStatus:
+        {
+            stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.datalogger_state_thread_safe);
+            code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
         default:

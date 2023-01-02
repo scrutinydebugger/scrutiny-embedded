@@ -39,3 +39,14 @@ namespace scrutiny
         std::ostream &operator<<(std::ostream &out, ResponseCode val);
     }
 }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+namespace scrutiny
+{
+    namespace datalogging
+    {
+        std::ostream &operator<<(std::ostream &out, DataLogger::State val);
+    }
+}
+
+#endif

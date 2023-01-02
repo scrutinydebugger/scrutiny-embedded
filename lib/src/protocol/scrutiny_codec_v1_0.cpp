@@ -976,14 +976,27 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        ResponseCode CodecV1_0::encode_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response)
         {
-            constexpr uint16_t datalen = sizeof(uint32_t);
+            constexpr uint16_t datalen = sizeof(response_data->buffer_size);
             if (datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
             codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[0]);
+            response->data_length = datalen;
+
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response)
+        {
+            constexpr uint16_t datalen = sizeof(response_data->state);
+            if (datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            codecs::encode_8_bits(response_data->state, &response->data[0]);
             response->data_length = datalen;
 
             return ResponseCode::OK;

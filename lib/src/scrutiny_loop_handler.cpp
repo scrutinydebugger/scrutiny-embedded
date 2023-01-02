@@ -77,14 +77,20 @@ namespace scrutiny
         {
             m_datalogger->process();
 
-            if (m_datalogger->data_acquired())
+            if (!m_loop2main_msg.has_content())
             {
-                if (!m_loop2main_msg.has_content() && !m_datalogger_data_acquired)
+                if (m_datalogger->data_acquired() && !m_datalogger_data_acquired)
                 {
                     msg_out.message_id = Loop2MainMessageID::DATALOGGER_DATA_ACQUIRED;
                     m_loop2main_msg.send(msg_out);
+                    m_datalogger_data_acquired = true;
                 }
-                m_datalogger_data_acquired = true;
+                else // Keep last for lowest priority
+                {
+                    msg_out.message_id = Loop2MainMessageID::DATALOGGER_STATUS_UPDATE;
+                    msg_out.data.datalogger_status_update.state = m_datalogger->get_state();
+                    m_loop2main_msg.send(msg_out);
+                }
             }
         }
 #endif
