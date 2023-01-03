@@ -16,7 +16,7 @@ void RawFormatParser::init(scrutiny::MainHandler *main_handler, scrutiny::datalo
     }
 }
 
-void RawFormatParser::parse(void)
+void RawFormatParser::parse(uint32_t entry_count)
 {
     if (m_error)
     {
@@ -51,15 +51,12 @@ void RawFormatParser::parse(void)
         entry_size += elem_size;
     }
 
-    uint32_t entry_count = scrutiny::codecs::decode_32_bits_big_endian(m_buffer);
-
-    if (entry_count > (m_buffer_size - 4) / entry_size)
+    if (entry_count > (m_buffer_size / entry_size))
     {
         m_error = true;
         return;
     }
 
-    cursor += 4;
     m_data.resize(entry_count);
 
     for (uint32_t i = 0; i < entry_count; i++)

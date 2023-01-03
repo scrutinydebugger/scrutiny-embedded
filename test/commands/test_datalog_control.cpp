@@ -44,9 +44,9 @@ protected:
                            variable_freq_loop("Loop2") {}
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    uint16_t encode_datalogger_config(uint8_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size);
+    uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
-    void test_configure(uint8_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
+    void test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
     void check_get_status(datalogging::DataLogger::State expected_state);
 
     float m_some_var_operand1 = 0;
@@ -100,14 +100,15 @@ TEST_F(TestDatalogControl, TestUnsupported)
 }
 #else
 
-uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size)
+uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size)
 {
     uint32_t cursor = 0;
-    if (max_size < 1 + 2 + 1 + 4 + 1 + 4 + 1)
+    if (max_size < 1 + 2 + 2 + 1 + 4 + 1 + 4 + 1)
     {
         return 0;
     }
-    cursor += codecs::encode_8_bits(static_cast<uint8_t>(loop_id), &buffer[cursor]);
+    cursor += codecs::encode_8_bits(loop_id, &buffer[cursor]);
+    cursor += codecs::encode_16_bits_big_endian(config_id, &buffer[cursor]);
     cursor += codecs::encode_16_bits_big_endian(dlconfig->decimation, &buffer[cursor]);
     cursor += codecs::encode_8_bits(dlconfig->probe_location, &buffer[cursor]);
     cursor += codecs::encode_32_bits_big_endian(dlconfig->timeout_us, &buffer[cursor]);
@@ -227,10 +228,10 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     return refconfig;
 }
 
-void TestDatalogControl::test_configure(uint8_t loop_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
+void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
 {
     uint8_t request_data[1024] = {5, 2};
-    uint16_t payload_size = encode_datalogger_config(loop_id, &refconfig, &request_data[4], sizeof(request_data));
+    uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
     ASSERT_GT(sizeof(request_data), payload_size + 8) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
     request_data[2] = (payload_size >> 8) & 0xFF;
@@ -293,11 +294,13 @@ TEST_F(TestDatalogControl, TestGetBufferSize)
 TEST_F(TestDatalogControl, TestConfigureValid1)
 {
     constexpr uint8_t loop_id = 1;
+    constexpr uint16_t config_id = 0xaa55;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
 
-    test_configure(loop_id, refconfig, protocol::ResponseCode::OK);
+    test_configure(loop_id, config_id, refconfig, protocol::ResponseCode::OK);
 
     const datalogging::Configuration *dlconfig = scrutiny_handler.datalogger()->config();
+    EXPECT_EQ(scrutiny_handler.datalogger()->get_config_id(), config_id);
 
     EXPECT_EQ(dlconfig->decimation, refconfig.decimation);
     EXPECT_EQ(dlconfig->probe_location, refconfig.probe_location);
@@ -325,7 +328,7 @@ TEST_F(TestDatalogControl, TestConfigureBadLoopID)
 {
     constexpr uint8_t loop_id = 2; // This loop does not exists
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    test_configure(loop_id, refconfig, protocol::ResponseCode::FailureToProceed);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
@@ -333,7 +336,7 @@ TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
     constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
-    test_configure(loop_id, refconfig, protocol::ResponseCode::Overflow);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
 
 TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
@@ -341,7 +344,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
     constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.trigger.operand_count = datalogging::MAX_OPERANDS + 1;
-    test_configure(loop_id, refconfig, protocol::ResponseCode::Overflow);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
 
 TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
@@ -349,7 +352,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
     constexpr uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.trigger.operand_count = 0; // Doesn'T match the condition set
-    test_configure(loop_id, refconfig, protocol::ResponseCode::InvalidRequest);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
 }
 
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
@@ -368,7 +371,7 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
         datalogging::Configuration refconfig = get_valid_reference_configuration();
         refconfig.trigger.operands[0].type = datalogging::OperandType::LITERAL;
         refconfig.trigger.operands[0].data.literal.val = bad_values[i];
-        test_configure(loop_id, refconfig, protocol::ResponseCode::InvalidRequest, true, error_msg);
+        test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest, true, error_msg);
     }
 }
 
@@ -379,7 +382,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
     refconfig.trigger.operands[0].type = datalogging::OperandType::RPV;
     refconfig.trigger.operands[0].data.rpv.id = 0x9999; // doesn't exist
 
-    test_configure(loop_id, refconfig, protocol::ResponseCode::FailureToProceed);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
@@ -389,7 +392,7 @@ TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
     refconfig.items_to_log[0].type = datalogging::LoggableType::RPV;
     refconfig.items_to_log[0].data.rpv.id = 0x9999; // doesn't exist
 
-    test_configure(loop_id, refconfig, protocol::ResponseCode::FailureToProceed);
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestOwnerMechanism)
@@ -403,7 +406,7 @@ TEST_F(TestDatalogControl, TestOwnerMechanism)
     refconfig.timeout_us = 0;
     refconfig.trigger.hold_time_us = 0;
 
-    test_configure(0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
     scrutiny_handler.process(0);
     scrutiny_handler.process(0);
     EXPECT_FALSE(fixed_freq_loop.owns_datalogger());
@@ -428,7 +431,7 @@ TEST_F(TestDatalogControl, TestOwnerMechanism)
     EXPECT_TRUE(scrutiny_handler.datalogging_data_available());
 
     // Switch loop.
-    test_configure(1, refconfig, protocol::ResponseCode::OK, false); // Assign to Loop 0 (Fixed freq)
+    test_configure(1, 0, refconfig, protocol::ResponseCode::OK, false); // Assign to Loop 0 (Fixed freq)
 
     EXPECT_TRUE(fixed_freq_loop.owns_datalogger());     // I'm the owner!
     EXPECT_FALSE(variable_freq_loop.owns_datalogger()); // Not me :(
@@ -490,8 +493,8 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     uint8_t tx_buffer[32];
     uint16_t n_to_read;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    test_configure(0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
-    fixed_freq_loop.process();                                // Accept ownership
+    test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                   // Accept ownership
     scrutiny_handler.process(0);
 
     // Arm trigger
@@ -574,8 +577,8 @@ TEST_F(TestDatalogControl, TestGetStatus)
     check_get_status(datalogging::DataLogger::State::IDLE);
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    test_configure(0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
-    fixed_freq_loop.process();                                // Accept ownership
+    test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                   // Accept ownership
     scrutiny_handler.process(0);
 
     // From this point, the datalogger is owned by a loop. We need to wait on the loop to broadcast the status through an IPC message.
@@ -589,7 +592,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     check_get_status(datalogging::DataLogger::State::ARMED);
 
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
-    test_configure(0, refconfig, protocol::ResponseCode::Overflow, false);
+    test_configure(0, 0, refconfig, protocol::ResponseCode::Overflow, false);
     fixed_freq_loop.process();
     scrutiny_handler.process(0);
 
@@ -603,7 +606,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
 
     refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
-    test_configure(0, refconfig, protocol::ResponseCode::OK);
+    test_configure(0, 0, refconfig, protocol::ResponseCode::OK);
     scrutiny_handler.process(0);
     fixed_freq_loop.process();
 
@@ -613,6 +616,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0); // Receive status
     check_get_status(datalogging::DataLogger::State::ARMED);
 
+    // We are rmed. We will force a full acquisition and make sure it is correctly reported.
     scrutiny_handler.datalogger()->force_trigger();
     for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
     {
@@ -623,6 +627,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
             break;
         }
     }
+    // Acquisition complete. Process for IPC message to be transferred from loop to main
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
     ASSERT_TRUE(scrutiny_handler.datalogger()->data_acquired());

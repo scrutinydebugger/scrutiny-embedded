@@ -44,9 +44,10 @@ namespace scrutiny
             m_remaining_data_to_write = 0;
             m_config_valid = false;
             m_manual_trigger = false;
+            m_acquisition_id = 0;
         }
 
-        void DataLogger::configure(Timebase *timebase_for_log)
+        void DataLogger::configure(Timebase *timebase_for_log, uint16_t config_id)
         {
             if (m_state != State::IDLE)
             {
@@ -59,6 +60,7 @@ namespace scrutiny
             m_trigger.rising_edge_timestamp = 0;
             m_decimation_counter = 0;
 
+            m_config_id = config_id;
             if (m_config.items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL || m_config.items_count == 0)
             {
                 m_config_valid = false;
@@ -247,6 +249,7 @@ namespace scrutiny
 
                         if (acquisition_completed())
                         {
+                            m_acquisition_id++;
                             m_state = State::ACQUISITION_COMPLETED;
                         }
                     }

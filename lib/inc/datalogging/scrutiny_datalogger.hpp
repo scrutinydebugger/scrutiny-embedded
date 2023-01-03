@@ -15,20 +15,8 @@
 
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
+#include "datalogging/scrutiny_data_encoding.hpp"
 #include "scrutiny_timebase.hpp"
-
-#if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
-#include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
-namespace scrutiny
-{
-    namespace datalogging
-    {
-
-        using DataEncoder = RawFormatEncoder;
-        using DataReader = RawFormatReader;
-    }
-}
-#endif
 
 namespace scrutiny
 {
@@ -48,13 +36,14 @@ namespace scrutiny
                 ACQUISITION_COMPLETED,
                 ERROR
             };
-
             void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size);
-            void configure(Timebase *timebase_for_log);
+            void configure(Timebase *timebase_for_log, uint16_t config_id = 0);
             void process(void);
             void reset(void);
 
             inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
+            inline uint16_t get_acquisition_id(void) const { return m_acquisition_id; }
+            inline uint16_t get_config_id(void) const { return m_config_id; }
             inline bool armed(void) const { return m_state == State::ARMED; }
             inline DataLogger::State get_state(void) const { return m_state; }
             void arm_trigger(void);
@@ -62,6 +51,7 @@ namespace scrutiny
 
             bool check_trigger(void);
             inline DataReader *get_reader(void) { return m_encoder.get_reader(); }
+            inline DataEncoder *get_encoder(void) { return &m_encoder; }
             inline Configuration *config(void) { return &m_config; }
             inline bool in_error(void) const { return m_state == State::ERROR; }
             inline bool config_valid(void) const { return m_config_valid; }
@@ -97,6 +87,8 @@ namespace scrutiny
             bool m_config_valid;
             DataEncoder m_encoder;
             uint16_t m_decimation_counter;
+            uint16_t m_acquisition_id;
+            uint16_t m_config_id;
 
             struct
             {

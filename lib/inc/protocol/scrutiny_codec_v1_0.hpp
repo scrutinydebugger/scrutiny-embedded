@@ -16,6 +16,7 @@
 
 #if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "datalogging/scrutiny_data_encoding.hpp"
 #endif
 namespace scrutiny
 {
@@ -292,6 +293,14 @@ namespace scrutiny
                 {
                     uint8_t state;
                 };
+
+                struct GetAcquisitionMetadata
+                {
+                    uint16_t acquisition_id;
+                    uint16_t config_id;
+                    uint32_t number_of_points;
+                    uint32_t data_size;
+                };
             }
 
 #endif
@@ -349,11 +358,13 @@ namespace scrutiny
             }
 
 #if SCRUTINY_ENABLE_DATALOGGING
+
             namespace DataLogControl
             {
                 struct Configure
                 {
                     uint8_t loop_id;
+                    uint16_t config_id;
                     // Rest is directly written to datalogger config. So not in this struct.
                 };
             }
@@ -402,6 +413,8 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
             ResponseCode encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response);
             ResponseCode encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response);
+            ResponseCode encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response);
+            ResponseCode encode_response_datalogging_read_acquisition(datalogging::DataReader *const reader, Response *response);
             ResponseCode decode_datalogging_configure_request(
                 const Request *request,
                 RequestData::DataLogControl::Configure *request_data,

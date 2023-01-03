@@ -997,9 +997,40 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
             codecs::encode_8_bits(response_data->state, &response->data[0]);
-            response->data_length = datalen;
+            response->data_length = 1;
 
             return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response)
+        {
+            constexpr uint16_t acquisition_id_size = sizeof(response_data->acquisition_id);
+            constexpr uint16_t config_id_size = sizeof(response_data->config_id);
+            constexpr uint16_t number_of_points_size = sizeof(response_data->number_of_points);
+            constexpr uint16_t data_size_size = sizeof(response_data->data_size);
+
+            constexpr uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size;
+
+            if (datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            uint16_t cursor = 0;
+            cursor += codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[cursor]);
+            cursor += codecs::encode_16_bits_big_endian(response_data->config_id, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->number_of_points, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->data_size, &response->data[cursor]);
+            response->data_length = cursor;
+
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(datalogging::DataReader *const reader, Response *response)
+        {
+            static_cast<void>(reader);
+            static_cast<void>(response);
+            return protocol::ResponseCode::OK;
         }
 
         ResponseCode CodecV1_0::decode_datalogging_configure_request(
@@ -1007,26 +1038,27 @@ namespace scrutiny
             RequestData::DataLogControl::Configure *request_data,
             datalogging::Configuration *config)
         {
-            if (request->data_length < 14)
+            if (request->data_length < 16)
             {
                 return ResponseCode::InvalidRequest;
             }
 
             request_data->loop_id = request->data[0];
+            request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
 
-            config->decimation = codecs::decode_16_bits_big_endian(&request->data[1]);
-            config->probe_location = request->data[3];
-            config->timeout_us = codecs::decode_32_bits_big_endian(&request->data[4]);
-            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(request->data[8]);
-            config->trigger.hold_time_us = codecs::decode_32_bits_big_endian(&request->data[9]);
-            config->trigger.operand_count = request->data[13];
+            config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
+            config->probe_location = request->data[5];
+            config->timeout_us = codecs::decode_32_bits_big_endian(&request->data[6]);
+            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(request->data[10]);
+            config->trigger.hold_time_us = codecs::decode_32_bits_big_endian(&request->data[11]);
+            config->trigger.operand_count = request->data[15];
 
             if (config->trigger.operand_count > datalogging::MAX_OPERANDS)
             {
                 return ResponseCode::Overflow;
             }
 
-            uint16_t cursor = 14;
+            uint16_t cursor = 16;
             for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
             {
                 if (request->data_length < cursor + 1)

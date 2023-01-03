@@ -51,7 +51,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
 {
     Timebase timebase;
     uint8_t dst_buffer[10];
-    uint8_t compare_buf[sizeof(dst_buffer)];
+    uint8_t compare_buf[128];
     float var1;
     uint32_t var2;
 
@@ -83,50 +83,54 @@ TEST_F(TestRawEncoder, BasicEncoding)
     encoder.encode_next_entry();
 
     datalogging::RawFormatReader *reader = encoder.get_reader();
+    reader->reset();
+
+    EXPECT_EQ(reader->get_entry_count(), 3);
+    EXPECT_EQ(reader->get_total_size(), (sizeof(var1) + sizeof(var2) + 4) * 3); // entry_size*entry_count
 
     uint32_t expected_time;
-    uint8_t temp_buffer[4];
 
     // Chunk 1
-    reader->read(dst_buffer, sizeof(dst_buffer));
     var1 = 1.0f;
     var2 = 0x1111;
     expected_time = 0;
-    scrutiny::codecs::encode_32_bits_big_endian(3, compare_buf); // Number of signals
-    memcpy(&compare_buf[4], &var1, 4);
-    memcpy(&compare_buf[8], &var2, 2);
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
+    memcpy(&compare_buf[0], &var1, 4);
+    memcpy(&compare_buf[4], &var2, 4);
+    scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[8]);
 
-    // Chunk 2
-    reader->read(dst_buffer, sizeof(dst_buffer));
-    memcpy(&compare_buf[0], &(reinterpret_cast<uint8_t *>(&var2)[2]), 2);
-    scrutiny::codecs::encode_32_bits_big_endian(expected_time, temp_buffer);
-    memcpy(&compare_buf[2], temp_buffer, 4);
     var1 = 2.0f;
     var2 = 0x2222;
     expected_time = 100;
-    memcpy(&compare_buf[6], &var1, 4);
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
+    memcpy(&compare_buf[12], &var1, 4);
+    memcpy(&compare_buf[16], &var2, 4);
+    scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[20]);
 
-    // Chunk 3
-    reader->read(dst_buffer, sizeof(dst_buffer));
-    memcpy(&compare_buf[0], &var2, 4);
-    scrutiny::codecs::encode_32_bits_big_endian(expected_time, temp_buffer);
-    memcpy(&compare_buf[4], temp_buffer, 4);
     var1 = 3.0f;
     var2 = 0x3333;
     expected_time = 200;
-    memcpy(&compare_buf[8], &var1, 2);
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, sizeof(compare_buf));
+    memcpy(&compare_buf[24], &var1, 4);
+    memcpy(&compare_buf[28], &var2, 4);
+    scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[32]);
 
-    // chunk 4
-    reader->read(dst_buffer, sizeof(dst_buffer));
-    memcpy(&compare_buf[0], &(reinterpret_cast<uint8_t *>(&var1)[2]), 2);
-    memcpy(&compare_buf[2], &var2, 4);
-    scrutiny::codecs::encode_32_bits_big_endian(expected_time, temp_buffer);
-    memcpy(&compare_buf[6], temp_buffer, 4);
+    const uint8_t chunk_size = sizeof(dst_buffer);
+    const uint8_t nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5);
+    uint32_t total_read = 0;
+    for (uint8_t i = 0; i < nbchunk; i++)
+    {
+        uint32_t nread = reader->read(dst_buffer, chunk_size);
+        total_read += nread;
+        if (reader->finished())
+        {
+            EXPECT_BUF_EQ(dst_buffer, &compare_buf[i * chunk_size], nread);
+        }
+        else
+        {
+            EXPECT_EQ(nread, chunk_size);
+            EXPECT_BUF_EQ(dst_buffer, &compare_buf[i * chunk_size], chunk_size);
+        }
+    }
 
-    EXPECT_BUF_EQ(dst_buffer, compare_buf, 10);
+    EXPECT_EQ(total_read, reader->get_total_size());
 }
 
 #endif

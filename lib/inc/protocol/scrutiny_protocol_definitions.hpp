@@ -151,6 +151,8 @@ namespace scrutiny
                 ArmTrigger = 3,
                 DisarmTrigger = 4,
                 GetStatus = 5,
+                GetAcquisitionMetadata = 6,
+                ReadAcquisition = 7,
                 // ListRecordings = 5,
                 // ReadRecordings = 6,
             };

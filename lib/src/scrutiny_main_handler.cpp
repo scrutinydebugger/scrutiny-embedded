@@ -49,11 +49,11 @@ namespace scrutiny
         m_datalogging.owner = nullptr;
         m_datalogging.new_owner = nullptr;
         m_datalogging.error = DataloggingError::NoError;
-        m_datalogging.data_available = false;
         m_datalogging.request_arm_trigger = false;
         m_datalogging.request_ownership_release = false;
         m_datalogging.pending_ownership_release = false;
         m_datalogging.request_disarm_trigger = false;
+        m_datalogging.reading_in_progress = false;
 
         m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
 #endif
@@ -303,27 +303,16 @@ namespace scrutiny
 
             m_datalogging.owner = nullptr;
             m_datalogging.datalogger.reset();
-            m_datalogging.data_available = false;
             m_datalogging.pending_ownership_release = false;
-            break;
-        }
-        case LoopHandler::Loop2MainMessageID::DATALOGGER_DATA_ACQUIRED:
-        {
-
-            if (sender != m_datalogging.owner)
-            {
-                m_datalogging.error = DataloggingError::UnexpectedData;
-            }
-            else
-            {
-                m_datalogging.data_available = true;
-            }
-
             break;
         }
         case LoopHandler::Loop2MainMessageID::DATALOGGER_STATUS_UPDATE:
         {
             m_datalogging.datalogger_state_thread_safe = msg->data.datalogger_status_update.state;
+            if (m_datalogging.datalogger_state_thread_safe != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
+            {
+                m_datalogging.reading_in_progress = false;
+            }
             break;
         }
         default:
@@ -1366,6 +1355,12 @@ namespace scrutiny
             {
                 protocol::ResponseData::DataLogControl::GetStatus response_data;
             } get_status;
+
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetAcquisitionMetadata response_data;
+            } get_acq_metadata;
+
         } stack;
 
         if (!m_config.is_datalogging_configured())
@@ -1385,6 +1380,8 @@ namespace scrutiny
         }
         case protocol::DataLogControl::Subfunction::ConfigureDatalog:
         {
+            m_datalogging.reading_in_progress = false; // Make sure to update this quickly because we can.
+
             // Make sure the datalogger is released before writing the config object to avoid race conditions.
             if (m_datalogging.owner != nullptr)
             {
@@ -1467,7 +1464,7 @@ namespace scrutiny
             }
 
             LoopHandler *const loop = m_config.m_loops[stack.configure.request_data.loop_id];
-            m_datalogging.datalogger.configure(loop->get_timebase()); // Expect config object to be set
+            m_datalogging.datalogger.configure(loop->get_timebase(), stack.configure.request_data.config_id); // Expect config object to be set
 
             if (m_datalogging.datalogger.config_valid())
             {
@@ -1518,6 +1515,49 @@ namespace scrutiny
             code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
+        case protocol::DataLogControl::Subfunction::GetAcquisitionMetadata:
+        {
+            if (!datalogging_data_available())
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+            const datalogging::DataReader *const reader = m_datalogging.datalogger.get_reader();
+
+            stack.get_acq_metadata.response_data.acquisition_id = m_datalogging.datalogger.get_acquisition_id();
+            stack.get_acq_metadata.response_data.config_id = m_datalogging.datalogger.get_config_id();
+            stack.get_acq_metadata.response_data.number_of_points = reader->get_entry_count();
+            stack.get_acq_metadata.response_data.data_size = reader->get_total_size();
+            code = m_codec.encode_response_datalogging_get_acquisition_metadata(&stack.get_acq_metadata.response_data, response);
+            break;
+        }
+        /*case protocol::DataLogControl::Subfunction::ReadAcquisition:
+        {
+            if (m_datalogging.owner == nullptr) // no owner
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            if (datalogging_data_available())
+            {
+                datalogging::DataReader *const reader = m_datalogging.datalogger.get_reader();
+                if (m_datalogging.reading_in_progress == false)
+                {
+                    reader->reset();
+                    m_datalogging.reading_in_progress = true;
+                }
+
+                m_codec.encode_response_datalogging_read_acquisition(reader, response);
+            }
+            else
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                m_datalogging.reading_in_progress = false;
+                break;
+            }
+            break;
+        }*/
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;

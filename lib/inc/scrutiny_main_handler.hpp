@@ -43,7 +43,7 @@ namespace scrutiny
         /// @brief  Returns true if the datalogger has data available. Thread safe
         inline bool datalogging_data_available(void) const
         {
-            return m_datalogging.data_available; // Thread safe.
+            return m_datalogging.datalogger_state_thread_safe == datalogging::DataLogger::State::ACQUISITION_COMPLETED; // Thread safe.
         }
 
         /// @brief Returns true if the datalogger is in an error state. Thread safe
@@ -108,8 +108,7 @@ namespace scrutiny
         {
             NoError,
             UnexpectedRelease,
-            UnexpectedClaim,
-            UnexpectedData
+            UnexpectedClaim
         };
 
         struct
@@ -120,11 +119,11 @@ namespace scrutiny
             LoopHandler *owner;
             LoopHandler *new_owner;
             DataloggingError error;
-            bool data_available;
             bool request_arm_trigger;
             bool request_ownership_release;
             bool request_disarm_trigger;
             bool pending_ownership_release;
+            bool reading_in_progress;
         } m_datalogging;
 
 #endif

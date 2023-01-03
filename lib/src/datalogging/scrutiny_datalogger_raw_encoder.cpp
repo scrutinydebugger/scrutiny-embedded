@@ -18,18 +18,6 @@ namespace scrutiny
             {
                 return 0;
             }
-            if (!m_count_written)
-            {
-                if (max_size < 4)
-                {
-                    m_error = true;
-                    return 0;
-                }
-
-                codecs::encode_32_bits_big_endian(m_encoder->m_entries_count, buffer);
-                output_size += 4;
-                m_count_written = true;
-            }
 
             const uint32_t write_cursor = m_encoder->get_write_cursor();
             const uint32_t buffer_end = m_encoder->get_buffer_effective_end();
@@ -67,11 +55,20 @@ namespace scrutiny
             return output_size;
         }
 
+        uint32_t RawFormatReader::get_total_size(void) const
+        {
+            if (m_encoder->error() || m_error)
+            {
+                return 0;
+            }
+
+            return m_encoder->m_entries_count * m_encoder->m_entry_size;
+        }
+
         /// @brief Reset the reader
         void RawFormatReader::reset(void)
         {
             m_read_started = false;
-            m_count_written = false;
             m_error = m_encoder->error();
             m_finished = false;
             m_read_cursor = m_encoder->get_read_cursor();

@@ -31,12 +31,12 @@ namespace scrutiny
             void reset(void);
             inline bool error(void) const { return m_error; }
             inline uint32_t get_entry_count(void) const;
+            uint32_t get_total_size(void) const;
 
         protected:
             const RawFormatEncoder *const m_encoder;
             uint32_t m_read_cursor;
             bool m_finished;
-            bool m_count_written;
             bool m_error;
             bool m_read_started = false;
         };
@@ -65,7 +65,6 @@ namespace scrutiny
 
             RawFormatReader *get_reader(void)
             {
-                m_reader.reset();
                 return &m_reader;
             };
 

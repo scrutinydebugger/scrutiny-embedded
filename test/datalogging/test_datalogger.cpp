@@ -317,6 +317,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         }
 
         EXPECT_TRUE(datalogger.data_acquired()) << error_msg;
+        ASSERT_FALSE(datalogger.get_encoder()->error()) << error_msg;
         check_canaries();
 
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
@@ -334,6 +335,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         memset(output_buffer_canary2, 0x55, sizeof(output_buffer_canary2));
 
         datalogging::DataReader *reader = datalogger.get_reader();
+        reader->reset();
 
         uint32_t copied_count = 0;
         while (!reader->finished())
@@ -349,7 +351,9 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         EXPECT_GE(copied_count, 9 * sizeof(dlbuffer) / 10); // 90% usage at leas << error_msgt
 
         parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
-        parser.parse();
+        parser.parse(datalogger.get_reader()->get_entry_count());
+
+        ASSERT_FALSE(datalogger.in_error()) << error_msg;
         ASSERT_FALSE(parser.error()) << error_msg;
 
         // Validate data now;
@@ -383,6 +387,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         }
 
         uint32_t trigger_location = static_cast<uint32_t>(std::round(static_cast<float>(probe_location) / 255 * (reader->get_entry_count() - 1)));
+        ASSERT_GT(data.size(), trigger_location);
 
         float mid_var1 = *reinterpret_cast<float *>(data[trigger_location][0].data());
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(data[trigger_location][1].data());

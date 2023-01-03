@@ -9,7 +9,7 @@ class RawFormatParser
 {
 public:
     void init(scrutiny::MainHandler *main_handler, scrutiny::datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size);
-    void parse();
+    void parse(uint32_t entry_count);
     inline std::vector<std::vector<std::vector<uint8_t>>> get(void) const { return m_data; };
     bool error(void) const { return m_error; }
 
