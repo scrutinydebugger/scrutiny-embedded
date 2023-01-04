@@ -32,6 +32,7 @@ namespace scrutiny
             inline bool error(void) const { return m_error; }
             inline uint32_t get_entry_count(void) const;
             uint32_t get_total_size(void) const;
+            inline datalogging::EncodingType get_encoding(void) const;
 
         protected:
             const RawFormatEncoder *const m_encoder;
@@ -87,6 +88,7 @@ namespace scrutiny
         };
 
         uint32_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
+        inline datalogging::EncodingType RawFormatReader::get_encoding(void) const { return m_encoder->get_encoding(); }
     }
 }
 

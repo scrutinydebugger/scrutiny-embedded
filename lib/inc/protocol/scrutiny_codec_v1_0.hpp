@@ -300,6 +300,7 @@ namespace scrutiny
                     uint16_t config_id;
                     uint32_t number_of_points;
                     uint32_t data_size;
+                    uint8_t encoding;
                 };
             }
 

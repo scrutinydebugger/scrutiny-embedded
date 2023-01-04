@@ -274,10 +274,7 @@ TEST_F(TestDatalogControl, TestGetBufferSize)
 
     // Make expected response
     uint8_t expected_response[9 + 4] = {0x85, 1, 0, 0, 4};
-    expected_response[5] = static_cast<uint8_t>((buffer_size >> 24) & 0xFF);
-    expected_response[6] = static_cast<uint8_t>((buffer_size >> 16) & 0xFF);
-    expected_response[7] = static_cast<uint8_t>((buffer_size >> 8) & 0xFF);
-    expected_response[8] = static_cast<uint8_t>((buffer_size >> 0) & 0xFF);
+    codecs::encode_32_bits_big_endian(buffer_size, &expected_response[5]);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -632,6 +629,74 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(1);
     ASSERT_TRUE(scrutiny_handler.datalogger()->data_acquired());
     check_get_status(datalogging::DataLogger::State::ACQUISITION_COMPLETED);
+}
+
+TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
+{
+    uint8_t tx_buffer[32];
+    uint16_t n_to_read;
+
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.decimation = 1;
+    test_configure(0, 0xabcd, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                        // Accept ownership
+    scrutiny_handler.process(0);
+
+    // Send a request and expect a FailureToProceed because no acquisition is ready.
+    uint8_t request_data_before[8] = {5, 6, 0, 0};
+    add_crc(request_data_before, sizeof(request_data_before) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data_before, sizeof(request_data_before));
+    scrutiny_handler.process(0);
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_GT(n_to_read, 0);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+    // Expect a failure because there is no daa available.
+    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::FailureToProceed));
+
+    // Force an acquisition to happen
+    scrutiny_handler.datalogger()->arm_trigger();
+    scrutiny_handler.datalogger()->force_trigger();
+    EXPECT_FALSE(scrutiny_handler.datalogging_data_available());
+    for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
+    {
+        fixed_freq_loop.process();
+        scrutiny_handler.process(1);
+        if (scrutiny_handler.datalogger()->data_acquired())
+        {
+            break;
+        }
+    }
+    EXPECT_TRUE(scrutiny_handler.datalogger()->data_acquired());
+    // Make sure that the loop informs the main handler that data is available.
+    fixed_freq_loop.process();
+    scrutiny_handler.process(1);
+
+    // Send a 2nd request. Expect a OK response because data is available now.
+    uint8_t request_data_after[8] = {5, 6, 0, 0};
+    add_crc(request_data_after, sizeof(request_data_after) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+    scrutiny_handler.process(0);
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_GT(n_to_read, 0);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+
+    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::OK));
+
+    uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 1] = {0x85, 6, 0, 0, 13};
+    uint16_t cursor = 5;
+    cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
+    cursor += codecs::encode_16_bits_big_endian(0xabcd, &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->get_reader()->get_entry_count(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->get_reader()->get_total_size(), &expected_response[cursor]);
+    cursor += codecs::encode_8_bits(static_cast<uint8_t>(scrutiny_handler.datalogger()->get_reader()->get_encoding()), &expected_response[cursor]);
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
 
 #endif
