@@ -699,4 +699,93 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
 
+TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
+{
+    uint8_t tx_buffer[32];
+    uint16_t n_to_read;
+
+    // Send a request and expect a FailureToProceed because no acquisition is ready.
+    uint8_t request_data_before[8] = {5, 7, 0, 0};
+    add_crc(request_data_before, sizeof(request_data_before) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data_before, sizeof(request_data_before));
+    scrutiny_handler.process(0);
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_GT(n_to_read, 0);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+    // Expect a failure because there is no daa available.
+    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::FailureToProceed));
+}
+
+TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
+{
+    uint8_t tx_buffer[1024];
+    uint16_t n_to_read;
+
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.decimation = 1;
+    test_configure(0, 0xabcd, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                        // Accept ownership
+    scrutiny_handler.process(0);
+
+    for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
+    {
+        fixed_freq_loop.process();
+        scrutiny_handler.process(1);
+    }
+
+    // Force an acquisition to happen
+    scrutiny_handler.datalogger()->arm_trigger();
+    scrutiny_handler.datalogger()->force_trigger();
+    EXPECT_FALSE(scrutiny_handler.datalogging_data_available());
+    for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
+    {
+        fixed_freq_loop.process();
+        scrutiny_handler.process(1);
+        if (scrutiny_handler.datalogger()->data_acquired())
+        {
+            break;
+        }
+    }
+    EXPECT_TRUE(scrutiny_handler.datalogger()->data_acquired());
+    // Make sure that the loop informs the main handler that data is available.
+    fixed_freq_loop.process();
+    scrutiny_handler.process(1);
+
+    // Send a 2nd request. Expect a OK response because data is available now.
+    uint8_t request_data_after[8] = {5, 7, 0, 0};
+    add_crc(request_data_after, sizeof(request_data_after) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+    scrutiny_handler.process(0);
+    n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_GT(n_to_read, 0);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+
+    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK));
+
+    datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
+    EXPECT_EQ(tx_buffer[5], 1); // finished
+    EXPECT_EQ(tx_buffer[6], 0); // Rolling counter;
+    EXPECT_EQ(codecs::decode_16_bits_big_endian(&tx_buffer[7]), scrutiny_handler.datalogger()->get_acquisition_id());
+    uint32_t payload_length = codecs::decode_16_bits_big_endian(&tx_buffer[3]);
+    EXPECT_TRUE(reader->finished());
+    reader->reset();
+
+    uint8_t raw_data[sizeof(dlbuffer)];
+    uint32_t data_count = reader->read(raw_data, sizeof(raw_data));
+    EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.8f);
+    ASSERT_EQ(data_count, reader->get_total_size());
+    ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
+
+    EXPECT_BUF_EQ(&tx_buffer[9], raw_data, data_count);
+
+    uint32_t expected_crc = tools::crc32(raw_data, data_count);
+    uint32_t gotten_crc = codecs::decode_32_bits_big_endian(&tx_buffer[n_to_read - 8]);
+    EXPECT_EQ(gotten_crc, expected_crc);
+}
+
 #endif

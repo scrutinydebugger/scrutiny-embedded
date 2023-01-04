@@ -101,6 +101,8 @@ namespace scrutiny
         timestamp_t m_process_again_timestamp;
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec;
+#else
+#error Unsupported codec
 #endif
 
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -124,6 +126,8 @@ namespace scrutiny
             bool request_disarm_trigger;
             bool pending_ownership_release;
             bool reading_in_progress;
+            uint8_t read_acquisition_rolling_counter;
+            uint32_t read_acquisition_crc;
         } m_datalogging;
 
 #endif

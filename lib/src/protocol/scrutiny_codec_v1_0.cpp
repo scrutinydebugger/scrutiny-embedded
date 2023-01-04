@@ -535,7 +535,7 @@ namespace scrutiny
         ResponseCode CodecV1_0::encode_response_protocol_version(const ResponseData::GetInfo::GetProtocolVersion *response_data, Response *response)
         {
             constexpr uint16_t datalen = 2;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -551,7 +551,7 @@ namespace scrutiny
         {
             constexpr uint16_t datalen = sizeof(scrutiny::software_id);
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -566,7 +566,7 @@ namespace scrutiny
             constexpr uint16_t readonly_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_readonly_region);
             constexpr uint16_t forbidden_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_forbidden_region);
             constexpr uint16_t datalen = readonly_region_count_size + forbidden_region_count_size;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -583,7 +583,7 @@ namespace scrutiny
             constexpr uint16_t region_index_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionLocation::region_index);
             constexpr uint16_t datalen = region_type_size + region_index_size + 2 * addr_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -601,7 +601,7 @@ namespace scrutiny
         {
             constexpr uint16_t datalen = 1;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -673,9 +673,9 @@ namespace scrutiny
             constexpr uint16_t timestep_us_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_us);
             constexpr uint16_t name_length_size = sizeof(response_data->loop_name_length);
 
-            constexpr uint16_t minimum_size = loop_id_size + loop_type_size + name_length_size;
+            constexpr uint16_t datalen = loop_id_size + loop_type_size + name_length_size;
 
-            if (response->data_max_length < minimum_size)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -719,7 +719,7 @@ namespace scrutiny
         {
             constexpr uint16_t count_size = sizeof(response_data->count);
             constexpr uint16_t datalen = count_size;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -733,7 +733,7 @@ namespace scrutiny
         {
             constexpr uint16_t count_size = sizeof(response_data->count);
             constexpr uint16_t datalen = count_size;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -763,7 +763,7 @@ namespace scrutiny
 
             uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -783,7 +783,7 @@ namespace scrutiny
             constexpr uint16_t challenge_response_size = sizeof(response_data->challenge_response);
             constexpr uint16_t datalen = session_id_size + challenge_response_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -812,7 +812,7 @@ namespace scrutiny
             constexpr uint16_t comm_rx_timeout_pos = heartbeat_timeout_pos + heartbeat_timeout_size;
             constexpr uint16_t address_size_pos = comm_rx_timeout_pos + comm_rx_timeout_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -836,7 +836,7 @@ namespace scrutiny
             constexpr uint16_t datalen = magic_size + session_id_size;
 
             static_assert(sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC), "Mismatch between codec definition and protocol constant.");
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -979,7 +979,7 @@ namespace scrutiny
         ResponseCode CodecV1_0::encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response)
         {
             constexpr uint16_t datalen = sizeof(response_data->buffer_size);
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -992,7 +992,7 @@ namespace scrutiny
         ResponseCode CodecV1_0::encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response)
         {
             constexpr uint16_t datalen = sizeof(response_data->state);
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -1012,7 +1012,7 @@ namespace scrutiny
 
             constexpr uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size + encoding_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -1028,10 +1028,31 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(datalogging::DataReader *const reader, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished)
         {
-            static_cast<void>(reader);
-            static_cast<void>(response);
+            constexpr uint16_t minimum_datalen = 16;
+            if (minimum_datalen > MINIMUM_TX_BUFFER_SIZE && minimum_datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            *finished = false;
+            // [0] is set at the end.
+            response->data[1] = response_data->rolling_counter;
+            codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
+
+            uint32_t nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
+            response->data_length = nread + 4;
+            *response_data->crc = tools::crc32(&response->data[4], nread, *response_data->crc);
+
+            if (response_data->reader->finished() && response->data_length <= response->data_max_length - 4)
+            {
+                codecs::encode_32_bits_big_endian(*response_data->crc, &response->data[response->data_length]);
+                response->data_length += 4;
+                *finished = true;
+            }
+
+            response->data[0] = static_cast<uint8_t>(*finished);
+
             return protocol::ResponseCode::OK;
         }
 

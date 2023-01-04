@@ -205,6 +205,7 @@ namespace scrutiny
         }
 
         VariableTypeSize get_required_type_size(uint8_t size);
+        uint32_t crc32(const uint8_t *data, const uint32_t size, const uint32_t start_value = 0);
     }
 
 }

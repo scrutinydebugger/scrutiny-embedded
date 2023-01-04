@@ -23,9 +23,6 @@
         "lib/inc/scrutiny_config.hpp": {
             "docstring": "Definition of a run-time configuration of the scrutiny module.\nTo be filled in startup phase"
         },
-        "lib/inc/scrutiny_crc.hpp": {
-            "docstring": "CRC calculation functions"
-        },
         "lib/inc/scrutiny_loop_handler.hpp": {
             "docstring": "LoopHandler definition.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
         },
@@ -58,9 +55,6 @@
         },
         "lib/src/scrutiny_config.cpp": {
             "docstring": "Implementation of the run-time Scrutiny configuration"
-        },
-        "lib/src/scrutiny_crc.cpp": {
-            "docstring": "CRC calculation for scrutiny protocol frames"
         },
         "lib/src/scrutiny_loop_handler.cpp": {
             "docstring": "LoopHandler implementation.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"

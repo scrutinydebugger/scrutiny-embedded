@@ -15,7 +15,7 @@
 
 void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
 {
-    uint32_t crc = scrutiny::crc32(data, data_len);
+    uint32_t crc = scrutiny::tools::crc32(data, data_len);
     data[data_len] = (crc >> 24) & 0xFF;
     data[data_len + 1] = (crc >> 16) & 0xFF;
     data[data_len + 2] = (crc >> 8) & 0xFF;
@@ -31,8 +31,8 @@ void ScrutinyTest::add_crc(scrutiny::protocol::Response *response)
     header[3] = (response->data_length >> 8) & 0xFF;
     header[4] = response->data_length & 0xFF;
 
-    uint32_t crc = scrutiny::crc32(header, sizeof(header));
-    response->crc = scrutiny::crc32(response->data, response->data_length, crc);
+    uint32_t crc = scrutiny::tools::crc32(header, sizeof(header));
+    response->crc = scrutiny::tools::crc32(response->data, response->data_length, crc);
 }
 
 void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)

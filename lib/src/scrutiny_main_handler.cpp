@@ -54,6 +54,7 @@ namespace scrutiny
         m_datalogging.pending_ownership_release = false;
         m_datalogging.request_disarm_trigger = false;
         m_datalogging.reading_in_progress = false;
+        m_datalogging.read_acquisition_rolling_counter = 0;
 
         m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
 #endif
@@ -1361,6 +1362,11 @@ namespace scrutiny
                 protocol::ResponseData::DataLogControl::GetAcquisitionMetadata response_data;
             } get_acq_metadata;
 
+            struct
+            {
+                protocol::ResponseData::DataLogControl::ReadAcquisition response_data;
+            } read_acquisition;
+
         } stack;
 
         if (!m_config.is_datalogging_configured())
@@ -1532,7 +1538,7 @@ namespace scrutiny
             code = m_codec.encode_response_datalogging_get_acquisition_metadata(&stack.get_acq_metadata.response_data, response);
             break;
         }
-        /*case protocol::DataLogControl::Subfunction::ReadAcquisition:
+        case protocol::DataLogControl::Subfunction::ReadAcquisition:
         {
             if (m_datalogging.owner == nullptr) // no owner
             {
@@ -1547,9 +1553,31 @@ namespace scrutiny
                 {
                     reader->reset();
                     m_datalogging.reading_in_progress = true;
+                    m_datalogging.read_acquisition_rolling_counter = 0;
+                    m_datalogging.read_acquisition_crc = 0;
                 }
 
-                m_codec.encode_response_datalogging_read_acquisition(reader, response);
+                stack.read_acquisition.response_data.acquisition_id = m_datalogging.datalogger.get_acquisition_id();
+                stack.read_acquisition.response_data.reader = reader;
+                stack.read_acquisition.response_data.rolling_counter = m_datalogging.read_acquisition_rolling_counter;
+                stack.read_acquisition.response_data.crc = &m_datalogging.read_acquisition_crc;
+
+                bool finished = false;
+                code = m_codec.encode_response_datalogging_read_acquisition(&stack.read_acquisition.response_data, response, &finished);
+                m_datalogging.read_acquisition_rolling_counter++;
+
+                if (code != protocol::ResponseCode::OK)
+                {
+                    m_datalogging.reading_in_progress = false;
+                    break;
+                }
+
+                if (finished)
+                {
+                    m_datalogging.reading_in_progress = false;
+                }
+
+                break;
             }
             else
             {
@@ -1558,7 +1586,8 @@ namespace scrutiny
                 break;
             }
             break;
-        }*/
+        }
+
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;

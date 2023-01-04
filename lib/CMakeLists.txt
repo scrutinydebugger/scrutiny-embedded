@@ -6,7 +6,6 @@ project(scrutiny-embedded)
 add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_main_handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_loop_handler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_software_id.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_config.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_common_codecs.cpp

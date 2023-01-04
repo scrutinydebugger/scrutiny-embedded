@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "protocol/scrutiny_comm_handler.hpp"
-#include "scrutiny_crc.hpp"
+#include "scrutiny_tools.hpp"
 
 namespace scrutiny
 {
@@ -462,8 +462,8 @@ namespace scrutiny
             header_data[1] = req->subfunction_id;
             header_data[2] = (req->data_length >> 8) & 0xFF;
             header_data[3] = req->data_length & 0xFF;
-            crc = crc32(header_data, sizeof(header_data));
-            crc = crc32(req->data, req->data_length, crc);
+            crc = tools::crc32(header_data, sizeof(header_data));
+            crc = tools::crc32(req->data, req->data_length, crc);
             return (crc == req->crc);
         }
 
@@ -479,8 +479,8 @@ namespace scrutiny
             header[3] = (response->data_length >> 8) & 0xFF;
             header[4] = response->data_length & 0xFF;
 
-            uint32_t crc = scrutiny::crc32(header, sizeof(header));
-            response->crc = scrutiny::crc32(response->data, response->data_length, crc);
+            uint32_t crc = tools::crc32(header, sizeof(header));
+            response->crc = tools::crc32(response->data, response->data_length, crc);
         }
 
         void CommHandler::reset(void)
