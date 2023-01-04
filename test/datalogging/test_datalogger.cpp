@@ -348,7 +348,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         ASSERT_BUF_SET(output_buffer_canary1, 0xAA, sizeof(output_buffer_canary1)) << error_msg;
         ASSERT_BUF_SET(output_buffer_canary2, 0x55, sizeof(output_buffer_canary2)) << error_msg;
 
-        EXPECT_GE(copied_count, 9 * sizeof(dlbuffer) / 10); // 90% usage at leas << error_msgt
+        EXPECT_GE(copied_count, 9 * sizeof(dlbuffer) / 10) << error_msg; // 90% usage at least
 
         parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
         parser.parse(datalogger.get_reader()->get_entry_count());
@@ -397,5 +397,60 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
         EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 3) << error_msg;
         EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
+    }
+}
+
+TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
+{
+    float var1 = 0.0;
+    int32_t var2 = 0;
+
+    datalogging::Configuration dlconfig;
+    dlconfig.items_count = 4;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].data.memory.address = &var1;
+    dlconfig.items_to_log[1].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].data.memory.address = &var2;
+    dlconfig.items_to_log[2].type = datalogging::LoggableType::RPV;
+    dlconfig.items_to_log[2].data.rpv.id = 0x1000;
+    dlconfig.items_to_log[3].type = datalogging::LoggableType::TIME;
+
+    dlconfig.decimation = 1;
+    dlconfig.trigger.hold_time_us = 0;
+    dlconfig.timeout_us = 0;
+    dlconfig.trigger.operand_count = 0;
+    dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::AlwaysTrue;
+
+    uint8_t probe_location = 0;
+    for (uint16_t probe_loop = 0; probe_loop <= 255; probe_loop++)
+    {
+        var1 = 0.0;
+        var2 = 0;
+        probe_location = static_cast<uint8_t>(probe_loop);
+        dlconfig.probe_location = probe_location;
+        std::string error_msg = "probe_location="s + std::to_string(probe_location);
+        datalogger.reset();
+        datalogger.config()->copy_from(&dlconfig);
+        datalogger.configure(&tb);
+        datalogger.arm_trigger();
+
+        for (unsigned int i = 0; i < sizeof(dlbuffer) / 4; i++)
+        {
+            datalogger.process();
+            tb.step(10);
+            if (datalogger.data_acquired())
+            {
+                break;
+            }
+        }
+        ASSERT_TRUE(datalogger.data_acquired()) << error_msg;
+        ASSERT_FALSE(datalogger.get_encoder()->error()) << error_msg;
+        check_canaries();
+
+        datalogging::DataReader *reader = datalogger.get_reader();
+
+        EXPECT_GE(reader->get_total_size(), 9 * sizeof(dlbuffer) / 10) << error_msg; // 90% usage at least
     }
 }

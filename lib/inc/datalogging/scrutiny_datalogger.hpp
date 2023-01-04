@@ -89,6 +89,7 @@ namespace scrutiny
             uint16_t m_decimation_counter;
             uint16_t m_acquisition_id;
             uint16_t m_config_id;
+            uint32_t m_log_points_after_trigger;
 
             struct
             {

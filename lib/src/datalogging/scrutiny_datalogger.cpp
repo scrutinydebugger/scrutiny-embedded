@@ -33,7 +33,6 @@ namespace scrutiny
 
         void DataLogger::reset(void)
         {
-
             m_state = State::IDLE;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
@@ -45,22 +44,18 @@ namespace scrutiny
             m_config_valid = false;
             m_manual_trigger = false;
             m_acquisition_id = 0;
+            m_decimation_counter = 0;
+            m_log_points_after_trigger = 0;
         }
 
         void DataLogger::configure(Timebase *timebase_for_log, uint16_t config_id)
         {
-            if (m_state != State::IDLE)
-            {
-                reset();
-            }
+            reset();
 
             m_config_valid = true;
             m_timebase_for_log = timebase_for_log;
-            m_trigger.previous_val = false;
-            m_trigger.rising_edge_timestamp = 0;
-            m_decimation_counter = 0;
-
             m_config_id = config_id;
+
             if (m_config.items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL || m_config.items_count == 0)
             {
                 m_config_valid = false;
@@ -251,6 +246,7 @@ namespace scrutiny
                         {
                             m_acquisition_id++;
                             m_state = State::ACQUISITION_COMPLETED;
+                            m_log_points_after_trigger = m_encoder.get_write_counter();
                         }
                     }
                     break;
@@ -286,7 +282,7 @@ namespace scrutiny
                     }
                 }
 
-                if (m_encoder.get_write_counter() >= m_remaining_data_to_write)
+                if (m_encoder.get_write_counter() >= m_remaining_data_to_write && m_encoder.buffer_full())
                 {
                     return true;
                 }

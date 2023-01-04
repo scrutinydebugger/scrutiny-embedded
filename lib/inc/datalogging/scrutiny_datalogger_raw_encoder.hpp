@@ -63,6 +63,7 @@ namespace scrutiny
             inline bool error(void) const { return m_error; }
             inline uint32_t get_entry_count(void) const { return m_entries_count; }
             inline uint32_t get_buffer_effective_end(void) const { return m_entry_size * m_entries_count; }
+            inline bool buffer_full(void) const { return m_full; }
 
             RawFormatReader *get_reader(void)
             {

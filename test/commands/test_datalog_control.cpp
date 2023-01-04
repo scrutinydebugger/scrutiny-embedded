@@ -730,12 +730,6 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     fixed_freq_loop.process();                                        // Accept ownership
     scrutiny_handler.process(0);
 
-    for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
-    {
-        fixed_freq_loop.process();
-        scrutiny_handler.process(1);
-    }
-
     // Force an acquisition to happen
     scrutiny_handler.datalogger()->arm_trigger();
     scrutiny_handler.datalogger()->force_trigger();
@@ -754,7 +748,6 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
 
-    // Send a 2nd request. Expect a OK response because data is available now.
     uint8_t request_data_after[8] = {5, 7, 0, 0};
     add_crc(request_data_after, sizeof(request_data_after) - 4);
 
@@ -777,7 +770,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 
     uint8_t raw_data[sizeof(dlbuffer)];
     uint32_t data_count = reader->read(raw_data, sizeof(raw_data));
-    EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.8f);
+    EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.9f);
     ASSERT_EQ(data_count, reader->get_total_size());
     ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
 
@@ -786,6 +779,101 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     uint32_t expected_crc = tools::crc32(raw_data, data_count);
     uint32_t gotten_crc = codecs::decode_32_bits_big_endian(&tx_buffer[n_to_read - 8]);
     EXPECT_EQ(gotten_crc, expected_crc);
+}
+
+TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
+{
+    uint8_t small_tx_buffer[32];
+    uint8_t big_dlbuffer[10000];
+
+    config.set_buffers(_rx_buffer, sizeof(_rx_buffer), small_tx_buffer, sizeof(small_tx_buffer));
+    config.set_datalogging_buffers(big_dlbuffer, sizeof(big_dlbuffer));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.decimation = 1;
+    test_configure(0, 0xabcd, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                        // Accept ownership
+    scrutiny_handler.process(0);
+
+    // Force an acquisition to happen
+    scrutiny_handler.datalogger()->arm_trigger();
+    scrutiny_handler.datalogger()->force_trigger();
+    EXPECT_FALSE(scrutiny_handler.datalogging_data_available());
+    for (uint32_t i = 0; i < sizeof(big_dlbuffer) / 4; i++)
+    {
+        fixed_freq_loop.process();
+        scrutiny_handler.process(1);
+        if (scrutiny_handler.datalogger()->data_acquired())
+        {
+            break;
+        }
+    }
+    EXPECT_TRUE(scrutiny_handler.datalogger()->data_acquired());
+    // Make sure that the loop informs the main handler that data is available.
+    fixed_freq_loop.process();
+    scrutiny_handler.process(1);
+    constexpr uint16_t transfer_overhead = 9 + 4; // protocol overhead =9.  Payload overhead = 4
+    constexpr uint16_t crc_size = 4;
+    ASSERT_GT(sizeof(small_tx_buffer), transfer_overhead);
+    constexpr uint16_t maximum_transfer_count = (sizeof(big_dlbuffer) + crc_size) / (sizeof(small_tx_buffer) - transfer_overhead);
+    uint8_t read_data[sizeof(big_dlbuffer)];
+    uint8_t reference_data[sizeof(big_dlbuffer)];
+    uint16_t expected_acquisition_id = scrutiny_handler.datalogger()->get_acquisition_id();
+    for (uint8_t iteration = 0; iteration < 3; iteration++)
+    {
+        uint32_t read_cursor = 0;
+        // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or rearm)
+        datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
+        reader->reset();
+        uint16_t total_data_length = reader->read(reference_data, sizeof(reference_data));
+        ASSERT_GT(total_data_length, 0.95f * sizeof(big_dlbuffer));
+        uint32_t expected_crc = tools::crc32(reference_data, total_data_length);
+        ASSERT_TRUE(reader->finished()) << "iteration=" << iteration;
+
+        bool finished = false;
+        for (uint16_t i = 0; i < maximum_transfer_count && !finished; i++)
+        {
+            std::string error_msg = std::string("iteration=") + std::to_string(iteration) + std::string(", i=") + std::to_string(i);
+            uint8_t validation_txbuffer[128];
+
+            uint8_t request_data_after[8] = {5, 7, 0, 0};
+            add_crc(request_data_after, sizeof(request_data_after) - 4);
+
+            scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+            scrutiny_handler.process(0);
+            uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+            ASSERT_GT(n_to_read, 0) << error_msg;
+            ASSERT_LT(n_to_read, sizeof(validation_txbuffer)) << error_msg;
+            scrutiny_handler.comm()->pop_data(validation_txbuffer, n_to_read);
+            scrutiny_handler.process(0);
+
+            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(validation_txbuffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK)) << error_msg;
+            finished = static_cast<bool>(validation_txbuffer[5]);
+            EXPECT_EQ(validation_txbuffer[6], i % 0x100) << error_msg; // Rolling counter;
+            EXPECT_EQ(codecs::decode_16_bits_big_endian(&validation_txbuffer[7]), expected_acquisition_id) << error_msg;
+
+            uint16_t payload_length = codecs::decode_16_bits_big_endian(&validation_txbuffer[3]);
+            ASSERT_GE(payload_length, 8);
+
+            uint16_t qty_to_read;
+            if (finished)
+            {
+                qty_to_read = payload_length - 4 - 4; // block Last block has CRC;
+                uint32_t read_crc = codecs::decode_32_bits_big_endian(&validation_txbuffer[9 + qty_to_read]);
+                EXPECT_EQ(read_crc, expected_crc) << error_msg;
+            }
+            else
+            {
+                qty_to_read = payload_length - 4;
+            }
+            std::memcpy(&read_data[read_cursor], &validation_txbuffer[9], qty_to_read);
+            read_cursor += qty_to_read;
+        }
+
+        EXPECT_BUF_EQ(read_data, reference_data, total_data_length);
+    }
 }
 
 #endif
