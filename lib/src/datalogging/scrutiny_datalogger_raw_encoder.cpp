@@ -206,6 +206,8 @@ namespace scrutiny
             {
                 m_error = true;
             }
+
+            m_reader.reset();
         }
     }
 }
