@@ -791,7 +791,7 @@ namespace scrutiny
             }
 
             const char *const loop_name = m_config.m_loops[loop_id]->get_name();
-            const uint8_t loop_name_length = tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH);
+            const uint8_t loop_name_length = static_cast<uint8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
             stack.get_loop_def.response_data.loop_name_length = loop_name_length;
             stack.get_loop_def.response_data.loop_name = loop_name;
 

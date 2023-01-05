@@ -351,7 +351,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         EXPECT_GE(copied_count, 9 * sizeof(dlbuffer) / 10) << error_msg; // 90% usage at least
 
         parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
-        parser.parse(datalogger.get_reader()->get_entry_count());
+        parser.parse(reader->get_entry_count());
 
         ASSERT_FALSE(datalogger.in_error()) << error_msg;
         ASSERT_FALSE(parser.error()) << error_msg;
@@ -450,6 +450,7 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
         check_canaries();
 
         datalogging::DataReader *reader = datalogger.get_reader();
+        reader->reset();
 
         EXPECT_GE(reader->get_total_size(), 9 * sizeof(dlbuffer) / 10) << error_msg; // 90% usage at least
     }

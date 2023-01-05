@@ -74,7 +74,7 @@ TEST(TestDataLoggingTypes, ConvertToCompareType)
     vtype = scrutiny::VariableType::sint64;
     v.sint64 = -0x123456789ABC;
     scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -0x123456789ABCu);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -0x123456789ABC);
 
     vtype = scrutiny::VariableType::float64;
     v.float64 = 3.1415926;

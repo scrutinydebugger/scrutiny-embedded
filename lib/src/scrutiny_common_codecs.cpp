@@ -129,7 +129,7 @@ namespace scrutiny
                 codecs::encode_64_bits_big_endian(val->uint64, buffer);
                 break;
 #endif
-            default: // handled above
+            default:
                 return 0;
             }
             return typesize;

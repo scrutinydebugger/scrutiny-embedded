@@ -44,7 +44,7 @@ protected:
                            variable_freq_loop("Loop2") {}
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size);
+    uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
     void test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
     void check_get_status(datalogging::DataLogger::State expected_state);
@@ -100,9 +100,9 @@ TEST_F(TestDatalogControl, TestUnsupported)
 }
 #else
 
-uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint32_t max_size)
+uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size)
 {
-    uint32_t cursor = 0;
+    uint16_t cursor = 0;
     if (max_size < 1 + 2 + 2 + 1 + 4 + 1 + 4 + 1)
     {
         return 0;
@@ -358,8 +358,7 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
         std::numeric_limits<float>::infinity(),
         -std::numeric_limits<float>::infinity(),
         std::numeric_limits<float>::quiet_NaN(),
-        std::numeric_limits<float>::signaling_NaN(),
-        0.0f / 0.0f};
+        std::numeric_limits<float>::signaling_NaN()};
 
     constexpr uint8_t loop_id = 1;
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
@@ -686,14 +685,16 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::OK));
+    datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
+    reader->reset();
 
     uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 1] = {0x85, 6, 0, 0, 13};
     uint16_t cursor = 5;
     cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
     cursor += codecs::encode_16_bits_big_endian(0xabcd, &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->get_reader()->get_entry_count(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->get_reader()->get_total_size(), &expected_response[cursor]);
-    cursor += codecs::encode_8_bits(static_cast<uint8_t>(scrutiny_handler.datalogger()->get_reader()->get_encoding()), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(reader->get_entry_count(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(reader->get_total_size(), &expected_response[cursor]);
+    cursor += codecs::encode_8_bits(static_cast<uint8_t>(reader->get_encoding()), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -827,7 +828,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or rearm)
         datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
         reader->reset();
-        uint16_t total_data_length = reader->read(reference_data, sizeof(reference_data));
+        const uint32_t total_data_length = reader->read(reference_data, sizeof(reference_data));
         ASSERT_GT(total_data_length, 0.95f * sizeof(big_dlbuffer));
         uint32_t expected_crc = tools::crc32(reference_data, total_data_length);
         ASSERT_TRUE(reader->finished()) << "iteration=" << iteration;

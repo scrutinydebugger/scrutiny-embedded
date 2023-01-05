@@ -1029,8 +1029,8 @@ namespace scrutiny
             response->data[1] = response_data->rolling_counter;
             codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
 
-            uint32_t nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
-            response->data_length = nread + 4;
+            const uint32_t nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
+            response->data_length = static_cast<uint16_t>(nread + 4);
             *response_data->crc = tools::crc32(&response->data[4], nread, *response_data->crc);
 
             if (response_data->reader->finished() && response->data_length <= response->data_max_length - 4)

@@ -521,9 +521,9 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
     uint8_t expected_response[9 + 12] = {0x81, 9, 0, 0, 12};
     expected_response[5] = 0; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
-    scrutiny::codecs::encode_32_bits_big_endian(0x12345678, &expected_response[7]);
-    expected_response[11] = loop_name.length();
-    strcpy(reinterpret_cast<char *>(&expected_response[12]), loop_name.c_str());
+    scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, &expected_response[7]);
+    expected_response[11] = static_cast<uint8_t>(loop_name.length());
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[12]), loop_name.c_str(), loop_name.size() + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -556,8 +556,8 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
     uint8_t expected_response[9 + 8] = {0x81, 9, 0, 0, 8};
     expected_response[5] = 1; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::VARIABLE_FREQ);
-    expected_response[7] = loop_name.length();
-    strcpy(reinterpret_cast<char *>(&expected_response[8]), loop_name.c_str());
+    expected_response[7] = static_cast<uint8_t>(loop_name.length());
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[8]), loop_name.c_str(), loop_name.size() + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));

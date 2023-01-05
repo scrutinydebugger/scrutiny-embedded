@@ -71,22 +71,22 @@ TEST_F(TestRawEncoder, BasicEncoding)
     timebase.reset();
 
     var1 = 1.0f;
-    var2 = 0x1111;
+    var2 = 0x1111u;
     encoder.encode_next_entry();
     timebase.step(100);
     var1 = 2.0f;
-    var2 = 0x2222;
+    var2 = 0x2222u;
     encoder.encode_next_entry();
     timebase.step(100);
     var1 = 3.0f;
-    var2 = 0x3333;
+    var2 = 0x3333u;
     encoder.encode_next_entry();
 
     datalogging::RawFormatReader *reader = encoder.get_reader();
     reader->reset();
 
-    EXPECT_EQ(reader->get_entry_count(), 3);
-    EXPECT_EQ(reader->get_total_size(), (sizeof(var1) + sizeof(var2) + 4) * 3); // entry_size*entry_count
+    EXPECT_EQ(reader->get_entry_count(), 3u);
+    EXPECT_EQ(reader->get_total_size(), (sizeof(var1) + sizeof(var2) + 4u) * 3u); // entry_size*entry_count
 
     uint32_t expected_time;
 
@@ -107,13 +107,13 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     var1 = 3.0f;
     var2 = 0x3333;
-    expected_time = 200;
+    expected_time = 200u;
     memcpy(&compare_buf[24], &var1, 4);
     memcpy(&compare_buf[28], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[32]);
 
     const uint8_t chunk_size = sizeof(dst_buffer);
-    const uint8_t nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5);
+    const uint8_t nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
     for (uint8_t i = 0; i < nbchunk; i++)
     {
