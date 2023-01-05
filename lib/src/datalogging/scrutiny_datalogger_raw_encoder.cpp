@@ -14,7 +14,7 @@ namespace scrutiny
         uint32_t RawFormatReader::read(uint8_t *buffer, const uint32_t max_size)
         {
             uint32_t output_size = 0;
-            if (m_error)
+            if (error())
             {
                 return 0;
             }
@@ -57,7 +57,7 @@ namespace scrutiny
 
         uint32_t RawFormatReader::get_total_size(void) const
         {
-            if (m_encoder->error() || m_error)
+            if (error())
             {
                 return 0;
             }
@@ -69,7 +69,6 @@ namespace scrutiny
         void RawFormatReader::reset(void)
         {
             m_read_started = false;
-            m_error = m_encoder->error();
             m_finished = false;
             m_read_cursor = m_encoder->get_read_cursor();
         }

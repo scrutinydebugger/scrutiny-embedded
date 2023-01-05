@@ -29,7 +29,7 @@ namespace scrutiny
             uint32_t read(uint8_t *buffer, const uint32_t max_size);
             inline bool finished(void) { return m_finished; }
             void reset(void);
-            inline bool error(void) const { return m_error; }
+            inline bool error(void) const;
             inline uint32_t get_entry_count(void) const;
             uint32_t get_total_size(void) const;
             inline datalogging::EncodingType get_encoding(void) const;
@@ -38,7 +38,6 @@ namespace scrutiny
             const RawFormatEncoder *const m_encoder;
             uint32_t m_read_cursor;
             bool m_finished;
-            bool m_error;
             bool m_read_started = false;
         };
 
@@ -90,6 +89,7 @@ namespace scrutiny
 
         uint32_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
         inline datalogging::EncodingType RawFormatReader::get_encoding(void) const { return m_encoder->get_encoding(); }
+        inline bool RawFormatReader::error(void) const { return m_encoder->error(); }
     }
 }
 
