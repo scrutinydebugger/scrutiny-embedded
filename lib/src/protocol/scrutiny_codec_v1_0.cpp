@@ -233,10 +233,8 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += addr_size;
-            codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
-            m_cursor += 2;
+            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
@@ -269,11 +267,8 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += addr_size;
-            codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
-            m_cursor += 2;
-
+            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
 
@@ -302,11 +297,8 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += 2;
-            m_buffer[m_cursor] = static_cast<uint8_t>(rpv->type);
-            m_cursor += 1;
-
+            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(static_cast<uint8_t>(rpv->type), &m_buffer[m_cursor]);
             m_response->data_length = m_cursor;
         }
 
@@ -343,10 +335,8 @@ namespace scrutiny
 #endif
             )
             {
-                codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-                m_cursor += 2;
-                codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
-                m_cursor += typesize;
+                m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
                 m_response->data_length = m_cursor;
             }
         }
@@ -378,9 +368,8 @@ namespace scrutiny
                 return;
             }
 
-            codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += 2;
-            m_buffer[m_cursor++] = typesize;
+            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(typesize, &m_buffer[m_cursor]);
 
             m_response->data_length = m_cursor;
         }

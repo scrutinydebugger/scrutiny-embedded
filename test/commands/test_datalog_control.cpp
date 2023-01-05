@@ -860,7 +860,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             uint16_t qty_to_read;
             if (finished)
             {
-                qty_to_read = payload_length - 4 - 4; // block Last block has CRC;
+                qty_to_read = payload_length - 4 - 4; // Last block has CRC;
                 uint32_t read_crc = codecs::decode_32_bits_big_endian(&validation_txbuffer[9 + qty_to_read]);
                 EXPECT_EQ(read_crc, expected_crc) << error_msg;
             }
@@ -871,8 +871,9 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             std::memcpy(&read_data[read_cursor], &validation_txbuffer[9], qty_to_read);
             read_cursor += qty_to_read;
         }
+        EXPECT_TRUE(finished);
 
-        EXPECT_BUF_EQ(read_data, reference_data, total_data_length);
+        EXPECT_BUF_EQ(read_data, reference_data, total_data_length) << "iteration=" << iteration;
     }
 }
 
