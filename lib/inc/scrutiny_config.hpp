@@ -33,6 +33,10 @@ namespace scrutiny
         void set_loops(LoopHandler **loops, uint8_t loop_count);
 #if SCRUTINY_ENABLE_DATALOGGING
         void set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
+        inline void set_datalogging_trigger_callback(datalogging::trigger_callback_t callback)
+        {
+            m_datalogger_trigger_callback = callback;
+        };
 #endif
         inline bool is_user_command_callback_set(void) const
         {
@@ -88,6 +92,7 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t *m_datalogger_buffer;
         uint32_t m_datalogger_buffer_size;
+        datalogging::trigger_callback_t m_datalogger_trigger_callback;
 #endif
     };
 }

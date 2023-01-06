@@ -20,11 +20,12 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size)
+        void DataLogger::init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size, trigger_callback_t trigger_callback)
         {
             m_timebase = timebase;
             m_main_handler = main_handler;
             m_buffer_size = buffer_size;
+            m_trigger_callback = trigger_callback;
 
             m_encoder.init(main_handler, timebase, &m_config, buffer, buffer_size);
 
@@ -238,6 +239,10 @@ namespace scrutiny
                         {
                             if (!m_trigger_point_stamped)
                             {
+                                if (m_trigger_callback != nullptr)
+                                {
+                                    m_trigger_callback();
+                                }
                                 stamp_trigger_point();
                             }
                         }

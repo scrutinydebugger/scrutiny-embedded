@@ -41,6 +41,7 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
         m_datalogger_buffer = nullptr;
         m_datalogger_buffer_size = 0;
+        m_datalogger_trigger_callback = nullptr;
 #endif
     }
 

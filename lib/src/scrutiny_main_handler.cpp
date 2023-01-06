@@ -45,7 +45,7 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        m_datalogging.datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size);
+        m_datalogging.datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size, m_config.m_datalogger_trigger_callback);
         m_datalogging.owner = nullptr;
         m_datalogging.new_owner = nullptr;
         m_datalogging.error = DataloggingError::NoError;

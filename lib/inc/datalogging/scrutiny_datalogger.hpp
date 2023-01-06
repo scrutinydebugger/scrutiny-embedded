@@ -43,7 +43,8 @@ namespace scrutiny
             /// @param timebase The timebase used to keep track of time
             /// @param buffer The logging buffer
             /// @param buffer_size Size of the logging buffer
-            void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size);
+            /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread safety)
+            void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_sizem, trigger_callback_t trigger_callback = nullptr);
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase_for_log The timebase used for time logging
@@ -117,8 +118,9 @@ namespace scrutiny
             uint16_t read_next_entry_size(uint32_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
-            MainHandler *m_main_handler; // A pointer to the main handler
-            uint32_t m_buffer_size;      // The datalogging buffer size
+            MainHandler *m_main_handler;           // A pointer to the main handler
+            uint32_t m_buffer_size;                // The datalogging buffer size
+            trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
             Timebase *m_timebase;               // Pointer to the timebase for internal time tracking
             Timebase *m_timebase_for_log;       // Pointer to timebase for time logging (can be in a different time domain)

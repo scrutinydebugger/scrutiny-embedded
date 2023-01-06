@@ -21,6 +21,7 @@ using namespace scrutiny;
 using namespace std;
 
 static uint32_t g_u32_rpv1000 = 0;
+static uint32_t g_trigger_callback_count = 0;
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
 {
@@ -42,6 +43,11 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
     }
 
     return true;
+}
+
+static void trigger_callback(void)
+{
+    g_trigger_callback_count++;
 }
 
 class TestDatalogger : public ScrutinyTest
@@ -86,10 +92,12 @@ protected:
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);
-        datalogger.init(&scrutiny_handler, &tb, dlbuffer, sizeof(dlbuffer));
+        datalogger.init(&scrutiny_handler, &tb, dlbuffer, sizeof(dlbuffer), trigger_callback);
 
         memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
         memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
+
+        g_trigger_callback_count = 0;
     }
 };
 
@@ -220,7 +228,7 @@ TEST_F(TestDatalogger, BasicAcquisition)
         my_var += 1.0;
     }
     EXPECT_FALSE(datalogger.data_acquired());
-
+    EXPECT_EQ(g_trigger_callback_count, 0);
     datalogger.arm_trigger();
 
     for (unsigned int i = 0; i < 100; i++)
@@ -230,6 +238,7 @@ TEST_F(TestDatalogger, BasicAcquisition)
         my_var += 1.0;
     }
     EXPECT_TRUE(datalogger.data_acquired());
+    EXPECT_EQ(g_trigger_callback_count, 1);
 
     check_canaries();
 }

@@ -168,6 +168,9 @@ namespace scrutiny
             TriggerConfig trigger;
         };
 
+        /// @brief Datalogging Trigger callback
+        typedef void (*trigger_callback_t)();
+
     }
 }
 
