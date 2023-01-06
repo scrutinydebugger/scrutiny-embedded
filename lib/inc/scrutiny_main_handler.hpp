@@ -27,10 +27,28 @@ namespace scrutiny
     {
 
     public:
+        /// @brief Initialize the scrutiny Main Handler
+        /// @param config A pointer to allocated configuration object. No copy will be made, config must stay allocated forever.
         void init(const Config *config);
+
+        /// @brief Gets the Runtime Published Definition from its ID
+        /// @param id The RPV ID
+        /// @param rpv The Runtime Published Value object to writes to
+        /// @return true if the RPV has been found, false otherwise
         bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
+
+        /// @brief Tells if a Runtime Published Values with the given ID has been defined.
+        /// @param id The RPV ID
+        /// @return True if RPV exists in configuration.
         bool rpv_exists(const uint16_t id) const;
+
+        /// @brief Returns the type of a Runtime Published Value identified by its ID
+        /// @param id The RPV ID
+        /// @return The VariableType object of the RPV.  VariableType::Unknown if the given ID is not set in the configuration.
         VariableType get_rpv_type(const uint16_t id) const;
+
+        /// @brief Periodic process loop to be called as fast as possible
+        /// @param timestep_100ns The time elapsed since last call to this function, in multiple of 100ns.
         void process(const timediff_t timestep_100ns);
 
 #if SCRUTINY_ENABLE_DATALOGGING

@@ -14,20 +14,24 @@
 
 namespace scrutiny
 {
+    /// @brief Represents an storage endianness
     enum class Endianness
     {
         LITTLE,
         BIG
     };
 
+    /// @brief Represents an adress range with a start an a end.
     struct AddressRange
     {
         void *start;
         void *end;
     };
 
+    /// @brief User Command Callback function
     typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
 
+    /// @brief Represent a type type, meaning a type without its size. uint8, uin16, int32 all have type type uint.
     enum class VariableTypeType
     {
         _sint = 0 << 4,
@@ -38,6 +42,7 @@ namespace scrutiny
         _undef = 0xF << 4
     };
 
+    /// @brief Represnet a type size
     enum class VariableTypeSize
     {
         _8 = 0,
@@ -75,6 +80,7 @@ namespace scrutiny
         unknown = 0xFF
     };
 
+    /// @brief Union structure to pass any type of data to a function.
     union AnyType
     {
         uint8_t uint8;
@@ -94,6 +100,7 @@ namespace scrutiny
 #endif
     };
 
+    /// @brief The fast version of AnyType
     union AnyTypeFast
     {
         uint_fast8_t uint8;
@@ -132,6 +139,7 @@ namespace scrutiny
     constexpr VariableType BiggestFloat = VariableType::float32;
 #endif
 
+    /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and a ID that can be read/written by the server
     struct RuntimePublishedValue
     {
     public:
@@ -139,9 +147,12 @@ namespace scrutiny
         VariableType type;
     };
 
+    /// @brief Callback called on Runtime Published Value read
     typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType *outval);
+    /// @brief Callback called on Runtime Published Value write
     typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType *inval);
 
+    /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
     struct MemoryBlock
     {
         uint8_t *start_address;

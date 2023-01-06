@@ -121,29 +121,50 @@ namespace scrutiny
 #endif
     };
 
+    /// @brief Handler for Fixed Frequency loops. (Same delta-time between each call to process)
+    /// This act as a probe to execute some code in tasks that are not synchronized with the Main Handler task
     class FixedFrequencyLoopHandler : public LoopHandler
     {
     public:
+        /// @brief Constructor
+        /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
+        /// @param name The name of the loop
         FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = nullptr) : LoopHandler(name),
                                                                                            m_timestep_100ns(timestep_100ns)
         {
         }
+        /// @brief Process function be callled at each iteration of the loop.
         void process(void);
+
+        /// @brief Return the type of loop handler
         virtual LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
+
+        /// @brief Returns the time delta assigned to the loop (in multiple of 100ns)
         virtual uint32_t get_timestep_100ns(void) const { return m_timestep_100ns; }
 
     protected:
         const uint32_t m_timestep_100ns;
     };
 
+    /// @brief Handler for Variable Frequency loops. (Variable delta-time between each call to process)
+    /// This act as a probe to execute some code in tasks that are not synchronized with the Main Handler task
     class VariableFrequencyLoopHandler : public LoopHandler
     {
     public:
+        /// @brief Constructor
+        /// @param name The name of the loop
         VariableFrequencyLoopHandler(const char *name = nullptr) : LoopHandler(name)
         {
         }
+
+        /// @brief Stubbed implementation that always return 0
         virtual uint32_t get_timestep_100ns(void) const { return 0; }
+
+        /// @brief Process function be callled at each iteration of the loop.
+        /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t timestep_100ns);
+
+        /// @brief Return the type of loop handler
         virtual LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
     };
 }
