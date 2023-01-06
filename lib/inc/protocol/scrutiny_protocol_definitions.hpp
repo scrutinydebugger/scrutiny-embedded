@@ -1,11 +1,11 @@
-//    scrutiny_protocol_definitions.h
+//    scrutiny_protocol_definitions.hpp
 //        Defines Request/Rsponse objects and commands/subfunctions IDs.
 //        Not version specific
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_PROTOCOL_DEFINITION_H___
 #define ___SCRUTINY_PROTOCOL_DEFINITION_H___
@@ -50,21 +50,13 @@ namespace scrutiny
             uint32_t crc;
         };
 
-        struct MemoryBlock
-        {
-            uint8_t *start_address;
-            uint16_t length;
-            uint8_t *source_data;
-            uint8_t *mask;
-        };
-
         enum class CommandId
         {
             GetInfo = 0x01,
             CommControl = 0x02,
             MemoryControl = 0x03,
-            DataLogControl = 0x04,
-            UserCommand = 0x05
+            UserCommand = 0x04,
+            DataLogControl = 0x05
         };
 
         enum class ResponseCode
@@ -75,7 +67,9 @@ namespace scrutiny
             Overflow = 3,
             Busy = 4,
             FailureToProceed = 5,
-            Forbidden = 6
+            Forbidden = 6,
+            NoResponseToSend = 0xFE,
+            ProcessAgain = 0xFF
         };
 
         enum class RxError
@@ -109,7 +103,9 @@ namespace scrutiny
                 GetSpecialMemoryRegionCount = 4,
                 GetSpecialMemoryLocation = 5,
                 GetRuntimePublishedValuesCount = 6,
-                GetRuntimePublishedValuesDefinition = 7
+                GetRuntimePublishedValuesDefinition = 7,
+                GetLoopCount = 8,
+                GetLoopDefinition = 9
             };
 
             enum class MemoryRegionType
@@ -143,6 +139,20 @@ namespace scrutiny
                 WriteMasked = 3,
                 ReadRPV = 4,
                 WriteRPV = 5
+            };
+        }
+
+        namespace DataLogControl
+        {
+            enum class Subfunction
+            {
+                GetSetup = 1,
+                ConfigureDatalog = 2,
+                ArmTrigger = 3,
+                DisarmTrigger = 4,
+                GetStatus = 5,
+                GetAcquisitionMetadata = 6,
+                ReadAcquisition = 7,
             };
         }
 

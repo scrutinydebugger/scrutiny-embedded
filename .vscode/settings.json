@@ -61,9 +61,13 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "ranges": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     },
     "cmake.configureOnOpen": false,
+    "cmake.configureSettings": { "gtest_build_samples": "ON" },
     "[cpp]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-vscode.cpptools"

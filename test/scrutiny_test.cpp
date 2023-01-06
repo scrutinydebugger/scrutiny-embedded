@@ -6,22 +6,23 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <cstdint>
+#include <string>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-void ScrutinyTest::add_crc(uint8_t* data, uint16_t data_len)
+void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
 {
-    uint32_t crc = scrutiny::crc32(data, data_len);
+    uint32_t crc = scrutiny::tools::crc32(data, data_len);
     data[data_len] = (crc >> 24) & 0xFF;
     data[data_len + 1] = (crc >> 16) & 0xFF;
     data[data_len + 2] = (crc >> 8) & 0xFF;
     data[data_len + 3] = (crc >> 0) & 0xFF;
 }
 
-void ScrutinyTest::add_crc(scrutiny::protocol::Response* response)
+void ScrutinyTest::add_crc(scrutiny::protocol::Response *response)
 {
     uint8_t header[5];
     header[0] = response->command_id;
@@ -30,11 +31,11 @@ void ScrutinyTest::add_crc(scrutiny::protocol::Response* response)
     header[3] = (response->data_length >> 8) & 0xFF;
     header[4] = response->data_length & 0xFF;
 
-    uint32_t crc = scrutiny::crc32(header, sizeof(header));
-    response->crc = scrutiny::crc32(response->data, response->data_length, crc);
+    uint32_t crc = scrutiny::tools::crc32(header, sizeof(header));
+    response->crc = scrutiny::tools::crc32(response->data, response->data_length, crc);
 }
 
-void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
+void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 {
     for (uint32_t i = 0; i < length; i++)
     {
@@ -42,22 +43,37 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
     }
 }
 
-::testing::AssertionResult ScrutinyTest::COMPARE_BUF(const uint8_t* candidate, const uint8_t* expected, const uint32_t size)
+::testing::AssertionResult ScrutinyTest::COMPARE_BUF(const uint8_t *candidate, const uint8_t *expected, const uint32_t size)
 {
     for (uint32_t i = 0; i < size; ++i)
     {
         if (expected[i] != candidate[i])
         {
             return ::testing::AssertionFailure() << "candidate[" << i
-                << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
-                << "] (" << static_cast<uint32_t>(expected[i]) << ")";
+                                                 << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
+                                                 << "] (" << static_cast<uint32_t>(expected[i]) << ")";
         }
     }
 
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t* buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code)
+::testing::AssertionResult ScrutinyTest::CHECK_SET(const uint8_t *buffer, const uint8_t val, const uint32_t size)
+{
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        if (buffer[i] != val)
+        {
+            return ::testing::AssertionFailure() << "buffer[" << i
+                                                 << "] (" << static_cast<uint32_t>(buffer[i]) << ") != expected[" << i
+                                                 << "] (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+
+    return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
@@ -71,7 +87,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<uint32_t>(buffer[2]) << " but expected " << static_cast<uint32_t>(code);
+        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode>(buffer[2]) << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
@@ -79,21 +95,20 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t* buffer, uint32_t length)
         return ::testing::AssertionFailure() << "Wrong command length. Got " << static_cast<uint32_t>(length) << " but expected 0";
     }
 
-
     return ::testing::AssertionSuccess();
 }
 
 #if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable:4127)   // Get rid of constexpr always true condition warning.
-#endif 
+#pragma warning(push)
+#pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
+#endif
 
-unsigned int ScrutinyTest::encode_addr(uint8_t* buffer, void* addr)
+unsigned int ScrutinyTest::encode_addr(uint8_t *buffer, void *addr)
 {
     std::uintptr_t ptr = reinterpret_cast<std::uintptr_t>(addr);
     constexpr unsigned int addr_size = sizeof(ptr);
 
-    unsigned int i = addr_size-1;
+    unsigned int i = addr_size - 1;
 
     if (addr_size >= 1)
     {
@@ -123,9 +138,84 @@ unsigned int ScrutinyTest::encode_addr(uint8_t* buffer, void* addr)
 }
 
 #if defined(_MSC_VER)
-    #pragma warning(pop)
-#endif 
+#pragma warning(pop)
+#endif
 
+namespace scrutiny
+{
+    namespace protocol
+    {
+        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode val)
+        {
+            switch (val)
+            {
+            case scrutiny::protocol::ResponseCode::OK:
+                out << "OK";
+                break;
+            case scrutiny::protocol::ResponseCode::Busy:
+                out << "Busy";
+                break;
+            case scrutiny::protocol::ResponseCode::FailureToProceed:
+                out << "FailureToProceed";
+                break;
+            case scrutiny::protocol::ResponseCode::Forbidden:
+                out << "Forbidden";
+                break;
+            case scrutiny::protocol::ResponseCode::InvalidRequest:
+                out << "InvalidRequest";
+                break;
+            case scrutiny::protocol::ResponseCode::NoResponseToSend:
+                out << "NoResponseToSend";
+                break;
+            case scrutiny::protocol::ResponseCode::Overflow:
+                out << "Overflow";
+                break;
+            case scrutiny::protocol::ResponseCode::ProcessAgain:
+                out << "ProcessAgain";
+                break;
+            case scrutiny::protocol::ResponseCode::UnsupportedFeature:
+                out << "UnsupportedFeature";
+                break;
+            default:
+                out << "Unknown";
+                break;
+            }
 
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+}
 
+#if SCRUTINY_ENABLE_DATALOGGING
+namespace scrutiny
+{
+    namespace datalogging
+    {
+        std::ostream &operator<<(std::ostream &out, DataLogger::State val)
+        {
+            switch (val)
+            {
+            case DataLogger::State::IDLE:
+                out << "IDLE";
+                break;
+            case DataLogger::State::ARMED:
+                out << "ARMED";
+                break;
+            case DataLogger::State::CONFIGURED:
+                out << "CONFIGURED";
+                break;
+            case DataLogger::State::ACQUISITION_COMPLETED:
+                out << "ACQUISITION_COMPLETED";
+                break;
+            case DataLogger::State::ERROR:
+                out << "ERROR";
+                break;
+            default:
+                out << "UNKNOWN";
+            }
 
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    }
+}
+#endif

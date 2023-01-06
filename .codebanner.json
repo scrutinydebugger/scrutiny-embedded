@@ -8,7 +8,9 @@
         "*.cpp",
         "*.hpp"
     ],
-    "exclude_patterns": [],
+    "exclude_patterns": [
+        "projects/platformio/*"
+    ],
     "license": "MIT - See LICENSE file",
     "project": "Scrutiny Debugger",
     "repo": "github.com/scrutinydebugger/scrutiny-embedded",
@@ -20,9 +22,6 @@
         },
         "lib/inc/scrutiny_config.hpp": {
             "docstring": "Definition of a run-time configuration of the scrutiny module.\nTo be filled in startup phase"
-        },
-        "lib/inc/scrutiny_crc.hpp": {
-            "docstring": "CRC calculation functions"
         },
         "lib/inc/scrutiny_loop_handler.hpp": {
             "docstring": "LoopHandler definition.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
@@ -54,14 +53,8 @@
         "lib/inc/protocol/scrutiny_protocol_definitions.hpp": {
             "docstring": "Defines Request/Rsponse objects and commands/subfunctions IDs.\n Not version specific"
         },
-        "lib/inc/protocol/scrutiny_protocol_tools.hpp": {
-            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
-        },
         "lib/src/scrutiny_config.cpp": {
             "docstring": "Implementation of the run-time Scrutiny configuration"
-        },
-        "lib/src/scrutiny_crc.cpp": {
-            "docstring": "CRC calculation for scrutiny protocol frames"
         },
         "lib/src/scrutiny_loop_handler.cpp": {
             "docstring": "LoopHandler implementation.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
@@ -80,9 +73,6 @@
         },
         "lib/src/protocol/scrutiny_protocol_definitions.cpp": {
             "docstring": "Instanciation of protocol definitions such as magic payload."
-        },
-        "lib/src/protocol/scrutiny_protocol_tools.cpp": {
-            "docstring": "Some helpers for encoding data in a standardised way.\n similar to hton() and ntoh()"
         },
         "test/scrutiny_test.cpp": {
             "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
@@ -161,6 +151,90 @@
         },
         "projects/testapp/src/comm_channels/win_serial_port_bridge.cpp": {
             "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
+        },
+        "lib/inc/scrutiny_common_codecs.hpp": {
+            "docstring": "Some codecs function used across the project"
+        },
+        "lib/inc/scrutiny_ipc.hpp": {
+            "docstring": "Some tools for inter-process communications"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging.hpp": {
+            "docstring": "The datalogging main include"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_types.hpp": {
+            "docstring": "Types used across datalogging feature"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_trigger.hpp": {
+            "docstring": "The definition of the datalogging trigger conditions operators"
+        },
+        "lib/inc/datalogging/scrutiny_datalogger.hpp": {
+            "docstring": "The definition of the datalogger object that should exist in each loop"
+        },
+        "lib/src/scrutiny_tools.cpp": {
+            "docstring": "Some tools used across the project"
+        },
+        "lib/src/scrutiny_common_codecs.cpp": {
+            "docstring": "Some common encoding/decoding functions used across the project."
+        },
+        "lib/src/datalogging/scrutiny_datalogger.cpp": {
+            "docstring": "The implementation of the datalogger object that should exist in each loop "
+        },
+        "lib/src/datalogging/datalogging.cpp": {
+            "docstring": "Implementation of some datalogging features"
+        },
+        "projects/testapp/src/include_test.cpp": {
+            "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
+        },
+        "test/test_ipc.cpp": {
+            "docstring": "Test for the Inter-process communication tools"
+        },
+        "test/test_variable_fetching.cpp": {
+            "docstring": "Test the capacity to read a variable from the memory given the debugging info"
+        },
+        "test/test_types.cpp": {
+            "docstring": "Some tests dones on scrutiny types"
+        },
+        "test/commands/test_memory_control_rpv.cpp": {
+            "docstring": "Test the memory control command dedicated for Runtime Published Values"
+        },
+        "test/datalogging/test_fetch_operands.cpp": {
+            "docstring": "Test the capacity to decode an operand for log trigger"
+        },
+        "lib/src/datalogging/scrutiny_datalogging_trigger.cpp": {
+            "docstring": "The implementation of the datalogging trigger conditions operators"
+        },
+        "test/datalogging/test_trigger_conditions.cpp": {
+            "docstring": "Test datalogging trigger conditions"
+        },
+        "test/datalogging/test_datalogging_types.cpp": {
+            "docstring": "Run some tests on datalogging types"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_data_encoding.hpp": {
+            "docstring": "File to be included to get access to the datalogging encoders/readers. Abstract the handling of different encoding."
+        },
+        "lib/inc/datalogging/scrutiny_datalogger_raw_encoder.hpp": {
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+        },
+        "lib/src/datalogging/scrutiny_datalogger_raw_encoder.cpp": {
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+        },
+        "test/test_codecs.cpp": {
+            "docstring": "Tests the different codecs function used across this project"
+        },
+        "test/commands/test_datalog_control.cpp": {
+            "docstring": "Test the DataLogControl command used to configure, control and reads the datalogger"
+        },
+        "test/datalogging/test_datalogger.cpp": {
+            "docstring": "Test suite for the datalogger object. Test its capacity to log, trigger access bitfields and report error on bad config."
+        },
+        "test/datalogging/raw_format_parser.hpp": {
+            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
+        },
+        "test/datalogging/test_raw_encoder.cpp": {
+            "docstring": "Test suite for the RawFormat encoder."
+        },
+        "test/datalogging/raw_format_parser.cpp": {
+            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
         }
     }
 }

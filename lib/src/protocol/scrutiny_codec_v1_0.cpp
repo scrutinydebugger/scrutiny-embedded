@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
 #include <stdint.h>
@@ -15,7 +15,7 @@
 #include "scrutiny_types.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "protocol/scrutiny_codec_v1_0.hpp"
-#include "protocol/scrutiny_protocol_tools.hpp"
+#include "scrutiny_common_codecs.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
@@ -41,7 +41,7 @@ namespace scrutiny
                 }
 
                 cursor += addr_size;
-                length = decode_16_bits_big_endian(&m_buffer[cursor]);
+                length = codecs::decode_16_bits_big_endian(&m_buffer[cursor]);
                 cursor += 2;
 
                 m_required_tx_buffer_size += addr_size + 2 + length;
@@ -78,9 +78,9 @@ namespace scrutiny
                 return;
             }
 
-            decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
+            codecs::decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
-            length = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            length = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             memblock->start_address = reinterpret_cast<uint8_t *>(addr);
@@ -126,7 +126,7 @@ namespace scrutiny
                 }
 
                 cursor += addr_size;
-                length = decode_16_bits_big_endian(&m_buffer[cursor]);
+                length = codecs::decode_16_bits_big_endian(&m_buffer[cursor]);
                 cursor += 2;
                 cursor += length;
                 if (m_masked_write)
@@ -166,9 +166,9 @@ namespace scrutiny
                 return;
             }
 
-            decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
+            codecs::decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
-            length = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            length = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             if ((length > static_cast<uint16_t>(m_size_limit - m_bytes_read)) ||
@@ -233,10 +233,8 @@ namespace scrutiny
                 return;
             }
 
-            encode_address_big_endian(&m_buffer[m_cursor], memblock->start_address);
-            m_cursor += addr_size;
-            encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
-            m_cursor += 2;
+            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
@@ -269,11 +267,8 @@ namespace scrutiny
                 return;
             }
 
-            encode_address_big_endian(&m_buffer[m_cursor], memblock->start_address);
-            m_cursor += addr_size;
-            encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
-            m_cursor += 2;
-
+            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
 
@@ -302,11 +297,8 @@ namespace scrutiny
                 return;
             }
 
-            encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += 2;
-            m_buffer[m_cursor] = static_cast<uint8_t>(rpv->type);
-            m_cursor += 1;
-
+            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(static_cast<uint8_t>(rpv->type), &m_buffer[m_cursor]);
             m_response->data_length = m_cursor;
         }
 
@@ -337,30 +329,14 @@ namespace scrutiny
                 return;
             }
 
-            if (typesize == 1u || typesize == 2u || typesize == 4u || typesize == 8u)
+            if (typesize == 1u || typesize == 2u || typesize == 4u
+#if SCRUTINY_SUPPORT_64BITS
+                || typesize == 8u
+#endif
+            )
             {
-                encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-                m_cursor += 2;
-
-                switch (typesize)
-                {
-                case 1:
-                    m_buffer[m_cursor] = v.uint8;
-                    break;
-                case 2:
-                    encode_16_bits_big_endian(v.uint16, &m_buffer[m_cursor]);
-                    break;
-                case 4:
-                    encode_32_bits_big_endian(v.uint32, &m_buffer[m_cursor]);
-                    break;
-                case 8:
-                    encode_64_bits_big_endian(v.uint64, &m_buffer[m_cursor]);
-                    break;
-                default: // handled above
-                    break;
-                }
-
-                m_cursor += typesize;
+                m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
                 m_response->data_length = m_cursor;
             }
         }
@@ -369,7 +345,6 @@ namespace scrutiny
         {
             m_cursor = 0;
             m_overflow = false;
-            m_unsupported_type = false;
         }
 
         //==============================================================
@@ -393,9 +368,8 @@ namespace scrutiny
                 return;
             }
 
-            encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += 2;
-            m_buffer[m_cursor++] = typesize;
+            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(typesize, &m_buffer[m_cursor]);
 
             m_response->data_length = m_cursor;
         }
@@ -439,7 +413,7 @@ namespace scrutiny
                 return false;
             }
 
-            *id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            *id = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             if (m_bytes_read == m_request_len)
@@ -482,7 +456,7 @@ namespace scrutiny
                 return false;
             }
 
-            const uint16_t id = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            const uint16_t id = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             const bool found = m_main_handler->get_rpv(id, rpv);
@@ -509,14 +483,16 @@ namespace scrutiny
                 v->uint8 = m_buffer[m_bytes_read];
                 break;
             case 2:
-                v->uint16 = decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint16 = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
             case 4:
-                v->uint32 = decode_32_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint32 = codecs::decode_32_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
+#if SCRUTINY_SUPPORT_64BITS
             case 8:
-                v->uint64 = decode_64_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint64 = codecs::decode_64_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
+#endif
             default:
                 ok_to_process = false;
                 break;
@@ -548,7 +524,7 @@ namespace scrutiny
         ResponseCode CodecV1_0::encode_response_protocol_version(const ResponseData::GetInfo::GetProtocolVersion *response_data, Response *response)
         {
             constexpr uint16_t datalen = 2;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -564,7 +540,7 @@ namespace scrutiny
         {
             constexpr uint16_t datalen = sizeof(scrutiny::software_id);
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -579,7 +555,7 @@ namespace scrutiny
             constexpr uint16_t readonly_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_readonly_region);
             constexpr uint16_t forbidden_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_forbidden_region);
             constexpr uint16_t datalen = readonly_region_count_size + forbidden_region_count_size;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -596,15 +572,15 @@ namespace scrutiny
             constexpr uint16_t region_index_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionLocation::region_index);
             constexpr uint16_t datalen = region_type_size + region_index_size + 2 * addr_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
             response->data[0] = static_cast<uint8_t>(response_data->region_type);
             response->data[1] = response_data->region_index;
-            encode_address_big_endian(&response->data[2], response_data->start);
-            encode_address_big_endian(&response->data[2 + addr_size], response_data->end);
+            codecs::encode_address_big_endian(response_data->start, &response->data[2]);
+            codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
             response->data_length = 1 + 1 + addr_size + addr_size;
 
             return ResponseCode::OK;
@@ -614,20 +590,26 @@ namespace scrutiny
         {
             constexpr uint16_t datalen = 1;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
             response->data[0] = 0x00;
-            if (response_data->memory_write)
+            if (response_data->memory_read)
                 response->data[0] |= 0x80;
 
-            if (response_data->datalog_acquire)
+            if (response_data->memory_write)
                 response->data[0] |= 0x40;
 
-            if (response_data->user_command)
+            if (response_data->datalogging)
                 response->data[0] |= 0x20;
+
+            if (response_data->user_command)
+                response->data[0] |= 0x10;
+
+            if (response_data->_64bits)
+                response->data[0] |= 0x08;
 
             response->data_length = 1;
             return ResponseCode::OK;
@@ -654,8 +636,72 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->start_index = decode_16_bits_big_endian(&request->data[start_index_pos]);
-            request_data->count = decode_16_bits_big_endian(&request->data[count_pos]);
+            request_data->start_index = codecs::decode_16_bits_big_endian(&request->data[start_index_pos]);
+            request_data->count = codecs::decode_16_bits_big_endian(&request->data[count_pos]);
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::decode_request_get_loop_definition(const Request *request, RequestData::GetInfo::GetLoopDefinition *request_data)
+        {
+            constexpr uint16_t loop_id_len = sizeof(request_data->loop_id);
+            constexpr uint16_t datalen = loop_id_len;
+
+            if (request->data_length != datalen)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            request_data->loop_id = request->data[0];
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_get_loop_definition(const ResponseData::GetInfo::GetLoopDefinition *response_data, Response *response)
+        {
+            static_assert(sizeof(timediff_t) == 4, "Unsupported timediff size");
+            constexpr uint16_t loop_id_size = sizeof(response_data->loop_id);
+            constexpr uint16_t loop_type_size = sizeof(response_data->loop_type);
+            constexpr uint16_t timestep_100ns_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_100ns);
+            constexpr uint16_t name_length_size = sizeof(response_data->loop_name_length);
+
+            constexpr uint16_t datalen = loop_id_size + loop_type_size + name_length_size;
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            response->data[0] = response_data->loop_id;
+            response->data[1] = response_data->loop_type;
+
+            uint16_t cursor = 2;
+            switch (static_cast<scrutiny::LoopType>(response_data->loop_type))
+            {
+            case scrutiny::LoopType::FIXED_FREQ:
+                if (cursor + timestep_100ns_size > response->data_max_length)
+                {
+                    return ResponseCode::Overflow;
+                }
+                cursor += codecs::encode_32_bits_big_endian(response_data->loop_type_specific.fixed_freq.timestep_100ns, &response->data[cursor]);
+                break;
+            case scrutiny::LoopType::VARIABLE_FREQ:
+                break;
+            default:
+                return ResponseCode::FailureToProceed;
+            }
+
+            uint8_t loop_name_length = response_data->loop_name_length;
+            loop_name_length = (loop_name_length > MAX_LOOP_NAME_LENGTH) ? MAX_LOOP_NAME_LENGTH : loop_name_length;
+
+            if (cursor + name_length_size + loop_name_length > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            response->data[cursor++] = response_data->loop_name_length;
+            memcpy(&response->data[cursor], response_data->loop_name, loop_name_length);
+            cursor += loop_name_length;
+
+            response->data_length = cursor;
             return ResponseCode::OK;
         }
 
@@ -663,12 +709,26 @@ namespace scrutiny
         {
             constexpr uint16_t count_size = sizeof(response_data->count);
             constexpr uint16_t datalen = count_size;
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
-            encode_16_bits_big_endian(response_data->count, &response->data[0]);
+            codecs::encode_16_bits_big_endian(response_data->count, &response->data[0]);
+            response->data_length = datalen;
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_get_loop_count(const ResponseData::GetInfo::GetLoopCount *response_data, Response *response)
+        {
+            constexpr uint16_t count_size = sizeof(response_data->count);
+            constexpr uint16_t datalen = count_size;
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            codecs::encode_8_bits(response_data->count, &response->data[0]);
             response->data_length = datalen;
             return ResponseCode::OK;
         }
@@ -693,7 +753,7 @@ namespace scrutiny
 
             uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
@@ -713,14 +773,14 @@ namespace scrutiny
             constexpr uint16_t challenge_response_size = sizeof(response_data->challenge_response);
             constexpr uint16_t datalen = session_id_size + challenge_response_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
             response->data_length = datalen;
-            encode_32_bits_big_endian(response_data->session_id, &response->data[0]);
-            encode_16_bits_big_endian(response_data->challenge_response, &response->data[4]);
+            codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[0]);
+            codecs::encode_16_bits_big_endian(response_data->challenge_response, &response->data[4]);
 
             return ResponseCode::OK;
         }
@@ -742,18 +802,18 @@ namespace scrutiny
             constexpr uint16_t comm_rx_timeout_pos = heartbeat_timeout_pos + heartbeat_timeout_size;
             constexpr uint16_t address_size_pos = comm_rx_timeout_pos + comm_rx_timeout_size;
 
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
             response->data_length = datalen;
 
-            encode_16_bits_big_endian(response_data->data_rx_buffer_size, &response->data[rx_buffer_size_pos]);
-            encode_16_bits_big_endian(response_data->data_tx_buffer_size, &response->data[tx_buffer_size_pos]);
-            encode_32_bits_big_endian(response_data->max_bitrate, &response->data[max_bitrate_pos]);
-            encode_32_bits_big_endian(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
-            encode_32_bits_big_endian(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
+            codecs::encode_16_bits_big_endian(response_data->data_rx_buffer_size, &response->data[rx_buffer_size_pos]);
+            codecs::encode_16_bits_big_endian(response_data->data_tx_buffer_size, &response->data[tx_buffer_size_pos]);
+            codecs::encode_32_bits_big_endian(response_data->max_bitrate, &response->data[max_bitrate_pos]);
+            codecs::encode_32_bits_big_endian(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
+            codecs::encode_32_bits_big_endian(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
             response->data[address_size_pos] = response_data->address_size; // Size in bytes
 
             return ResponseCode::OK;
@@ -766,14 +826,14 @@ namespace scrutiny
             constexpr uint16_t datalen = magic_size + session_id_size;
 
             static_assert(sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC), "Mismatch between codec definition and protocol constant.");
-            if (datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
             response->data_length = datalen;
             memcpy(&response->data[0], response_data->magic, magic_size);
-            encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
+            codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
 
             return ResponseCode::OK;
         }
@@ -809,8 +869,8 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->session_id = decode_32_bits_big_endian(&request->data[0]);
-            request_data->challenge = decode_16_bits_big_endian(&request->data[4]);
+            request_data->session_id = codecs::decode_32_bits_big_endian(&request->data[0]);
+            request_data->challenge = codecs::decode_16_bits_big_endian(&request->data[4]);
 
             return ResponseCode::OK;
         }
@@ -840,7 +900,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->session_id = decode_32_bits_big_endian(&request->data[0]);
+            request_data->session_id = codecs::decode_32_bits_big_endian(&request->data[0]);
             return ResponseCode::OK;
         }
 
@@ -904,5 +964,241 @@ namespace scrutiny
             parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
             return &parsers.m_memory_control_write_rpv_parser;
         }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        ResponseCode CodecV1_0::encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response)
+        {
+            constexpr uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding);
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            uint16_t cursor = 0;
+            cursor += codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[cursor]);
+            cursor += codecs::encode_8_bits(response_data->data_encoding, &response->data[cursor]);
+            response->data_length = cursor;
+
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response)
+        {
+            constexpr uint16_t datalen = sizeof(response_data->state);
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            codecs::encode_8_bits(response_data->state, &response->data[0]);
+            response->data_length = 1;
+
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response)
+        {
+            constexpr uint16_t acquisition_id_size = sizeof(response_data->acquisition_id);
+            constexpr uint16_t config_id_size = sizeof(response_data->config_id);
+            constexpr uint16_t number_of_points_size = sizeof(response_data->number_of_points);
+            constexpr uint16_t data_size_size = sizeof(response_data->data_size);
+            constexpr uint16_t points_after_trigger_size = sizeof(response_data->points_after_trigger);
+
+            constexpr uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            uint16_t cursor = 0;
+            cursor += codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[cursor]);
+            cursor += codecs::encode_16_bits_big_endian(response_data->config_id, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->number_of_points, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->data_size, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->points_after_trigger, &response->data[cursor]);
+            response->data_length = cursor;
+
+            return ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished)
+        {
+            constexpr uint16_t minimum_datalen = 16;
+            if (minimum_datalen > MINIMUM_TX_BUFFER_SIZE && minimum_datalen > response->data_max_length)
+            {
+                return ResponseCode::Overflow;
+            }
+            *finished = false;
+            // [0] is set at the end.
+            response->data[1] = response_data->rolling_counter;
+            codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
+
+            const uint32_t nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
+            response->data_length = static_cast<uint16_t>(nread + 4);
+            *response_data->crc = tools::crc32(&response->data[4], nread, *response_data->crc);
+
+            if (response_data->reader->finished() && response->data_length <= response->data_max_length - 4)
+            {
+                codecs::encode_32_bits_big_endian(*response_data->crc, &response->data[response->data_length]);
+                response->data_length += 4;
+                *finished = true;
+            }
+
+            response->data[0] = static_cast<uint8_t>(*finished);
+
+            return protocol::ResponseCode::OK;
+        }
+
+        ResponseCode CodecV1_0::decode_datalogging_configure_request(
+            const Request *request,
+            RequestData::DataLogControl::Configure *request_data,
+            datalogging::Configuration *config)
+        {
+            if (request->data_length < 16)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            request_data->loop_id = request->data[0];
+            request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
+
+            config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
+            config->probe_location = request->data[5];
+            config->timeout_100ns = codecs::decode_32_bits_big_endian(&request->data[6]);
+            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(request->data[10]);
+            config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian(&request->data[11]);
+            config->trigger.operand_count = request->data[15];
+
+            if (config->trigger.operand_count > datalogging::MAX_OPERANDS)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            uint16_t cursor = 16;
+            for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
+            {
+                if (request->data_length < cursor + 1)
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+
+                const datalogging::OperandType optype = static_cast<datalogging::OperandType>(request->data[cursor]);
+                config->trigger.operands[i].type = optype;
+                cursor++;
+
+                switch (optype)
+                {
+                case datalogging::OperandType::LITERAL:
+                {
+                    if (request->data_length < cursor + sizeof(float))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian(&request->data[cursor]);
+                    cursor += sizeof(float);
+                    break;
+                }
+                case datalogging::OperandType::RPV:
+                {
+                    if (request->data_length < cursor + sizeof(uint16_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    cursor += sizeof(uint16_t);
+                    break;
+                }
+                case datalogging::OperandType::VAR:
+                {
+                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType>(request->data[cursor++]);
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
+                    break;
+                }
+                case datalogging::OperandType::VARBIT:
+                {
+                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+
+                    config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType>(request->data[cursor++]);
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
+                    config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++];
+                    config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++];
+                    break;
+                }
+                default:
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+                }
+            }
+
+            if (request->data_length < cursor + sizeof(uint8_t))
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            config->items_count = request->data[cursor++];
+
+            if (config->items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL)
+            {
+                return ResponseCode::Overflow;
+            }
+
+            for (uint_fast8_t i = 0; i < config->items_count; i++)
+            {
+                if (request->data_length < cursor + sizeof(uint8_t))
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+
+                config->items_to_log[i].type = static_cast<datalogging::LoggableType>(request->data[cursor++]);
+
+                switch (config->items_to_log[i].type)
+                {
+                case datalogging::LoggableType::MEMORY:
+                {
+                    if (request->data_length < cursor + sizeof(void *) + sizeof(uint8_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
+                    config->items_to_log[i].data.memory.size = request->data[cursor++];
+                    break;
+                }
+                case datalogging::LoggableType::RPV:
+                {
+                    if (request->data_length < cursor + sizeof(uint16_t))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
+
+                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    cursor += sizeof(uint16_t);
+                    break;
+                }
+                case datalogging::LoggableType::TIME:
+                {
+                    break;
+                }
+                default:
+                {
+                    return ResponseCode::InvalidRequest;
+                }
+                }
+            }
+
+            if (cursor != request->data_length)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
+            return ResponseCode::OK;
+        }
+#endif
     }
 }

@@ -4,10 +4,11 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include "scrutiny_config.hpp"
 #include "scrutiny_tools.hpp"
+#include "scrutiny_loop_handler.hpp"
 #include <string.h>
 
 namespace scrutiny
@@ -32,8 +33,16 @@ namespace scrutiny
         display_name = "";
         max_bitrate = 0;
         user_command_callback = nullptr;
-        prng_seed = 0;
+        session_counter_seed = 0;
         memory_write_enable = true;
+        m_loops = nullptr;
+        m_loop_count = 0;
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        m_datalogger_buffer = nullptr;
+        m_datalogger_buffer_size = 0;
+        m_datalogger_trigger_callback = nullptr;
+#endif
     }
 
     void Config::set_buffers(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size)
@@ -63,4 +72,18 @@ namespace scrutiny
         m_rpv_read_callback = rd_cb;
         m_rpv_write_callback = wr_cb;
     }
+
+    void Config::set_loops(LoopHandler **loops, uint8_t loop_count)
+    {
+        m_loops = loops;
+        m_loop_count = loop_count;
+    }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+    void Config::set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size)
+    {
+        m_datalogger_buffer = datalogger_buffer;
+        m_datalogger_buffer_size = datalogger_buffer_size;
+    }
+#endif
 }

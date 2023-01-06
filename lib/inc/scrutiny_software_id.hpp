@@ -1,10 +1,10 @@
-//    scrutiny_software_id.h
+//    scrutiny_software_id.hpp
 //        Contains the definition of the Scrutiny ID global var used for tagging of firmware.
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_SOFTWARE_ID_H___
 #define ___SCRUTINY_SOFTWARE_ID_H___

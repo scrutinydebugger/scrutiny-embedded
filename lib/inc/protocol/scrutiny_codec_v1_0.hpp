@@ -1,10 +1,10 @@
-//    scrutiny_codec_v1_0.h
+//    scrutiny_codec_v1_0.hpp
 //        Definitions of encode/decode functions for the scrutiny protocol V1.0
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_CODEC_V1_0___
 #define ___SCRUTINY_CODEC_V1_0___
@@ -14,6 +14,10 @@
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
 
+#if SCRUTINY_ENABLE_DATALOGGING
+#include "datalogging/scrutiny_datalogging_types.hpp"
+#include "datalogging/scrutiny_datalogging_data_encoding.hpp"
+#endif
 namespace scrutiny
 {
     class MainHandler;
@@ -23,6 +27,7 @@ namespace scrutiny
         constexpr unsigned int REQUEST_OVERHEAD = 8;
         constexpr unsigned int RESPONSE_OVERHEAD = 9;
         constexpr unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
+        constexpr unsigned int MAX_LOOP_NAME_LENGTH = 32;
         constexpr unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
         constexpr unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
         constexpr uint16_t BUFFER_OVERFLOW_MARGIN = 16; // This margin let us detect overflow in comm with less calculations.
@@ -133,7 +138,6 @@ namespace scrutiny
             uint16_t m_cursor;
             uint16_t m_size_limit;
             bool m_overflow;
-            bool m_unsupported_type;
         };
 
         class ReadRPVRequestParser
@@ -169,7 +173,6 @@ namespace scrutiny
             uint16_t m_cursor;
             uint16_t m_size_limit;
             bool m_overflow;
-            bool m_unsupported_type;
         };
 
         class WriteRPVRequestParser
@@ -204,8 +207,9 @@ namespace scrutiny
                 {
                     bool memory_read;
                     bool memory_write;
-                    bool datalog_acquire;
+                    bool datalogging;
                     bool user_command;
+                    bool _64bits;
                 };
 
                 struct GetSpecialMemoryRegionCount
@@ -225,6 +229,27 @@ namespace scrutiny
                 struct GetRPVCount
                 {
                     uint16_t count;
+                };
+
+                struct GetLoopCount
+                {
+                    uint8_t count;
+                };
+
+                struct GetLoopDefinition
+                {
+                    uint8_t loop_id;
+                    uint8_t loop_type;
+                    union
+                    {
+                        struct
+                        {
+                            uint32_t timestep_100ns;
+                        } fixed_freq;
+                    } loop_type_specific;
+
+                    uint8_t loop_name_length;
+                    const char *loop_name;
                 };
             }
 
@@ -255,6 +280,40 @@ namespace scrutiny
                     uint32_t session_id;
                 };
             }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+            namespace DataLogControl
+            {
+                struct GetSetup
+                {
+                    uint32_t buffer_size;
+                    uint8_t data_encoding;
+                };
+
+                struct GetStatus
+                {
+                    uint8_t state;
+                };
+
+                struct GetAcquisitionMetadata
+                {
+                    uint16_t acquisition_id;
+                    uint16_t config_id;
+                    uint32_t number_of_points;
+                    uint32_t data_size;
+                    uint32_t points_after_trigger;
+                };
+
+                struct ReadAcquisition
+                {
+                    uint16_t acquisition_id;
+                    uint8_t rolling_counter;
+                    datalogging::DataReader *reader;
+                    uint32_t *crc;
+                };
+            }
+
+#endif
         }
 
         namespace RequestData
@@ -271,6 +330,16 @@ namespace scrutiny
                 {
                     uint16_t start_index;
                     uint16_t count;
+                };
+
+                struct GetLoopCount
+                {
+                    uint8_t loop_count;
+                };
+
+                struct GetLoopDefinition
+                {
+                    uint8_t loop_id;
                 };
             }
 
@@ -297,6 +366,19 @@ namespace scrutiny
                     uint32_t session_id;
                 };
             }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+
+            namespace DataLogControl
+            {
+                struct Configure
+                {
+                    uint8_t loop_id;
+                    uint16_t config_id;
+                    // Rest is directly written to datalogger config. So not in this struct.
+                };
+            }
+#endif
         }
 
         class CodecV1_0
@@ -308,6 +390,8 @@ namespace scrutiny
             ResponseCode encode_response_special_memory_region_location(const ResponseData::GetInfo::GetSpecialMemoryRegionLocation *response_data, Response *response);
             ResponseCode encode_response_supported_features(const ResponseData::GetInfo::GetSupportedFeatures *response_data, Response *response);
             ResponseCode encode_response_get_rpv_count(const ResponseData::GetInfo::GetRPVCount *response_data, Response *response);
+            ResponseCode encode_response_get_loop_count(const ResponseData::GetInfo::GetLoopCount *response_data, Response *response);
+            ResponseCode encode_response_get_loop_definition(const ResponseData::GetInfo::GetLoopDefinition *response_data, Response *response);
 
             ResponseCode encode_response_comm_discover(Response *response, const ResponseData::CommControl::Discover *response_data);
             ResponseCode encode_response_comm_heartbeat(const ResponseData::CommControl::Heartbeat *response_data, Response *response);
@@ -316,6 +400,7 @@ namespace scrutiny
 
             ResponseCode decode_request_get_special_memory_region_location(const Request *request, RequestData::GetInfo::GetSpecialMemoryRegionLocation *request_data);
             ResponseCode decode_request_get_rpv_definition(const Request *request, RequestData::GetInfo::GetRPVDefinition *request_data);
+            ResponseCode decode_request_get_loop_definition(const Request *request, RequestData::GetInfo::GetLoopDefinition *request_data);
 
             ResponseCode decode_request_comm_discover(const Request *request, RequestData::CommControl::Discover *request_data);
             ResponseCode decode_request_comm_heartbeat(const Request *request, RequestData::CommControl::Heartbeat *request_data);
@@ -334,6 +419,17 @@ namespace scrutiny
 
             WriteRPVRequestParser *decode_request_memory_control_write_rpv(const Request *request, MainHandler *main_handler);
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *response, const uint16_t max_size);
+
+#if SCRUTINY_ENABLE_DATALOGGING
+            ResponseCode encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response);
+            ResponseCode encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response);
+            ResponseCode encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response);
+            ResponseCode encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished);
+            ResponseCode decode_datalogging_configure_request(
+                const Request *request,
+                RequestData::DataLogControl::Configure *request_data,
+                datalogging::Configuration *config);
+#endif
 
         protected:
             union

@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <gtest/gtest.h>
 
@@ -151,7 +151,7 @@ TEST_F(TestRxParsing, TestRx_OverflowRestoreAfterDelay)
     ASSERT_FALSE(comm.request_received());
     EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::Overflow);
 
-    tb.step(SCRUTINY_COMM_RX_TIMEOUT_US); // Increase the timesbase from enough time for comm to restart
+    tb.step(SCRUTINY_COMM_RX_TIMEOUT_US * 10); // Increase the timesbase from enough time for comm to restart
 
     datalen = sizeof(_rx_buffer);
     uint8_t data2[sizeof(_rx_buffer) + 8] = {1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF)};
@@ -172,7 +172,7 @@ TEST_F(TestRxParsing, TestRx_Timeout)
     {
         comm.receive_data(&data[0], i);
         ASSERT_FALSE(comm.request_received());
-        tb.step(SCRUTINY_COMM_RX_TIMEOUT_US);
+        tb.step(SCRUTINY_COMM_RX_TIMEOUT_US * 10);
         comm.receive_data(&data[i], sizeof(data) - 1);
         ASSERT_FALSE(comm.request_received());
         comm.reset();

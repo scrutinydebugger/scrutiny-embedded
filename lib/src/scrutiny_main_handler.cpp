@@ -4,25 +4,28 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
 
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
+#include "scrutiny_common_codecs.hpp"
+#include "scrutiny_loop_handler.hpp"
 
 namespace scrutiny
 {
-    void MainHandler::init(Config *config)
+    void MainHandler::init(const Config *config)
     {
         m_processing_request = false;
         m_disconnect_pending = false;
+        m_process_again_timestamp_taken = false;
         m_config = *config;
 
         m_comm_handler.init(
             m_config.m_rx_buffer, m_config.m_rx_buffer_size,
             m_config.m_tx_buffer, m_config.m_tx_buffer_size,
-            &m_timebase, m_config.prng_seed);
+            &m_timebase, m_config.session_counter_seed);
 
         check_config();
         if (!m_enabled)
@@ -30,11 +33,31 @@ namespace scrutiny
             m_comm_handler.disable();
         }
 
-        // If there's an init error witht he comm handler, we disable as well.
+        // If there's an init error with the comm handler, we disable as well.
         if (!m_comm_handler.is_enabled())
         {
             m_enabled = false;
         }
+
+        for (uint16_t i = 0; i < m_config.m_loop_count; i++)
+        {
+            m_config.m_loops[i]->init(this);
+        }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+        m_datalogging.datalogger.init(this, &m_timebase, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size, m_config.m_datalogger_trigger_callback);
+        m_datalogging.owner = nullptr;
+        m_datalogging.new_owner = nullptr;
+        m_datalogging.error = DataloggingError::NoError;
+        m_datalogging.request_arm_trigger = false;
+        m_datalogging.request_ownership_release = false;
+        m_datalogging.pending_ownership_release = false;
+        m_datalogging.request_disarm_trigger = false;
+        m_datalogging.reading_in_progress = false;
+        m_datalogging.read_acquisition_rolling_counter = 0;
+
+        m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
+#endif
     }
 
     void MainHandler::check_config()
@@ -59,35 +82,381 @@ namespace scrutiny
         {
             m_enabled = false;
         }
+
+        for (uint32_t i = 0; i < m_config.m_rpv_count; i++)
+        {
+            if (!tools::is_supported_type(m_config.m_rpvs[i].type))
+            {
+                m_enabled = false;
+            }
+        }
     }
 
-    void MainHandler::process(const uint32_t timestep_us)
+#if SCRUTINY_ENABLE_DATALOGGING
+
+    /// @brief Copy memory from src to dst (makes a memcpy) but respect the forbodden region constraints given by the user.
+    /// @param dst Destination buffer
+    /// @param src Source buffer
+    /// @param size Number of bytes to copy
+    /// @return true on success. False on failure
+    bool MainHandler::read_memory(void *dst, const void *src, const uint32_t size) const
+    {
+        if (touches_forbidden_region(src, size))
+        {
+            return false;
+        }
+
+        memcpy(dst, src, size);
+        return true;
+    }
+
+    /// @brief Reads a variable from the memory
+    /// @param addr Location of the variable in memory
+    /// @param variable_type Type of variable to read
+    /// @param val The output structure that supports all types.
+    /// @return true on success. False on failure
+    bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
+    {
+        uint8_t typesize = tools::get_type_size(variable_type);
+        if (typesize == 0 || typesize > sizeof(AnyType))
+        {
+            return false;
+        }
+
+        if (read_memory(val, addr, typesize) == false)
+        {
+            memset(val, 0, sizeof(AnyType));
+            return false;
+        }
+        return true;
+    }
+
+    /// @brief Reads a bitfield variable from the memory
+    /// @param addr Location of the variable in memory
+    /// @param var_tt Variable Type Type (no size in type). (uint, sint, float, etc.)
+    /// @param bitoffset Offset of the start of the data
+    /// @param bitsize Size of the data to read
+    /// @param val The output structure that supports all types.
+    /// @param output_type The type of the data read. The size is adjusted to be as small as possible.
+    /// @return true on success. False on failure
+    bool MainHandler::fetch_variable_bitfield(
+        const void *addr,
+        const VariableTypeType var_tt,
+        const uint_fast8_t bitoffset,
+        const uint_fast8_t bitsize,
+        AnyType *val,
+        VariableType *output_type) const
+    {
+        bool success = true;
+        const uint_fast8_t fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
+        const uint_fast8_t output_required_size = ((bitsize - 1) >> 3) + 1;
+        const VariableTypeSize fetch_type_size = tools::get_required_type_size(fetch_required_size);
+        const VariableTypeSize output_type_size = tools::get_required_type_size(output_required_size);
+        const VariableType fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
+        const VariableType output_variable_type = tools::make_type(var_tt, output_type_size);
+
+        if (touches_forbidden_region(addr, tools::get_type_size(fetch_type_size)))
+        {
+            success = false;
+        }
+        else if (bitsize == 0)
+        {
+            success = false;
+        }
+        else if (var_tt == VariableTypeType::_sint || var_tt == VariableTypeType::_uint || var_tt == VariableTypeType::_boolean)
+        {
+            success = fetch_variable(addr, fetch_variable_type, val);
+            if (success)
+            {
+                if (fetch_type_size == VariableTypeSize::_8)
+                {
+                    val->uint8 >>= bitoffset;
+                }
+                else if (fetch_type_size == VariableTypeSize::_16)
+                {
+                    val->uint16 >>= bitoffset;
+                }
+                else if (fetch_type_size == VariableTypeSize::_32)
+                {
+                    val->uint32 >>= bitoffset;
+                }
+#if SCRUTINY_SUPPORT_64BITS
+                else if (fetch_type_size == VariableTypeSize::_64)
+                {
+                    val->uint64 >>= bitoffset;
+                }
+#endif
+                else // Unsupported
+                {
+                    success = false;
+                }
+
+                if (success)
+                {
+                    AnyTypeFast mask;
+                    uint_fast8_t i;
+                    if (output_type_size == VariableTypeSize::_8)
+                    {
+                        mask.uint8 = 1;
+                        for (i = 1; i < bitsize; i++)
+                        {
+                            mask.uint8 |= (static_cast<uint_fast8_t>(1) << i);
+                        }
+                        val->uint8 &= mask.uint8;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint8 >> (bitsize - 1))
+                            {
+                                val->uint8 |= (~mask.uint8);
+                            }
+                        }
+                    }
+                    else if (output_type_size == VariableTypeSize::_16)
+                    {
+                        mask.uint16 = 0x1FF;
+                        for (i = 9; i < bitsize; i++)
+                        {
+                            mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
+                        }
+                        val->uint16 &= mask.uint16;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint16 >> (bitsize - 1))
+                            {
+                                val->uint16 |= (~mask.uint16);
+                            }
+                        }
+                    }
+                    else if (output_type_size == VariableTypeSize::_32)
+                    {
+                        mask.uint32 = 0x1FFFF;
+                        for (i = 17; i < bitsize; i++)
+                        {
+                            mask.uint32 |= (static_cast<uint_fast32_t>(1) << i);
+                        }
+                        val->uint32 &= mask.uint32;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint32 >> (bitsize - 1))
+                            {
+                                val->uint32 |= (~mask.uint32);
+                            }
+                        }
+                    }
+#if SCRUTINY_SUPPORT_64BITS
+                    else if (output_type_size == VariableTypeSize::_64)
+                    {
+                        mask.uint64 = 0x1FFFFFFFF;
+                        for (i = 33; i < bitsize; i++)
+                        {
+                            mask.uint64 |= (static_cast<uint_fast64_t>(1) << i);
+                        }
+                        val->uint64 &= mask.uint64;
+                        if (var_tt == VariableTypeType::_sint)
+                        {
+                            if (val->uint64 >> (bitsize - 1))
+                            {
+                                val->uint64 |= (~mask.uint64);
+                            }
+                        }
+                    }
+#endif
+                    else // Unsupported
+                    {
+                        success = false;
+                    }
+                }
+            }
+        }
+
+        if (!success)
+        {
+            *output_type = VariableType::unknown;
+            memset(val, 0, sizeof(AnyType));
+        }
+        else
+        {
+            *output_type = output_variable_type;
+        }
+
+        return success;
+    }
+
+    void MainHandler::process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg)
+    {
+        switch (msg->message_id)
+        {
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_TAKEN:
+        {
+            if (m_datalogging.owner != nullptr)
+            {
+                m_datalogging.error = DataloggingError::UnexpectedClaim;
+            }
+            m_datalogging.owner = sender;
+            break;
+        }
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_OWNERSHIP_RELEASED:
+        {
+            if (sender != m_datalogging.owner)
+            {
+                m_datalogging.error = DataloggingError::UnexpectedRelease;
+            }
+
+            m_datalogging.owner = nullptr;
+            m_datalogging.datalogger.reset();
+            m_datalogging.pending_ownership_release = false;
+            break;
+        }
+        case LoopHandler::Loop2MainMessageID::DATALOGGER_STATUS_UPDATE:
+        {
+            m_datalogging.datalogger_state_thread_safe = msg->data.datalogger_status_update.state;
+            if (m_datalogging.datalogger_state_thread_safe != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
+            {
+                m_datalogging.reading_in_progress = false;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    void MainHandler::process_datalogging_logic(void)
+    {
+        if (m_datalogging.error != DataloggingError::NoError)
+        {
+            return;
+        }
+
+        if (m_datalogging.owner == nullptr) // no owner
+        {
+            // No owner, can read directly. Otherwise will be updated by an IPC message
+            m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
+
+            if (m_datalogging.new_owner != nullptr)
+            {
+                if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+                {
+                    LoopHandler::Main2LoopMessage msg;
+                    msg.message_id = LoopHandler::Main2LoopMessageID::TAKE_DATALOGGER_OWNERSHIP;
+                    m_datalogging.new_owner->ipc_main2loop()->send(msg);
+                    m_datalogging.new_owner = nullptr;
+                }
+            }
+
+            // No message from loop that can move these back to false.
+            m_datalogging.request_arm_trigger = false;
+            m_datalogging.request_disarm_trigger = false;
+        }
+        else
+        {
+            if (!m_datalogging.owner->ipc_main2loop()->has_content())
+            {
+                LoopHandler::Main2LoopMessage msg;
+                if (m_datalogging.request_ownership_release)
+                {
+                    msg.message_id = LoopHandler::Main2LoopMessageID::RELEASE_DATALOGGER_OWNERSHIP;
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_ownership_release = false;
+                    m_datalogging.pending_ownership_release = true;
+                }
+                else if (m_datalogging.request_arm_trigger)
+                {
+                    msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_ARM_TRIGGER;
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_arm_trigger = false;
+                }
+                else if (m_datalogging.request_disarm_trigger)
+                {
+                    msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_DISARM_TRIGGER;
+                    m_datalogging.owner->ipc_main2loop()->send(msg);
+                    m_datalogging.request_disarm_trigger = false;
+                }
+            }
+        }
+    }
+
+#endif
+
+    void MainHandler::process_loops(void)
+    {
+        for (uint_fast8_t i = 0; i < m_config.m_loop_count; i++)
+        {
+            LoopHandler *const loop = m_config.m_loops[i];
+            if (loop->ipc_loop2main()->has_content())
+            {
+                LoopHandler::Loop2MainMessage msg = loop->ipc_loop2main()->pop();
+                static_cast<void>(msg);
+#if SCRUTINY_ENABLE_DATALOGGING
+                process_datalogging_loop_msg(loop, &msg);
+#endif
+            }
+        }
+    }
+
+    void MainHandler::process(const timediff_t timestep_100ns)
     {
         if (!m_enabled)
         {
             m_processing_request = false;
             m_disconnect_pending = false;
             m_comm_handler.reset();
+#if SCRUTINY_ENABLE_DATALOGGING
+            m_datalogging.datalogger.reset();
+#endif
             return;
         }
-        m_timebase.step(timestep_us);
+        m_timebase.step(timestep_100ns);
         m_comm_handler.process();
+        process_loops();
+#if SCRUTINY_ENABLE_DATALOGGING
+        process_datalogging_logic();
+#endif
 
         if (m_comm_handler.request_received() && !m_processing_request)
         {
-            m_processing_request = true;
+
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
-            m_comm_handler.send_response(response);
+            if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::ProcessAgain)
+            {
+                m_processing_request = false;
+                if (!m_process_again_timestamp_taken)
+                {
+                    m_process_again_timestamp = m_timebase.get_timestamp();
+                    m_process_again_timestamp_taken = true;
+                }
+                else
+                {
+                    if (m_timebase.has_expired(m_process_again_timestamp, SCRUTINY_REQUEST_MAX_PROCESS_TIME_US * 10))
+                    {
+                        // Set only response code. All other fields are set in process_request()
+                        response->response_code = static_cast<uint8_t>(protocol::ResponseCode::FailureToProceed);
+                        m_comm_handler.send_response(response);
+                        m_processing_request = true;
+                    }
+                }
+                // comm handler will stay in standby until we process the request. Data in rx buffer is guaranteed to stay valid until then
+            }
+            else if (static_cast<protocol::ResponseCode>(response->response_code) == protocol::ResponseCode::NoResponseToSend)
+            {
+                m_processing_request = true;
+                // Will not be transmitting, therefore automatically wait for next request below
+            }
+            else
+            {
+                m_processing_request = true;
+                m_comm_handler.send_response(response);
+            }
         }
 
         if (m_processing_request)
         {
-            if (!m_comm_handler.transmitting())
+            if (!m_comm_handler.transmitting()) // Will be false if NoResponseToSend or if finished transmitting
             {
                 m_comm_handler.wait_next_request(); // Allow reception of next request
                 m_processing_request = false;
+                m_process_again_timestamp_taken = false;
 
                 if (m_disconnect_pending)
                 {
@@ -96,9 +465,30 @@ namespace scrutiny
                 }
             }
         }
+
+        process_loops();
+#if SCRUTINY_ENABLE_DATALOGGING
+        process_datalogging_logic();
+#endif
     }
 
-    bool MainHandler::get_rpv(uint16_t id, RuntimePublishedValue *rpv)
+    bool MainHandler::rpv_exists(const uint16_t id) const
+    {
+        const uint16_t rpv_count = m_config.get_rpv_count();
+        bool found = false;
+        for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
+        {
+            if (m_config.get_rpvs_array()[i].id == id)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    bool MainHandler::get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const
     {
         const uint16_t rpv_count = m_config.get_rpv_count();
         bool found = false;
@@ -115,14 +505,14 @@ namespace scrutiny
         return found;
     }
 
-    VariableType MainHandler::get_rpv_type(uint16_t id)
+    VariableType MainHandler::get_rpv_type(const uint16_t id) const
     {
         RuntimePublishedValue rpv;
         const bool found = get_rpv(id, &rpv);
         return (found) ? rpv.type : VariableType::unknown;
     }
 
-    void MainHandler::process_request(const protocol::Request *request, protocol::Response *response)
+    void MainHandler::process_request(const protocol::Request *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
         response->reset();
@@ -147,9 +537,12 @@ namespace scrutiny
             code = process_memory_control(request, response);
             break;
 
+#if SCRUTINY_ENABLE_DATALOGGING
             // ============= [DataLogControl] ===========
         case protocol::CommandId::DataLogControl:
+            code = process_datalog_control(request, response);
             break;
+#endif
 
             // ============= [UserCommand] ===========
         case protocol::CommandId::UserCommand:
@@ -170,7 +563,7 @@ namespace scrutiny
     }
 
     // ============= [GetInfo] ============
-    protocol::ResponseCode MainHandler::process_get_info(const protocol::Request *request, protocol::Response *response)
+    protocol::ResponseCode MainHandler::process_get_info(const protocol::Request *const request, protocol::Response *const response)
     {
         union
         {
@@ -207,6 +600,17 @@ namespace scrutiny
                 protocol::GetRPVDefinitionResponseEncoder *response_encoder;
             } get_prv_def;
 
+            struct
+            {
+                protocol::ResponseData::GetInfo::GetLoopCount response_data;
+            } get_loop_count;
+
+            struct
+            {
+                protocol::RequestData::GetInfo::GetLoopDefinition request_data;
+                protocol::ResponseData::GetInfo::GetLoopDefinition response_data;
+            } get_loop_def;
+
         } stack;
 
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
@@ -233,8 +637,17 @@ namespace scrutiny
         {
             stack.get_supproted_features.response_data.memory_read = true;
             stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
-            stack.get_supproted_features.response_data.datalog_acquire = false; // todo
+#if SCRUTINY_ENABLE_DATALOGGING
+            stack.get_supproted_features.response_data.datalogging = m_config.is_datalogging_configured();
+#else
+            stack.get_supproted_features.response_data.datalogging = false;
+#endif
             stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
+#if SCRUTINY_SUPPORT_64BITS
+            stack.get_supproted_features.response_data._64bits = true;
+#else
+            stack.get_supproted_features.response_data._64bits = false;
+#endif
 
             code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
             break;
@@ -351,6 +764,41 @@ namespace scrutiny
             break;
         }
             // =================================
+
+        case protocol::GetInfo::Subfunction::GetLoopCount:
+        {
+            stack.get_loop_count.response_data.count = m_config.m_loop_count; // Should be 0 if not set by user.
+            code = m_codec.encode_response_get_loop_count(&stack.get_loop_count.response_data, response);
+            break;
+        }
+
+        case protocol::GetInfo::Subfunction::GetLoopDefinition:
+        {
+            m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
+            const uint8_t loop_id = stack.get_loop_def.request_data.loop_id;
+            if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
+            {
+                return code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            const LoopType loop_type = m_config.m_loops[loop_id]->loop_type();
+            stack.get_loop_def.response_data.loop_id = loop_id;
+            stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
+            if (loop_type == LoopType::FIXED_FREQ)
+            {
+                stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_100ns = m_config.m_loops[loop_id]->get_timestep_100ns();
+            }
+
+            const char *const loop_name = m_config.m_loops[loop_id]->get_name();
+            const uint8_t loop_name_length = static_cast<uint8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
+            stack.get_loop_def.response_data.loop_name_length = loop_name_length;
+            stack.get_loop_def.response_data.loop_name = loop_name;
+
+            code = m_codec.encode_response_get_loop_definition(&stack.get_loop_def.response_data, response);
+            break;
+        }
+
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;
@@ -362,7 +810,7 @@ namespace scrutiny
     }
 
     // ============= [CommControl] ============
-    protocol::ResponseCode MainHandler::process_comm_control(const protocol::Request *request, protocol::Response *response)
+    protocol::ResponseCode MainHandler::process_comm_control(const protocol::Request *const request, protocol::Response *const response)
     {
         union
         {
@@ -516,7 +964,7 @@ namespace scrutiny
         return code;
     }
 
-    protocol::ResponseCode MainHandler::process_memory_control(const protocol::Request *request, protocol::Response *response)
+    protocol::ResponseCode MainHandler::process_memory_control(const protocol::Request *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
@@ -527,12 +975,12 @@ namespace scrutiny
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
                 protocol::ReadMemoryBlocksResponseEncoder *readmem_encoder;
-                protocol::MemoryBlock block;
+                MemoryBlock block;
             } read_mem;
 
             struct
             {
-                protocol::MemoryBlock block;
+                MemoryBlock block;
                 protocol::WriteMemoryBlocksRequestParser *writemem_parser;
                 protocol::WriteMemoryBlocksResponseEncoder *writemem_encoder;
             } write_mem;
@@ -613,6 +1061,12 @@ namespace scrutiny
         {
             const bool masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
             code = protocol::ResponseCode::OK;
+
+            if (m_config.memory_write_enable == false)
+            {
+                code = protocol::ResponseCode::Forbidden;
+                break;
+            }
 
             stack.write_mem.writemem_parser = m_codec.decode_request_memory_control_write(request, masked);
             stack.write_mem.writemem_encoder = m_codec.encode_response_memory_control_write(response, m_comm_handler.tx_buffer_size());
@@ -792,15 +1246,20 @@ namespace scrutiny
         return code;
     }
 
-    bool MainHandler::touches_forbidden_region(const protocol::MemoryBlock *block)
+    bool MainHandler::touches_forbidden_region(const MemoryBlock *block) const
+    {
+        return touches_forbidden_region(block->start_address, block->length);
+    }
+
+    bool MainHandler::touches_forbidden_region(const void *addr_start, const size_t length) const
     {
         if (!m_config.is_forbidden_address_range_set())
         {
             return false;
         }
 
-        const uintptr_t block_start = reinterpret_cast<uintptr_t>(block->start_address);
-        const uintptr_t block_end = block_start + block->length;
+        const uintptr_t block_start = reinterpret_cast<uintptr_t>(addr_start);
+        const uintptr_t block_end = block_start + length;
 
         for (unsigned int i = 0; i < m_config.forbidden_ranges_count(); i++)
         {
@@ -819,15 +1278,20 @@ namespace scrutiny
         return false;
     }
 
-    bool MainHandler::touches_readonly_region(const protocol::MemoryBlock *block)
+    bool MainHandler::touches_readonly_region(const MemoryBlock *block) const
+    {
+        return touches_readonly_region(block->start_address, block->length);
+    }
+
+    bool MainHandler::touches_readonly_region(const void *addr_start, const size_t length) const
     {
         if (!m_config.is_readonly_address_range_set())
         {
             return false;
         }
 
-        const uintptr_t block_start = reinterpret_cast<uintptr_t>(block->start_address);
-        const uintptr_t block_end = block_start + block->length;
+        const uintptr_t block_start = reinterpret_cast<uintptr_t>(addr_start);
+        const uintptr_t block_end = block_start + length;
         for (unsigned int i = 0; i < m_config.readonly_ranges_count(); i++)
         {
             const AddressRange &range = m_config.readonly_ranges()[i];
@@ -845,7 +1309,7 @@ namespace scrutiny
         return false;
     }
 
-    protocol::ResponseCode MainHandler::process_user_command(const protocol::Request *request, protocol::Response *response)
+    protocol::ResponseCode MainHandler::process_user_command(const protocol::Request *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
@@ -871,4 +1335,275 @@ namespace scrutiny
 
         return code;
     }
+
+#if SCRUTINY_ENABLE_DATALOGGING
+    protocol::ResponseCode MainHandler::process_datalog_control(const protocol::Request *const request, protocol::Response *const response)
+    {
+        union
+        {
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetSetup response_data;
+            } get_setup;
+
+            struct
+            {
+                protocol::RequestData::DataLogControl::Configure request_data;
+                datalogging::Configuration *dlconfig;
+            } configure;
+
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetStatus response_data;
+            } get_status;
+
+            struct
+            {
+                protocol::ResponseData::DataLogControl::GetAcquisitionMetadata response_data;
+            } get_acq_metadata;
+
+            struct
+            {
+                protocol::ResponseData::DataLogControl::ReadAcquisition response_data;
+            } read_acquisition;
+
+        } stack;
+
+        if (!m_config.is_datalogging_configured())
+        {
+            return protocol::ResponseCode::UnsupportedFeature;
+        }
+
+        protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
+        switch (static_cast<protocol::DataLogControl::Subfunction>(request->subfunction_id))
+        {
+
+        case protocol::DataLogControl::Subfunction::GetSetup:
+        {
+            stack.get_setup.response_data.buffer_size = m_config.m_datalogger_buffer_size;
+            stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
+            code = m_codec.encode_response_datalogging_get_setup(&stack.get_setup.response_data, response);
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::ConfigureDatalog:
+        {
+            m_datalogging.reading_in_progress = false; // Make sure to update this quickly because we can.
+
+            // Make sure the datalogger is released before writing the config object to avoid race conditions.
+            if (m_datalogging.owner != nullptr)
+            {
+                if (!m_datalogging.pending_ownership_release)
+                {
+                    m_datalogging.request_ownership_release = true;
+                }
+                code = protocol::ResponseCode::ProcessAgain;
+                break;
+            }
+
+            code = m_codec.decode_datalogging_configure_request(request, &stack.configure.request_data, m_datalogging.datalogger.config());
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
+
+            if (stack.configure.request_data.loop_id >= m_config.m_loop_count)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            const datalogging::Configuration *const config = m_datalogging.datalogger.config();
+
+            for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
+            {
+                if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
+                {
+                    if (touches_forbidden_region(config->trigger.operands[i].data.var.addr, tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->trigger.operands[i].type == datalogging::OperandType::VARBIT)
+                {
+                    if (touches_forbidden_region(
+                            config->trigger.operands[i].data.varbit.addr,
+                            config->trigger.operands[i].data.varbit.bitoffset + config->trigger.operands[i].data.varbit.bitsize))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->trigger.operands[i].type == datalogging::OperandType::RPV)
+                {
+
+                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->trigger.operands[i].data.rpv.id))
+                    {
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+                }
+            }
+
+            for (uint_fast8_t i = 0; i < config->items_count; i++)
+            {
+                if (config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                {
+                    if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
+                    {
+                        code = protocol::ResponseCode::Forbidden;
+                        break;
+                    }
+                }
+                else if (config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                {
+                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].data.rpv.id))
+                    {
+                        code = protocol::ResponseCode::FailureToProceed;
+                        break;
+                    }
+                }
+            }
+
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
+
+            LoopHandler *const loop = m_config.m_loops[stack.configure.request_data.loop_id];
+            m_datalogging.datalogger.configure(loop->get_timebase(), stack.configure.request_data.config_id); // Expect config object to be set
+
+            if (m_datalogging.datalogger.config_valid())
+            {
+                m_datalogging.new_owner = loop; // Will trigger a request for ownership
+            }
+            else
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+            }
+            break;
+        }
+
+        case protocol::DataLogControl::Subfunction::ArmTrigger:
+        {
+
+            if (m_datalogging.owner == nullptr || m_datalogging.pending_ownership_release)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            // Do not wait on feedback from loop here on purpose
+            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            m_datalogging.request_arm_trigger = true;
+            code = protocol::ResponseCode::OK;
+
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::DisarmTrigger:
+        {
+
+            if (m_datalogging.owner == nullptr || m_datalogging.pending_ownership_release)
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            // Do not wait on feedback from loop here on purpose
+            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            m_datalogging.request_disarm_trigger = true;
+            code = protocol::ResponseCode::OK;
+
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::GetStatus:
+        {
+            stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.datalogger_state_thread_safe);
+            code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::GetAcquisitionMetadata:
+        {
+            if (!datalogging_data_available())
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+            const datalogging::DataReader *const reader = m_datalogging.datalogger.get_reader();
+
+            stack.get_acq_metadata.response_data.acquisition_id = m_datalogging.datalogger.get_acquisition_id();
+            stack.get_acq_metadata.response_data.config_id = m_datalogging.datalogger.get_config_id();
+            stack.get_acq_metadata.response_data.number_of_points = reader->get_entry_count();
+            stack.get_acq_metadata.response_data.data_size = reader->get_total_size();
+            stack.get_acq_metadata.response_data.points_after_trigger = m_datalogging.datalogger.log_points_after_trigger();
+            code = m_codec.encode_response_datalogging_get_acquisition_metadata(&stack.get_acq_metadata.response_data, response);
+            break;
+        }
+        case protocol::DataLogControl::Subfunction::ReadAcquisition:
+        {
+            if (m_datalogging.owner == nullptr) // no owner
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            if (datalogging_data_available())
+            {
+                datalogging::DataReader *const reader = m_datalogging.datalogger.get_reader();
+                if (m_datalogging.reading_in_progress == false)
+                {
+                    reader->reset();
+                    m_datalogging.reading_in_progress = true;
+                    m_datalogging.read_acquisition_rolling_counter = 0;
+                    m_datalogging.read_acquisition_crc = 0;
+                }
+
+                stack.read_acquisition.response_data.acquisition_id = m_datalogging.datalogger.get_acquisition_id();
+                stack.read_acquisition.response_data.reader = reader;
+                stack.read_acquisition.response_data.rolling_counter = m_datalogging.read_acquisition_rolling_counter;
+                stack.read_acquisition.response_data.crc = &m_datalogging.read_acquisition_crc;
+
+                bool finished = false;
+                code = m_codec.encode_response_datalogging_read_acquisition(&stack.read_acquisition.response_data, response, &finished);
+                m_datalogging.read_acquisition_rolling_counter++;
+
+                if (code != protocol::ResponseCode::OK)
+                {
+                    m_datalogging.reading_in_progress = false;
+                    break;
+                }
+
+                if (finished)
+                {
+                    m_datalogging.reading_in_progress = false;
+                }
+
+                break;
+            }
+            else
+            {
+                code = protocol::ResponseCode::FailureToProceed;
+                m_datalogging.reading_in_progress = false;
+                break;
+            }
+            break;
+        }
+
+        default:
+        {
+            code = protocol::ResponseCode::UnsupportedFeature;
+        }
+        }
+
+        if (static_cast<protocol::DataLogControl::Subfunction>(request->subfunction_id) == protocol::DataLogControl::Subfunction::ConfigureDatalog)
+        {
+            if (code != protocol::ResponseCode::OK && code != protocol::ResponseCode::ProcessAgain)
+            {
+                m_datalogging.datalogger.reset();
+            }
+        }
+
+        return code;
+    }
+#endif
 }

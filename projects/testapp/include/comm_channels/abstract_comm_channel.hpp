@@ -1,11 +1,11 @@
-//    abstract_comm_channel.h
+//    abstract_comm_channel.hpp
 //        Define the interface for a communication channel used by the testapp to run the scrutiny
 //        embedded lib
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___ABSTRACT_COMM_CHANNEL_H___
 #define ___ABSTRACT_COMM_CHANNEL_H___

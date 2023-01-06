@@ -1,25 +1,24 @@
-//    scrutiny_protocol_tools.cpp
-//        Some helpers for encoding data in a standardised way.
-//        similar to hton() and ntoh()
+//    scrutiny_common_codecs.cpp
+//        Some common encoding/decoding functions used across the project.
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
-#include "protocol/scrutiny_protocol_tools.hpp"
-
+#include "scrutiny_common_codecs.hpp"
+#include "scrutiny_tools.hpp"
 #include <stdint.h>
 
 namespace scrutiny
 {
-    namespace protocol
+    namespace codecs
     {
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
-        uint8_t decode_address_big_endian(uint8_t *buf, uintptr_t *addr)
+        uint8_t decode_address_big_endian(const uint8_t *buf, uintptr_t *addr)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -59,16 +58,16 @@ namespace scrutiny
 #pragma warning(pop)
 #endif
 
-        uint8_t encode_address_big_endian(uint8_t *buf, void *ptr)
+        uint8_t encode_address_big_endian(const void *addr, uint8_t *buf)
         {
-            return encode_address_big_endian(buf, reinterpret_cast<uintptr_t>(ptr));
+            return encode_address_big_endian(reinterpret_cast<uintptr_t>(addr), buf);
         }
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
-        uint8_t encode_address_big_endian(uint8_t *buf, uintptr_t addr)
+        uint8_t encode_address_big_endian(const uintptr_t addr, uint8_t *buf)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -104,5 +103,36 @@ namespace scrutiny
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
+        uint8_t encode_anytype_big_endian(const AnyType *val, const VariableType vartype, uint8_t *buffer)
+        {
+            const uint8_t typesize = tools::get_type_size(vartype);
+            return encode_anytype_big_endian(val, typesize, buffer);
+        }
+
+        uint8_t encode_anytype_big_endian(const AnyType *val, const uint8_t typesize, uint8_t *buffer)
+        {
+
+            switch (typesize)
+            {
+            case 1:
+                *buffer = val->uint8;
+                break;
+            case 2:
+                codecs::encode_16_bits_big_endian(val->uint16, buffer);
+                break;
+            case 4:
+                codecs::encode_32_bits_big_endian(val->uint32, buffer);
+                break;
+#if SCRUTINY_SUPPORT_64BITS
+            case 8:
+                codecs::encode_64_bits_big_endian(val->uint64, buffer);
+                break;
+#endif
+            default:
+                return 0;
+            }
+            return typesize;
+        }
     }
 }
