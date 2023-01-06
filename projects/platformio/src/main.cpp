@@ -28,7 +28,7 @@ void setup()
     scrutiny::Config config;
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.max_bitrate = 100000;
-    config.display_name="Arduino";
+    config.display_name = "Arduino";
 
     scrutiny_handler.init(&config);
     printf("Scrutiny rdy\n");
@@ -59,7 +59,7 @@ void loop()
         Serial.write(buffer, data_to_send);
     }
 
-    scrutiny_handler.process(timestep_us);
+    scrutiny_handler.process(timestep_us * 10);
 
     last_call_us = current_us;
 }

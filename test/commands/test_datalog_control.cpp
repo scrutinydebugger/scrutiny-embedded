@@ -1,3 +1,11 @@
+//    test_datalog_control.cpp
+//        Test the DataLogControl command used to configure, control and reads the datalogger
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 #include <cstring>
 #include <string>
@@ -100,6 +108,13 @@ TEST_F(TestDatalogControl, TestUnsupported)
 }
 #else
 
+/// @brief Encodes a datalogging config to be received by Configure subfunction
+/// @param loop_id The loop ID to which runs the datalogger
+/// @param config_id A Configuration ID that will be associated with the config
+/// @param dlconfig The configuration to encode
+/// @param buffer The destination buffer
+/// @param max_size The buffer max size.
+/// @return  Number of bytes written. Will be 0 in case of overflow
 uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size)
 {
     uint16_t cursor = 0;
@@ -111,9 +126,9 @@ uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t 
     cursor += codecs::encode_16_bits_big_endian(config_id, &buffer[cursor]);
     cursor += codecs::encode_16_bits_big_endian(dlconfig->decimation, &buffer[cursor]);
     cursor += codecs::encode_8_bits(dlconfig->probe_location, &buffer[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(dlconfig->timeout_us, &buffer[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(dlconfig->timeout_100ns, &buffer[cursor]);
     cursor += codecs::encode_8_bits(static_cast<uint8_t>(dlconfig->trigger.condition), &buffer[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(dlconfig->trigger.hold_time_us, &buffer[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(dlconfig->trigger.hold_time_100ns, &buffer[cursor]);
     cursor += codecs::encode_8_bits(dlconfig->trigger.operand_count, &buffer[cursor]);
 
     for (uint32_t i = 0; i < dlconfig->trigger.operand_count; i++)
@@ -200,13 +215,14 @@ uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t 
     return cursor;
 }
 
+/// @brief Return a valid configuration used across the whole test suite
 datalogging::Configuration TestDatalogControl::get_valid_reference_configuration()
 {
     datalogging::Configuration refconfig;
 
     refconfig.decimation = 0x1234;
     refconfig.probe_location = 123;
-    refconfig.timeout_us = 0x11223344;
+    refconfig.timeout_100ns = 0x11223344;
     refconfig.items_count = 3;
 
     refconfig.items_to_log[0].type = datalogging::LoggableType::TIME;
@@ -217,7 +233,7 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     refconfig.items_to_log[2].data.rpv.id = 0x8888;
 
     refconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
-    refconfig.trigger.hold_time_us = 0xaabbccdd;
+    refconfig.trigger.hold_time_100ns = 0xaabbccdd;
     refconfig.trigger.operand_count = 2;
     refconfig.trigger.operands[0].type = datalogging::OperandType::LITERAL;
     refconfig.trigger.operands[0].data.literal.val = 3.1415926f;
@@ -228,6 +244,13 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     return refconfig;
 }
 
+/// @brief Runs a test for DataLogControl-Configure command.
+/// @param loop_id Loop ID to configure
+/// @param config_id  The configuraiton ID
+/// @param refconfig The datalog coniguration
+/// @param expected_code Expected response code returned through CommHandler
+/// @param check_response When true, make sure the respons eis valid.
+/// @param error_msg Error message to log in case of failure
 void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response, std::string error_msg)
 {
     uint8_t request_data[1024] = {5, 2};
@@ -264,7 +287,7 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
     }
 }
 
-TEST_F(TestDatalogControl, TestGetBufferSize)
+TEST_F(TestDatalogControl, TestGetSetup)
 {
     uint8_t tx_buffer[32];
     uint32_t buffer_size = sizeof(dlbuffer);
@@ -273,8 +296,13 @@ TEST_F(TestDatalogControl, TestGetBufferSize)
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 4] = {0x85, 1, 0, 0, 4};
+    uint8_t expected_response[9 + 4 + 1] = {0x85, 1, 0, 0, 5};
     codecs::encode_32_bits_big_endian(buffer_size, &expected_response[5]);
+#if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
+    expected_response[9] = static_cast<uint8_t>(datalogging::EncodingType::RAW);
+#else
+#error Unkown encoding
+#endif
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -301,7 +329,7 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
 
     EXPECT_EQ(dlconfig->decimation, refconfig.decimation);
     EXPECT_EQ(dlconfig->probe_location, refconfig.probe_location);
-    EXPECT_EQ(dlconfig->timeout_us, refconfig.timeout_us);
+    EXPECT_EQ(dlconfig->timeout_100ns, refconfig.timeout_100ns);
     ASSERT_EQ(dlconfig->items_count, refconfig.items_count);
     EXPECT_EQ(dlconfig->items_to_log[0].type, refconfig.items_to_log[0].type);
     EXPECT_EQ(dlconfig->items_to_log[1].type, refconfig.items_to_log[1].type);
@@ -310,7 +338,7 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
     EXPECT_EQ(dlconfig->items_to_log[2].type, refconfig.items_to_log[2].type);
     EXPECT_EQ(dlconfig->items_to_log[2].data.rpv.id, refconfig.items_to_log[2].data.rpv.id);
     EXPECT_EQ(dlconfig->trigger.condition, refconfig.trigger.condition);
-    EXPECT_EQ(dlconfig->trigger.hold_time_us, refconfig.trigger.hold_time_us);
+    EXPECT_EQ(dlconfig->trigger.hold_time_100ns, refconfig.trigger.hold_time_100ns);
     EXPECT_EQ(dlconfig->trigger.operand_count, refconfig.trigger.operand_count);
     EXPECT_EQ(dlconfig->trigger.operands[0].type, refconfig.trigger.operands[0].type);
     EXPECT_EQ(dlconfig->trigger.operands[0].data.literal.val, refconfig.trigger.operands[0].data.literal.val);
@@ -399,8 +427,8 @@ TEST_F(TestDatalogControl, TestOwnerMechanism)
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
     refconfig.probe_location = 128;
-    refconfig.timeout_us = 0;
-    refconfig.trigger.hold_time_us = 0;
+    refconfig.timeout_100ns = 0;
+    refconfig.trigger.hold_time_100ns = 0;
 
     test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
     scrutiny_handler.process(0);
@@ -688,13 +716,13 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
     reader->reset();
 
-    uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 1] = {0x85, 6, 0, 0, 13};
+    uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 4] = {0x85, 6, 0, 0, 16};
     uint16_t cursor = 5;
     cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
     cursor += codecs::encode_16_bits_big_endian(0xabcd, &expected_response[cursor]);
     cursor += codecs::encode_32_bits_big_endian(reader->get_entry_count(), &expected_response[cursor]);
     cursor += codecs::encode_32_bits_big_endian(reader->get_total_size(), &expected_response[cursor]);
-    cursor += codecs::encode_8_bits(static_cast<uint8_t>(reader->get_encoding()), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));

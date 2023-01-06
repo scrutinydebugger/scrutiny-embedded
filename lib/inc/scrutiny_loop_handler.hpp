@@ -6,7 +6,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_LOOP_HANDLER_H___
 #define ___SCRUTINY_LOOP_HANDLER_H___
@@ -79,7 +79,7 @@ namespace scrutiny
         /// @brief Returns the loop type: Fixed frequency or variable frequency
         virtual LoopType loop_type(void) const = 0;
 
-        virtual uint32_t get_timestep_us(void) const = 0;
+        virtual uint32_t get_timestep_100ns(void) const = 0;
 
         /// @brief Return the timebase used by the Loop Handler
         inline Timebase *get_timebase(void) { return &m_timebase; }
@@ -102,7 +102,7 @@ namespace scrutiny
     protected:
         /// @brief Initialize the Loop Handler
         void init(MainHandler *main_handler);
-        void process_common(timestamp_t timestep_us);
+        void process_common(timestamp_t timestep_100ns);
 
         Timebase m_timebase;
         /// @brief  Atomic message transferred from the Main Handler to the Loop Handler
@@ -124,16 +124,16 @@ namespace scrutiny
     class FixedFrequencyLoopHandler : public LoopHandler
     {
     public:
-        FixedFrequencyLoopHandler(timestamp_t timestep_us, const char *name = nullptr) : LoopHandler(name),
-                                                                                         m_timestep_us(timestep_us)
+        FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = nullptr) : LoopHandler(name),
+                                                                                           m_timestep_100ns(timestep_100ns)
         {
         }
         void process(void);
         virtual LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
-        virtual uint32_t get_timestep_us(void) const { return m_timestep_us; }
+        virtual uint32_t get_timestep_100ns(void) const { return m_timestep_100ns; }
 
     protected:
-        const uint32_t m_timestep_us;
+        const uint32_t m_timestep_100ns;
     };
 
     class VariableFrequencyLoopHandler : public LoopHandler
@@ -142,8 +142,8 @@ namespace scrutiny
         VariableFrequencyLoopHandler(const char *name = nullptr) : LoopHandler(name)
         {
         }
-        virtual uint32_t get_timestep_us(void) const { return 0; }
-        void process(timestamp_t timestep_us);
+        virtual uint32_t get_timestep_100ns(void) const { return 0; }
+        void process(timediff_t timestep_100ns);
         virtual LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
     };
 }

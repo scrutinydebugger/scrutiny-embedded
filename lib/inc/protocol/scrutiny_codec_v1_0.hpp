@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_CODEC_V1_0___
 #define ___SCRUTINY_CODEC_V1_0___
@@ -16,7 +16,7 @@
 
 #if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging_types.hpp"
-#include "datalogging/scrutiny_data_encoding.hpp"
+#include "datalogging/scrutiny_datalogging_data_encoding.hpp"
 #endif
 namespace scrutiny
 {
@@ -244,7 +244,7 @@ namespace scrutiny
                     {
                         struct
                         {
-                            uint32_t timestep_us;
+                            uint32_t timestep_100ns;
                         } fixed_freq;
                     } loop_type_specific;
 
@@ -284,9 +284,10 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
             namespace DataLogControl
             {
-                struct GetBufferSize
+                struct GetSetup
                 {
                     uint32_t buffer_size;
+                    uint8_t data_encoding;
                 };
 
                 struct GetStatus
@@ -300,7 +301,7 @@ namespace scrutiny
                     uint16_t config_id;
                     uint32_t number_of_points;
                     uint32_t data_size;
-                    uint8_t encoding;
+                    uint32_t points_after_trigger;
                 };
 
                 struct ReadAcquisition
@@ -420,7 +421,7 @@ namespace scrutiny
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *response, const uint16_t max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response);
+            ResponseCode encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response);
             ResponseCode encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response);
             ResponseCode encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response);
             ResponseCode encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished);

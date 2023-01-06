@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
 
@@ -393,7 +393,7 @@ namespace scrutiny
         }
     }
 
-    void MainHandler::process(const uint32_t timestep_us)
+    void MainHandler::process(const timediff_t timestep_100ns)
     {
         if (!m_enabled)
         {
@@ -405,7 +405,7 @@ namespace scrutiny
 #endif
             return;
         }
-        m_timebase.step(timestep_us);
+        m_timebase.step(timestep_100ns);
         m_comm_handler.process();
         process_loops();
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -428,7 +428,7 @@ namespace scrutiny
                 }
                 else
                 {
-                    if (m_timebase.has_expired(m_process_again_timestamp, SCRUTINY_REQUEST_MAX_PROCESS_TIME_US))
+                    if (m_timebase.has_expired(m_process_again_timestamp, SCRUTINY_REQUEST_MAX_PROCESS_TIME_US * 10))
                     {
                         // Set only response code. All other fields are set in process_request()
                         response->response_code = static_cast<uint8_t>(protocol::ResponseCode::FailureToProceed);
@@ -787,7 +787,7 @@ namespace scrutiny
             stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
             if (loop_type == LoopType::FIXED_FREQ)
             {
-                stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_us = m_config.m_loops[loop_id]->get_timestep_us();
+                stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_100ns = m_config.m_loops[loop_id]->get_timestep_100ns();
             }
 
             const char *const loop_name = m_config.m_loops[loop_id]->get_name();
@@ -1343,8 +1343,8 @@ namespace scrutiny
         {
             struct
             {
-                protocol::ResponseData::DataLogControl::GetBufferSize response_data;
-            } get_buffer_size;
+                protocol::ResponseData::DataLogControl::GetSetup response_data;
+            } get_setup;
 
             struct
             {
@@ -1378,10 +1378,11 @@ namespace scrutiny
         switch (static_cast<protocol::DataLogControl::Subfunction>(request->subfunction_id))
         {
 
-        case protocol::DataLogControl::Subfunction::GetBufferSize:
+        case protocol::DataLogControl::Subfunction::GetSetup:
         {
-            stack.get_buffer_size.response_data.buffer_size = m_config.m_datalogger_buffer_size;
-            code = m_codec.encode_response_datalogging_buffer_size(&stack.get_buffer_size.response_data, response);
+            stack.get_setup.response_data.buffer_size = m_config.m_datalogger_buffer_size;
+            stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
+            code = m_codec.encode_response_datalogging_get_setup(&stack.get_setup.response_data, response);
             break;
         }
         case protocol::DataLogControl::Subfunction::ConfigureDatalog:
@@ -1534,7 +1535,7 @@ namespace scrutiny
             stack.get_acq_metadata.response_data.config_id = m_datalogging.datalogger.get_config_id();
             stack.get_acq_metadata.response_data.number_of_points = reader->get_entry_count();
             stack.get_acq_metadata.response_data.data_size = reader->get_total_size();
-            stack.get_acq_metadata.response_data.encoding = static_cast<uint8_t>(reader->get_encoding());
+            stack.get_acq_metadata.response_data.points_after_trigger = m_datalogging.datalogger.log_points_after_trigger();
             code = m_codec.encode_response_datalogging_get_acquisition_metadata(&stack.get_acq_metadata.response_data, response);
             break;
         }

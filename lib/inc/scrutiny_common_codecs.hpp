@@ -1,9 +1,10 @@
 //    scrutiny_common_codecs.hpp
+//        Some codecs function used across the project
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_COMMON_CODECS_H___
 #define ___SCRUTINY_COMMON_CODECS_H___

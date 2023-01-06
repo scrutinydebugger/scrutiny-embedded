@@ -1,3 +1,11 @@
+//    test_raw_encoder.cpp
+//        Test suite for the RawFormat encoder.
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 
 #include "scrutiny_test.hpp"

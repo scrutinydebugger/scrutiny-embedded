@@ -6,7 +6,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include "scrutiny_loop_handler.hpp"
 #include "scrutiny_timebase.hpp"
@@ -27,9 +27,9 @@ namespace scrutiny
 #endif
     }
 
-    void LoopHandler::process_common(timestamp_t timestep_us)
+    void LoopHandler::process_common(timediff_t timestep_100ns)
     {
-        m_timebase.step(timestep_us);
+        m_timebase.step(timestep_100ns);
 
         Loop2MainMessage msg_out;
         static_cast<void>(msg_out);
@@ -98,11 +98,11 @@ namespace scrutiny
 
     void FixedFrequencyLoopHandler::process()
     {
-        process_common(m_timestep_us);
+        process_common(m_timestep_100ns);
     }
-    void VariableFrequencyLoopHandler::process(timestamp_t timestep_us)
+    void VariableFrequencyLoopHandler::process(timediff_t timestep_100ns)
     {
-        process_common(timestep_us);
+        process_common(timestep_100ns);
     }
 
 }

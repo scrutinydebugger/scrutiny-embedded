@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_DATALOGGING_TYPES_H___
 #define ___SCRUTINY_DATALOGGING_TYPES_H___
@@ -107,12 +107,12 @@ namespace scrutiny
 
                 condition = other->condition;
                 operand_count = other->operand_count;
-                hold_time_us = other->hold_time_us;
+                hold_time_100ns = other->hold_time_100ns;
             }
 
             SupportedTriggerConditions condition;
             uint8_t operand_count;
-            uint32_t hold_time_us;
+            uint32_t hold_time_100ns;
             Operand operands[MAX_OPERANDS];
         };
 
@@ -149,7 +149,7 @@ namespace scrutiny
                 items_count = other->items_count;
                 decimation = other->decimation;
                 probe_location = other->probe_location;
-                timeout_us = other->timeout_us;
+                timeout_100ns = other->timeout_100ns;
                 trigger.copy_from(&other->trigger);
                 if (items_count <= SCRUTINY_DATALOGGING_MAX_SIGNAL)
                 {
@@ -164,7 +164,7 @@ namespace scrutiny
             uint8_t items_count;
             uint16_t decimation;
             uint8_t probe_location;
-            uint32_t timeout_us;
+            uint32_t timeout_100ns;
             TriggerConfig trigger;
         };
 

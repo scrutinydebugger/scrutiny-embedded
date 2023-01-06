@@ -1,3 +1,12 @@
+//    raw_format_parser.cpp
+//        Class that can reads the data encoded by the datalogging encoder. It does what the
+//        server would do for testing purpose
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include "datalogging/raw_format_parser.hpp"
 #include "scrutiny.hpp"
 

@@ -1,3 +1,11 @@
+//    test_codecs.cpp
+//        Tests the different codecs function used across this project
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"

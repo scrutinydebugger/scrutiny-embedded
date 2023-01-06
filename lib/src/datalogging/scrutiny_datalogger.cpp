@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
@@ -246,7 +246,7 @@ namespace scrutiny
                         {
                             m_acquisition_id++;
                             m_state = State::ACQUISITION_COMPLETED;
-                            m_log_points_after_trigger = m_encoder.get_write_counter();
+                            m_log_points_after_trigger = m_encoder.get_entry_write_counter();
                         }
                     }
                     break;
@@ -274,15 +274,15 @@ namespace scrutiny
         {
             if (m_trigger_point_stamped)
             {
-                if (m_config.timeout_us > 0)
+                if (m_config.timeout_100ns > 0)
                 {
-                    if (m_timebase->has_expired(m_trigger_timestamp, m_config.timeout_us))
+                    if (m_timebase->has_expired(m_trigger_timestamp, m_config.timeout_100ns))
                     {
                         return true;
                     }
                 }
 
-                if (m_encoder.get_write_counter() >= m_remaining_data_to_write && m_encoder.buffer_full())
+                if (m_encoder.get_data_write_counter() >= m_remaining_data_to_write && m_encoder.buffer_full())
                 {
                     return true;
                 }
@@ -348,7 +348,7 @@ namespace scrutiny
                         m_trigger.rising_edge_timestamp = m_timebase->get_timestamp();
                     }
 
-                    if (m_timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_us))
+                    if (m_timebase->has_expired(m_trigger.rising_edge_timestamp, m_config.trigger.hold_time_100ns))
                     {
                         outval = true;
                     }

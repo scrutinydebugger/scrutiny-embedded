@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
 #include <stdint.h>
@@ -657,9 +657,10 @@ namespace scrutiny
 
         ResponseCode CodecV1_0::encode_response_get_loop_definition(const ResponseData::GetInfo::GetLoopDefinition *response_data, Response *response)
         {
+            static_assert(sizeof(timediff_t) == 4, "Unsupported timediff size");
             constexpr uint16_t loop_id_size = sizeof(response_data->loop_id);
             constexpr uint16_t loop_type_size = sizeof(response_data->loop_type);
-            constexpr uint16_t timestep_us_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_us);
+            constexpr uint16_t timestep_100ns_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_100ns);
             constexpr uint16_t name_length_size = sizeof(response_data->loop_name_length);
 
             constexpr uint16_t datalen = loop_id_size + loop_type_size + name_length_size;
@@ -676,11 +677,11 @@ namespace scrutiny
             switch (static_cast<scrutiny::LoopType>(response_data->loop_type))
             {
             case scrutiny::LoopType::FIXED_FREQ:
-                if (cursor + timestep_us_size > response->data_max_length)
+                if (cursor + timestep_100ns_size > response->data_max_length)
                 {
                     return ResponseCode::Overflow;
                 }
-                cursor += codecs::encode_32_bits_big_endian(response_data->loop_type_specific.fixed_freq.timestep_us, &response->data[cursor]);
+                cursor += codecs::encode_32_bits_big_endian(response_data->loop_type_specific.fixed_freq.timestep_100ns, &response->data[cursor]);
                 break;
             case scrutiny::LoopType::VARIABLE_FREQ:
                 break;
@@ -965,15 +966,17 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        ResponseCode CodecV1_0::encode_response_datalogging_buffer_size(const ResponseData::DataLogControl::GetBufferSize *response_data, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response)
         {
-            constexpr uint16_t datalen = sizeof(response_data->buffer_size);
+            constexpr uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding);
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
-            codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[0]);
-            response->data_length = datalen;
+            uint16_t cursor = 0;
+            cursor += codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[cursor]);
+            cursor += codecs::encode_8_bits(response_data->data_encoding, &response->data[cursor]);
+            response->data_length = cursor;
 
             return ResponseCode::OK;
         }
@@ -997,9 +1000,9 @@ namespace scrutiny
             constexpr uint16_t config_id_size = sizeof(response_data->config_id);
             constexpr uint16_t number_of_points_size = sizeof(response_data->number_of_points);
             constexpr uint16_t data_size_size = sizeof(response_data->data_size);
-            constexpr uint16_t encoding_size = sizeof(response_data->encoding);
+            constexpr uint16_t points_after_trigger_size = sizeof(response_data->points_after_trigger);
 
-            constexpr uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size + encoding_size;
+            constexpr uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -1011,7 +1014,7 @@ namespace scrutiny
             cursor += codecs::encode_16_bits_big_endian(response_data->config_id, &response->data[cursor]);
             cursor += codecs::encode_32_bits_big_endian(response_data->number_of_points, &response->data[cursor]);
             cursor += codecs::encode_32_bits_big_endian(response_data->data_size, &response->data[cursor]);
-            cursor += codecs::encode_8_bits(response_data->encoding, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->points_after_trigger, &response->data[cursor]);
             response->data_length = cursor;
 
             return ResponseCode::OK;
@@ -1060,9 +1063,9 @@ namespace scrutiny
 
             config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
             config->probe_location = request->data[5];
-            config->timeout_us = codecs::decode_32_bits_big_endian(&request->data[6]);
+            config->timeout_100ns = codecs::decode_32_bits_big_endian(&request->data[6]);
             config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(request->data[10]);
-            config->trigger.hold_time_us = codecs::decode_32_bits_big_endian(&request->data[11]);
+            config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian(&request->data[11]);
             config->trigger.operand_count = request->data[15];
 
             if (config->trigger.operand_count > datalogging::MAX_OPERANDS)

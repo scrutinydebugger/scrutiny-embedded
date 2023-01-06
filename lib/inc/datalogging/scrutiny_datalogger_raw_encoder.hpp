@@ -1,5 +1,14 @@
-#ifndef ___SCRUTINY_DATALOGGER_ENCODER___
-#define ___SCRUTINY_DATALOGGER_ENCODER___
+//    scrutiny_datalogger_raw_encoder.hpp
+//        Class that handles the encoding of the datalogger data. RawFormat just copy to emmory,
+//        no encoding scheme.
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
+#ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
+#define ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -54,8 +63,9 @@ namespace scrutiny
             void init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size);
             void encode_next_entry(void);
             void reset(void);
-            inline void reset_write_counter(void) { m_write_counter = 0; }
-            inline uint32_t get_write_counter(void) const { return m_write_counter; }
+            inline void reset_write_counter(void) { m_entry_write_counter = 0; }
+            inline uint32_t get_entry_write_counter(void) const { return m_entry_write_counter; }
+            inline uint32_t get_data_write_counter(void) const { return m_entry_write_counter * m_entry_size; }
             inline datalogging::EncodingType get_encoding(void) const { return ENCODING; }
             inline uint32_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
             inline uint32_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
@@ -80,7 +90,7 @@ namespace scrutiny
             uint32_t m_max_entries;
             uint32_t m_next_entry_write_index;
             uint32_t m_first_valid_entry_index;
-            uint32_t m_write_counter;
+            uint32_t m_entry_write_counter;
             uint16_t m_entry_size;
             uint32_t m_entries_count;
             bool m_full;
@@ -93,4 +103,4 @@ namespace scrutiny
     }
 }
 
-#endif // ___SCRUTINY_DATALOGGER_ENCODER___
+#endif // ___SCRUTINY_DATALOGGER_RAW_ENCODER___

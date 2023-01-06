@@ -5,7 +5,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_PROTOCOL_DEFINITION_H___
 #define ___SCRUTINY_PROTOCOL_DEFINITION_H___
@@ -146,15 +146,13 @@ namespace scrutiny
         {
             enum class Subfunction
             {
-                GetBufferSize = 1,
+                GetSetup = 1,
                 ConfigureDatalog = 2,
                 ArmTrigger = 3,
                 DisarmTrigger = 4,
                 GetStatus = 5,
                 GetAcquisitionMetadata = 6,
                 ReadAcquisition = 7,
-                // ListRecordings = 5,
-                // ReadRecordings = 6,
             };
         }
 

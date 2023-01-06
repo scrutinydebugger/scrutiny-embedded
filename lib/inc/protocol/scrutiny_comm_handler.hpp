@@ -5,7 +5,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_COMM_HANDLER_H___
 #define ___SCRUTINY_COMM_HANDLER_H___
@@ -95,7 +95,7 @@ namespace scrutiny
             bool m_enabled;
             uint32_t m_session_id;
             bool m_session_active;
-            uint32_t m_heartbeat_timestamp;
+            timestamp_t m_heartbeat_timestamp;
             uint16_t m_last_heartbeat_challenge;
             bool m_heartbeat_received;
             bool m_reception_paused;
@@ -112,7 +112,7 @@ namespace scrutiny
             uint8_t m_crc_bytes_received;
             uint8_t m_length_bytes_received;
             uint16_t m_data_bytes_received;
-            uint32_t m_last_rx_timestamp;
+            timestamp_t m_last_rx_timestamp;
 
             // Transmission
             Response m_active_response;

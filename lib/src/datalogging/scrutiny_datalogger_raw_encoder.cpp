@@ -1,3 +1,12 @@
+//    scrutiny_datalogger_raw_encoder.cpp
+//        Class that handles the encoding of the datalogger data. RawFormat just copy to emmory,
+//        no encoding scheme.
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_common_codecs.hpp"
@@ -128,7 +137,7 @@ namespace scrutiny
                 m_next_entry_write_index = 0;
             }
 
-            m_write_counter += m_entry_size;
+            m_entry_write_counter++;
         }
 
         /// @brief  Init the encoder

@@ -153,10 +153,10 @@
             "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
         },
         "lib/inc/scrutiny_common_codecs.hpp": {
-            "docstring": ""
+            "docstring": "Some codecs function used across the project"
         },
         "lib/inc/scrutiny_ipc.hpp": {
-            "docstring": "Some tools for inter-=process communications"
+            "docstring": "Some tools for inter-process communications"
         },
         "lib/inc/datalogging/scrutiny_datalogging.hpp": {
             "docstring": "The datalogging main include"
@@ -208,6 +208,33 @@
         },
         "test/datalogging/test_datalogging_types.cpp": {
             "docstring": "Run some tests on datalogging types"
+        },
+        "lib/inc/datalogging/scrutiny_datalogging_data_encoding.hpp": {
+            "docstring": "File to be included to get access to the datalogging encoders/readers. Abstract the handling of different encoding."
+        },
+        "lib/inc/datalogging/scrutiny_datalogger_raw_encoder.hpp": {
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+        },
+        "lib/src/datalogging/scrutiny_datalogger_raw_encoder.cpp": {
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+        },
+        "test/test_codecs.cpp": {
+            "docstring": "Tests the different codecs function used across this project"
+        },
+        "test/commands/test_datalog_control.cpp": {
+            "docstring": "Test the DataLogControl command used to configure, control and reads the datalogger"
+        },
+        "test/datalogging/test_datalogger.cpp": {
+            "docstring": "Test suite for the datalogger object. Test its capacity to log, trigger access bitfields and report error on bad config."
+        },
+        "test/datalogging/raw_format_parser.hpp": {
+            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
+        },
+        "test/datalogging/test_raw_encoder.cpp": {
+            "docstring": "Test suite for the RawFormat encoder."
+        },
+        "test/datalogging/raw_format_parser.cpp": {
+            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
         }
     }
 }

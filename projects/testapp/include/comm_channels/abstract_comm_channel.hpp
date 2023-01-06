@@ -5,7 +5,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___ABSTRACT_COMM_CHANNEL_H___
 #define ___ABSTRACT_COMM_CHANNEL_H___

@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <gtest/gtest.h>
 #include "scrutiny.hpp"
@@ -12,7 +12,7 @@
 TEST(TestTimebase, CheckTimeouts)
 {
     scrutiny::Timebase tb;
-    uint32_t timestamp;
+    scrutiny::timestamp_t timestamp;
 
     timestamp = tb.get_timestamp();
     tb.step(100);

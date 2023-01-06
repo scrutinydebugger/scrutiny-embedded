@@ -1,10 +1,10 @@
 //    scrutiny_ipc.hpp
-//        Some tools for inter-=process communications
+//        Some tools for inter-process communications
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_IPC_H___
 #define ___SCRUTINY_IPC_H___
@@ -17,6 +17,10 @@ namespace scrutiny
 {
 #if SCRUTINY_BUILD_AVR_GCC
 
+    /// @brief Message that can be sent to another time domain without race condition.
+    /// It is designed for one producer and one consumer.  It is the responsability of the sender to
+    /// wait for message to be cleared before writing a new one
+    /// @tparam T DataType to send
     template <class T>
     class IPCMessage
     {
@@ -64,6 +68,10 @@ namespace scrutiny
     };
 
 #else
+    /// @brief Message that can be sent to another time domain without race condition.
+    /// It is designed for one producer and one consumer.  It is the responsability of the sender to
+    /// wait for message to be cleared before writing a new one
+    /// @tparam T DataType to send
     template <class T>
     class IPCMessage
     {
@@ -74,33 +82,42 @@ namespace scrutiny
             clear();
         }
 
+        /// @brief Tells if the message content is valid and can be read.
         inline bool has_content(void) const
         {
             return m_written.load();
         }
 
+        /// @brief Mark the message as ready to be read using an atomic operation
         inline void commit(void)
         {
             m_written.store(true);
         }
 
+        /// @brief  Deletes the message content and leave rooms for the next one.
         inline void clear(void)
         {
             m_written.store(false);
         }
 
+        /// @brief Sends a message to the receiver. Meant to be used by the producer
+        /// @param indata Data to be sent
         inline void send(const T &indata)
         {
             data = indata;
             commit();
         }
 
+        /// @brief Sends a message to the receiver. Meant to be used by the producer
+        /// @param indata Data to be sent
         inline void send(const T &&indata)
         {
             data = std::move(indata);
             commit();
         }
 
+        /// @brief Reads the message and clear it. Meant to be used by the consumer
+        /// @return The message sent by the sender
         inline T pop(void)
         {
             T outdata = std::move(data);

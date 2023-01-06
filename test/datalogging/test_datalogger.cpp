@@ -1,3 +1,12 @@
+//    test_datalogger.cpp
+//        Test suite for the datalogger object. Test its capacity to log, trigger access bitfields
+//        and report error on bad config.
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021-2023 Scrutiny Debugger
+
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -101,9 +110,9 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
     dlconfig.items_to_log[0].data.memory.address = &logged_var;
     dlconfig.decimation = 1;
-    dlconfig.timeout_us = 0;
+    dlconfig.timeout_100ns = 0;
     dlconfig.probe_location = 128;
-    dlconfig.trigger.hold_time_us = 0;
+    dlconfig.trigger.hold_time_100ns = 0;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
@@ -142,9 +151,9 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.items_to_log[0].data.memory.address = &logged_var;
 
     dlconfig.decimation = 1;
-    dlconfig.timeout_us = 0;
+    dlconfig.timeout_100ns = 0;
     dlconfig.probe_location = 128;
-    dlconfig.trigger.hold_time_us = 100;
+    dlconfig.trigger.hold_time_100ns = 100;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
@@ -180,9 +189,9 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.items_to_log[0].data.memory.size = sizeof(my_var);
     dlconfig.items_to_log[0].data.memory.address = &my_var;
     dlconfig.decimation = 2;
-    dlconfig.timeout_us = 0;
+    dlconfig.timeout_100ns = 0;
     dlconfig.probe_location = 128;
-    dlconfig.trigger.hold_time_us = 100;
+    dlconfig.trigger.hold_time_100ns = 100;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::GreaterThan;
 
@@ -248,7 +257,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
     dlconfig.decimation = 2;
 
-    dlconfig.trigger.hold_time_us = 50;
+    dlconfig.trigger.hold_time_100ns = 50;
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
@@ -388,6 +397,10 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
         uint32_t trigger_location = static_cast<uint32_t>(std::round(static_cast<float>(probe_location) / 255 * (reader->get_entry_count() - 1)));
         ASSERT_GT(data.size(), trigger_location);
+        ASSERT_GT(data.size(), 0);
+        ASSERT_GE(data.size(), datalogger.log_points_after_trigger());
+
+        EXPECT_NEAR(trigger_location, data.size() - datalogger.log_points_after_trigger(), 1);
 
         float mid_var1 = *reinterpret_cast<float *>(data[trigger_location][0].data());
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(data[trigger_location][1].data());
@@ -418,8 +431,8 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
     dlconfig.items_to_log[3].type = datalogging::LoggableType::TIME;
 
     dlconfig.decimation = 1;
-    dlconfig.trigger.hold_time_us = 0;
-    dlconfig.timeout_us = 0;
+    dlconfig.trigger.hold_time_100ns = 0;
+    dlconfig.timeout_100ns = 0;
     dlconfig.trigger.operand_count = 0;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::AlwaysTrue;
 

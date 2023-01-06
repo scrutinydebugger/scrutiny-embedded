@@ -5,7 +5,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
 
@@ -64,7 +64,7 @@ namespace scrutiny
             // Handle rx timeouts. Start a new reception if no data for too long
             if (m_rx_state != RxFSMState::WaitForCommand && len != 0)
             {
-                if (m_timebase->has_expired(m_last_rx_timestamp, SCRUTINY_COMM_RX_TIMEOUT_US))
+                if (m_timebase->has_expired(m_last_rx_timestamp, SCRUTINY_COMM_RX_TIMEOUT_US * 10))
                 {
                     reset_rx();
                     m_state = State::Idle;
@@ -419,7 +419,7 @@ namespace scrutiny
         {
             if (m_session_active)
             {
-                if (m_timebase->has_expired(m_heartbeat_timestamp, SCRUTINY_COMM_HEARTBEAT_TMEOUT_US))
+                if (m_timebase->has_expired(m_heartbeat_timestamp, SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10))
                 {
                     reset(); // Disable and reset all internal vars
                 }

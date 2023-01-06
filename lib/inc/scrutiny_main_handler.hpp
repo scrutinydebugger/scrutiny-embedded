@@ -4,7 +4,7 @@
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2022 Scrutiny Debugger
+//   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #ifndef __SCRUTINY_HANDLER_H__
 #define __SCRUTINY_HANDLER_H__
@@ -31,7 +31,7 @@ namespace scrutiny
         bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
         bool rpv_exists(const uint16_t id) const;
         VariableType get_rpv_type(const uint16_t id) const;
-        void process(const uint32_t timestep_us);
+        void process(const timediff_t timestep_100ns);
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief Returns the state of the datalogger. Thread safe
