@@ -228,7 +228,7 @@ TEST_F(TestDatalogger, BasicAcquisition)
         my_var += 1.0;
     }
     EXPECT_FALSE(datalogger.data_acquired());
-    EXPECT_EQ(g_trigger_callback_count, 0);
+    EXPECT_EQ(g_trigger_callback_count, 0u);
     datalogger.arm_trigger();
 
     for (unsigned int i = 0; i < 100; i++)
@@ -238,7 +238,7 @@ TEST_F(TestDatalogger, BasicAcquisition)
         my_var += 1.0;
     }
     EXPECT_TRUE(datalogger.data_acquired());
-    EXPECT_EQ(g_trigger_callback_count, 1);
+    EXPECT_EQ(g_trigger_callback_count, 1u);
 
     check_canaries();
 }
@@ -409,7 +409,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         ASSERT_GT(data.size(), 0);
         ASSERT_GE(data.size(), datalogger.log_points_after_trigger());
 
-        EXPECT_NEAR(trigger_location, data.size() - datalogger.log_points_after_trigger(), 1);
+        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(data.size() - datalogger.log_points_after_trigger()), 1u);
 
         float mid_var1 = *reinterpret_cast<float *>(data[trigger_location][0].data());
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(data[trigger_location][1].data());
