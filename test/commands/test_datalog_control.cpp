@@ -409,6 +409,15 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
+TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
+{
+    constexpr uint8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.condition = static_cast<datalogging::SupportedTriggerConditions>(0xAA);
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
+
 TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
     constexpr uint8_t loop_id = 1;

@@ -38,6 +38,7 @@ namespace scrutiny
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
             m_trigger_point_stamped = false;
+            m_trigger.active_condition = nullptr;
 
             m_trigger_cursor_location = 0;
             m_trigger_timestamp = 0;
@@ -97,6 +98,7 @@ namespace scrutiny
                 m_trigger.active_condition = &m_trigger.conditions.within;
                 break;
             default:
+                m_trigger.active_condition = &m_trigger.conditions.always_true; // fallback to avoid nullptr;
                 m_config_valid = false;
             }
 
