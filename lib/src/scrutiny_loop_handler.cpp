@@ -85,7 +85,7 @@ namespace scrutiny
                     m_loop2main_msg.send(msg_out);
                     m_datalogger_data_acquired = true;
                 }
-                else // Keep last for lowest priority
+                else // Keep last for lowest priority. Status is given when nothing else is to be done.
                 {
                     msg_out.message_id = Loop2MainMessageID::DATALOGGER_STATUS_UPDATE;
                     msg_out.data.datalogger_status_update.state = m_datalogger->get_state();

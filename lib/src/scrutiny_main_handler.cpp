@@ -94,11 +94,6 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    /// @brief Copy memory from src to dst (makes a memcpy) but respect the forbodden region constraints given by the user.
-    /// @param dst Destination buffer
-    /// @param src Source buffer
-    /// @param size Number of bytes to copy
-    /// @return true on success. False on failure
     bool MainHandler::read_memory(void *dst, const void *src, const uint32_t size) const
     {
         if (touches_forbidden_region(src, size))
@@ -110,11 +105,6 @@ namespace scrutiny
         return true;
     }
 
-    /// @brief Reads a variable from the memory
-    /// @param addr Location of the variable in memory
-    /// @param variable_type Type of variable to read
-    /// @param val The output structure that supports all types.
-    /// @return true on success. False on failure
     bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
     {
         uint8_t typesize = tools::get_type_size(variable_type);
@@ -131,14 +121,6 @@ namespace scrutiny
         return true;
     }
 
-    /// @brief Reads a bitfield variable from the memory
-    /// @param addr Location of the variable in memory
-    /// @param var_tt Variable Type Type (no size in type). (uint, sint, float, etc.)
-    /// @param bitoffset Offset of the start of the data
-    /// @param bitsize Size of the data to read
-    /// @param val The output structure that supports all types.
-    /// @param output_type The type of the data read. The size is adjusted to be as small as possible.
-    /// @return true on success. False on failure
     bool MainHandler::fetch_variable_bitfield(
         const void *addr,
         const VariableTypeType var_tt,
@@ -586,7 +568,7 @@ namespace scrutiny
             struct
             {
                 protocol::ResponseData::GetInfo::GetSupportedFeatures response_data;
-            } get_supproted_features;
+            } get_supported_features;
 
             struct
             {
@@ -635,21 +617,21 @@ namespace scrutiny
             // =========== [GetSupportedFeatures] ==========
         case protocol::GetInfo::Subfunction::GetSupportedFeatures:
         {
-            stack.get_supproted_features.response_data.memory_read = true;
-            stack.get_supproted_features.response_data.memory_write = m_config.memory_write_enable;
+            stack.get_supported_features.response_data.memory_read = true;
+            stack.get_supported_features.response_data.memory_write = m_config.memory_write_enable;
 #if SCRUTINY_ENABLE_DATALOGGING
-            stack.get_supproted_features.response_data.datalogging = m_config.is_datalogging_configured();
+            stack.get_supported_features.response_data.datalogging = m_config.is_datalogging_configured();
 #else
-            stack.get_supproted_features.response_data.datalogging = false;
+            stack.get_supported_features.response_data.datalogging = false;
 #endif
-            stack.get_supproted_features.response_data.user_command = m_config.is_user_command_callback_set();
+            stack.get_supported_features.response_data.user_command = m_config.is_user_command_callback_set();
 #if SCRUTINY_SUPPORT_64BITS
-            stack.get_supproted_features.response_data._64bits = true;
+            stack.get_supported_features.response_data._64bits = true;
 #else
-            stack.get_supproted_features.response_data._64bits = false;
+            stack.get_supported_features.response_data._64bits = false;
 #endif
 
-            code = m_codec.encode_response_supported_features(&stack.get_supproted_features.response_data, response);
+            code = m_codec.encode_response_supported_features(&stack.get_supported_features.response_data, response);
             break;
         }
             // =========== [GetSpecialMemoryRegionCount] ==========
@@ -896,7 +878,7 @@ namespace scrutiny
             stack.get_params.response_data.data_rx_buffer_size = m_config.m_rx_buffer_size;
             stack.get_params.response_data.max_bitrate = m_config.max_bitrate;
             stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
-            stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TMEOUT_US;
+            stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US;
             stack.get_params.response_data.address_size = sizeof(void *);
             code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
             break;
@@ -928,7 +910,7 @@ namespace scrutiny
             break;
         }
 
-            // =========== [Diconnect] ==========
+            // =========== [Disconnect] ==========
         case protocol::CommControl::Subfunction::Disconnect:
         {
             code = m_codec.decode_request_comm_disconnect(request, &stack.disconnect.request_data);
@@ -1316,7 +1298,7 @@ namespace scrutiny
         if (m_config.is_user_command_callback_set())
         {
             uint16_t response_data_length = 0;
-            // caling user callback;
+            // Calling user callback;
             m_config.user_command_callback(request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
             if (response_data_length > m_comm_handler.tx_buffer_size())
             {

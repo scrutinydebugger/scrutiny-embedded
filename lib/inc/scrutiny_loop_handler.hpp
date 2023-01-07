@@ -102,7 +102,10 @@ namespace scrutiny
     protected:
         /// @brief Initialize the Loop Handler
         void init(MainHandler *main_handler);
-        void process_common(timestamp_t timestep_100ns);
+
+        /// @brief Process method common to both FixedFreqLoop and VariableFreqLoop
+        /// @param timestep_100ns Timestep since last call
+        void process_common(timediff_t timestep_100ns);
 
         Timebase m_timebase;
         /// @brief  Atomic message transferred from the Main Handler to the Loop Handler
@@ -114,9 +117,9 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
         datalogging::DataLogger *m_datalogger;
-        /// @brief TElls wehter this loop is the owner of the datalogger
+        /// @brief TElls wether this loop is the owner of the datalogger
         bool m_owns_datalogger;
-        /// @brief Indicates if data has been acquired and ready to be downlaoded or saved
+        /// @brief Indicates if data has been acquired and ready to be downloaded or saved
         bool m_datalogger_data_acquired;
 #endif
     };
@@ -133,7 +136,7 @@ namespace scrutiny
                                                                                            m_timestep_100ns(timestep_100ns)
         {
         }
-        /// @brief Process function be callled at each iteration of the loop.
+        /// @brief Process function be called at each iteration of the loop.
         void process(void);
 
         /// @brief Return the type of loop handler
@@ -160,7 +163,7 @@ namespace scrutiny
         /// @brief Stubbed implementation that always return 0
         virtual uint32_t get_timestep_100ns(void) const { return 0; }
 
-        /// @brief Process function be callled at each iteration of the loop.
+        /// @brief Process function be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t timestep_100ns);
 

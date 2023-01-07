@@ -79,7 +79,7 @@ namespace scrutiny
             /// @brief Disarm the trigger, meaning it will stop looking for the trigger condition
             void disarm_trigger(void);
 
-            /// @brief Check if the trigger condition is met.
+            /// @brief Check if the trigger is fulfilled. Trigger condition must be true for the given hold time.
             /// @return True if the condition is met
             bool check_trigger(void);
 
@@ -95,7 +95,7 @@ namespace scrutiny
             /// @brief Returns true if the datalogger is in error state
             inline bool in_error(void) const { return m_state == State::ERROR; }
 
-            /// @brief Retruns true if the active configuration is valid. Must be called after a call to "configure"
+            /// @brief Returns true if the active configuration is valid. Must be called after a call to "configure"
             inline bool config_valid(void) const { return m_config_valid; }
 
             /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition

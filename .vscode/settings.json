@@ -72,4 +72,18 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
+    "cSpell.words": [
+        "bitoffset",
+        "Datalog",
+        "Loggable",
+        "readmem",
+        "readrpv",
+        "rpvs",
+        "scrutinydebugger",
+        "timediff",
+        "timestep",
+        "typesize",
+        "writemem",
+        "writerpv"
+    ],
 }

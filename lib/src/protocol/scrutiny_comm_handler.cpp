@@ -419,7 +419,7 @@ namespace scrutiny
         {
             if (m_session_active)
             {
-                if (m_timebase->has_expired(m_heartbeat_timestamp, SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10))
+                if (m_timebase->has_expired(m_heartbeat_timestamp, SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US * 10))
                 {
                     reset(); // Disable and reset all internal vars
                 }
@@ -434,9 +434,9 @@ namespace scrutiny
                 return false;
             }
 
-            if ((challenge != m_last_heartbeat_challenge || m_heartbeat_received == false))
+            if ((challenge != m_last_heartbeat_challenge || m_first_heartbeat_received == false))
             {
-                m_heartbeat_received = true;
+                m_first_heartbeat_received = true;
                 m_heartbeat_timestamp = m_timebase->get_timestamp();
                 m_last_heartbeat_challenge = challenge;
                 success = true;
@@ -488,7 +488,7 @@ namespace scrutiny
             m_state = State::Idle;
             m_heartbeat_timestamp = m_timebase->get_timestamp();
             m_last_heartbeat_challenge = 0;
-            m_heartbeat_received = false;
+            m_first_heartbeat_received = false;
             m_session_id = 0;
             m_session_active = false;
 
@@ -540,7 +540,7 @@ namespace scrutiny
 
             m_session_id = s_session_counter++;
             m_session_active = true;
-            m_heartbeat_received = false;
+            m_first_heartbeat_received = false;
             m_heartbeat_timestamp = m_timebase->get_timestamp();
             reset_rx();
 
@@ -551,7 +551,7 @@ namespace scrutiny
         {
             m_session_id = 0;
             m_session_active = false;
-            m_heartbeat_received = false;
+            m_first_heartbeat_received = false;
             reset_rx();
             reset_tx();
         }

@@ -83,18 +83,18 @@ TEST_F(TestCommHandler, TestHeartbeatTimeoutExpire)
     ASSERT_FALSE(comm.is_connected());
     comm.connect();
     ASSERT_TRUE(comm.is_connected());
-    tb.step(SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10 - 1);
+    tb.step(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US * 10 - 1);
     comm.process();
     ASSERT_TRUE(comm.is_connected());
     comm.heartbeat(10); // first rolling counter always valid
-    tb.step(SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10 - 1);
+    tb.step(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US * 10 - 1);
     comm.process();
     ASSERT_TRUE(comm.is_connected());
-    tb.step(SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10 - 1);
+    tb.step(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US * 10 - 1);
     comm.heartbeat(11);
     comm.process();
     ASSERT_TRUE(comm.is_connected());
-    tb.step(SCRUTINY_COMM_HEARTBEAT_TMEOUT_US * 10 - 1);
+    tb.step(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US * 10 - 1);
     comm.heartbeat(11); // Will be ignored since rolling_counter didn't change.
     comm.process();
     ASSERT_TRUE(comm.is_connected());

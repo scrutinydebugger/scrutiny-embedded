@@ -44,7 +44,7 @@ namespace scrutiny
 
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
-        /// @param size Adress range size
+        /// @param size Address range size
         /// @return AddressRange object
         inline AddressRange make_address_range(const void *start, size_t size)
         {

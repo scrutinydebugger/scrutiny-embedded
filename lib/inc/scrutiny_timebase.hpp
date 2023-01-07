@@ -41,7 +41,7 @@ namespace scrutiny
             return m_time_100ns - timestamp;
         }
 
-        /// @brief Returns the number of microsecs elapsed since the timestamp has been taken
+        /// @brief Returns the number of microseconds elapsed since the timestamp has been taken
         /// @param timestamp The timestamp
         /// @return Time delta in multiple of 100ns
         inline timediff_t elapsed_us_since(const timestamp_t timestamp) const
@@ -50,7 +50,7 @@ namespace scrutiny
         }
 
         /// @brief Returns true if the given timeout has elapsed since the given timestamp
-        /// @param timestamp Timetamp to check against
+        /// @param timestamp Timestamp to check against
         /// @param timeout_100ns Maximum time delta since the timestamp
         /// @return true if expired
         inline bool has_expired(const timestamp_t timestamp, const timediff_t timeout_100ns) const

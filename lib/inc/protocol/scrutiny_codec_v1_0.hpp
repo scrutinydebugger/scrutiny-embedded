@@ -24,15 +24,15 @@ namespace scrutiny
 
     namespace protocol
     {
-        constexpr unsigned int REQUEST_OVERHEAD = 8;
-        constexpr unsigned int RESPONSE_OVERHEAD = 9;
-        constexpr unsigned int MAX_DISPLAY_NAME_LENGTH = 64;
-        constexpr unsigned int MAX_LOOP_NAME_LENGTH = 32;
-        constexpr unsigned int MINIMUM_RX_BUFFER_SIZE = 32;
-        constexpr unsigned int MINIMUM_TX_BUFFER_SIZE = 32;
-        constexpr uint16_t BUFFER_OVERFLOW_MARGIN = 16; // This margin let us detect overflow in comm with less calculations.
-        constexpr unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN;
-        constexpr unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN;
+        constexpr unsigned int REQUEST_OVERHEAD = 8;                                     // Number of bytes in a request that are not part of the payload
+        constexpr unsigned int RESPONSE_OVERHEAD = 9;                                    // Number of bytes in a response that are not part of the payload
+        constexpr unsigned int MAX_DISPLAY_NAME_LENGTH = 64;                             // Maximum length of a display name given on discover
+        constexpr unsigned int MAX_LOOP_NAME_LENGTH = 32;                                // Maximum length given to a loop
+        constexpr unsigned int MINIMUM_RX_BUFFER_SIZE = 32;                              // Minimum size of the reception buffer
+        constexpr unsigned int MINIMUM_TX_BUFFER_SIZE = 32;                              // Minimum size of the transmit buffer
+        constexpr uint16_t BUFFER_OVERFLOW_MARGIN = 16;                                  // This margin let us detect overflow in CommHandler with very few calculations.
+        constexpr unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum reception buffer size in bytes
+        constexpr unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum transmission buffer size in bytes
 
         class ReadMemoryBlocksRequestParser
         {

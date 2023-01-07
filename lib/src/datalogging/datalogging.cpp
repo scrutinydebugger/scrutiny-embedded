@@ -18,6 +18,10 @@ namespace scrutiny
 {
     namespace datalogging
     {
+        /// @brief Takes a value and make sure that the biggest supported version of it is valid. For instance if a value is a uint8, the uin32 field
+        /// will have a valid value with zeros in the MSBs
+        /// @param vtype Variable type of the input data
+        /// @param val Input data
         void convert_to_compare_type(VariableType *vtype, AnyType *val)
         {
             switch (*vtype)
@@ -68,6 +72,12 @@ namespace scrutiny
             }
         }
 
+        /// @brief Fetch an operand value from an operand definition
+        /// @param main_handler A pointer to the MainHandler since memory access will go through it for respect of forbidden regions
+        /// @param operand The operand definition
+        /// @param val The output value
+        /// @param variable_type The output value data type
+        /// @return true on success, false on failure
         bool fetch_operand(const MainHandler *const main_handler, const Operand *const operand, AnyType *const val, VariableType *const variable_type)
         {
             bool success = true;

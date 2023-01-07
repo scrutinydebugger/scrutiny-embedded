@@ -21,7 +21,7 @@ namespace scrutiny
         BIG
     };
 
-    /// @brief Represents an adress range with a start an a end.
+    /// @brief Represents an address range with a start an a end.
     struct AddressRange
     {
         void *start;
@@ -42,7 +42,7 @@ namespace scrutiny
         _undef = 0xF << 4
     };
 
-    /// @brief Represnet a type size
+    /// @brief Represent a type size
     enum class VariableTypeSize
     {
         _8 = 0,
