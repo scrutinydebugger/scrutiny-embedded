@@ -17,11 +17,13 @@
 #define SCRUTINY_SOFTWARE_ID_PLACEHOLDER                   \
     {                                                      \
         0xA9, 0xDC, 0xC0, 0x65, 0x28, 0xFD, 0x41, 0xFA,    \
-        0x7C, 0xE8, 0x63, 0xD6, 0xAA, 0x94, 0xA7, 0x08     \
+            0x7C, 0xE8, 0x63, 0xD6, 0xAA, 0x94, 0xA7, 0x08 \
     }
 
 namespace scrutiny
 {
+    /// @brief The Scrutiny software ID used to identify the firmware with a unique hash.
+    /// The offline toolchain will generate and inject its value after the binary has been produced.
     extern const uint8_t software_id[SCRUTINY_SOFTWARE_ID_LENGTH];
 }
 #endif // ___SCRUTINY_SOFTWARE_ID_H___

@@ -145,7 +145,7 @@ TEST_F(TestCommControl, TestHeartbeat)
         add_crc(request_data, sizeof(request_data) - 4);
         add_crc(expected_response, sizeof(expected_response) - 4);
         scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
-        scrutiny_handler.process(SCRUTINY_COMM_HEARTBEAT_TMEOUT_US / 2);
+        scrutiny_handler.process(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US / 2);
 
         uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
         ASSERT_EQ(n_to_read, sizeof(expected_response)) << "challenge=" << static_cast<uint32_t>(challenge);
@@ -176,10 +176,10 @@ TEST_F(TestCommControl, TestGetParams)
     expected_response[i++] = (config.max_bitrate >> 16) & 0xFF;
     expected_response[i++] = (config.max_bitrate >> 8) & 0xFF;
     expected_response[i++] = (config.max_bitrate >> 0) & 0xFF;
-    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TMEOUT_US >> 24) & 0xFF;
-    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TMEOUT_US >> 16) & 0xFF;
-    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TMEOUT_US >> 8) & 0xFF;
-    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TMEOUT_US >> 0) & 0xFF;
+    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US >> 24) & 0xFF;
+    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US >> 16) & 0xFF;
+    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US >> 8) & 0xFF;
+    expected_response[i++] = (SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US >> 0) & 0xFF;
     expected_response[i++] = (SCRUTINY_COMM_RX_TIMEOUT_US >> 24) & 0xFF;
     expected_response[i++] = (SCRUTINY_COMM_RX_TIMEOUT_US >> 16) & 0xFF;
     expected_response[i++] = (SCRUTINY_COMM_RX_TIMEOUT_US >> 8) & 0xFF;

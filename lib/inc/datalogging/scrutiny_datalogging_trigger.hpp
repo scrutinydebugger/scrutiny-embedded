@@ -127,7 +127,7 @@ namespace scrutiny
                 };
 
             private:
-                ConditionSharedData m_data;
+                ConditionSharedData m_data; // Data shared between each condition.
             };
 
         }

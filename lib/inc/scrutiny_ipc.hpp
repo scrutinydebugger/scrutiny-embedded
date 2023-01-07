@@ -18,9 +18,9 @@ namespace scrutiny
 #if SCRUTINY_BUILD_AVR_GCC
 
     /// @brief Message that can be sent to another time domain without race condition.
-    /// It is designed for one producer and one consumer.  It is the responsability of the sender to
+    /// It is designed for one producer and one consumer.  It is the responsibility of the sender to
     /// wait for message to be cleared before writing a new one
-    /// @tparam T DataType to send
+    /// @param T DataType to send
     template <class T>
     class IPCMessage
     {
@@ -69,9 +69,9 @@ namespace scrutiny
 
 #else
     /// @brief Message that can be sent to another time domain without race condition.
-    /// It is designed for one producer and one consumer.  It is the responsability of the sender to
+    /// It is designed for one producer and one consumer.  It is the responsibility of the sender to
     /// wait for message to be cleared before writing a new one
-    /// @tparam T DataType to send
+    /// @param T DataType to send
     template <class T>
     class IPCMessage
     {

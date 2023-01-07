@@ -213,10 +213,10 @@
             "docstring": "File to be included to get access to the datalogging encoders/readers. Abstract the handling of different encoding."
         },
         "lib/inc/datalogging/scrutiny_datalogger_raw_encoder.hpp": {
-            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to memory, no encoding scheme."
         },
         "lib/src/datalogging/scrutiny_datalogger_raw_encoder.cpp": {
-            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to emmory, no encoding scheme."
+            "docstring": "Class that handles the encoding of the datalogger data. RawFormat just copy to memory, no encoding scheme."
         },
         "test/test_codecs.cpp": {
             "docstring": "Tests the different codecs function used across this project"

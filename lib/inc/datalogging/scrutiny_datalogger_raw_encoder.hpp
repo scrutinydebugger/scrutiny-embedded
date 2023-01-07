@@ -1,5 +1,5 @@
 //    scrutiny_datalogger_raw_encoder.hpp
-//        Class that handles the encoding of the datalogger data. RawFormat just copy to emmory,
+//        Class that handles the encoding of the datalogger data. RawFormat just copy to memory,
 //        no encoding scheme.
 //
 //   - License : MIT - See LICENSE file.

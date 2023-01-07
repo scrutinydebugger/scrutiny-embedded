@@ -1,5 +1,5 @@
 //    scrutiny_datalogger_raw_encoder.cpp
-//        Class that handles the encoding of the datalogger data. RawFormat just copy to emmory,
+//        Class that handles the encoding of the datalogger data. RawFormat just copy to memory,
 //        no encoding scheme.
 //
 //   - License : MIT - See LICENSE file.
@@ -29,12 +29,16 @@ namespace scrutiny
             }
 
             const uint32_t write_cursor = m_encoder->get_write_cursor();
-            const uint32_t buffer_end = m_encoder->get_buffer_effective_end();
+            const uint32_t buffer_end = m_encoder->get_buffer_effective_end(); // Encoder may not use the full buffer
             if (m_read_cursor == write_cursor && m_read_started)
             {
                 m_finished = true;
                 return 0;
             }
+
+            // Will do a maximum of 2 loops only if there is a wrap in the buffer.
+            // This will cause 2 memcpy   start to buffer_end & buffer start to end
+            // Otherwise a 1 loop and 1 memcpy
             while (output_size < max_size)
             {
                 uint32_t transfer_size;
@@ -64,6 +68,7 @@ namespace scrutiny
             return output_size;
         }
 
+        /// @brief Returns the total number of bytes that the reader will read
         uint32_t RawFormatReader::get_total_size(void) const
         {
             if (error())
@@ -113,7 +118,7 @@ namespace scrutiny
                     AnyType outval;
                     const uint16_t rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    const uint8_t typesize = tools::get_type_size(rpv.type); // Should be supproted. We rely on datalogger::configure
+                    const uint8_t typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
                     m_main_handler->get_rpv_read_callback()(rpv, &outval);   // We assume that this is not nullptr. We rely on datalogger::configure
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;

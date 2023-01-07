@@ -107,6 +107,7 @@ namespace scrutiny
                 m_config_valid = false;
             }
 
+            // Size are consistent so far, we can read the operand and items definition without crashing anything
             if (m_config_valid)
             {
                 for (uint8_t i = 0; i < m_config.trigger.operand_count; i++)
@@ -189,6 +190,7 @@ namespace scrutiny
                 }
             }
 
+            // The configuration is good. Let's initialize to do an start logging
             if (m_config_valid)
             {
                 m_trigger.active_condition->reset(m_trigger.conditions.data());
@@ -219,7 +221,9 @@ namespace scrutiny
 
         void DataLogger::process(void)
         {
-
+            // IDLE --> CONFIGURED --> ARMED --> ACQUISITION_COMPLETED.
+            // We acquire in both CONFIGURED and ARMED state so that we can have data before the trigger as well.
+            
             switch (m_state)
             {
             case State::IDLE:

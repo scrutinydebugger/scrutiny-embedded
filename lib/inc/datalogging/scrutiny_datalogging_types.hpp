@@ -24,7 +24,7 @@ namespace scrutiny
     namespace datalogging
     {
         constexpr unsigned int MAX_OPERANDS = 4;
-        static_assert(MAX_OPERANDS < 255, "Too many operands. uint8 must be enough for iteration.");
+        static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
 
         enum class EncodingType
         {
@@ -85,19 +85,21 @@ namespace scrutiny
 
         enum class SupportedTriggerConditions
         {
-            AlwaysTrue = 0,
-            Equal = 1,
-            NotEqual = 2,
-            LessThan = 3,
-            LessOrEqualThan = 4,
-            GreaterThan = 5,
-            GreaterOrEqualThan = 6,
-            ChangeMoreThan = 7,
-            IsWithin = 8
+            AlwaysTrue = 0,         // Always true
+            Equal = 1,              // Operand1 == Operand2
+            NotEqual = 2,           // Operand1 != Operand2
+            LessThan = 3,           // Operand1 < Operand2
+            LessOrEqualThan = 4,    // Operand1 <= Operand2
+            GreaterThan = 5,        // Operand1 > Operand2
+            GreaterOrEqualThan = 6, // Operand1 >= Operand2
+            ChangeMoreThan = 7,     // |Operand1[n] - Operand1[n-1]| > |Operand2| && sign(Operand1[n] - Operand1[n-1]) == sign(Operand2)
+            IsWithin = 8            // |Operand1 - Operand2| < |Operand3|
         };
 
         struct TriggerConfig
         {
+            /// @brief Reads a configuration and make a copy of it
+            /// @param other The configuration to copy
             void copy_from(TriggerConfig *other)
             {
                 for (unsigned int i = 0; i < MAX_OPERANDS; i++)
@@ -110,10 +112,10 @@ namespace scrutiny
                 hold_time_100ns = other->hold_time_100ns;
             }
 
-            SupportedTriggerConditions condition;
-            uint8_t operand_count;
-            uint32_t hold_time_100ns;
-            Operand operands[MAX_OPERANDS];
+            SupportedTriggerConditions condition; // Selected condition
+            uint8_t operand_count;                // Number of given operands
+            uint32_t hold_time_100ns;             // Amount of time that the condition must be true for trigger to trig
+            Operand operands[MAX_OPERANDS];       // The operand definitions
         };
 
         enum class LoggableType
@@ -144,6 +146,8 @@ namespace scrutiny
 
         struct Configuration
         {
+            /// @brief Reads a configuration and make a copy of it
+            /// @param other The configuration to copy
             void copy_from(Configuration *other)
             {
                 items_count = other->items_count;
@@ -160,12 +164,13 @@ namespace scrutiny
                 }
             }
 
-            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL];
-            uint8_t items_count;
-            uint16_t decimation;
-            uint8_t probe_location;
-            uint32_t timeout_100ns;
-            TriggerConfig trigger;
+            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
+
+            uint8_t items_count;    // Number of items to logs
+            uint16_t decimation;    // Decimation of the acquisition. Effectively reduce the sampling rate
+            uint8_t probe_location; // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
+            uint32_t timeout_100ns; // Time after which an acquisition is considered complete even if the buffer is not full
+            TriggerConfig trigger;  // The trigger configuration
         };
 
         /// @brief Datalogging Trigger callback
