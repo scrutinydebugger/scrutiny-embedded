@@ -120,9 +120,9 @@ namespace scrutiny
 
         enum class LoggableType
         {
-            MEMORY,
-            RPV,
-            TIME
+            MEMORY = 0,
+            RPV = 1,
+            TIME = 2
         };
         struct LoggableItem
         {

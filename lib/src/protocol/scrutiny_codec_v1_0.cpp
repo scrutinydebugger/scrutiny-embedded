@@ -660,10 +660,11 @@ namespace scrutiny
             static_assert(sizeof(timediff_t) == 4, "Unsupported timediff size");
             constexpr uint16_t loop_id_size = sizeof(response_data->loop_id);
             constexpr uint16_t loop_type_size = sizeof(response_data->loop_type);
+            constexpr uint16_t attribute_field_size = sizeof(uint8_t); // datalogging is embedded in bitfield
             constexpr uint16_t timestep_100ns_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_100ns);
             constexpr uint16_t name_length_size = sizeof(response_data->loop_name_length);
 
-            constexpr uint16_t datalen = loop_id_size + loop_type_size + name_length_size;
+            constexpr uint16_t datalen = loop_id_size + loop_type_size + attribute_field_size + name_length_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -672,8 +673,14 @@ namespace scrutiny
 
             response->data[0] = response_data->loop_id;
             response->data[1] = response_data->loop_type;
+            response->data[2] = 0;
 
-            uint16_t cursor = 2;
+            if (response_data->support_datalogging)
+            {
+                response->data[2] |= 0x80;
+            }
+
+            uint16_t cursor = 3;
             switch (static_cast<scrutiny::LoopType>(response_data->loop_type))
             {
             case scrutiny::LoopType::FIXED_FREQ:

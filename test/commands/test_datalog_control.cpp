@@ -40,16 +40,18 @@ protected:
     uint8_t _rx_buffer[1024];
     uint8_t _tx_buffer[1024];
     uint8_t dlbuffer[256];
-    LoopHandler *loops[2];
+    LoopHandler *loops[3];
 
     FixedFrequencyLoopHandler fixed_freq_loop;
     VariableFrequencyLoopHandler variable_freq_loop;
+    FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
     RuntimePublishedValue rpvs[1] = {
         {0x8888, VariableType::float32}};
 
     TestDatalogControl() : ScrutinyTest(), fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
-                           variable_freq_loop("Loop2") {}
+                           variable_freq_loop("Loop2"),
+                           fixed_freq_loop_no_datalogging(100) {}
 #if SCRUTINY_ENABLE_DATALOGGING
 
     uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
@@ -62,8 +64,12 @@ protected:
 #endif
     virtual void SetUp()
     {
+#if SCRUTINY_ENABLE_DATALOGGING
+        fixed_freq_loop_no_datalogging.allow_datalogging(false);
+#endif
         loops[0] = &fixed_freq_loop;
         loops[1] = &variable_freq_loop;
+        loops[2] = &fixed_freq_loop_no_datalogging;
 
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
@@ -351,9 +357,16 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
 
 TEST_F(TestDatalogControl, TestConfigureBadLoopID)
 {
-    constexpr uint8_t loop_id = 2; // This loop does not exists
+    constexpr uint8_t loop_id = 55; // This loop does not exists
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
+}
+
+TEST_F(TestDatalogControl, TestConfigureNoDatalogSupport)
+{
+    constexpr uint8_t loop_id = 2;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
 
 TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)

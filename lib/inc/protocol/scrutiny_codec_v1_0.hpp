@@ -240,6 +240,7 @@ namespace scrutiny
                 {
                     uint8_t loop_id;
                     uint8_t loop_type;
+                    bool support_datalogging;
                     union
                     {
                         struct
