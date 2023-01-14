@@ -767,6 +767,11 @@ namespace scrutiny
             const LoopType loop_type = m_config.m_loops[loop_id]->loop_type();
             stack.get_loop_def.response_data.loop_id = loop_id;
             stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
+#if SCRUTINY_ENABLE_DATALOGGING
+            stack.get_loop_def.response_data.support_datalogging = m_config.m_loops[loop_id]->datalogging_allowed();
+#else
+            stack.get_loop_def.response_data.support_datalogging = false;
+#endif
             if (loop_type == LoopType::FIXED_FREQ)
             {
                 stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_100ns = m_config.m_loops[loop_id]->get_timestep_100ns();
@@ -1391,6 +1396,12 @@ namespace scrutiny
             if (stack.configure.request_data.loop_id >= m_config.m_loop_count)
             {
                 code = protocol::ResponseCode::FailureToProceed;
+                break;
+            }
+
+            if (!m_config.m_loops[stack.configure.request_data.loop_id]->datalogging_allowed())
+            {
+                code = protocol::ResponseCode::Forbidden;
                 break;
             }
 

@@ -22,21 +22,27 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
-    scrutiny::LoopHandler *loops[2];
+    scrutiny::LoopHandler *loops[3];
 
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop;
     scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
+    scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
     TestGetInfo() : ScrutinyTest(), fixed_freq_loop(0x12345678, "Loop1"),
-                    variable_freq_loop("Loop2") {}
+                    variable_freq_loop("Loop2"),
+                    fixed_freq_loop_no_datalogging(100, "Loop3") {}
 
     virtual void SetUp()
     {
 
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
 
+#if SCRUTINY_ENABLE_DATALOGGING
+        fixed_freq_loop_no_datalogging.allow_datalogging(false);
+#endif
         loops[0] = &fixed_freq_loop;
         loops[1] = &variable_freq_loop;
+        loops[2] = &fixed_freq_loop_no_datalogging;
         config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
 
         scrutiny_handler.init(&config);
@@ -459,7 +465,7 @@ TEST_F(TestGetInfo, TestGetLoopCount)
 
     // Make expected response
     uint8_t expected_response[9 + 1] = {0x81, 8, 0, 0, 1};
-    expected_response[5] = 2; // 2 loops
+    expected_response[5] = 3; // 3 loops
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -512,18 +518,24 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
     /*
         ID : 1
         type: 1
+        attributes (datalogging bitfield) : 1
         timestep : 4 (only if fixed)
         name length : 1
         name : 0-32 (5)
     */
 
     // Make expected response
-    uint8_t expected_response[9 + 12] = {0x81, 9, 0, 0, 12};
+    uint8_t expected_response[9 + 13] = {0x81, 9, 0, 0, 13};
     expected_response[5] = 0; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
-    scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, &expected_response[7]);
-    expected_response[11] = static_cast<uint8_t>(loop_name.length());
-    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[12]), loop_name.c_str(), loop_name.size() + 1);
+#if SCRUTINY_ENABLE_DATALOGGING
+    expected_response[7] = 0x80; // Enabled by default
+#else
+    expected_response[7] = 0;
+#endif
+    scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, &expected_response[8]);
+    expected_response[12] = static_cast<uint8_t>(loop_name.length());
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name.c_str(), loop_name.size() + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -531,6 +543,44 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 
     uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+}
+
+TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
+{
+    std::string loop_name = "Loop3";
+    uint8_t tx_buffer[64];
+
+    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 2}; // Read loop 2
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    /*
+        ID : 1
+        type: 1
+        attributes (datalogging bitfield) : 1
+        timestep : 4 (only if fixed)
+        name length : 1
+        name : 0-32 (5)
+    */
+
+    // Make expected response
+    uint8_t expected_response[9 + 13] = {0x81, 9, 0, 0, 13};
+    expected_response[5] = 2; // loop ID
+    expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
+    expected_response[7] = 0;
+    scrutiny::codecs::encode_32_bits_big_endian(100u, &expected_response[8]);
+    expected_response[12] = static_cast<uint8_t>(loop_name.length());
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name.c_str(), loop_name.size() + 1);
+    add_crc(expected_response, sizeof(expected_response) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LE(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
 
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
@@ -548,16 +598,23 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
     /*
         ID : 1
         type: 1
+        attributes (datalogging bitfield) : 1
         name length : 1
         name : 0-32 (5)
     */
 
     // Make expected response
-    uint8_t expected_response[9 + 8] = {0x81, 9, 0, 0, 8};
+    uint8_t expected_response[9 + 9] = {0x81, 9, 0, 0, 9};
     expected_response[5] = 1; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::VARIABLE_FREQ);
-    expected_response[7] = static_cast<uint8_t>(loop_name.length());
-    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[8]), loop_name.c_str(), loop_name.size() + 1);
+#if SCRUTINY_ENABLE_DATALOGGING
+    expected_response[7] = 0x80; // Enabled by default
+#else
+    expected_response[7] = 0;
+#endif
+    expected_response[8] = static_cast<uint8_t>(loop_name.length());
+
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[9]), loop_name.c_str(), loop_name.size() + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
