@@ -34,6 +34,7 @@ namespace scrutiny
                 IDLE,
                 CONFIGURED,
                 ARMED,
+                TRIGGERED,
                 ACQUISITION_COMPLETED,
                 ERROR
             };
@@ -125,7 +126,6 @@ namespace scrutiny
             Timebase *m_timebase;               // Pointer to the timebase for internal time tracking
             Timebase *m_timebase_for_log;       // Pointer to timebase for time logging (can be in a different time domain)
             State m_state;                      // Internal state
-            bool m_trigger_point_stamped;       // True if the trigger point has been recorded
             timestamp_t m_trigger_timestamp;    // The timestamp at which the trigger happened
             uint32_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 
