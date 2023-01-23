@@ -37,7 +37,6 @@ namespace scrutiny
             m_state = State::IDLE;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
-            m_trigger_point_stamped = false;
             m_trigger.active_condition = nullptr;
 
             m_trigger_cursor_location = 0;
@@ -205,7 +204,7 @@ namespace scrutiny
 
         void DataLogger::arm_trigger(void)
         {
-            if (m_state == State::CONFIGURED || m_state == State::ACQUISITION_COMPLETED)
+            if (m_state == State::CONFIGURED || m_state == State::ACQUISITION_COMPLETED || m_state == State::TRIGGERED)
             {
                 m_state = State::ARMED;
             }
@@ -213,7 +212,7 @@ namespace scrutiny
 
         void DataLogger::disarm_trigger(void)
         {
-            if (m_state == State::ARMED || m_state == State::ACQUISITION_COMPLETED)
+            if (m_state == State::ARMED || m_state == State::ACQUISITION_COMPLETED || m_state == State::TRIGGERED)
             {
                 m_state = State::CONFIGURED;
             }
@@ -223,7 +222,7 @@ namespace scrutiny
         {
             // IDLE --> CONFIGURED --> ARMED --> ACQUISITION_COMPLETED.
             // We acquire in both CONFIGURED and ARMED state so that we can have data before the trigger as well.
-            
+
             switch (m_state)
             {
             case State::IDLE:
@@ -232,6 +231,7 @@ namespace scrutiny
                 break;
             case State::CONFIGURED:
             case State::ARMED:
+            case State::TRIGGERED:
                 if (m_encoder.error())
                 {
                     m_state = State::ERROR;
@@ -243,16 +243,17 @@ namespace scrutiny
                     {
                         if (check_trigger())
                         {
-                            if (!m_trigger_point_stamped)
+                            if (m_trigger_callback != nullptr)
                             {
-                                if (m_trigger_callback != nullptr)
-                                {
-                                    m_trigger_callback();
-                                }
-                                stamp_trigger_point();
+                                m_trigger_callback();
                             }
+                            stamp_trigger_point();
+                            m_state = State::TRIGGERED;
                         }
+                    }
 
+                    if (m_state == State::TRIGGERED)
+                    {
                         if (acquisition_completed())
                         {
                             m_acquisition_id++;
@@ -267,7 +268,6 @@ namespace scrutiny
 
         void DataLogger::stamp_trigger_point(void)
         {
-            m_trigger_point_stamped = true;
             m_trigger_cursor_location = m_encoder.get_write_cursor();
             m_trigger_timestamp = m_timebase->get_timestamp();
             m_encoder.reset_write_counter();
@@ -283,7 +283,12 @@ namespace scrutiny
 
         bool DataLogger::acquisition_completed(void)
         {
-            if (m_trigger_point_stamped)
+            if (m_state == State::ACQUISITION_COMPLETED)
+            {
+                return true;
+            }
+
+            if (m_state == State::TRIGGERED)
             {
                 if (m_config.timeout_100ns > 0)
                 {
