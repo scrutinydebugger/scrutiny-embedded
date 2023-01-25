@@ -31,7 +31,7 @@
 
 #define SCRUTINY_REQUEST_MAX_PROCESS_TIME_US 100000u                       // If a request takes more than this time to process, it will be nacked.
 #define SCRUTINY_COMM_RX_TIMEOUT_US 50000u                                 // Reset reception state machine when no data is received for that amount of time.
-#define SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US 5000000u                         // Disconnect session if no heartbeat request after this delay
+#define SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US 5000000u                        // Disconnect session if no heartbeat request after this delay
 #define SCRUTINY_ACTUAL_PROTOCOL_VERSION SCRUTINY_PROTOCOL_VERSION(1u, 0u) // protocol version to use
 
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -76,6 +76,10 @@
 
 #if SCRUTINY_BUILD_WINDOWS && SCRUTINY_BUILD_AVR_GCC
 #error Bad detection of build environment
+#endif
+
+#if SCRUTINY_DATALOGGING_MAX_SIGNAL > 255
+#error Number of signal too big
 #endif
 
 #endif // ___SCRUTINY_H___

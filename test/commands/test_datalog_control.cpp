@@ -302,13 +302,14 @@ TEST_F(TestDatalogControl, TestGetSetup)
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 4 + 1] = {0x85, 1, 0, 0, 5};
+    uint8_t expected_response[9 + 4 + 1 + 1] = {0x85, 1, 0, 0, 6};
     codecs::encode_32_bits_big_endian(buffer_size, &expected_response[5]);
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
     expected_response[9] = static_cast<uint8_t>(datalogging::EncodingType::RAW);
 #else
 #error Unkown encoding
 #endif
+    expected_response[10] = SCRUTINY_DATALOGGING_MAX_SIGNAL;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
