@@ -1369,6 +1369,7 @@ namespace scrutiny
         {
             stack.get_setup.response_data.buffer_size = m_config.m_datalogger_buffer_size;
             stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
+            stack.get_setup.response_data.max_signal_count = SCRUTINY_DATALOGGING_MAX_SIGNAL;
             code = m_codec.encode_response_datalogging_get_setup(&stack.get_setup.response_data, response);
             break;
         }

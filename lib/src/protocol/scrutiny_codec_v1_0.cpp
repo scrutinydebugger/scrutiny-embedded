@@ -975,7 +975,7 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
         ResponseCode CodecV1_0::encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response)
         {
-            constexpr uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding);
+            constexpr uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding) + sizeof(response_data->max_signal_count);
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
@@ -983,6 +983,7 @@ namespace scrutiny
             uint16_t cursor = 0;
             cursor += codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[cursor]);
             cursor += codecs::encode_8_bits(response_data->data_encoding, &response->data[cursor]);
+            cursor += codecs::encode_8_bits(response_data->max_signal_count, &response->data[cursor]);
             response->data_length = cursor;
 
             return ResponseCode::OK;
