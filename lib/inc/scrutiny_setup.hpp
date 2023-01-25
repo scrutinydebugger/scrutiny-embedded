@@ -78,8 +78,4 @@
 #error Bad detection of build environment
 #endif
 
-#if SCRUTINY_DATALOGGING_MAX_SIGNAL > 255
-#error Number of signal too big
-#endif
-
 #endif // ___SCRUTINY_H___

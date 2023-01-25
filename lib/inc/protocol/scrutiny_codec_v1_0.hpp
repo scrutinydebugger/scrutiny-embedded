@@ -289,7 +289,7 @@ namespace scrutiny
                 {
                     uint32_t buffer_size;
                     uint8_t data_encoding;
-                    uint8_t max_signal;
+                    uint8_t max_signal_count;
                 };
 
                 struct GetStatus
