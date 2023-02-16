@@ -298,7 +298,6 @@ void process_interactive_data()
 
 void process_scrutiny_lib(AbstractCommChannel *channel)
 {
-    static uint8_t datalogging_buffer[4096];
     uint8_t buffer[1024];
     static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
@@ -311,6 +310,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
 
 #if SCRUTINY_ENABLE_DATALOGGING
+    static uint8_t datalogging_buffer[4096];
     config.set_datalogging_buffers(datalogging_buffer, sizeof(datalogging_buffer));
 #endif
 
