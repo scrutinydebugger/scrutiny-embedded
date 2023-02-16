@@ -106,6 +106,9 @@ namespace scrutiny
         {
             return (m_datalogger_buffer != nullptr && m_datalogger_buffer_size != 0);
         };
+
+        /// @brief Returns true if at least one loop support datalogging
+        bool has_at_least_one_loop_with_datalogging(void) const;
 #endif
 
         /// @brief Returns the list of forbidden address ranges. A forbidden range is never read or written by Scrutiny.

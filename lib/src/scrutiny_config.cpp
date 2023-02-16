@@ -85,5 +85,17 @@ namespace scrutiny
         m_datalogger_buffer = datalogger_buffer;
         m_datalogger_buffer_size = datalogger_buffer_size;
     }
+
+    bool Config::has_at_least_one_loop_with_datalogging(void) const
+    {
+        for (uint8_t i = 0; i < m_loop_count; i++)
+        {
+            if (m_loops[i]->datalogging_allowed())
+            {
+                return true;
+            }
+        }
+        return false;
+    };
 #endif
 }
