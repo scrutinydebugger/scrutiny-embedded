@@ -298,16 +298,18 @@ void process_interactive_data()
 
 void process_scrutiny_lib(AbstractCommChannel *channel)
 {
+    static uint8_t datalogging_buffer[4096];
     uint8_t buffer[1024];
     static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
-    scrutiny::VariableFrequencyLoopHandler vf_loop;
-    scrutiny::FixedFrequencyLoopHandler ff_loop(200000);
+    scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq");
+    scrutiny::FixedFrequencyLoopHandler ff_loop(200000, "50hz");
     scrutiny::LoopHandler *loops[] = {&ff_loop, &vf_loop};
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
+    config.set_datalogging_buffers(datalogging_buffer, sizeof(datalogging_buffer));
     config.max_bitrate = 100000;
     config.display_name = "TestApp Executable";
     config.session_counter_seed = 0xdeadbeef;
