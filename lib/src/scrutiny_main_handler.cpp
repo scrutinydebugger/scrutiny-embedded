@@ -12,7 +12,6 @@
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"
 #include "scrutiny_loop_handler.hpp"
-#include <iostream>
 
 namespace scrutiny
 {
