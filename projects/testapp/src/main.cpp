@@ -302,8 +302,12 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
+    scrutiny::VariableFrequencyLoopHandler vf_loop;
+    scrutiny::FixedFrequencyLoopHandler ff_loop(200000);
+    scrutiny::LoopHandler *loops[] = {&ff_loop, &vf_loop};
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
+    config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
     config.max_bitrate = 100000;
     config.display_name = "TestApp Executable";
     config.session_counter_seed = 0xdeadbeef;
@@ -353,10 +357,12 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             }
 
             scrutiny_handler.process(timestep);
+            vf_loop.process(timestep);
+            ff_loop.process();
 #if SCRUTINY_BUILD_WINDOWS
             Sleep(10);
 #else
-            this_thread::sleep_for(chrono::milliseconds(10));
+            this_thread ::sleep_for(chrono::milliseconds(10));
 #endif
             last_timestamp = now_timestamp;
         }

@@ -74,7 +74,7 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(const char *name = nullptr) : m_name(name)
+        LoopHandler(const char *name = "") : m_name(name)
         {
 #if SCRUTINY_ENABLE_DATALOGGING
             m_support_datalogging = true;
@@ -147,8 +147,8 @@ namespace scrutiny
         /// @brief Constructor
         /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
         /// @param name The name of the loop
-        FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = nullptr) : LoopHandler(name),
-                                                                                           m_timestep_100ns(timestep_100ns)
+        FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = "") : LoopHandler(name),
+                                                                                      m_timestep_100ns(timestep_100ns)
         {
         }
         /// @brief Process function be called at each iteration of the loop.
@@ -171,7 +171,7 @@ namespace scrutiny
     public:
         /// @brief Constructor
         /// @param name The name of the loop
-        VariableFrequencyLoopHandler(const char *name = nullptr) : LoopHandler(name)
+        VariableFrequencyLoopHandler(const char *name = "") : LoopHandler(name)
         {
         }
 

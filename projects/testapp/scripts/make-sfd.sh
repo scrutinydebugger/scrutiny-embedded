@@ -16,6 +16,7 @@ scrutiny make-metadata  --output "${WORKDIR}" --project-name "Scrutiny TestAPP" 
 scrutiny add-alias "${WORKDIR}" --file "${SCRIPT_DIR}/../assets/aliases.json" --loglevel ${LOGLEVEL}
 
 scrutiny tag-firmware-id "${BINFILE}" "${TAGGED_FILE}"  --loglevel ${LOGLEVEL}
+chmod +x ${TAGGED_FILE}
 echo "Tagged file written to ${TAGGED_FILE}"
 
 scrutiny make-sfd "${WORKDIR}" "${SFDOUTPUT}" --loglevel ${LOGLEVEL}

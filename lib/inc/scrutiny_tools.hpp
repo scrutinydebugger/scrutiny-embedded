@@ -190,6 +190,11 @@ namespace scrutiny
         inline size_t strnlen(const char *const s, const size_t maxlen)
         {
             size_t n = 0;
+            if (s == nullptr)
+            {
+                return 0;
+            }
+
             for (; n < maxlen; n++)
             {
                 if (s[n] == '\0')
