@@ -9,7 +9,7 @@
 #ifndef ___SCRUTINY_TYPES_H___
 #define ___SCRUTINY_TYPES_H___
 
-#include "stdint.h"
+#include <stdint.h>
 #include "scrutiny_setup.hpp"
 
 namespace scrutiny

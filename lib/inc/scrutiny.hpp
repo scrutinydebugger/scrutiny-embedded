@@ -9,8 +9,8 @@
 #ifndef ___SCRUTINY_H___
 #define ___SCRUTINY_H___
 
-#include "scrutiny_types.hpp"
 #include "scrutiny_setup.hpp"
+#include "scrutiny_types.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"
 #include "scrutiny_timebase.hpp"

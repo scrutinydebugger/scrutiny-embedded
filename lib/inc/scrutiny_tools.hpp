@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 
 #if !SCRUTINY_BUILD_AVR_GCC

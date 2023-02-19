@@ -7,10 +7,10 @@
 //
 //   Copyright (c) 2021-2023 Scrutiny Debugger
 
+#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_common_codecs.hpp"
-#include "scrutiny_setup.hpp"
 
 namespace scrutiny
 {

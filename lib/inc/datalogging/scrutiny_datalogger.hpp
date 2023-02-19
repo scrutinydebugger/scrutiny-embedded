@@ -9,14 +9,15 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
-#if SCRUTINY_ENABLE_DATALOGGING == 0
-#error "Not enabled"
-#endif
-
+#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
 #include "scrutiny_timebase.hpp"
+
+#if SCRUTINY_ENABLE_DATALOGGING == 0
+#error "Not enabled"
+#endif
 
 namespace scrutiny
 {

@@ -7,6 +7,7 @@
 //   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <stdint.h>
+#include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 #include "scrutiny_tools.hpp"
 

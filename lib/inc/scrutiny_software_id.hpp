@@ -10,6 +10,7 @@
 #define ___SCRUTINY_SOFTWARE_ID_H___
 
 #include <stdint.h>
+#include "scrutiny_setup.hpp"
 
 #define SCRUTINY_SOFTWARE_ID_LENGTH 16u
 

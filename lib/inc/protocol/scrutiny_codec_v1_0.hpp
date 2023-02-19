@@ -10,6 +10,8 @@
 #define ___SCRUTINY_CODEC_V1_0___
 
 #include <stdint.h>
+
+#include "scrutiny_setup.hpp"
 #include "scrutiny_protocol_definitions.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
@@ -18,6 +20,7 @@
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
 #endif
+
 namespace scrutiny
 {
     class MainHandler;

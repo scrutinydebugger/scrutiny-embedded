@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "scrutiny_setup.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"

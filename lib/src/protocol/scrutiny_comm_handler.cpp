@@ -9,6 +9,7 @@
 
 #include <string.h>
 
+#include "scrutiny_setup.hpp"
 #include "protocol/scrutiny_comm_handler.hpp"
 #include "scrutiny_tools.hpp"
 

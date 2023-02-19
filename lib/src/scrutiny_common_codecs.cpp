@@ -6,6 +6,7 @@
 //
 //   Copyright (c) 2021-2023 Scrutiny Debugger
 
+#include "scrutiny_setup.hpp"
 #include "scrutiny_common_codecs.hpp"
 #include "scrutiny_tools.hpp"
 #include <stdint.h>

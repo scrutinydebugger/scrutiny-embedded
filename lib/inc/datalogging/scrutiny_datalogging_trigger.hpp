@@ -9,12 +9,14 @@
 #ifndef ___SCRUTINY_DATALOGGING_TRIGGER_H___
 #define ___SCRUTINY_DATALOGGING_TRIGGER_H___
 
+#include <string.h>
+
+#include "scrutiny_setup.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
+
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
 #endif
-
-#include <string.h>
-#include "datalogging/scrutiny_datalogging_types.hpp"
 
 namespace scrutiny
 {
