@@ -6,6 +6,7 @@
 //
 //   Copyright (c) 2021-2023 Scrutiny Debugger
 
+#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "scrutiny_ipc.hpp"

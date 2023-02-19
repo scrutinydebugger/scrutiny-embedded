@@ -9,13 +9,14 @@
 #ifndef ___SCRUTINY_DATALOGGING_TYPES_H___
 #define ___SCRUTINY_DATALOGGING_TYPES_H___
 
+#include "string.h"
+
+#include "scrutiny_setup.hpp"
+#include "scrutiny_types.hpp"
+
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
 #endif
-
-#include "scrutiny_types.hpp"
-
-#include "string.h"
 
 static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
 

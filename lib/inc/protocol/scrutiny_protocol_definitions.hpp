@@ -10,6 +10,8 @@
 #ifndef ___SCRUTINY_PROTOCOL_DEFINITION_H___
 #define ___SCRUTINY_PROTOCOL_DEFINITION_H___
 
+#include "scrutiny_setup.hpp"
+
 namespace scrutiny
 {
     namespace protocol

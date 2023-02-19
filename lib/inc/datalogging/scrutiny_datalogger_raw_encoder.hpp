@@ -10,6 +10,11 @@
 #ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 #define ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 
+#include "stdint.h"
+#include "scrutiny_setup.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_timebase.hpp"
+
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
 #endif
@@ -17,10 +22,6 @@
 #if SCRUTINY_DATALOGGING_ENCODING != SCRUTINY_DATALOGGING_ENCODING_RAW
 #error "Encoding not supported"
 #endif
-
-#include "stdint.h"
-#include "datalogging/scrutiny_datalogging_types.hpp"
-#include "scrutiny_timebase.hpp"
 
 namespace scrutiny
 {

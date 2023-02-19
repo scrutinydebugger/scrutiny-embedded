@@ -10,6 +10,7 @@
 #define ___SCRUTINY_TIMEBASE_H___
 
 #include <stdint.h>
+#include "scrutiny_setup.hpp"
 
 namespace scrutiny
 {

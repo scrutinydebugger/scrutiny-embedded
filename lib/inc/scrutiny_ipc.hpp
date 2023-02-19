@@ -9,6 +9,8 @@
 #ifndef ___SCRUTINY_IPC_H___
 #define ___SCRUTINY_IPC_H___
 
+#include "scrutiny_setup.hpp"
+
 #if !SCRUTINY_BUILD_AVR_GCC
 #include <atomic>
 #include <utility>

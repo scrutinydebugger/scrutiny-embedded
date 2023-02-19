@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 
 namespace scrutiny
