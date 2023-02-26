@@ -991,13 +991,23 @@ namespace scrutiny
 
         ResponseCode CodecV1_0::encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response)
         {
-            constexpr uint16_t datalen = sizeof(response_data->state);
+            constexpr uint16_t state_len = sizeof(response_data->state);
+            constexpr uint16_t bytes_to_acquire_len = sizeof(response_data->bytes_to_acquire_from_trigger_to_completion);
+            constexpr uint16_t write_counter_len = sizeof(response_data->write_counter_since_trigger);
+
+            constexpr uint16_t datalen = state_len + bytes_to_acquire_len + write_counter_len;
+            static_assert(datalen == 1 + 4 + 4, "Bad data length");
+
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
-            codecs::encode_8_bits(response_data->state, &response->data[0]);
-            response->data_length = 1;
+
+            uint16_t cursor = 0;
+            cursor += codecs::encode_8_bits(response_data->state, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->bytes_to_acquire_from_trigger_to_completion, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian(response_data->write_counter_since_trigger, &response->data[cursor]);
+            response->data_length = cursor;
 
             return ResponseCode::OK;
         }

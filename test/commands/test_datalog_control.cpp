@@ -57,7 +57,7 @@ protected:
     uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
     void test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode expected_code, bool check_response = true, std::string error_msg = "");
-    void check_get_status(datalogging::DataLogger::State expected_state);
+    void check_get_status(datalogging::DataLogger::State expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1 = 0;
     float m_some_var_logged1 = 0;
@@ -587,15 +587,18 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
 }
 
-void TestDatalogControl::check_get_status(datalogging::DataLogger::State expected_state)
+void TestDatalogControl::check_get_status(datalogging::DataLogger::State expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter)
 {
     uint8_t tx_buffer[32];
     uint16_t n_to_read;
 
     uint8_t request_data[8] = {5, 5, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
-    uint8_t expected_response[9 + 1] = {0x85, 5, 0, 0, 1};
-    expected_response[5] = static_cast<uint8_t>(expected_state);
+    uint8_t expected_response[9 + 1 + 4 + 4] = {0x85, 5, 0, 0, 1 + 4 + 4};
+    uint16_t cursor = 5;
+    cursor += codecs::encode_8_bits(static_cast<uint8_t>(expected_state), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(expected_remaining_bytes, &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian(expected_counter, &expected_response[cursor]);
 
     add_crc(expected_response, sizeof(expected_response) - 4);
     scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
@@ -613,7 +616,11 @@ void TestDatalogControl::check_get_status(datalogging::DataLogger::State expecte
             protocol::ResponseCode::OK));
 
     datalogging::DataLogger::State gotten_state = static_cast<datalogging::DataLogger::State>(tx_buffer[5]);
+    uint32_t gotten_remaining_bytes = codecs::decode_32_bits_big_endian(&tx_buffer[6]);
+    uint32_t gotten_byte_counter = codecs::decode_32_bits_big_endian(&tx_buffer[10]);
     EXPECT_EQ(gotten_state, expected_state);
+    EXPECT_EQ(gotten_remaining_bytes, expected_remaining_bytes);
+    EXPECT_EQ(gotten_byte_counter, expected_counter);
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response)); // Last check. Redundant, but it's ok.
 }
 
@@ -621,7 +628,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
 {
 
     // Get Status
-    check_get_status(datalogging::DataLogger::State::IDLE);
+    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
@@ -632,11 +639,11 @@ TEST_F(TestDatalogControl, TestGetStatus)
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
 
-    check_get_status(datalogging::DataLogger::State::CONFIGURED);
+    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
     scrutiny_handler.datalogger()->arm_trigger();
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
-    check_get_status(datalogging::DataLogger::State::ARMED);
+    check_get_status(datalogging::DataLogger::State::ARMED, 0, 0);
 
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
     test_configure(0, 0, refconfig, protocol::ResponseCode::Overflow, false);
@@ -649,7 +656,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow));
     scrutiny_handler.process(0);
 
-    check_get_status(datalogging::DataLogger::State::IDLE); // Gets reset if in error.
+    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0); // Gets reset if in error.
 
     refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
@@ -657,11 +664,11 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0);
     fixed_freq_loop.process();
 
-    check_get_status(datalogging::DataLogger::State::CONFIGURED);
+    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
     scrutiny_handler.datalogger()->arm_trigger();
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
-    check_get_status(datalogging::DataLogger::State::ARMED);
+    check_get_status(datalogging::DataLogger::State::ARMED, 0, 0);
 
     // We are rmed. We will force a full acquisition and make sure it is correctly reported.
     scrutiny_handler.datalogger()->force_trigger();
@@ -678,7 +685,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
     ASSERT_TRUE(scrutiny_handler.datalogger()->data_acquired());
-    check_get_status(datalogging::DataLogger::State::ACQUISITION_COMPLETED);
+    check_get_status(datalogging::DataLogger::State::ACQUISITION_COMPLETED, 0, 0);
 }
 
 TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)

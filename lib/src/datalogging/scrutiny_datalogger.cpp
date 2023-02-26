@@ -140,7 +140,8 @@ namespace scrutiny
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
                     {
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset > 63 || m_config.trigger.operands[i].data.varbit.bitsize > 64)
+                        // Works with and without 64bits support
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) || m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * 8)
                         {
                             m_config_valid = false;
                         }

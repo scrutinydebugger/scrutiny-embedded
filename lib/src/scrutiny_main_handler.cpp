@@ -57,7 +57,9 @@ namespace scrutiny
         m_datalogging.reading_in_progress = false;
         m_datalogging.read_acquisition_rolling_counter = 0;
 
-        m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
+        m_datalogging.threadsafe_data.datalogger_state = m_datalogging.datalogger.get_state();
+        m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion = 0;
+        m_datalogging.threadsafe_data.write_counter_since_trigger = 0;
 #endif
     }
 
@@ -292,8 +294,10 @@ namespace scrutiny
         }
         case LoopHandler::Loop2MainMessageID::DATALOGGER_STATUS_UPDATE:
         {
-            m_datalogging.datalogger_state_thread_safe = msg->data.datalogger_status_update.state;
-            if (m_datalogging.datalogger_state_thread_safe != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
+            m_datalogging.threadsafe_data.datalogger_state = msg->data.datalogger_status_update.state;
+            m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion = msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
+            m_datalogging.threadsafe_data.write_counter_since_trigger = msg->data.datalogger_status_update.write_counter_since_trigger;
+            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
             {
                 m_datalogging.reading_in_progress = false;
             }
@@ -313,7 +317,7 @@ namespace scrutiny
         if (m_datalogging.owner == nullptr) // no owner
         {
             // No owner, can read directly. Otherwise will be updated by an IPC message
-            m_datalogging.datalogger_state_thread_safe = m_datalogging.datalogger.get_state();
+            m_datalogging.threadsafe_data.datalogger_state = m_datalogging.datalogger.get_state();
 
             if (m_datalogging.new_owner != nullptr)
             {
@@ -1513,7 +1517,9 @@ namespace scrutiny
         }
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
-            stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.datalogger_state_thread_safe);
+            stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
+            stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion = m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion;
+            stack.get_status.response_data.write_counter_since_trigger = m_datalogging.threadsafe_data.write_counter_since_trigger;
             code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
