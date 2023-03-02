@@ -222,5 +222,15 @@ namespace scrutiny
 
             m_reader.reset();
         }
+
+        uint32_t RawFormatEncoder::remaining_bytes_to_full() const
+        {
+            if (m_full)
+            {
+                return 0;
+            }
+
+            return get_buffer_effective_end() - get_write_cursor();
+        }
     }
 }

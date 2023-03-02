@@ -92,8 +92,9 @@ namespace scrutiny
                     msg_out.data.datalogger_status_update.state = m_datalogger->get_state();
                     if (msg_out.data.datalogger_status_update.state == datalogging::DataLogger::State::TRIGGERED)
                     {
+                        // write counter gets reset on trigger
                         msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion = m_datalogger->get_bytes_to_acquire_from_trigger_to_completion();
-                        msg_out.data.datalogger_status_update.write_counter_since_trigger = m_datalogger->get_encoder()->get_data_write_counter();
+                        msg_out.data.datalogger_status_update.write_counter_since_trigger = m_datalogger->data_counter_since_trigger();
                     }
                     else
                     {

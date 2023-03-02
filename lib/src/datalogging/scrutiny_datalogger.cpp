@@ -272,10 +272,14 @@ namespace scrutiny
         {
             m_trigger_cursor_location = m_encoder.get_write_cursor();
             m_trigger_timestamp = m_timebase->get_timestamp();
-            m_encoder.reset_write_counter();
+            m_encoder.reset_write_counter(); // Completion logic uses that counter directly without processing
 
             const uint64_t multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
             m_remaining_data_to_write = static_cast<uint32_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
+            if (!m_encoder.buffer_full())
+            {
+                m_remaining_data_to_write = SCRUTINY_MAX(m_remaining_data_to_write, m_encoder.remaining_bytes_to_full());
+            }
 
             if (m_remaining_data_to_write > m_buffer_size)
             {
@@ -300,13 +304,24 @@ namespace scrutiny
                     }
                 }
 
-                if (m_encoder.get_data_write_counter() >= m_remaining_data_to_write && m_encoder.buffer_full())
+                if (m_encoder.get_data_write_counter() >= m_remaining_data_to_write)
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        uint32_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
+        {
+            return (m_state == State::TRIGGERED) ? m_remaining_data_to_write : 0;
+        }
+
+        uint32_t DataLogger::data_counter_since_trigger(void) const
+        {
+            // This counter gets reset when trigger happens.
+            return (m_state == State::TRIGGERED) ? m_encoder.get_data_write_counter() : 0;
         }
 
         void DataLogger::process_acquisition(void)
