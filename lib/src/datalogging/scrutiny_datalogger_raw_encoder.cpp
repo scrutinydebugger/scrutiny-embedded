@@ -29,7 +29,7 @@ namespace scrutiny
             }
 
             const uint32_t write_cursor = m_encoder->get_write_cursor();
-            const uint32_t buffer_end = m_encoder->get_buffer_effective_end(); // Encoder may not use the full buffer
+            const uint32_t buffer_end = m_encoder->get_buffer_effective_size(); // Encoder may not use the full buffer
             if (m_read_cursor == write_cursor && m_read_started)
             {
                 m_finished = true;
@@ -230,7 +230,7 @@ namespace scrutiny
                 return 0;
             }
 
-            return get_buffer_effective_end() - get_write_cursor();
+            return get_buffer_effective_size() - get_write_cursor();
         }
     }
 }

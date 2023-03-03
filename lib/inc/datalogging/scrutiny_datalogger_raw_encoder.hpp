@@ -72,7 +72,7 @@ namespace scrutiny
             inline uint32_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
             inline bool error(void) const { return m_error; }
             inline uint32_t get_entry_count(void) const { return m_entries_count; }
-            inline uint32_t get_buffer_effective_end(void) const { return m_entry_size * m_max_entries; }
+            inline uint32_t get_buffer_effective_size(void) const { return m_entry_size * m_max_entries; }
             inline bool buffer_full(void) const { return m_full; }
             uint32_t remaining_bytes_to_full() const;
 
