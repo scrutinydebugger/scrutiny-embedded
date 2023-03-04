@@ -69,6 +69,8 @@ namespace scrutiny
                 struct
                 {
                     datalogging::DataLogger::State state;
+                    uint32_t bytes_to_acquire_from_trigger_to_completion;
+                    uint32_t write_counter_since_trigger;
                 } datalogger_status_update;
 #endif
             } data;

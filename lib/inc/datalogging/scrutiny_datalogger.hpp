@@ -103,6 +103,12 @@ namespace scrutiny
             /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition
             inline uint32_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
 
+            /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete
+            uint32_t get_bytes_to_acquire_from_trigger_to_completion(void) const;
+
+            /// @brief Returns the number of bytes acquired since the trigger event.
+            uint32_t data_counter_since_trigger(void) const;
+
             /// @brief Forces the trigger condition to be fulfilled, triggering an acquisition if the datalogger is armed.
             void force_trigger(void)
             {

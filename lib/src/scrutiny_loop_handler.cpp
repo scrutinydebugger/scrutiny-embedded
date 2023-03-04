@@ -32,7 +32,7 @@ namespace scrutiny
     {
         m_timebase.step(timestep_100ns);
 
-        Loop2MainMessage msg_out;
+        Loop2MainMessage msg_out{};
         static_cast<void>(msg_out);
 
         if (m_main2loop_msg.has_content() && !m_loop2main_msg.has_content())
@@ -90,6 +90,18 @@ namespace scrutiny
                 {
                     msg_out.message_id = Loop2MainMessageID::DATALOGGER_STATUS_UPDATE;
                     msg_out.data.datalogger_status_update.state = m_datalogger->get_state();
+                    if (msg_out.data.datalogger_status_update.state == datalogging::DataLogger::State::TRIGGERED)
+                    {
+                        // write counter gets reset on trigger
+                        msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion = m_datalogger->get_bytes_to_acquire_from_trigger_to_completion();
+                        msg_out.data.datalogger_status_update.write_counter_since_trigger = m_datalogger->data_counter_since_trigger();
+                    }
+                    else
+                    {
+                        msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion = 0;
+                        msg_out.data.datalogger_status_update.write_counter_since_trigger = 0;
+                    }
+
                     m_loop2main_msg.send(msg_out);
                 }
             }

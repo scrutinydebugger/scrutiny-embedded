@@ -55,19 +55,19 @@ namespace scrutiny
         /// @brief Returns the state of the datalogger. Thread safe
         inline datalogging::DataLogger::State get_datalogger_state(void) const
         {
-            return m_datalogging.datalogger_state_thread_safe;
+            return m_datalogging.threadsafe_data.datalogger_state;
         }
 
         /// @brief  Returns true if the datalogger has data available. Thread safe
         inline bool datalogging_data_available(void) const
         {
-            return m_datalogging.datalogger_state_thread_safe == datalogging::DataLogger::State::ACQUISITION_COMPLETED; // Thread safe.
+            return m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ACQUISITION_COMPLETED; // Thread safe.
         }
 
         /// @brief Returns true if the datalogger is in an error state. Thread safe
         inline bool datalogging_error(void) const
         {
-            return (m_datalogging.datalogger_state_thread_safe == datalogging::DataLogger::State::ERROR) || m_datalogging.error != DataloggingError::NoError;
+            return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ERROR) || m_datalogging.error != DataloggingError::NoError;
         }
 
         /// @brief Reads a section of memory like a memcpy does, but enforce the respect of forbidden regions
@@ -156,11 +156,18 @@ namespace scrutiny
             UnexpectedClaim
         };
 
+        struct ThreadSafeData
+        {
+            datalogging::DataLogger::State datalogger_state;
+            uint32_t bytes_to_acquire_from_trigger_to_completion;
+            uint32_t write_counter_since_trigger;
+        };
+
         struct
         {
 
-            datalogging::DataLogger datalogger;                          // The Datalogger object
-            datalogging::DataLogger::State datalogger_state_thread_safe; // The state of the Datalogger in the MainHandler Task context
+            datalogging::DataLogger datalogger; // The Datalogger object
+            ThreadSafeData threadsafe_data;     // Data that got read from the datalogger through IPC
 
             LoopHandler *owner;                       // LoopHandler that presently own the Datalogger
             LoopHandler *new_owner;                   // LoopHandler that is requested to take ownership of the  Datalogger

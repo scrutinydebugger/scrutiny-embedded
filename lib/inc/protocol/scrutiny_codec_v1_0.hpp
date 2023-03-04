@@ -298,6 +298,8 @@ namespace scrutiny
                 struct GetStatus
                 {
                     uint8_t state;
+                    uint32_t bytes_to_acquire_from_trigger_to_completion;
+                    uint32_t write_counter_since_trigger;
                 };
 
                 struct GetAcquisitionMetadata

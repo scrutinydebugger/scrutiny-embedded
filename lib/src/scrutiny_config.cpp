@@ -97,6 +97,6 @@ namespace scrutiny
             }
         }
         return false;
-    };
+    }
 #endif
 }

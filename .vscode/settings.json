@@ -64,7 +64,8 @@
         "variant": "cpp",
         "ranges": "cpp",
         "condition_variable": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "cinttypes": "cpp"
     },
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },
