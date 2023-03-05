@@ -302,8 +302,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
-    scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq");
-    scrutiny::FixedFrequencyLoopHandler ff_loop(200000, "50Hz");
+    scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq loop");
+    scrutiny::FixedFrequencyLoopHandler ff_loop(100000, "100Hz Loop");
     scrutiny::LoopHandler *loops[] = {&ff_loop, &vf_loop};
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
