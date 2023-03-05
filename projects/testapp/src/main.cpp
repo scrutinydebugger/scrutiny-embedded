@@ -332,7 +332,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
-            uint32_t timestep = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
+            uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
 
             if (len_received > 0)
             {
@@ -362,8 +362,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 cout << endl;
             }
 
-            scrutiny_handler.process(timestep);
-            vf_loop.process(timestep);
+            scrutiny_handler.process(timestep_us * 10);
+            vf_loop.process(timestep_us * 10);
             ff_loop.process();
 #if SCRUTINY_BUILD_WINDOWS
             Sleep(10);
