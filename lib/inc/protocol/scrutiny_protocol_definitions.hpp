@@ -155,6 +155,7 @@ namespace scrutiny
                 GetStatus = 5,
                 GetAcquisitionMetadata = 6,
                 ReadAcquisition = 7,
+                ResetDatalogger = 8
             };
         }
 

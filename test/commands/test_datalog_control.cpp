@@ -936,4 +936,41 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
     }
 }
 
+TEST_F(TestDatalogControl, TestResetDatalogger)
+{
+    uint8_t tx_buffer[32];
+    // Get Status
+    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
+
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
+    fixed_freq_loop.process();                                   // Accept ownership
+    scrutiny_handler.process(0);
+
+    // From this point, the datalogger is owned by a loop. We need to wait on the loop to broadcast the status through an IPC message.
+    fixed_freq_loop.process();   // Send status
+    scrutiny_handler.process(0); // Receive status
+
+    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
+    EXPECT_TRUE(scrutiny_handler.datalogging_ownership_taken());
+
+    uint8_t request_data[8] = {5, 8, 0, 0};
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+    fixed_freq_loop.process();
+    scrutiny_handler.process(1);
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    ASSERT_LE(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.process(0);
+    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 8, protocol::ResponseCode::OK));
+    EXPECT_FALSE(scrutiny_handler.datalogging_ownership_taken());
+    // Acquisition complete. Process for IPC message to be transferred from loop to main
+    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
+}
+
 #endif
