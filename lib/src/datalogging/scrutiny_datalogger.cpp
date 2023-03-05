@@ -29,6 +29,7 @@ namespace scrutiny
             m_trigger_callback = trigger_callback;
 
             m_encoder.init(main_handler, timebase, &m_config, buffer, buffer_size);
+            m_acquisition_id = 0;
 
             reset();
         }
@@ -45,7 +46,7 @@ namespace scrutiny
             m_remaining_data_to_write = 0;
             m_config_valid = false;
             m_manual_trigger = false;
-            m_acquisition_id = 0;
+
             m_decimation_counter = 0;
             m_log_points_after_trigger = 0;
         }

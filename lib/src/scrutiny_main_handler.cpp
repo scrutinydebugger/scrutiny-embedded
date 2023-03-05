@@ -1580,6 +1580,23 @@ namespace scrutiny
             break;
         }
 
+        case protocol::DataLogControl::Subfunction::ResetDatalogger:
+        {
+            if (m_datalogging.owner != nullptr)
+            {
+                if (!m_datalogging.pending_ownership_release)
+                {
+                    m_datalogging.request_ownership_release = true;
+                }
+                code = protocol::ResponseCode::ProcessAgain;
+            }
+            else
+            {
+                m_datalogging.datalogger.reset();
+                code = protocol::ResponseCode::OK;
+            }
+            break;
+        }
         default:
         {
             code = protocol::ResponseCode::UnsupportedFeature;

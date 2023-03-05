@@ -70,6 +70,9 @@ namespace scrutiny
             return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ERROR) || m_datalogging.error != DataloggingError::NoError;
         }
 
+        /// @brief Returns true if the datalogger is presently owned by a loop
+        bool datalogging_ownership_taken(void) const { return m_datalogging.owner != nullptr; }
+
         /// @brief Reads a section of memory like a memcpy does, but enforce the respect of forbidden regions
         /// @param dst Destination buffer
         /// @param src  Source buffer
