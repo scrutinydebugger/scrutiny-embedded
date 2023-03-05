@@ -66,22 +66,12 @@ namespace scrutiny
     void MainHandler::check_config()
     {
         m_enabled = true;
-        if (m_config.m_rx_buffer == nullptr || m_config.m_rx_buffer_size < protocol::MINIMUM_RX_BUFFER_SIZE)
+        if (m_config.m_rx_buffer == nullptr || m_config.m_rx_buffer_size < protocol::MINIMUM_RX_BUFFER_SIZE || m_config.m_rx_buffer_size > protocol::MAXIMUM_RX_BUFFER_SIZE)
         {
             m_enabled = false;
         }
 
-        if (m_config.m_rx_buffer == nullptr || m_config.m_rx_buffer_size > protocol::MAXIMUM_RX_BUFFER_SIZE)
-        {
-            m_enabled = false;
-        }
-
-        if (m_config.m_tx_buffer == nullptr || m_config.m_tx_buffer_size < protocol::MINIMUM_TX_BUFFER_SIZE)
-        {
-            m_enabled = false;
-        }
-
-        if (m_config.m_tx_buffer == nullptr || m_config.m_tx_buffer_size > protocol::MAXIMUM_TX_BUFFER_SIZE)
+        if (m_config.m_tx_buffer == nullptr || m_config.m_tx_buffer_size < protocol::MINIMUM_TX_BUFFER_SIZE || m_config.m_tx_buffer_size > protocol::MAXIMUM_TX_BUFFER_SIZE)
         {
             m_enabled = false;
         }
