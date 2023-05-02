@@ -35,7 +35,6 @@ namespace scrutiny
         public:
             explicit RawFormatReader(const RawFormatEncoder *encoder) : m_encoder(encoder)
             {
-                reset();
             }
             uint32_t read(uint8_t *buffer, const uint32_t max_size);
             inline bool finished(void) { return m_finished; }
@@ -47,8 +46,8 @@ namespace scrutiny
 
         protected:
             const RawFormatEncoder *const m_encoder;
-            uint32_t m_read_cursor;
-            bool m_finished;
+            uint32_t m_read_cursor = 0;
+            bool m_finished = false;
             bool m_read_started = false;
         };
 
@@ -60,7 +59,6 @@ namespace scrutiny
             static constexpr EncodingType ENCODING = EncodingType::RAW;
             RawFormatEncoder() : m_reader(this)
             {
-                reset();
             }
 
             void init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size);
@@ -84,21 +82,21 @@ namespace scrutiny
             };
 
         protected:
-            uint8_t *m_buffer;
-            uint32_t m_buffer_size;
-            const datalogging::Configuration *m_config;
+            uint8_t *m_buffer = nullptr;
+            uint32_t m_buffer_size = 0;
+            const datalogging::Configuration *m_config = nullptr;
             RawFormatReader m_reader;
-            MainHandler *m_main_handler;
-            Timebase *m_timebase_for_log;
+            MainHandler *m_main_handler = nullptr;
+            Timebase *m_timebase_for_log = nullptr;
 
-            uint32_t m_max_entries;
-            uint32_t m_next_entry_write_index;
-            uint32_t m_first_valid_entry_index;
-            uint32_t m_entry_write_counter;
-            uint16_t m_entry_size;
-            uint32_t m_entries_count;
-            bool m_full;
-            bool m_error;
+            uint32_t m_max_entries = 0;
+            uint32_t m_next_entry_write_index = 0;
+            uint32_t m_first_valid_entry_index = 0;
+            uint32_t m_entry_write_counter = 0;
+            uint16_t m_entry_size = 0;
+            uint32_t m_entries_count = 0;
+            bool m_full = false;
+            bool m_error = false;
         };
 
         uint32_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
