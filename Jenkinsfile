@@ -8,8 +8,8 @@ pipeline {
                 stage('Static Analysis'){
                     agent {
                         dockerfile {
-                            additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            additionalBuildArgs '--target static-analysis'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=static-analysis'
                             reuseNode true
                         }
                     }

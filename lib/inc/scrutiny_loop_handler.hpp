@@ -170,7 +170,7 @@ namespace scrutiny
     public:
         /// @brief Constructor
         /// @param name The name of the loop
-        VariableFrequencyLoopHandler(const char *name = "") : LoopHandler(name)
+        explicit VariableFrequencyLoopHandler(const char *name = "") : LoopHandler(name)
         {
         }
 
