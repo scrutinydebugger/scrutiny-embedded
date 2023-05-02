@@ -16,7 +16,7 @@ pipeline {
                     stages {
                         stage("Run") {
                             steps {
-                                sh 'scripts/static-analysis.sh'
+                                sh 'scripts/static_analysis.sh'
                             }
                         }
 

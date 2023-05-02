@@ -76,14 +76,8 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(const char *name = "") : m_name(name),
-                                             m_datalogger(nullptr),
-                                             m_owns_datalogger(false),
-                                             m_datalogger_data_acquired(false)
+        LoopHandler(const char *name = "") : m_name(name)
         {
-#if SCRUTINY_ENABLE_DATALOGGING
-            m_support_datalogging = true;
-#endif
         }
 
         /// @brief Returns the loop type: Fixed frequency or variable frequency
@@ -134,13 +128,13 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
-        datalogging::DataLogger *m_datalogger;
+        datalogging::DataLogger *m_datalogger = nullptr;
         /// @brief Tells wether this loop is the owner of the datalogger
-        bool m_owns_datalogger;
+        bool m_owns_datalogger = false;
         /// @brief Indicates if data has been acquired and ready to be downloaded or saved
-        bool m_datalogger_data_acquired;
+        bool m_datalogger_data_acquired = false;
         /// @brief Indicates if this loop can do datalogging
-        bool m_support_datalogging;
+        bool m_support_datalogging = true;
 #endif
     };
 
