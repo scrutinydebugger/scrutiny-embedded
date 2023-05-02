@@ -5,6 +5,23 @@ pipeline {
     stages {
         stage('All') {
             parallel{
+                stage('Static Analysis'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Run") {
+                            steps {
+                                sh 'scripts/static-analysis.sh'
+                            }
+                        }
+
+                    }
+                }
                 stage('GCC Full'){
                     agent {
                         dockerfile {

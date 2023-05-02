@@ -23,6 +23,8 @@ namespace scrutiny
     {
         m_tx_buffer = nullptr;
         m_rx_buffer = nullptr;
+        m_rx_buffer_size = 0;
+        m_tx_buffer_size = 0;
         m_forbidden_address_ranges = nullptr;
         m_forbidden_range_count = 0;
         m_readonly_address_ranges = nullptr;

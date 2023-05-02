@@ -76,7 +76,10 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(const char *name = "") : m_name(name)
+        LoopHandler(const char *name = "") : m_name(name),
+                                             m_datalogger(nullptr),
+                                             m_owns_datalogger(false),
+                                             m_datalogger_data_acquired(false)
         {
 #if SCRUTINY_ENABLE_DATALOGGING
             m_support_datalogging = true;
@@ -149,18 +152,18 @@ namespace scrutiny
         /// @brief Constructor
         /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
         /// @param name The name of the loop
-        FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = "") : LoopHandler(name),
-                                                                                      m_timestep_100ns(timestep_100ns)
+        explicit FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = "") : LoopHandler(name),
+                                                                                               m_timestep_100ns(timestep_100ns)
         {
         }
         /// @brief Process function be called at each iteration of the loop.
         void process(void);
 
         /// @brief Return the type of loop handler
-        virtual LoopType loop_type(void) const { return LoopType::FIXED_FREQ; }
+        virtual LoopType loop_type(void) const override { return LoopType::FIXED_FREQ; }
 
         /// @brief Returns the time delta assigned to the loop (in multiple of 100ns)
-        virtual uint32_t get_timestep_100ns(void) const { return m_timestep_100ns; }
+        virtual uint32_t get_timestep_100ns(void) const override { return m_timestep_100ns; }
 
     protected:
         const uint32_t m_timestep_100ns;
@@ -178,14 +181,14 @@ namespace scrutiny
         }
 
         /// @brief Stubbed implementation that always return 0
-        virtual uint32_t get_timestep_100ns(void) const { return 0; }
+        virtual uint32_t get_timestep_100ns(void) const override { return 0; }
 
         /// @brief Process function be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType loop_type(void) const { return LoopType::VARIABLE_FREQ; }
+        virtual LoopType loop_type(void) const override { return LoopType::VARIABLE_FREQ; }
     };
 }
 

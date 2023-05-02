@@ -9,7 +9,7 @@
 #ifndef ___SCRUTINY_DATALOGGING_TYPES_H___
 #define ___SCRUTINY_DATALOGGING_TYPES_H___
 
-#include "string.h"
+#include <string.h>
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"

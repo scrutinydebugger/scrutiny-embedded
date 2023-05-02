@@ -10,7 +10,7 @@
 #ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 #define ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 
-#include "stdint.h"
+#include <stdint.h>
 #include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "scrutiny_timebase.hpp"
@@ -33,8 +33,9 @@ namespace scrutiny
         class RawFormatReader
         {
         public:
-            RawFormatReader(const RawFormatEncoder *encoder) : m_encoder(encoder)
+            explicit RawFormatReader(const RawFormatEncoder *encoder) : m_encoder(encoder)
             {
+                reset();
             }
             uint32_t read(uint8_t *buffer, const uint32_t max_size);
             inline bool finished(void) { return m_finished; }
@@ -59,6 +60,7 @@ namespace scrutiny
             static constexpr EncodingType ENCODING = EncodingType::RAW;
             RawFormatEncoder() : m_reader(this)
             {
+                reset();
             }
 
             void init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size);

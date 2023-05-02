@@ -30,10 +30,10 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint32_t cursor = 0;
-            uint16_t length;
 
             while (true)
             {
+                uint16_t length;
                 if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - cursor))
                 {
                     m_invalid = true;
@@ -115,10 +115,10 @@ namespace scrutiny
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint16_t cursor = 0;
-            uint16_t length;
 
             while (true)
             {
+                uint16_t length;
                 if (addr_size + 2 > static_cast<uint16_t>(m_size_limit - cursor))
                 {
                     m_invalid = true;
@@ -315,7 +315,6 @@ namespace scrutiny
             m_size_limit = max_size;
             m_buffer = response->data;
             m_response = response;
-            m_size_limit = max_size;
             reset();
         }
 
@@ -354,7 +353,6 @@ namespace scrutiny
             m_size_limit = max_size;
             m_buffer = response->data;
             m_response = response;
-            m_size_limit = max_size;
             reset();
         }
 
@@ -421,7 +419,7 @@ namespace scrutiny
                 m_finished = true;
             }
 
-            return !m_invalid;
+            return !m_invalid; // cppcheck-suppress[knownConditionTrueFalse]
         }
 
         void ReadRPVRequestParser::reset()
