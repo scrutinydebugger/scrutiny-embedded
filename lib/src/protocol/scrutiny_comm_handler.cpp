@@ -315,7 +315,7 @@ namespace scrutiny
                 {
                     buffer[i] = static_cast<uint8_t>((m_active_response.data_length >> 8) & 0xFFu);
                 }
-                else if (m_nbytes_sent == 4u)
+                else if (m_nbytes_sent == 4u) // cppcheck-suppress[knownConditionTrueFalse]
                 {
                     buffer[i] = static_cast<uint8_t>(m_active_response.data_length & 0xFFu);
                 }

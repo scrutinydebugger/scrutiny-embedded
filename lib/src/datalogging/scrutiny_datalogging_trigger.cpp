@@ -12,7 +12,7 @@
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
-#include "string.h"
+#include <string.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -264,7 +264,7 @@ namespace scrutiny
                     {
                         operands_vals_float[i] = static_cast<float>(operand_vals[i]._uint);
                     }
-                    else if (operand_types[0] == VariableTypeCompare::_uint)
+                    else if (operand_types[0] == VariableTypeCompare::_sint)
                     {
                         operands_vals_float[i] = static_cast<float>(operand_vals[i]._sint);
                     }

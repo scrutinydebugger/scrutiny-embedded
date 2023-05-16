@@ -7,6 +7,25 @@ RUN apt-get update && apt-get install -y \
     ninja-build \ 
     cmake \
     git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM base as static-analysis
+ARG CPPCHECK_VERSION="2.10.3"
+ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
+ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
+RUN apt-get update \
+    && apt-get install -y \ 
+        build-essential \
+        python3 \
+        libpcre3-dev \
+    && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
+    && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
+    && cd "/tmp/${CPPCHECK_FOLDER}" \
+    && make MATCHCOMPILER=no FILESDIR=/usr/share/cppcheck HAVE_RULES=no CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j2 \
+    && FILESDIR=/usr/share/cppcheck make install  \
+    && cd /tmp/ \
+    && rm -rf "/tmp/${CPPCHECK_FOLDER}" \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as native-gcc

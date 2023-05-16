@@ -57,25 +57,25 @@ namespace scrutiny
     /// @brief  Represent a datatype. Must match the python core module enum
     enum class VariableType
     {
-        sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),
-        sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),
-        sint32 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_32),
-        uint8 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_8),
-        uint16 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_16),
-        uint32 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_32),
-        float8 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_8),
-        float16 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_16),
-        float32 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_32),
-        cfloat8 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_8),
-        cfloat16 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_16),
-        cfloat32 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_32),
-        boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8),
+        sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),       // cppcheck-suppress[badBitmaskCheck]
+        sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),     // cppcheck-suppress[badBitmaskCheck]
+        sint32 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_32),     // cppcheck-suppress[badBitmaskCheck]
+        uint8 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_8),       // cppcheck-suppress[badBitmaskCheck]
+        uint16 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_16),     // cppcheck-suppress[badBitmaskCheck]
+        uint32 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_32),     // cppcheck-suppress[badBitmaskCheck]
+        float8 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_8),     // cppcheck-suppress[badBitmaskCheck]
+        float16 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_16),   // cppcheck-suppress[badBitmaskCheck]
+        float32 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_32),   // cppcheck-suppress[badBitmaskCheck]
+        cfloat8 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_8),   // cppcheck-suppress[badBitmaskCheck]
+        cfloat16 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_16), // cppcheck-suppress[badBitmaskCheck]
+        cfloat32 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_32), // cppcheck-suppress[badBitmaskCheck]
+        boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8),  // cppcheck-suppress[badBitmaskCheck]
 
 #if SCRUTINY_SUPPORT_64BITS
-        uint64 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_64),
-        sint64 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_64),
-        float64 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_64),
-        cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64),
+        uint64 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_64),     // cppcheck-suppress[badBitmaskCheck]
+        sint64 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_64),     // cppcheck-suppress[badBitmaskCheck]
+        float64 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_64),   // cppcheck-suppress[badBitmaskCheck]
+        cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64), // cppcheck-suppress[badBitmaskCheck]
 #endif
         unknown = 0xFF
     };

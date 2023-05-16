@@ -76,7 +76,11 @@ namespace scrutiny
             }
             else if (tt == VariableTypeType::_float)
             {
+#if SCRUTINY_SUPPORT_64BITS
                 return (ts == 4 || ts == 8);
+#else
+                return (ts == 4);
+#endif
             }
             else
             {

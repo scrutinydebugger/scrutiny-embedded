@@ -5,6 +5,23 @@ pipeline {
     stages {
         stage('All') {
             parallel{
+                stage('Static Analysis'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target static-analysis'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=static-analysis'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Run") {
+                            steps {
+                                sh 'scripts/static_analysis.sh'
+                            }
+                        }
+
+                    }
+                }
                 stage('GCC Full'){
                     agent {
                         dockerfile {

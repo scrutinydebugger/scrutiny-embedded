@@ -755,7 +755,7 @@ namespace scrutiny
             const uint8_t loop_id = stack.get_loop_def.request_data.loop_id;
             if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
             {
-                return code = protocol::ResponseCode::FailureToProceed;
+                code = protocol::ResponseCode::FailureToProceed;
                 break;
             }
 
@@ -1095,9 +1095,9 @@ namespace scrutiny
                 }
                 else
                 {
-                    uint8_t temp;
                     for (uint16_t i = 0; i < stack.write_mem.block.length; i++)
                     {
+                        uint8_t temp;
                         temp = stack.write_mem.block.start_address[i];
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
                         temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
@@ -1331,7 +1331,6 @@ namespace scrutiny
             struct
             {
                 protocol::RequestData::DataLogControl::Configure request_data;
-                datalogging::Configuration *dlconfig;
             } configure;
 
             struct
