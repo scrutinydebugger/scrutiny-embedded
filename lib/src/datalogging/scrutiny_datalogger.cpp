@@ -223,7 +223,7 @@ namespace scrutiny
 
         void DataLogger::process(void)
         {
-            // IDLE --> CONFIGURED --> ARMED --> ACQUISITION_COMPLETED.
+            // IDLE --> CONFIGURED --> ARMED --> TRIGGERED --> ACQUISITION_COMPLETED.
             // We acquire in both CONFIGURED and ARMED state so that we can have data before the trigger as well.
 
             switch (m_state)

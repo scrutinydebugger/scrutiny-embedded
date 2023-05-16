@@ -104,7 +104,7 @@ struct
     float rpv_id_3000;
     bool rpv_id_4000;
     bool rpv_id_5000;
-    uint16_t rpv_id_5001;
+    int16_t rpv_id_5001;
 
 #if SCRUTINY_SUPPORT_64BITS
     int64_t rpv_id_1003;
@@ -283,16 +283,17 @@ void init_all_values()
 void process_interactive_data()
 {
     static bool enable = false;
-    static uint16_t counter = 0;
+    static int16_t counter = 0;
+    static int16_t step = 1;
 
     if (rpvStorage.rpv_id_5000)
     {
-        rpvStorage.rpv_id_5001++;
+        rpvStorage.rpv_id_5001 += step;
     }
 
     if (enable)
     {
-        counter++;
+        counter += step;
     }
 }
 
