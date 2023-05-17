@@ -282,9 +282,9 @@ void init_all_values()
 
 void process_interactive_data()
 {
-    static bool enable = false;
-    static int16_t counter = 0;
-    static int16_t step = 1;
+    static volatile bool enable = false;
+    static volatile int16_t counter = 0;
+    static volatile int16_t step = 1;
 
     if (rpvStorage.rpv_id_5000)
     {
