@@ -286,6 +286,10 @@ void process_interactive_data()
     static volatile int16_t counter = 0;
     static volatile int16_t step = 1;
 
+    static_cast<void>(enable);  // suppress unused variable error
+    static_cast<void>(counter); // suppress unused variable error
+    static_cast<void>(step);    // suppress unused variable error
+
     if (rpvStorage.rpv_id_5000)
     {
         rpvStorage.rpv_id_5001 += step;
