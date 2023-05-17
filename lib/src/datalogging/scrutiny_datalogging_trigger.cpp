@@ -260,15 +260,15 @@ namespace scrutiny
 
                 for (uint_fast8_t i = 0; i < 3; i++)
                 {
-                    if (operand_types[0] == VariableTypeCompare::_uint)
+                    if (operand_types[i] == VariableTypeCompare::_uint)
                     {
                         operands_vals_float[i] = static_cast<float>(operand_vals[i]._uint);
                     }
-                    else if (operand_types[0] == VariableTypeCompare::_sint)
+                    else if (operand_types[i] == VariableTypeCompare::_sint)
                     {
                         operands_vals_float[i] = static_cast<float>(operand_vals[i]._sint);
                     }
-                    else if (operand_types[0] == VariableTypeCompare::_float)
+                    else if (operand_types[i] == VariableTypeCompare::_float)
                     {
                         operands_vals_float[i] = operand_vals[i]._float;
                     }

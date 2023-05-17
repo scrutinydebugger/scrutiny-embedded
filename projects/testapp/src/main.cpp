@@ -104,7 +104,7 @@ struct
     float rpv_id_3000;
     bool rpv_id_4000;
     bool rpv_id_5000;
-    uint16_t rpv_id_5001;
+    int16_t rpv_id_5001;
 
 #if SCRUTINY_SUPPORT_64BITS
     int64_t rpv_id_1003;
@@ -282,17 +282,22 @@ void init_all_values()
 
 void process_interactive_data()
 {
-    static bool enable = false;
-    static uint16_t counter = 0;
+    static volatile bool enable = false;
+    static volatile int16_t counter = 0;
+    static volatile int16_t step = 1;
+
+    static_cast<void>(enable);  // suppress unused variable error
+    static_cast<void>(counter); // suppress unused variable error
+    static_cast<void>(step);    // suppress unused variable error
 
     if (rpvStorage.rpv_id_5000)
     {
-        rpvStorage.rpv_id_5001++;
+        rpvStorage.rpv_id_5001 += step;
     }
 
     if (enable)
     {
-        counter++;
+        counter += step;
     }
 }
 
