@@ -16,9 +16,9 @@ ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHEC
 ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
     && apt-get install -y \ 
-        build-essential \
-        python3 \
-        libpcre3-dev \
+    build-essential \
+    python3 \
+    libpcre3-dev \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
     && cd "/tmp/${CPPCHECK_FOLDER}" \
@@ -61,3 +61,15 @@ FROM base as arm-none-gcc
 RUN apt-get update && apt-get install -y \
     gcc-arm-none-eabi \
     && rm -rf /var/lib/apt/lists/*
+
+
+FROM native-gcc as dev-sample
+WORKDIR /app
+COPY . .
+RUN CMAKE_TOOLCHAIN_FILE=\/app/cmake/gcc.cmake \
+    SCRUTINY_BUILD_TEST=1 \
+    SCRUTINY_BUILD_TESTAPP=1 \
+    bash scripts/build.sh
+
+CMD /app/build-dev/projects/testapp/testapp udp-listen 12345
+
