@@ -21,6 +21,7 @@ endif()
 set(INSTALL_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/install)
 
 install(
+    
     TARGETS scrutiny-embedded 
         ARCHIVE DESTINATION ${INSTALL_FOLDER} 
     )
