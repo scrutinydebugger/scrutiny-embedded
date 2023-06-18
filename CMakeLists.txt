@@ -16,3 +16,5 @@ add_subdirectory(projects)
 if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
+
+install(TARGETS test DESTINATION bin)
