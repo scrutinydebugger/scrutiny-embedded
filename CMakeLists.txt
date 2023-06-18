@@ -20,5 +20,5 @@ endif()
 install(
     TARGETS scrutiny-embedded 
         ARCHIVE DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
-        PUBLIC_HEADER DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
+        PUBLIC_HEADER DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install/include
     )
