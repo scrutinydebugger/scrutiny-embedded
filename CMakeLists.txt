@@ -17,4 +17,4 @@ if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
 
-install(TARGETS scrutiny-embedded DESTINATION bin)
+install(TARGETS scrutiny-embedded)
