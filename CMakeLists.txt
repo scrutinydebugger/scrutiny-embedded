@@ -16,5 +16,3 @@ add_subdirectory(projects)
 if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
-
-install(TARGETS scrutiny-embedded DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib)
