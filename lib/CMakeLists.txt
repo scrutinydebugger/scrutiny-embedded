@@ -56,3 +56,9 @@ if (MSVC)
 else()
      target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
 endif()
+
+
+install(
+    TARGETS scrutiny-embedded DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
+    PUBLIC_HEADER DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
+    )
