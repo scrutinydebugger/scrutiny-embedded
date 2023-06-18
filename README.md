@@ -4,10 +4,7 @@ This library must be linked against your C++ project and called periodically.
 
 The library has 2 data streams going in and out. It is the responsability of the integrator to bring the data to and from a hardware communication device such as a Serial Port, a CAN bus, IP stack or any other. 
 
-
-## State of project
-The project is well advanced and works, but is not in a publishable state.
-
+For the integration guide, see : https://scrutinydebugger.com/guide-instrumentation.html
 
 ## Example of integration
 The following example is taken from the Arduino example and show how to initialize the library and how the glue code between Scrutiny Embedded Lib and a serial port can be written.
@@ -17,9 +14,9 @@ The following example is taken from the Arduino example and show how to initiali
 #include <stdint.h>
 
 scrutiny::MainHandler scrutiny_handler; // Main scrutiny handler
-scrutiny::Config scrutiny_config;       // Scrutiny runtime configuration
-uint8_t scrutiny_rx_buffer[32];         // Receive buffer
-uint8_t scrutiny_tx_buffer[48];         // Transmit buffer
+
+uint8_t scrutiny_rx_buffer[32];   // Receive buffer - Keep global
+uint8_t scrutiny_tx_buffer[48];   // Transmit buffer - Keep global
 
 void process_scrutiny_loop()
 {
@@ -53,6 +50,8 @@ void process_scrutiny_loop()
 
 void scrutiny_configure()
 {
+  scrutiny::Config scrutiny_config;   // Scrutiny runtime configuration. Can be local, will be copied
+
   // Only required configuration is the comm buffers
   config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
 

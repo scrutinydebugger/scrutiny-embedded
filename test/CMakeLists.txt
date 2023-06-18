@@ -1,3 +1,7 @@
+# Copyright (c) 2021-2023 Scrutiny Debugger
+# License : MIT - See LICENSE file.
+# Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+
 cmake_minimum_required(VERSION 3.14)
 
 include(FetchContent)
@@ -55,14 +59,8 @@ target_link_libraries(${PROJECT_NAME}
     )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(scrutiny-embedded PRIVATE /W4 /Od)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Od)
-
-    if(SCRUTINY_WERR)
-        target_compile_options(scrutiny-embedded PRIVATE /WX)
-        target_compile_options(${PROJECT_NAME} PRIVATE /WX)
-    endif()
-
+    target_compile_options(scrutiny-embedded PRIVATE /W4 /Od /WX)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Od  /WX)
 else()
     # We don't require no-pie here. But we need scrutiny-embedded to have the same parameter as this project.
     # So we need to set an explicit value, if we don't set no-pie or -pie (blank), cmake might chose to keep scrutiny-embedded
@@ -80,15 +78,9 @@ else()
         set(LINKER_NO_PIE_OPTION "")
     endif()
 
-    target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic ${COMPILER_NO_PIE_OPTION})
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic ${COMPILER_NO_PIE_OPTION})
+    target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
     target_link_options(${PROJECT_NAME} PUBLIC ${LINKER_NO_PIE_OPTION})
-
-    if(SCRUTINY_WERR)
-        target_compile_options(scrutiny-embedded PRIVATE -Werror)
-        target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
-    endif()
-
 endif()
 
 include(GoogleTest)
