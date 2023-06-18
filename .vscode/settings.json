@@ -70,7 +70,7 @@
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },
     "[cpp]": {
-        "editor.formatOnSave": true,
+        "editor.formatOnSave": false,
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
     "cSpell.words": [
