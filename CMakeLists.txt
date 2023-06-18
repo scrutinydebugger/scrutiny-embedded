@@ -17,8 +17,13 @@ if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
 
+set(INSTALL_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/install)
 install(
     TARGETS scrutiny-embedded 
-        ARCHIVE DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
-        PUBLIC_HEADER DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install/include
+        ARCHIVE DESTINATION ${INSTALL_FOLDER} 
     )
+
+install(DIRECTORY lib/inc 
+    DESTINATION ${INSTALL_FOLDER}/include
+    FILES_MATCHING  PATTERN "*.hpp" # select header files
+)
