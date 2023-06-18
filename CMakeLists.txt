@@ -17,4 +17,6 @@ if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
 
-install(TARGETS scrutiny-embedded DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install PUBLIC_HEADER)
+install(
+    TARGETS scrutiny-embedded DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install 
+    PUBLIC_HEADER DESTINATION include)
