@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(testapp)
 
-option(SCRUTINY_WERR "Converts all warning to error" ON)
-
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
@@ -43,9 +41,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")    # MSVC doesn't support dwarf outpu
         PRIVATE
             /W4 /Od)
 
-    if(SCRUTINY_WERR)
-        target_compile_options(${PROJECT_NAME} PRIVATE /WX)
-    endif()
+    target_compile_options(${PROJECT_NAME} PRIVATE /WX)
 
     target_link_options(${PROJECT_NAME}
         PUBLIC
@@ -73,10 +69,8 @@ else()
 
     target_compile_options(scrutiny-embedded PRIVATE ${COMPILER_NO_PIE_OPTION})
     
-    if(SCRUTINY_WERR)
-        target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
-        target_compile_options(scrutiny-embedded PRIVATE -Werror)
-    endif()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Werror )
+    target_compile_options(scrutiny-embedded PRIVATE -Werror)
 
     target_link_options(${PROJECT_NAME}
         PUBLIC
