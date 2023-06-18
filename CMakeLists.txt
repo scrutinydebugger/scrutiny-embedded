@@ -18,7 +18,7 @@ if (SCRUTINY_BUILD_TEST)
 endif()
 
 
-set(INSTALL_FOLDER install)
+set(INSTALL_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/install)
 
 install(
     TARGETS scrutiny-embedded 
