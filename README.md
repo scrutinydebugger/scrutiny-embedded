@@ -14,9 +14,9 @@ The following example is taken from the Arduino example and show how to initiali
 #include <stdint.h>
 
 scrutiny::MainHandler scrutiny_handler; // Main scrutiny handler
-scrutiny::Config scrutiny_config;       // Scrutiny runtime configuration
-uint8_t scrutiny_rx_buffer[32];         // Receive buffer
-uint8_t scrutiny_tx_buffer[48];         // Transmit buffer
+
+uint8_t scrutiny_rx_buffer[32];   // Receive buffer - Keep global
+uint8_t scrutiny_tx_buffer[48];   // Transmit buffer - Keep global
 
 void process_scrutiny_loop()
 {
@@ -50,6 +50,8 @@ void process_scrutiny_loop()
 
 void scrutiny_configure()
 {
+  scrutiny::Config scrutiny_config;   // Scrutiny runtime configuration. Can be local, will be copied
+
   // Only required configuration is the comm buffers
   config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
 
