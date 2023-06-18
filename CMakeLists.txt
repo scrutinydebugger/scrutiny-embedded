@@ -3,9 +3,11 @@
 # Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 
 cmake_minimum_required(VERSION 3.14)
+project(scrutiny-embedded)
 
 option(SCRUTINY_BUILD_TEST "Activate test suite" ON)
-option(SCRUTINY_ENABLE_DATALOGGING "Activate test suite" ON)
+option(SCRUTINY_ENABLE_DATALOGGING "Enable datalogging feature" ON)
+option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(lib)
