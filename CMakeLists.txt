@@ -24,6 +24,5 @@ install(
     )
 
 install(DIRECTORY lib/inc 
-    DESTINATION ${INSTALL_FOLDER}/include
-    FILES_MATCHING  PATTERN "*.hpp" # select header files
+    DESTINATION ${INSTALL_FOLDER}
 )
