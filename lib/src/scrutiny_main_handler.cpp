@@ -612,7 +612,6 @@ namespace scrutiny
             // =========== [GetSupportedFeatures] ==========
         case protocol::GetInfo::Subfunction::GetSupportedFeatures:
         {
-            stack.get_supported_features.response_data.memory_read = true;
             stack.get_supported_features.response_data.memory_write = m_config.memory_write_enable;
 #if SCRUTINY_ENABLE_DATALOGGING
             stack.get_supported_features.response_data.datalogging = m_config.is_datalogging_configured() && m_config.has_at_least_one_loop_with_datalogging();

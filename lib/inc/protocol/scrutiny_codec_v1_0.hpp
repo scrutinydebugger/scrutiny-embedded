@@ -208,7 +208,6 @@ namespace scrutiny
 
                 struct GetSupportedFeatures
                 {
-                    bool memory_read;
                     bool memory_write;
                     bool datalogging;
                     bool user_command;

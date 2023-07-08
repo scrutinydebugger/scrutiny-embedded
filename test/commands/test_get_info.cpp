@@ -421,24 +421,23 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
         // Make expected response
         uint8_t expected_response[9 + 1] = {0x81, 3, 0, 0, 1};
         expected_response[5] = 0;
-        expected_response[5] |= 0x80; // memory read
 
         if (config.memory_write_enable)
         {
-            expected_response[5] |= 0x40; // memory write
+            expected_response[5] |= 0x80; // memory write
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        expected_response[5] |= 0x20;
+        expected_response[5] |= 0x40;
 #endif
 
         if (config.user_command_callback != nullptr)
         {
-            expected_response[5] |= 0x10; // User command
+            expected_response[5] |= 0x20; // User command
         }
 
 #if SCRUTINY_SUPPORT_64BITS
-        expected_response[5] |= 0x08;
+        expected_response[5] |= 0x10;
 #endif
 
         add_crc(expected_response, sizeof(expected_response) - 4);
