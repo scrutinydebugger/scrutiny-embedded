@@ -594,20 +594,17 @@ namespace scrutiny
             }
 
             response->data[0] = 0x00;
-            if (response_data->memory_read)
+            if (response_data->memory_write)
                 response->data[0] |= 0x80;
 
-            if (response_data->memory_write)
+            if (response_data->datalogging)
                 response->data[0] |= 0x40;
 
-            if (response_data->datalogging)
+            if (response_data->user_command)
                 response->data[0] |= 0x20;
 
-            if (response_data->user_command)
-                response->data[0] |= 0x10;
-
             if (response_data->_64bits)
-                response->data[0] |= 0x08;
+                response->data[0] |= 0x10;
 
             response->data_length = 1;
             return ResponseCode::OK;
