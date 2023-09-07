@@ -11,7 +11,7 @@ pipeline {
             }
 
             steps {
-                echo ready
+                sh 'echo "ready"'
             }
 
         }
