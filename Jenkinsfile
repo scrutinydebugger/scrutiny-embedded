@@ -11,6 +11,7 @@ pipeline {
             }
 
             steps {
+                echo ready
             }
 
         }
