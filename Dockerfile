@@ -62,6 +62,8 @@ RUN apt-get update && apt-get install -y \
     gcc-arm-none-eabi \
     && rm -rf /var/lib/apt/lists/*
 
+#Jenkins runs everything up to the specified target.
+# So that would be the stopping point of the Wait Docker stage
 FROM base AS CI
 
 FROM native-gcc as dev-sample
