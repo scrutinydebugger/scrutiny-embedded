@@ -10,7 +10,9 @@ pipeline {
                 }
             }
             stages {
-                stage() {
+                stage {
+                    steps {
+                    }
                 }
             }
         }
