@@ -31,3 +31,4 @@ cmake -GNinja \
         -B "$BUILD_DIR"
 
 nice cmake --build "$BUILD_DIR" --target all -- -j8
+cmake --install "$BUILD_DIR"
