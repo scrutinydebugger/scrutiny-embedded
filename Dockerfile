@@ -62,8 +62,7 @@ RUN apt-get update && apt-get install -y \
     gcc-arm-none-eabi \
     && rm -rf /var/lib/apt/lists/*
 
-FROM base AS citest
-RUN echo "test"
+FROM base AS CI
 
 FROM native-gcc as dev-sample
 WORKDIR /app
