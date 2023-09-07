@@ -4,6 +4,21 @@ pipeline {
     }
     stages {
         stage('All') {
+            stage('Docker'){
+                agent {
+                    dockerfile {
+                        reuseNode true
+                    }
+                }
+                stages {
+                    stage("Docker") {
+                        steps {
+                            sh 'echo "Done."'
+                        }
+                    }
+
+                }
+            }
             parallel{
                 stage('Static Analysis'){
                     agent {
