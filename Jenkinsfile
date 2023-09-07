@@ -3,19 +3,11 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage('Wait Docker'){
+        stage('Docker'){
             agent {
                 dockerfile {
                     reuseNode true
                 }
-            }
-            stages {
-                stage("Wait Docker") {
-                    steps {
-                        sh 'echo "Done."'
-                    }
-                }
-
             }
         }
         stage('All') {
