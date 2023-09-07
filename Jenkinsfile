@@ -9,12 +9,10 @@ pipeline {
                     reuseNode true
                 }
             }
-            stages {
-                stage {
-                    steps {
-                    }
-                }
+
+            steps {
             }
+
         }
         stage('All') {
             parallel{
