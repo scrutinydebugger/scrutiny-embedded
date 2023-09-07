@@ -6,6 +6,7 @@ pipeline {
         stage('Wait Docker'){
             agent {
                 dockerfile {
+                    additionalBuildArgs '--target static-analysis'
                     reuseNode true
                 }
             }
