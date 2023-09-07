@@ -3,22 +3,22 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage('All') {
-            stage('Docker'){
-                agent {
-                    dockerfile {
-                        reuseNode true
-                    }
-                }
-                stages {
-                    stage("Docker") {
-                        steps {
-                            sh 'echo "Done."'
-                        }
-                    }
-
+        stage('Docker'){
+            agent {
+                dockerfile {
+                    reuseNode true
                 }
             }
+            stages {
+                stage("Docker") {
+                    steps {
+                        sh 'echo "Done."'
+                    }
+                }
+
+            }
+        }
+        stage('All') {
             parallel{
                 stage('Static Analysis'){
                     agent {
