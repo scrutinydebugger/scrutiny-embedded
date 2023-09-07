@@ -3,14 +3,15 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage('Docker'){
+        stage('Wait Docker'){
             agent {
                 dockerfile {
                     reuseNode true
                 }
             }
             stages {
-
+                stage {
+                }
             }
         }
         stage('All') {
