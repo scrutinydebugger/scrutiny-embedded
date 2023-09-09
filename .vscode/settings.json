@@ -65,13 +65,14 @@
         "ranges": "cpp",
         "condition_variable": "cpp",
         "mutex": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "*.in": "plaintext"
     },
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },
     "[cpp]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-vscode.cpptools"
+        "editor.defaultFormatter": "ms-vscode.cpptools",
     },
     "cSpell.words": [
         "bitoffset",

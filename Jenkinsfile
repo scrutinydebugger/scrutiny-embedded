@@ -106,9 +106,9 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
-                                SCRUTINY_ENABLE_DATALOGGING=0 \
-                                SCRUTINY_SUPPORT_64BITS=1 \
-                                scripts/build.sh
+                                scripts/build.sh \
+                                -DSCRUTINY_ENABLE_DATALOGGING=0 \
+                                -DSCRUTINY_SUPPORT_64BITS=1
                                 '''
                             }
                         }
@@ -136,9 +136,9 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
-                                SCRUTINY_ENABLE_DATALOGGING=0 \
-                                SCRUTINY_SUPPORT_64BITS=0 \
-                                scripts/build.sh
+                                scripts/build.sh \
+                                -DSCRUTINY_ENABLE_DATALOGGING=0 \
+                                -DSCRUTINY_SUPPORT_64BITS=0
                                 '''
                             }
                         }
@@ -166,9 +166,9 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
-                                SCRUTINY_ENABLE_DATALOGGING=1 \
-                                SCRUTINY_SUPPORT_64BITS=0 \
-                                scripts/build.sh
+                                scripts/build.sh \
+                                -DSCRUTINY_ENABLE_DATALOGGING=1 \
+                                -DSCRUTINY_SUPPORT_64BITS=0
                                 '''
                             }
                         }

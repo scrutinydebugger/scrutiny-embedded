@@ -10,6 +10,8 @@ option(SCRUTINY_ENABLE_DATALOGGING "Enable datalogging feature" ON)
 option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(INSTALL_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/install)
+
 add_subdirectory(lib)
 add_subdirectory(projects)
 
@@ -18,14 +20,13 @@ if (SCRUTINY_BUILD_TEST)
 endif()
 
 
-set(INSTALL_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/install)
 
-install(
-    TARGETS scrutiny-embedded 
-        ARCHIVE DESTINATION ${INSTALL_FOLDER} 
-    )
+#install(
+#    TARGETS scrutiny-embedded 
+#        ARCHIVE DESTINATION ${INSTALL_FOLDER} 
+#    )
 
-install(DIRECTORY lib/inc 
-    DESTINATION ${INSTALL_FOLDER}
-)
+
+
+
 
