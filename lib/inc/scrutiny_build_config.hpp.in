@@ -1,0 +1,18 @@
+#ifndef ___SCRUTINY_BUILD_CONFIG_H___
+#define ___SCRUTINY_BUILD_CONFIG_H___
+
+#cmakedefine01 SCRUTINY_ENABLE_DATALOGGING
+#cmakedefine01 SCRUTINY_SUPPORT_64BITS
+
+#cmakedefine SCRUTINY_REQUEST_MAX_PROCESS_TIME_US @SCRUTINY_REQUEST_MAX_PROCESS_TIME_US@u // If a request takes more than this time to process, it will be nacked.
+#cmakedefine SCRUTINY_COMM_RX_TIMEOUT_US @SCRUTINY_COMM_RX_TIMEOUT_US@u                   // Reset reception state machine when no data is received for that amount of time.
+#cmakedefine SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US @SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US@u     // Disconnect session if no heartbeat request after this delay
+
+#define SCRUTINY_ACTUAL_PROTOCOL_VERSION SCRUTINY_PROTOCOL_VERSION(@SCRUTINY_PROTOCOL_VERSION_MAJOR@u, @SCRUTINY_PROTOCOL_VERSION_MINOR@u) // protocol version to use
+
+#if SCRUTINY_ENABLE_DATALOGGING
+    #cmakedefine SCRUTINY_DATALOGGING_MAX_SIGNAL @SCRUTINY_DATALOGGING_MAX_SIGNAL@u
+    #cmakedefine SCRUTINY_DATALOGGING_ENCODING @SCRUTINY_DATALOGGING_ENCODING@
+#endif
+
+#endif

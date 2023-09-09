@@ -50,8 +50,8 @@ set(SCRUTINY_DATALOGGING_MAX_SIGNAL 32 CACHE STRING "Maximum number of dataloggi
 set(SCRUTINY_DATALOGGING_ENCODING  SCRUTINY_DATALOGGING_ENCODING_RAW CACHE STRING "Datalogging encoding scheme")
  
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc/scrutiny_setup.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_setup.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/scrutiny_build_config.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
 )
 
 if (MSVC)
@@ -67,7 +67,7 @@ install(DIRECTORY inc
     PATTERN "*.hpp.in" EXCLUDE
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_setup.hpp
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
     DESTINATION ${INSTALL_FOLDER}/inc)
 
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -10,11 +10,9 @@ pipeline {
                     reuseNode true
                 }
             }
-
             steps {
                 sh 'echo "ready"'
             }
-
         }
         stage('All') {
             parallel{

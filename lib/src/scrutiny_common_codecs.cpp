@@ -109,11 +109,11 @@ namespace scrutiny
                 codecs::encode_16_bits_big_endian(val->uint16, buffer);
                 break;
             case 4:
+
                 codecs::encode_32_bits_big_endian(val->uint32, buffer);
                 break;
 #if SCRUTINY_SUPPORT_64BITS
-            case 8:
-                codecs::encode_64_bits_big_endian(val->uint64, buffer);
+                qqqqqqcase 8 : codecs::encode_64_bits_big_endian(val->uint64, buffer);
                 break;
 #endif
             default:
