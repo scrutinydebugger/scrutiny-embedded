@@ -24,6 +24,15 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[TX_BUFFER_SIZE];
 
+    TestUserCommand() : ScrutinyTest(),
+                        tb{},
+                        scrutiny_handler{},
+                        config{},
+                        _rx_buffer{0},
+                        _tx_buffer{0}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));

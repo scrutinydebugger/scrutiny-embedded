@@ -27,6 +27,8 @@ namespace scrutiny
     class MainHandler
     {
     public:
+        MainHandler(void);
+
         /// @brief Initialize the scrutiny Main Handler
         /// @param config A pointer to configuration object. A copy will be made, therefore given configuration can be on the stack.
         void init(const Config *config);

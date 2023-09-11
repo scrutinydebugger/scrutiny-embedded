@@ -16,6 +16,22 @@
 
 namespace scrutiny
 {
+    MainHandler::MainHandler(void) : m_timebase{},
+                                     m_comm_handler{},
+                                     m_processing_request{},
+                                     m_disconnect_pending{},
+                                     m_config{},
+                                     m_enabled{},
+                                     m_process_again_timestamp_taken{},
+                                     m_process_again_timestamp{},
+                                     m_codec{}
+#if SCRUTINY_ENABLE_DATALOGGING
+                                     ,
+                                     m_datalogging{}
+#endif
+    {
+    }
+
     void MainHandler::init(const Config *config)
     {
         m_processing_request = false;

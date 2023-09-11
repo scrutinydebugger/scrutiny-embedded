@@ -14,6 +14,7 @@
 
 class TestGetInfo : public ScrutinyTest
 {
+
 protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
@@ -28,7 +29,13 @@ protected:
     scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
-    TestGetInfo() : ScrutinyTest(), fixed_freq_loop(0x12345678, "Loop1"),
+    TestGetInfo() : ScrutinyTest(), tb{},
+                    scrutiny_handler{},
+                    config{},
+                    _rx_buffer{0},
+                    _tx_buffer{0},
+                    loops{nullptr, nullptr, nullptr},
+                    fixed_freq_loop(0x12345678, "Loop1"),
                     variable_freq_loop("Loop2"),
                     fixed_freq_loop_no_datalogging(100, "Loop3") {}
 

@@ -57,6 +57,19 @@ protected:
         {0x1234, scrutiny::VariableType::uint32},
         {0x5678, scrutiny::VariableType::float32}};
 
+    TestTriggerConditions() : ScrutinyTest(),
+                              tb{},
+                              scrutiny_handler{},
+                              config{},
+                              _rx_buffer{0},
+                              _tx_buffer{0},
+                              forbidden_buffer{0},
+                              forbidden_buffer2{0},
+                              readonly_buffer{0},
+                              readonly_buffer2{0}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));

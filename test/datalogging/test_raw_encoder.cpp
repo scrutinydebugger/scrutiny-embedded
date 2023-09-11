@@ -32,6 +32,19 @@ protected:
     uint8_t dlbuffer[128];
     uint8_t buffer_canary_2[512];
 
+    TestRawEncoder() : ScrutinyTest(),
+                       scrutiny_handler{},
+                       config{},
+                       dlconfig{},
+                       encoder{},
+                       _rx_buffer{},
+                       _tx_buffer{},
+                       buffer_canary_1{},
+                       dlbuffer{},
+                       buffer_canary_2{}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));

@@ -49,9 +49,15 @@ protected:
     RuntimePublishedValue rpvs[1] = {
         {0x8888, VariableType::float32}};
 
-    TestDatalogControl() : ScrutinyTest(), fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
+    TestDatalogControl() : ScrutinyTest(),
+                           tb{},
+                           scrutiny_handler{},
+                           config{},
+                           fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
                            variable_freq_loop("Loop2"),
-                           fixed_freq_loop_no_datalogging(100) {}
+                           fixed_freq_loop_no_datalogging(100)
+    {
+    }
 #if SCRUTINY_ENABLE_DATALOGGING
 
     uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
@@ -224,7 +230,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t 
 /// @brief Return a valid configuration used across the whole test suite
 datalogging::Configuration TestDatalogControl::get_valid_reference_configuration()
 {
-    datalogging::Configuration refconfig;
+    datalogging::Configuration refconfig{};
 
     refconfig.decimation = 0x1234;
     refconfig.probe_location = 123;
@@ -270,7 +276,7 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
     scrutiny_handler.comm()->receive_data(request_data, payload_size + 8);
     scrutiny_handler.process(0);
 
-    uint8_t tx_buffer[32];
+    uint8_t tx_buffer[32]{0};
     uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
@@ -295,7 +301,7 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
 
 TEST_F(TestDatalogControl, TestGetSetup)
 {
-    uint8_t tx_buffer[32];
+    uint8_t tx_buffer[32]{0};
     uint32_t buffer_size = sizeof(dlbuffer);
 
     uint8_t request_data[8] = {5, 1, 0, 0};
@@ -359,21 +365,21 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
 TEST_F(TestDatalogControl, TestConfigureBadLoopID)
 {
     constexpr uint8_t loop_id = 55; // This loop does not exists
-    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    datalogging::Configuration refconfig{get_valid_reference_configuration()};
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestConfigureNoDatalogSupport)
 {
     constexpr uint8_t loop_id = 2;
-    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    datalogging::Configuration refconfig{get_valid_reference_configuration()};
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
 
 TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
 {
     constexpr uint8_t loop_id = 1;
-    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    datalogging::Configuration refconfig{get_valid_reference_configuration()};
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
@@ -381,7 +387,7 @@ TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
 TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
 {
     constexpr uint8_t loop_id = 1;
-    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    datalogging::Configuration refconfig{get_valid_reference_configuration()};
     refconfig.trigger.operand_count = datalogging::MAX_OPERANDS + 1;
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
@@ -389,7 +395,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountOverflow)
 TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 {
     constexpr uint8_t loop_id = 1;
-    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    datalogging::Configuration refconfig{get_valid_reference_configuration()};
     refconfig.trigger.operand_count = 0; // Doesn'T match the condition set
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
 }
@@ -589,8 +595,8 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
 
 void TestDatalogControl::check_get_status(datalogging::DataLogger::State expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter)
 {
-    uint8_t tx_buffer[32];
-    uint16_t n_to_read;
+    uint8_t tx_buffer[32]{};
+    uint16_t n_to_read{0};
 
     uint8_t request_data[8] = {5, 5, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
@@ -651,7 +657,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0);
 
     // Empty transmit buffer
-    uint8_t dummy_buffer[32];
+    uint8_t dummy_buffer[32]{0};
     scrutiny_handler.comm()->pop_data(dummy_buffer, sizeof(dummy_buffer));
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow));
     scrutiny_handler.process(0);
@@ -690,8 +696,8 @@ TEST_F(TestDatalogControl, TestGetStatus)
 
 TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
 {
-    uint8_t tx_buffer[32];
-    uint16_t n_to_read;
+    uint8_t tx_buffer[32]{0};
+    uint16_t n_to_read{0};
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
@@ -760,8 +766,8 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 {
-    uint8_t tx_buffer[32];
-    uint16_t n_to_read;
+    uint8_t tx_buffer[32]{0};
+    uint16_t n_to_read{0};
 
     // Send a request and expect a FailureToProceed because no acquisition is ready.
     uint8_t request_data_before[8] = {5, 7, 0, 0};
@@ -780,8 +786,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    uint8_t tx_buffer[1024];
-    uint16_t n_to_read;
+    uint8_t tx_buffer[1024]{};
+    uint16_t n_to_read{};
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
@@ -842,8 +848,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
 {
-    uint8_t small_tx_buffer[32];
-    uint8_t big_dlbuffer[10000];
+    uint8_t small_tx_buffer[32]{0};
+    uint8_t big_dlbuffer[10000]{0};
 
     config.set_buffers(_rx_buffer, sizeof(_rx_buffer), small_tx_buffer, sizeof(small_tx_buffer));
     config.set_datalogging_buffers(big_dlbuffer, sizeof(big_dlbuffer));
@@ -938,7 +944,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
 
 TEST_F(TestDatalogControl, TestResetDatalogger)
 {
-    uint8_t tx_buffer[32];
+    uint8_t tx_buffer[32]{0};
     // Get Status
     check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
 

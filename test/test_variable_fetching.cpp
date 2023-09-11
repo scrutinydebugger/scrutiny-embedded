@@ -34,6 +34,19 @@ protected:
         scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer)),
         scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2))};
 
+    TestVariableFetching() : ScrutinyTest(),
+                             tb{},
+                             scrutiny_handler{},
+                             config{},
+                             _rx_buffer{},
+                             _tx_buffer{},
+                             forbidden_buffer{},
+                             forbidden_buffer2{},
+                             readonly_buffer{},
+                             readonly_buffer2{}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
