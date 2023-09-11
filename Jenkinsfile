@@ -3,19 +3,6 @@ pipeline {
         label 'docker'
     }
     stages {
-        stage('Wait Docker'){
-            agent {
-                dockerfile {
-                    additionalBuildArgs '--target CI'
-                    reuseNode true
-                }
-            }
-
-            steps {
-                sh 'echo "ready"'
-            }
-
-        }
         stage('All') {
             parallel{
                 stage('Static Analysis'){
