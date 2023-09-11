@@ -56,7 +56,6 @@ namespace scrutiny
 
         union OperandData
         {
-            OperandData() : literal{0.0f} {}
             struct
             {
                 float val;
@@ -81,9 +80,6 @@ namespace scrutiny
 
         struct Operand
         {
-            Operand() : type{OperandType::LITERAL}, data{}
-            {
-            }
             OperandType type;
             OperandData data;
         };
@@ -103,13 +99,6 @@ namespace scrutiny
 
         struct TriggerConfig
         {
-            TriggerConfig(void) : condition{},
-                                  operand_count{},
-                                  hold_time_100ns{},
-                                  operands{}
-            {
-            }
-
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
             void copy_from(TriggerConfig *other)
@@ -138,10 +127,6 @@ namespace scrutiny
         };
         struct LoggableItem
         {
-            LoggableItem() : type{}, data{{}}
-            {
-            }
-
             LoggableType type;
             union
             {
@@ -162,16 +147,6 @@ namespace scrutiny
 
         struct Configuration
         {
-
-            Configuration(void) : items_to_log{},
-                                  items_count{0},
-                                  decimation{0},
-                                  probe_location{0},
-                                  timeout_100ns{0},
-                                  trigger{}
-            {
-            }
-
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
             void copy_from(Configuration *other)

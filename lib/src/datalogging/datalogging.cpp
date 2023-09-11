@@ -106,7 +106,7 @@ namespace scrutiny
             }
             else if (operand->type == OperandType::RPV)
             {
-                RuntimePublishedValue rpv{};
+                RuntimePublishedValue rpv;
                 main_handler->get_rpv(operand->data.rpv.id, &rpv);
                 success = main_handler->get_rpv_read_callback()(rpv, val);
                 *variable_type = rpv.type;
