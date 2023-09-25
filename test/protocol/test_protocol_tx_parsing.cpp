@@ -13,6 +13,16 @@
 
 class TestTxParsing : public ScrutinyTest
 {
+public:
+    TestTxParsing() : ScrutinyTest(),
+                      comm{},
+                      response_buffer{},
+                      response{},
+                      _rx_buffer{},
+                      _tx_buffer{}
+    {
+    }
+
 protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;

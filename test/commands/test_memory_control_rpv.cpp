@@ -25,6 +25,15 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
+    TestMemoryControlRPV() : ScrutinyTest(),
+                             tb{},
+                             scrutiny_handler{},
+                             config{},
+                             _rx_buffer{0},
+                             _tx_buffer{0}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
@@ -325,12 +334,13 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     {
         const uint16_t id = p->first;
         request_data[index++] = (id >> 8) & 0xFF;
-        request_data[index++] = (id)&0xFF;
+        request_data[index++] = (id) & 0xFF;
     }
     add_crc(request_data, request_buffer_size - 4);
 
     scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
+    delete[] request_data;
 
     uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
@@ -470,6 +480,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
 
     scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
+    delete[] request_data;
 
     uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
@@ -701,6 +712,10 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s64, -90000000000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_f64, -5.123);
 #endif
+
+    delete[] request_data;
+    delete[] expected_response;
+    delete[] tx_buffer;
 }
 
 /*
@@ -794,7 +809,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 
     // Make request
 
-    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size)&0xFF};
+    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF};
 
     uint16_t index = 4;
     for (uint16_t i = 0; i < nb_write; i++)
@@ -847,8 +862,8 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size)&0xFF};
-    uint8_t expected_response[response_size] = {0x83, 5, 0, ((tx_data_size) >> 8) & 0xFF, (tx_data_size)&0xFF};
+    uint8_t request_data[request_size] = {3, 5, ((rx_data_size) >> 8) & 0xFF, (rx_data_size) & 0xFF};
+    uint8_t expected_response[response_size] = {0x83, 5, 0, ((tx_data_size) >> 8) & 0xFF, (tx_data_size) & 0xFF};
 
     uint16_t rx_index = 4;
     uint16_t tx_index = 5;

@@ -84,6 +84,23 @@ protected:
     uint8_t dlbuffer[128];
     uint8_t buffer_canary_2[512];
 
+    TestDatalogger() : ScrutinyTest(),
+                       tb{},
+                       scrutiny_handler{},
+                       config{},
+                       datalogger{},
+                       _rx_buffer{},
+                       _tx_buffer{},
+                       forbidden_buffer{},
+                       forbidden_buffer2{},
+                       readonly_buffer{},
+                       readonly_buffer2{},
+                       buffer_canary_1{},
+                       dlbuffer{},
+                       buffer_canary_2{}
+    {
+    }
+
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
@@ -249,7 +266,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     int32_t var2 = 0;
     float trigger_val = 0.0f;
 
-    datalogging::Configuration dlconfig;
+    datalogging::Configuration dlconfig{};
     dlconfig.items_count = 4;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
     dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
