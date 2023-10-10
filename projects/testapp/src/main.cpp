@@ -377,11 +377,11 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
-    config.set_datalogging_trigger_callback(datalogging_callback);
     config.set_user_command_callback(my_user_command);
 
 #if SCRUTINY_ENABLE_DATALOGGING
     static uint8_t datalogging_buffer[4096];
+    config.set_datalogging_trigger_callback(datalogging_callback);
     config.set_datalogging_buffers(datalogging_buffer, sizeof(datalogging_buffer));
 #endif
 
