@@ -60,6 +60,23 @@ namespace scrutiny
         /// allocated forever as no copy will be made
         /// @param loop_count Number of LoopHandlers
         void set_loops(LoopHandler **loops, uint8_t loop_count);
+
+        /// @brief Sets a callback to be called by Scrutiny after a request to the UserCommand function.
+        /// This generic feature allows the integrator to pass down some custom request/data to the application by leveraging the already
+        /// existing Scrutiny protocol.
+        /// @param callback The callback
+        inline void set_user_command_callback(user_command_callback_t callback)
+        {
+            m_user_command_callback = callback;
+        };
+
+        /// @brief Returns the actual user command callback. nullptr if unset
+        /// @return The callback
+        inline user_command_callback_t get_user_command_callback(void)
+        {
+            return m_user_command_callback;
+        };
+
 #if SCRUTINY_ENABLE_DATALOGGING
 
         /// @brief Sets the buffer used to store data when doing a datalogging acquisition
@@ -70,7 +87,7 @@ namespace scrutiny
         /// @brief Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
         /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
         /// the integrator responsibility to ensure thread safety
-        /// @param callback The callback to be call up datalogging trigger
+        /// @param callback The callback to be call upon datalogging trigger
         inline void set_datalogging_trigger_callback(datalogging::trigger_callback_t callback)
         {
             m_datalogger_trigger_callback = callback;
@@ -79,7 +96,7 @@ namespace scrutiny
         /// @brief Returns true if a callback has been set to support the UserCallback service call
         inline bool is_user_command_callback_set(void) const
         {
-            return user_command_callback != nullptr;
+            return m_user_command_callback != nullptr;
         }
 
         /// @brief Returns true if the communication buffers were sets
@@ -150,8 +167,6 @@ namespace scrutiny
         /// @brief When true, memory write are enabled. When false, no memory writ is permitted.
         bool memory_write_enable;
 
-        /// @brief Callback to be called on a User Command request.
-        user_command_callback_t user_command_callback; // Callback to call when a User Command service call is requested by the server
     private:
         uint8_t *m_rx_buffer;                           // The comm Rx buffer
         uint16_t m_rx_buffer_size;                      // The comm Rx buffer size
@@ -167,6 +182,9 @@ namespace scrutiny
         RpvWriteCallback m_rpv_write_callback;          // The callback to perform write operation on a Runtime Published Value (RPV)
         LoopHandler **m_loops;                          // The array of Loop Handler pointers
         uint8_t m_loop_count;                           // Number of Loop Handler in the array
+
+        /// @brief Callback to be called on a User Command request.
+        user_command_callback_t m_user_command_callback; // Callback to call when a User Command service call is requested by the server
 
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t *m_datalogger_buffer;                                  // Buffer that stores the datalogging data

@@ -410,7 +410,7 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
     {
 
         config.memory_write_enable = (i == 0) ? true : false;
-        config.user_command_callback = (i == 0) ? nullptr : dummy_callback;
+        config.set_user_command_callback((i == 0) ? nullptr : dummy_callback);
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t dl_buffer[128];
         config.set_datalogging_buffers(dl_buffer, sizeof(dl_buffer));
@@ -438,7 +438,7 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
         expected_response[5] |= 0x40;
 #endif
 
-        if (config.user_command_callback != nullptr)
+        if (config.is_user_command_callback_set())
         {
             expected_response[5] |= 0x20; // User command
         }

@@ -1314,7 +1314,7 @@ namespace scrutiny
         {
             uint16_t response_data_length = 0;
             // Calling user callback;
-            m_config.user_command_callback(request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
+            m_config.get_user_command_callback()(request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
             if (response_data_length > m_comm_handler.tx_buffer_size())
             {
                 code = protocol::ResponseCode::Overflow;
