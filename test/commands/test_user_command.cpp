@@ -69,7 +69,7 @@ void my_callback2(const uint8_t subfunction, const uint8_t *request_data, const 
 TEST_F(TestUserCommand, TestCommandCalled)
 {
     uint8_t tx_buffer[32];
-    config.user_command_callback = &my_callback1;
+    config.set_user_command_callback(my_callback1);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
@@ -95,7 +95,7 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     const scrutiny::protocol::ResponseCode code = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
-    config.user_command_callback = &my_callback2;
+    config.set_user_command_callback(my_callback2);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 

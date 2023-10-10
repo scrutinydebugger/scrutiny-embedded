@@ -301,6 +301,70 @@ void process_interactive_data()
     }
 }
 
+void datalogging_callback()
+{
+    std::cout << "Graph Triggered!" << std::endl;
+}
+
+void my_user_command(
+    const uint8_t subfunction,
+    const uint8_t *request_data,
+    const uint16_t request_data_length,
+    uint8_t *response_data,
+    uint16_t *response_data_length,
+    const uint16_t response_max_data_length)
+{
+    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction) << std::endl;
+
+    if (response_max_data_length < 1)
+    {
+        *response_data_length = 0;
+        return;
+    }
+
+    if (subfunction == 0 && response_max_data_length >= 8)
+    {
+        *response_data_length = 8;
+        response_data[0] = subfunction;
+        for (int i = 0; i < 7; i++)
+        {
+            response_data[i + 1] = i;
+        }
+    }
+    else if (subfunction == 1)
+    {
+        *response_data_length = response_max_data_length;
+        response_data[0] = subfunction;
+        for (int i = 1; i < response_max_data_length; i++)
+        {
+            response_data[i] = i;
+        }
+    }
+    else if (subfunction == 2)
+    {
+        *response_data_length = response_max_data_length + 1;
+    }
+    else if (subfunction == 3)
+    {
+        *response_data_length = 0;
+    }
+    else if (subfunction == 4)
+    {
+        const uint16_t max_echo_size = std::min(request_data_length, static_cast<uint16_t>(response_max_data_length - 1));
+        response_data[0] = subfunction;
+        for (uint16_t i = 0; i < max_echo_size; i++)
+        {
+            response_data[i + 1] = request_data[i];
+        }
+        *response_data_length = max_echo_size + 1;
+    }
+    else
+    {
+        *response_data_length = 1;
+        response_data[0] = 0xFF;
+    }
+}
+
 void process_scrutiny_lib(AbstractCommChannel *channel)
 {
     uint8_t buffer[1024];
@@ -313,6 +377,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
+    config.set_datalogging_trigger_callback(datalogging_callback);
+    config.set_user_command_callback(my_user_command);
 
 #if SCRUTINY_ENABLE_DATALOGGING
     static uint8_t datalogging_buffer[4096];

@@ -35,7 +35,7 @@ namespace scrutiny
         m_rpv_write_callback = nullptr;
         display_name = "";
         max_bitrate = 0;
-        user_command_callback = nullptr;
+        m_user_command_callback = nullptr;
         session_counter_seed = 0;
         memory_write_enable = true;
         m_loops = nullptr;
