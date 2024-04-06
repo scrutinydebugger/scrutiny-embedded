@@ -10,8 +10,14 @@ error() { >&2 echo -e "$RED[Error]$NC $1"; }
 fatal() { >&2 echo -e "$RED[Fatal]$NC $1"; exit ${2:-1}; }
 
 [ -z ${ARDUINO_PATH:+x} ] && fatal "ARDUINO_PATH must be set"
-[ ! -d "Arduino-AVR-CMake" ] && fatal "Submodule 'Arduino-AVR-CMake' missing. Did you forget to run : git submodule init?"
 
 info "ARDUINO_PATH=$ARDUINO_PATH"
 
-echo running
+mkdir -p build
+
+cmake -G Ninja \
+    -DARDUINO_PATH=$ARDUINO_PATH \
+    -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchain/avr.toolchain.cmake" \
+    -S . -B build
+
+ninja -C build

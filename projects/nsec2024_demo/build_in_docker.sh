@@ -7,5 +7,6 @@ docker build . -t nsec2024
 docker run \
     --volume $SCRIPT_DIR:$WORKDIR \
     -e ARDUINO_PATH=/usr/share/arduino \
+    -u $(id -u):$(id -g) \
     nsec2024 \
     bash -c $WORKDIR/build.sh
