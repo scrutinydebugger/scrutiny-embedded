@@ -12,12 +12,10 @@ fatal() { >&2 echo -e "$RED[Fatal]$NC $1"; exit ${2:-1}; }
 [ -z ${ARDUINO_PATH:+x} ] && fatal "ARDUINO_PATH must be set"
 
 info "ARDUINO_PATH=$ARDUINO_PATH"
-
 mkdir -p build
-
 cmake -G Ninja \
     -DARDUINO_PATH=$ARDUINO_PATH \
-    -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchain/avr.toolchain.cmake" \
+    -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchain/mega2526.toolchain.cmake" \
     -S . -B build
 
 ninja -C build
