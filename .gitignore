@@ -2,4 +2,4 @@
 .vscode
 out
 build
-*o
+*.o
