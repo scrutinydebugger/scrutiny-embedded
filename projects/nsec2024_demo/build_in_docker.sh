@@ -1,7 +1,9 @@
 #!/bin/bash
+set -euo pipefail 
+
 SCRIPT_DIR=$(realpath "$(dirname ${BASH_SOURCE[0]})")
 cd $SCRIPT_DIR
-WORKDIR=/tmp/nsec2024
+WORKDIR=$SCRIPT_DIR
 
 docker build . -t nsec2024
 docker run \

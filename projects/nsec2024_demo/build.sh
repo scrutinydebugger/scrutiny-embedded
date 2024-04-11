@@ -1,4 +1,6 @@
 #/bin/bash
+set -euo pipefail
+
 SCRIPT_DIR=$(realpath "$(dirname ${BASH_SOURCE[0]})")
 cd "$SCRIPT_DIR" 
 
@@ -11,6 +13,7 @@ mkdir -p build
 cmake -G Ninja \
     -DARDUINO_PATH=$ARDUINO_PATH \
     -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchain/mega2526.toolchain.cmake" \
+    --graphviz=project.dot \
     -S . -B build
 
 ninja -C build
