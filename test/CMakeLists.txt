@@ -80,6 +80,7 @@ else()
         set(LINKER_NO_PIE_OPTION "")
     endif()
 
+    target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
     target_link_options(${PROJECT_NAME} PUBLIC ${LINKER_NO_PIE_OPTION})
 endif()

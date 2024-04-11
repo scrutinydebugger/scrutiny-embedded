@@ -18,7 +18,6 @@ ExternalProject_Add(scrutiny-embedded
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DSCRUTINY_ENABLE_DATALOGGING=1
         -DSCRUTINY_SUPPORT_64BITS=1
-        -DSCRUTINY_BUILD_TEST=0
         -DINSTALL_FOLDER=${THIRDPARTY_INSTALL_DIR}/scrutiny
     BUILD_BYPRODUCTS
         ${THIRDPARTY_INSTALL_DIR}/scrutiny/libscrutiny-embedded.a
