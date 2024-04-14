@@ -425,6 +425,10 @@ namespace scrutiny
                     reset(); // Disable and reset all internal vars
                 }
             }
+            else
+            {
+                m_heartbeat_timestamp = m_timebase->get_timestamp();
+            }
         }
 
         bool CommHandler::heartbeat(const uint16_t challenge)
