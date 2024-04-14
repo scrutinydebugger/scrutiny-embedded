@@ -1,61 +1,59 @@
 #include <stdio.h>
 #include <Arduino.h>
 #include "scrutiny.hpp"
+#include "scrutiny_integration.hpp"
 
-uint8_t scrutiny_rx_buffer[64];
-uint8_t scrutiny_tx_buffer[128];
 
-volatile bool blink2 = true;
-
-scrutiny::Config config;
-scrutiny::MainHandler scrutiny_main;
-
-void update_scrutiny_main(){
-    static uint32_t last_timestamp = micros();
-    uint32_t timestamp = micros();
-    uint8_t buffer[16];
-    
-    // Connect the streams
-    uint16_t const nrx{ static_cast<uint16_t>(Serial.readBytes(buffer, sizeof(buffer))) };
-    if (nrx > 0){
-        scrutiny_main.comm()->receive_data(buffer, nrx);  
-    }
-    
-    uint16_t const ntx{ scrutiny_main.comm()->pop_data(buffer, sizeof(buffer)) };
-    Serial.write(buffer, ntx);
-
-    scrutiny_main.process((timestamp - last_timestamp) * 10);
-    last_timestamp = timestamp;
+void toggle_io(){
+    static int state=LOW;
+    digitalWrite(LED_BUILTIN, state);
+    state = (state == LOW) ? HIGH : LOW;
 }
+
 
 void setup() {
     Serial.begin(115200);
     pinMode(LED_BUILTIN, OUTPUT);
-    
-    // Setup Scrutiny
-    config.set_buffers(
-        scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer),     // Receive
-        scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer)      // Transmit 
-        );
-    scrutiny_main.init(&config);
+    nsec2024_demo_config_scrutiny();
 }
 
-constexpr int HIGH_LOW[2] {HIGH, LOW};
-void loop() {
-    static volatile bool blink = true;
-    static uint32_t last_timestamp = micros();
-    
-    uint8_t state = 0;
-    uint32_t timestamp = micros();
+void task_100hz(){
+    static volatile uint32_t var_100hz=0;
+    var_100hz++;
+    task_100hz_loop_handler.process();
+}
 
-    if (blink && blink2)
-    {
-        if (timestamp - last_timestamp > 200000){
-            state = (state+1)&0xFE;
-            digitalWrite(LED_BUILTIN, HIGH_LOW[state]);
-            last_timestamp = timestamp;
-        }
+void task_1hz(){
+    static volatile uint32_t var_1hz=0;
+    static int led_state = LOW;
+    var_1hz++;
+
+    digitalWrite(LED_BUILTIN, led_state);
+    led_state = (led_state == LOW) ? HIGH : LOW;
+
+    task_1hz_loop_handler.process();
+}
+
+
+void loop() {
+    static uint32_t last_timestamp = micros();
+    static uint32_t last_timestamp_task_1hz = micros();
+    static uint32_t last_timestamp_task_100hz = micros();
+
+    uint32_t const timestamp = micros();
+
+    if (timestamp - last_timestamp_task_100hz){
+        task_100hz();   // Could be in a different thread
+        last_timestamp_task_100hz = timestamp;
     }
 
-    update_scrutiny_main();
+    if (timestamp - last_timestamp_task_1hz){
+        task_1hz();   // Could be in a different thread
+        last_timestamp_task_1hz = timestamp;
+    }
+
+    uint32_t const timediff_100ns { (timestamp - last_timestamp) * 10};
+    task_idle_lopp_handler.process(timediff_100ns); // Variable Frequency loop. Need to provide the timestep
+    nsec2024_demo_update_scrutiny_main(timediff_100ns);
+    last_timestamp = timestamp;
 }

@@ -13,4 +13,4 @@ if [ -z ${ARDUINO_PORT:+x} ]; then
     ARDUINO_PORT=$DEFAULT_PORT
 fi
 
-avrdude -C "/etc/avrdude.conf" -p atmega2560 -cwiring -P $ARDUINO_PORT -b 115200 -F -D -U flash:w:$BINPATH -v -v
+avrdude -C "/etc/avrdude.conf" -p atmega2560 -cwiring -P $ARDUINO_PORT -b 115200 -F -D -V -U flash:w:$BINPATH -v 

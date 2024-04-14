@@ -23,7 +23,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(scrutiny-embedded)
 
 add_compile_options(
-    -Os 
+    -Os
     -Wall 
     -Wextra 
     -pedantic 
@@ -33,10 +33,9 @@ add_compile_options(
 
 target_link_libraries(scrutiny-embedded PUBLIC ArduinoCore) # Will inherit the build flags
 
-set(PROJECT_NAME_UNTAGGED ${PROJECT_NAME}_untagged)
-
 add_executable(${PROJECT_NAME} 
     src/main.cpp
+    src/scrutiny_integration.cpp
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX "_untagged.elf")
 
@@ -44,6 +43,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ArduinoCore
     scrutiny-embedded
     )
+
 
 set(WORKDIR ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_sfd)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -56,7 +56,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     # scrutiny add-alias ${WORKDIR} --file alias1.json
     # scrutiny add-alias ${WORKDIR} --file alias2.json
     COMMAND scrutiny make-sfd ${WORKDIR} ${PROJECT_NAME}.sfd
-    )
+)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     BYPRODUCTS ${PROJECT_NAME}.eep
@@ -65,7 +65,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         --set-section-flags=.eeprom=alloc,load
         --no-change-warnings --change-section-lma 
         .eeprom=0
-        $<TARGET_FILE:${PROJECT_NAME}>
+        ${PROJECT_NAME}.elf
         ${PROJECT_NAME}.eep)
 
 add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
