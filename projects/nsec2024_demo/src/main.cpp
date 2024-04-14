@@ -53,7 +53,7 @@ void loop() {
     }
 
     uint32_t const timediff_100ns { (timestamp - last_timestamp) * 10};
-    task_idle_lopp_handler.process(timediff_100ns); // Variable Frequency loop. Need to provide the timestep
+    task_idle_loop_handler.process(timediff_100ns); // Variable Frequency loop. Need to provide the timestep
     nsec2024_demo_update_scrutiny_main(timediff_100ns);
     last_timestamp = timestamp;
 }

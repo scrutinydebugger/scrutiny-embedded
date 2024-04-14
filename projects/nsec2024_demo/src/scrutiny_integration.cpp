@@ -5,11 +5,11 @@
 uint8_t scrutiny_rx_buffer[64];
 uint8_t scrutiny_tx_buffer[128];
 uint8_t scrutiny_datalogging_buffer[4096];  // Allow as much as possible
-scrutiny::VariableFrequencyLoopHandler task_idle_lopp_handler("Idle");
+scrutiny::VariableFrequencyLoopHandler task_idle_loop_handler("Idle");
 scrutiny::FixedFrequencyLoopHandler task_100hz_loop_handler(1e7/100); 
 scrutiny::FixedFrequencyLoopHandler task_1hz_loop_handler(1e7/1); 
 scrutiny::LoopHandler *scrutiny_loops[] = {
-    &task_idle_lopp_handler,
+    &task_idle_loop_handler,
     &task_100hz_loop_handler,
     &task_1hz_loop_handler,
 };
