@@ -34,29 +34,45 @@ add_compile_options(
 target_link_libraries(scrutiny-embedded PUBLIC ArduinoCore) # Will inherit the build flags
 
 set(PROJECT_NAME_UNTAGGED ${PROJECT_NAME}_untagged)
-add_executable(${PROJECT_NAME_UNTAGGED} 
+
+add_executable(${PROJECT_NAME} 
     src/main.cpp
 )
+set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX "_untagged.elf")
 
-target_link_libraries(${PROJECT_NAME_UNTAGGED} PRIVATE 
+target_link_libraries(${PROJECT_NAME} PRIVATE 
     ArduinoCore
     scrutiny-embedded
     )
-    
-arduino_avr_hex(${PROJECT_NAME_UNTAGGED})
 
-# Generate the SFD file
 set(WORKDIR ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_sfd)
-add_custom_command(
-    TARGET ${PROJECT_NAME_UNTAGGED}
-    DEPENDS ${PROJECT_NAME_UNTAGGED}.elf
-    BYPRODUCTS ${PROJECT_NAME}.sfd 
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${WORKDIR}
-        COMMAND scrutiny elf2varmap ${PROJECT_NAME_UNTAGGED}.elf --output ${WORKDIR} --loglevel error
-        COMMAND scrutiny get-firmware-id ${PROJECT_NAME_UNTAGGED}.elf --output ${WORKDIR} 
-        COMMAND scrutiny tag-firmware-id ${PROJECT_NAME_UNTAGGED}.elf ${PROJECT_NAME}.elf
-        COMMAND scrutiny make-metadata --output ${WORKDIR} --project-name ${PROJECT_NAME} --version "V1.0.0" --author "Pier-Yves Lessard"
-        # scrutiny add-alias ${WORKDIR} --file alias1.json
-        # scrutiny add-alias ${WORKDIR} --file alias2.json
-        COMMAND scrutiny make-sfd ${WORKDIR} ${PROJECT_NAME}.sfd
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    BYPRODUCTS ${PROJECT_NAME}.sfd  ${PROJECT_NAME}.elf
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${WORKDIR}
+    COMMAND scrutiny elf2varmap $<TARGET_FILE:${PROJECT_NAME}> --output ${WORKDIR} --loglevel error
+    COMMAND scrutiny get-firmware-id $<TARGET_FILE:${PROJECT_NAME}> --output ${WORKDIR} 
+    COMMAND scrutiny tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.elf
+    COMMAND scrutiny make-metadata --output ${WORKDIR} --project-name ${PROJECT_NAME} --version "V1.0.0" --author "Pier-Yves Lessard"
+    # scrutiny add-alias ${WORKDIR} --file alias1.json
+    # scrutiny add-alias ${WORKDIR} --file alias2.json
+    COMMAND scrutiny make-sfd ${WORKDIR} ${PROJECT_NAME}.sfd
     )
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    BYPRODUCTS ${PROJECT_NAME}.eep
+    COMMAND ${CMAKE_OBJCOPY} ARGS 
+        -O ihex -j .eeprom
+        --set-section-flags=.eeprom=alloc,load
+        --no-change-warnings --change-section-lma 
+        .eeprom=0
+        $<TARGET_FILE:${PROJECT_NAME}>
+        ${PROJECT_NAME}.eep)
+
+add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
+    DEPENDS ${PROJECT_NAME}.elf
+    BYPRODUCTS ${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} ARGS 
+        -O ihex -R .eeprom
+        ${PROJECT_NAME}.elf
+        ${PROJECT_NAME}.hex
+)
