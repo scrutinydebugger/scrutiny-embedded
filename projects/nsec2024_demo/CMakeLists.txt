@@ -10,31 +10,53 @@ include(cmake/arduino_hex.cmake)
 include(cmake/arduino_upload.cmake)
 include(cmake/scrutiny-postbuild.cmake)
 
-add_subdirectory(3rdparty)
+include(FetchContent)
+
+set(SCRUTINY_ENABLE_DATALOGGING 1)
+set(SCRUTINY_SUPPORT_64BITS 1)
+
+FetchContent_Declare(
+  scrutiny-embedded
+
+  GIT_REPOSITORY https://github.com/scrutinydebugger/scrutiny-embedded.git
+  GIT_TAG        nsec_demo
+)
+FetchContent_MakeAvailable(scrutiny-embedded)
+
+add_compile_options(
+    -Os 
+    -Wall 
+    -Wextra 
+    -pedantic 
+    -Werror 
+    -gdwarf-4
+)
+
+target_link_libraries(scrutiny-embedded PUBLIC ArduinoCore) # Will inherit the build flags
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${THIRDPARTY_INSTALL_DIR}/scrutiny/inc
-)
-
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -Os
-    -Wall
-    -Wextra
-    -pedantic
-    -Werror
-    -gdwarf-4
-)
-
-add_dependencies(${PROJECT_NAME} scrutiny-embedded)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ArduinoCore
-    ${THIRDPARTY_INSTALL_DIR}/scrutiny/libscrutiny-embedded.a
+    scrutiny-embedded
     )
     
 arduino_avr_hex(${PROJECT_NAME})
-#scrutiny_generate_sfd()
+
+# Generate the SFD file
+set(WORKDIR ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_sfd)
+add_custom_command(
+    TARGET ${PROJECT_NAME}
+    DEPENDS ${PROJECT_NAME}.elf
+    BYPRODUCTS ${PROJECT_NAME}.sfd 
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${WORKDIR}
+        COMMAND scrutiny elf2varmap ${PROJECT_NAME}.elf --output ${WORKDIR} --loglevel error
+        COMMAND scrutiny get-firmware-id ${PROJECT_NAME}.elf --output ${WORKDIR} 
+        COMMAND scrutiny tag-firmware-id ${PROJECT_NAME}.elf --inplace
+        COMMAND scrutiny make-metadata --output ${WORKDIR} --project-name ${PROJECT_NAME} --version "V1.0.0" --author "Pier-Yves Lessard"
+        # scrutiny add-alias ${WORKDIR} --file alias1.json
+        # scrutiny add-alias ${WORKDIR} --file alias2.json
+        COMMAND scrutiny make-sfd ${WORKDIR} ${PROJECT_NAME}.sfd
+    )

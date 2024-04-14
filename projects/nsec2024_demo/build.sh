@@ -12,7 +12,7 @@ info "ARDUINO_PATH=$ARDUINO_PATH"
 mkdir -p build
 cmake -G Ninja \
     -DARDUINO_PATH=$ARDUINO_PATH \
-    -DCMAKE_TOOLCHAIN_FILE="./cmake/toolchain/mega2526.toolchain.cmake" \
+    -DCMAKE_TOOLCHAIN_FILE="$SCRIPT_DIR/cmake/toolchain/mega2526.toolchain.cmake" \
     -S . -B build
 
 ninja -C build
