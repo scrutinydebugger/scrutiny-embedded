@@ -36,24 +36,24 @@ void task_1hz(){
 
 
 void loop() {
-    static uint32_t last_timestamp = micros();
-    static uint32_t last_timestamp_task_1hz = micros();
-    static uint32_t last_timestamp_task_100hz = micros();
+    static uint32_t last_timestamp_us = micros();
+    static uint32_t last_timestamp_task_1hz_us = micros();
+    static uint32_t last_timestamp_task_100hz_us = micros();
 
-    uint32_t const timestamp = micros();
+    uint32_t const timestamp_us = micros();
 
-    if (timestamp - last_timestamp_task_100hz){
+    if (timestamp_us - last_timestamp_task_100hz_us >= 1e6/100){
         task_100hz();   // Could be in a different thread
-        last_timestamp_task_100hz = timestamp;
+        last_timestamp_task_100hz_us = timestamp_us;
     }
 
-    if (timestamp - last_timestamp_task_1hz){
+    if (timestamp_us - last_timestamp_task_1hz_us >= 1e6/1){
         task_1hz();   // Could be in a different thread
-        last_timestamp_task_1hz = timestamp;
+        last_timestamp_task_1hz_us = timestamp_us;
     }
 
-    uint32_t const timediff_100ns { (timestamp - last_timestamp) * 10};
+    uint32_t const timediff_100ns { (timestamp_us - last_timestamp_us) * 10};
     task_idle_loop_handler.process(timediff_100ns); // Variable Frequency loop. Need to provide the timestep
     nsec2024_demo_update_scrutiny_main(timediff_100ns);
-    last_timestamp = timestamp;
+    last_timestamp_us = timestamp_us;
 }

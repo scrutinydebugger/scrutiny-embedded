@@ -11,6 +11,7 @@ target_compile_options(ArduinoFlags INTERFACE
     "-fdata-sections"
     "$<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>"
     "-mmcu=${ARDUINO_MCU}"
+    "-Os"
 )
 target_compile_definitions(ArduinoFlags INTERFACE
     "F_CPU=${ARDUINO_F_CPU}"
