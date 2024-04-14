@@ -126,7 +126,7 @@ namespace scrutiny
             /// @brief Returns the size of the transmission buffer
             inline uint16_t tx_buffer_size(void) const { return m_tx_buffer_size; }
 
-            // protected:
+        protected:
             void process_active_request(void);
             bool received_discover_request(void);
             bool received_connect_request(void);
