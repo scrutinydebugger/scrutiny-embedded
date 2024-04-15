@@ -151,7 +151,7 @@ namespace scrutiny
                     if (m_active_request.data_length > m_rx_buffer_size)
                     {
                         m_rx_error = RxError::Overflow;
-                        m_rx_state = RxFSMState::Error;
+                        m_rx_state = RxFSMState::Error; // Timeout will bring it back to wroking state
                         break;
                     }
 

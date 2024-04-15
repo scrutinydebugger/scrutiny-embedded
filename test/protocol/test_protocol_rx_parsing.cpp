@@ -106,6 +106,33 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
 }
 
 //=============================================================================
+TEST_F(TestRxParsing, TestRx_Discover_2_parts)
+{
+    uint8_t data[12] = {1, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68};
+    add_crc(data, 8);
+
+    for (unsigned int i = 0; i < sizeof(data); i++)
+    {
+        comm.receive_data(&data[0], i);
+        comm.process();
+
+        comm.receive_data(&data[i], sizeof(data) - i);
+
+        ASSERT_TRUE(comm.request_received()) << "i=" << i;
+        scrutiny::protocol::Request *req = comm.get_request();
+        EXPECT_EQ(req->command_id, 1) << "i=" << i;
+        EXPECT_EQ(req->subfunction_id, 2) << "i=" << i;
+        EXPECT_EQ(req->data_length, 4) << "i=" << i;
+        EXPECT_EQ(req->data[0], 0x7e) << "i=" << i;
+        EXPECT_EQ(req->data[1], 0x18) << "i=" << i;
+        EXPECT_EQ(req->data[2], 0xfc) << "i=" << i;
+        EXPECT_EQ(req->data[3], 0x68) << "i=" << i;
+
+        EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::None) << "i=" << i;
+    }
+}
+
+//=============================================================================
 TEST_F(TestRxParsing, TestRx_UseAllBuffer)
 {
     ASSERT_LT(sizeof(_rx_buffer), scrutiny::protocol::MAXIMUM_RX_BUFFER_SIZE); // Lengths are 16bits maximum by protocol definition

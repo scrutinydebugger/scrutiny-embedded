@@ -32,5 +32,5 @@ cmake -GNinja \
         -S "$APP_ROOT" \
         -B "$BUILD_DIR"
 
-nice cmake --build "$BUILD_DIR" --target all -- -j8
+nice cmake --build "$BUILD_DIR" --target all
 cmake --install "$BUILD_DIR"

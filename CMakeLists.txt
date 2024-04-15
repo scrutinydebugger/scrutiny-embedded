@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(scrutiny-embedded)
 
-option(SCRUTINY_BUILD_TEST "Activate test suite" ON)
+option(SCRUTINY_BUILD_TEST "Activate test suite" OFF)
 option(SCRUTINY_ENABLE_DATALOGGING "Enable datalogging feature" ON)
 option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" ON)
 option(INSTALL_FOLDER "Install folder" ${CMAKE_CURRENT_BINARY_DIR}/install )
