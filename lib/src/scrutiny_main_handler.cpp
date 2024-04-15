@@ -30,7 +30,6 @@ namespace scrutiny
                                      m_datalogging{}
 #endif
     {
-        static_cast<void>(const_cast<volatile uint8_t *>(scrutiny::software_id));
     }
 
     void MainHandler::init(const Config *config)
