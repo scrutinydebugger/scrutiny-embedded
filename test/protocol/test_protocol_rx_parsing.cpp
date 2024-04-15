@@ -111,13 +111,12 @@ TEST_F(TestRxParsing, TestRx_Discover_2_parts)
     uint8_t data[12] = {1, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68};
     add_crc(data, 8);
 
-    for (unsigned int i = 0; i < sizeof(data) - 1; i++)
+    for (unsigned int i = 0; i < sizeof(data); i++)
     {
-        comm.reset();
-        comm.receive_data(&data[0], 1 + i);
+        comm.receive_data(&data[0], i);
         comm.process();
 
-        comm.receive_data(&data[i + 1], sizeof(data) - 1 - i);
+        comm.receive_data(&data[i], sizeof(data) - i);
 
         ASSERT_TRUE(comm.request_received()) << "i=" << i;
         scrutiny::protocol::Request *req = comm.get_request();
