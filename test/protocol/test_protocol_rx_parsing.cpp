@@ -113,7 +113,7 @@ TEST_F(TestRxParsing, TestRx_Discover_2_parts)
 
     for (unsigned int i = 0; i < sizeof(data) - 1; i++)
     {
-        comm.reset_rx();
+        comm.reset();
         comm.receive_data(&data[0], 1 + i);
         comm.process();
 
