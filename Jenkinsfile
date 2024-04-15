@@ -16,7 +16,7 @@ pipeline {
             }
 
         }
-        stage('All') {
+        stage('Compilers') {
             parallel{
                 stage('Static Analysis'){
                     agent {
@@ -91,6 +91,78 @@ pipeline {
                         }
                     }
                 }
+                stage('AVR'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target avr-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=avr-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
+                        SCRUTINY_BUILD_TEST=0 \
+                        SCRUTINY_BUILD_TESTAPP=0 \
+                        scripts/build.sh
+                        '''
+                    }
+                }
+                stage('aarch64-linux-gcc'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target aarch64-linux-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=aarch64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/aarch64-linux-gcc.cmake \
+                        SCRUTINY_BUILD_TEST=1 \
+                        SCRUTINY_BUILD_TESTAPP=1 \
+                        scripts/build.sh
+                        '''
+                    }
+                }
+                stage('powerpc64-linux-gcc'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target powerpc64-linux-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=powerpc64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/powerpc64-linux-gcc.cmake \
+                        SCRUTINY_BUILD_TEST=1 \
+                        SCRUTINY_BUILD_TESTAPP=1 \
+                        scripts/build.sh
+                        '''
+                    }
+                }
+                stage('arm-none-gcc'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target arm-none-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=arm-none-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/arm-none-gcc.cmake \
+                        SCRUTINY_BUILD_TEST=0 \
+                        SCRUTINY_BUILD_TESTAPP=0 \
+                        scripts/build.sh
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Configs'){
+            parallel{
                 stage('GCC 64bits - No Datalogging'){
                     agent {
                         dockerfile {
@@ -179,74 +251,6 @@ pipeline {
                                 '''
                             }
                         }
-                    }
-                }
-                stage('AVR'){
-                    agent {
-                        dockerfile {
-                            additionalBuildArgs '--target avr-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=avr-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
-                            reuseNode true
-                        }
-                    }
-                    steps{
-                        sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
-                        SCRUTINY_BUILD_TEST=0 \
-                        SCRUTINY_BUILD_TESTAPP=0 \
-                        scripts/build.sh
-                        '''
-                    }
-                }
-                stage('aarch64-linux-gcc'){
-                    agent {
-                        dockerfile {
-                            additionalBuildArgs '--target aarch64-linux-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=aarch64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
-                            reuseNode true
-                        }
-                    }
-                    steps{
-                        sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/aarch64-linux-gcc.cmake \
-                        SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_BUILD_TESTAPP=1 \
-                        scripts/build.sh
-                        '''
-                    }
-                }
-                stage('powerpc64-linux-gcc'){
-                    agent {
-                        dockerfile {
-                            additionalBuildArgs '--target powerpc64-linux-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=powerpc64-linux-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
-                            reuseNode true
-                        }
-                    }
-                    steps{
-                        sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/powerpc64-linux-gcc.cmake \
-                        SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_BUILD_TESTAPP=1 \
-                        scripts/build.sh
-                        '''
-                    }
-                }
-                stage('arm-none-gcc'){
-                    agent {
-                        dockerfile {
-                            additionalBuildArgs '--target arm-none-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=arm-none-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
-                            reuseNode true
-                        }
-                    }
-                    steps{
-                        sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/arm-none-gcc.cmake \
-                        SCRUTINY_BUILD_TEST=0 \
-                        SCRUTINY_BUILD_TESTAPP=0 \
-                        scripts/build.sh
-                        '''
                     }
                 }
             }
