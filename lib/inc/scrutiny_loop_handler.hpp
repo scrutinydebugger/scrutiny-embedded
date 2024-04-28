@@ -24,7 +24,7 @@ namespace scrutiny
 {
     class MainHandler;
 
-    enum class LoopType
+    enum class LoopType : uint8_t
     {
         FIXED_FREQ,
         VARIABLE_FREQ
@@ -35,7 +35,7 @@ namespace scrutiny
         friend class scrutiny::MainHandler;
 
     public:
-        enum class Main2LoopMessageID
+        enum class Main2LoopMessageID : uint8_t
         {
 #if SCRUTINY_ENABLE_DATALOGGING
             RELEASE_DATALOGGER_OWNERSHIP,
@@ -45,7 +45,7 @@ namespace scrutiny
 #endif
         };
 
-        enum class Loop2MainMessageID
+        enum class Loop2MainMessageID : uint8_t
         {
 #if SCRUTINY_ENABLE_DATALOGGING
             DATALOGGER_OWNERSHIP_TAKEN,

@@ -30,7 +30,7 @@ namespace scrutiny
         {
         public:
             /// @brief The internal state of the datalogger
-            enum class State
+            enum class State : uint8_t
             {
                 IDLE,
                 CONFIGURED,

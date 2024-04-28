@@ -27,7 +27,7 @@ namespace scrutiny
         constexpr unsigned int MAX_OPERANDS = 4;
         static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
 
-        enum class EncodingType
+        enum class EncodingType : uint8_t
         {
             RAW
         };
@@ -39,14 +39,14 @@ namespace scrutiny
             float _float;
         };
 
-        enum class VariableTypeCompare
+        enum class VariableTypeCompare : uint8_t
         {
             _float = static_cast<int>(scrutiny::VariableType::float32),
             _uint = static_cast<int>(scrutiny::BiggestUint),
             _sint = static_cast<int>(scrutiny::BiggestSint)
         };
 
-        enum class OperandType
+        enum class OperandType : uint8_t
         {
             LITERAL = 0,
             VAR = 1,
@@ -84,7 +84,7 @@ namespace scrutiny
             OperandData data;
         };
 
-        enum class SupportedTriggerConditions
+        enum class SupportedTriggerConditions : uint8_t
         {
             AlwaysTrue = 0,         // Always true
             Equal = 1,              // Operand1 == Operand2
@@ -119,7 +119,7 @@ namespace scrutiny
             Operand operands[MAX_OPERANDS];       // The operand definitions
         };
 
-        enum class LoggableType
+        enum class LoggableType : uint8_t
         {
             MEMORY = 0,
             RPV = 1,

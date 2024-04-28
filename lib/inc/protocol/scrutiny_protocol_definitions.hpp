@@ -52,7 +52,7 @@ namespace scrutiny
             uint32_t crc;
         };
 
-        enum class CommandId
+        enum class CommandId : uint8_t
         {
             GetInfo = 0x01,
             CommControl = 0x02,
@@ -61,7 +61,7 @@ namespace scrutiny
             DataLogControl = 0x05
         };
 
-        enum class ResponseCode
+        enum class ResponseCode : uint8_t
         {
             OK = 0,
             InvalidRequest = 1,
@@ -74,14 +74,14 @@ namespace scrutiny
             ProcessAgain = 0xFF
         };
 
-        enum class RxError
+        enum class RxError : uint8_t
         {
             None,
             Overflow,
             Disabled
         };
 
-        enum class TxError
+        enum class TxError : uint8_t
         {
             None,
             Overflow,
@@ -97,7 +97,7 @@ namespace scrutiny
 
         namespace GetInfo
         {
-            enum class Subfunction
+            enum class Subfunction : uint8_t
             {
                 GetprotocolVersion = 1,
                 GetSoftwareId = 2,
@@ -110,7 +110,7 @@ namespace scrutiny
                 GetLoopDefinition = 9
             };
 
-            enum class MemoryRegionType
+            enum class MemoryRegionType : uint8_t
             {
                 ReadOnly = 0,
                 Forbidden = 1
@@ -122,7 +122,7 @@ namespace scrutiny
             extern const uint8_t DISCOVER_MAGIC[4];
             extern const uint8_t CONNECT_MAGIC[4];
 
-            enum class Subfunction
+            enum class Subfunction : uint8_t
             {
                 Discover = 1,
                 Heartbeat = 2,
@@ -134,7 +134,7 @@ namespace scrutiny
 
         namespace MemoryControl
         {
-            enum class Subfunction
+            enum class Subfunction : uint8_t
             {
                 Read = 1,
                 Write = 2,
@@ -146,7 +146,7 @@ namespace scrutiny
 
         namespace DataLogControl
         {
-            enum class Subfunction
+            enum class Subfunction : uint8_t
             {
                 GetSetup = 1,
                 ConfigureDatalog = 2,
