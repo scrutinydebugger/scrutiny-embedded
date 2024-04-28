@@ -31,7 +31,7 @@
 
 #define SCRUTINY_FABS(x) SCRUTINY_ABS(x)
 #define SCRUTINY_FMIN(x, y) SCRUTINY_MIN(x, y)
-#define SCRUTINY_FMAX(x, y) SCRUTINY_MAX(x, y)  
+#define SCRUTINY_FMAX(x, y) SCRUTINY_MAX(x, y)
 
 // ================================
 

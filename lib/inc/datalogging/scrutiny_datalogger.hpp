@@ -101,13 +101,13 @@ namespace scrutiny
             inline bool config_valid(void) const { return m_config_valid; }
 
             /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition
-            inline uint32_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
+            inline buffer_size_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
 
             /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete
-            uint32_t get_bytes_to_acquire_from_trigger_to_completion(void) const;
+            buffer_size_t get_bytes_to_acquire_from_trigger_to_completion(void) const;
 
             /// @brief Returns the number of bytes acquired since the trigger event.
-            uint32_t data_counter_since_trigger(void) const;
+            buffer_size_t data_counter_since_trigger(void) const;
 
             /// @brief Forces the trigger condition to be fulfilled, triggering an acquisition if the datalogger is armed.
             void force_trigger(void)
@@ -123,29 +123,29 @@ namespace scrutiny
             void stamp_trigger_point(void);
             bool acquisition_completed(void);
             void write_uncompressed_entry(void);
-            uint16_t read_next_entry_size(uint32_t *cursor);
+            uint16_t read_next_entry_size(buffer_size_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
             MainHandler *m_main_handler;           // A pointer to the main handler
-            uint32_t m_buffer_size;                // The datalogging buffer size
+            buffer_size_t m_buffer_size;           // The datalogging buffer size
             trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
-            Timebase *m_timebase;               // Pointer to the timebase for internal time tracking
-            Timebase *m_timebase_for_log;       // Pointer to timebase for time logging (can be in a different time domain)
-            State m_state;                      // Internal state
-            timestamp_t m_trigger_timestamp;    // The timestamp at which the trigger happened
-            uint32_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
+            Timebase *m_timebase;                    // Pointer to the timebase for internal time tracking
+            Timebase *m_timebase_for_log;            // Pointer to timebase for time logging (can be in a different time domain)
+            State m_state;                           // Internal state
+            timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
+            buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 
-            uint32_t m_remaining_data_to_write; // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
-            bool m_manual_trigger;              // Indicates if a manual trigger have been requested
+            buffer_size_t m_remaining_data_to_write; // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
+            bool m_manual_trigger;                   // Indicates if a manual trigger have been requested
 
-            Configuration m_config;              // The datalogger configuration object
-            bool m_config_valid;                 // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
-            DataEncoder m_encoder;               // The data encoder that reads the data and lay it into the datalogging buffer
-            uint16_t m_decimation_counter;       // counter used for effective decimation
-            uint16_t m_acquisition_id;           // The acquisition ID of the last acquired acquisition
-            uint16_t m_config_id;                // The configuration ID given by the server
-            uint32_t m_log_points_after_trigger; // Number of log entry counted after the trigger condition was fulfilled.
+            Configuration m_config;                   // The datalogger configuration object
+            bool m_config_valid;                      // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
+            DataEncoder m_encoder;                    // The data encoder that reads the data and lay it into the datalogging buffer
+            uint16_t m_decimation_counter;            // counter used for effective decimation
+            uint16_t m_acquisition_id;                // The acquisition ID of the last acquired acquisition
+            uint16_t m_config_id;                     // The configuration ID given by the server
+            buffer_size_t m_log_points_after_trigger; // Number of log entry counted after the trigger condition was fulfilled.
 
             struct
             {
