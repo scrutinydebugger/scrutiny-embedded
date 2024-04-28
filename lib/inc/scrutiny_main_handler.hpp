@@ -154,7 +154,7 @@ namespace scrutiny
 #endif
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        enum class DataloggingError
+        enum class DataloggingError : uint8_t
         {
             NoError,
             UnexpectedRelease,

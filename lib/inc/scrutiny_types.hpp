@@ -15,7 +15,7 @@
 namespace scrutiny
 {
     /// @brief Represents an storage endianness
-    enum class Endianness
+    enum class Endianness : uint8_t
     {
         LITTLE,
         BIG
@@ -32,7 +32,7 @@ namespace scrutiny
     typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
 
     /// @brief Represent a type type, meaning a type without its size. uint8, uin16, int32 all have type type uint.
-    enum class VariableTypeType
+    enum class VariableTypeType : uint8_t
     {
         _sint = 0 << 4,
         _uint = 1 << 4,
@@ -43,7 +43,7 @@ namespace scrutiny
     };
 
     /// @brief Represent a type size
-    enum class VariableTypeSize
+    enum class VariableTypeSize : uint8_t
     {
         _8 = 0,
         _16 = 1,
@@ -55,7 +55,7 @@ namespace scrutiny
     };
 
     /// @brief  Represent a datatype. Must match the python core module enum
-    enum class VariableType
+    enum class VariableType : uint8_t
     {
         sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),       // cppcheck-suppress[badBitmaskCheck]
         sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),     // cppcheck-suppress[badBitmaskCheck]

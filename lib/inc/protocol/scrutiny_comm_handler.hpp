@@ -131,7 +131,7 @@ namespace scrutiny
             bool received_discover_request(void);
             bool received_connect_request(void);
 
-            enum class RxFSMState
+            enum class RxFSMState : uint8_t
             {
                 WaitForCommand,
                 WaitForSubfunction,
@@ -142,7 +142,7 @@ namespace scrutiny
                 Error
             };
 
-            enum class State
+            enum class State : uint8_t
             {
                 Idle,
                 Receiving,
