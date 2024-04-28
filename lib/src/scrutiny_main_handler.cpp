@@ -1522,8 +1522,8 @@ namespace scrutiny
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
             stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
-            stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion = m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion;
-            stack.get_status.response_data.write_counter_since_trigger = m_datalogging.threadsafe_data.write_counter_since_trigger;
+            stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion = static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
+            stack.get_status.response_data.write_counter_since_trigger = static_cast<uint32_t>(m_datalogging.threadsafe_data.write_counter_since_trigger);
             code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
