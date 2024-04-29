@@ -1521,6 +1521,9 @@ namespace scrutiny
         }
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
+            static_assert(sizeof(stack.get_status.response_data.write_counter_since_trigger) >= sizeof(m_datalogging.threadsafe_data.write_counter_since_trigger), "Data cannot fit in protocol");
+            static_assert(sizeof(stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion) >= sizeof(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion), "Data cannot fit in protocol");
+
             stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
             stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion = static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
             stack.get_status.response_data.write_counter_since_trigger = static_cast<uint32_t>(m_datalogging.threadsafe_data.write_counter_since_trigger);
@@ -1529,6 +1532,10 @@ namespace scrutiny
         }
         case protocol::DataLogControl::Subfunction::GetAcquisitionMetadata:
         {
+            static_assert(sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+            static_assert(sizeof(stack.get_acq_metadata.response_data.data_size) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+            static_assert(sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+
             if (!datalogging_data_available())
             {
                 code = protocol::ResponseCode::FailureToProceed;
