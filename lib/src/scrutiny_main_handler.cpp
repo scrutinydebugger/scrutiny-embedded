@@ -1376,6 +1376,8 @@ namespace scrutiny
 
         case protocol::DataLogControl::Subfunction::GetSetup:
         {
+            static_assert(sizeof(stack.get_setup.response_data.buffer_size) >= sizeof(m_config.m_datalogger_buffer_size), "Data won't fit in protocol");
+
             stack.get_setup.response_data.buffer_size = static_cast<uint32_t>(m_config.m_datalogger_buffer_size);
             stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
             stack.get_setup.response_data.max_signal_count = SCRUTINY_DATALOGGING_MAX_SIGNAL;
