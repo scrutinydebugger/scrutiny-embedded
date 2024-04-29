@@ -48,6 +48,7 @@ set(SCRUTINY_PROTOCOL_VERSION_MAJOR 1 CACHE STRING "Protocol version major numbe
 set(SCRUTINY_PROTOCOL_VERSION_MINOR 0 CACHE STRING "Protocol version minor")
 set(SCRUTINY_DATALOGGING_MAX_SIGNAL 32 CACHE STRING "Maximum number of datalogging signal if datalogging is enabled")
 set(SCRUTINY_DATALOGGING_ENCODING  SCRUTINY_DATALOGGING_ENCODING_RAW CACHE STRING "Datalogging encoding scheme")
+set(SCRUTINY_DATALOGGING_BUFFER_32BITS  OFF CACHE STRING "Allow datalogging buffers bigger than 65536 bytes")
  
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/inc/scrutiny_build_config.hpp.in

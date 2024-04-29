@@ -188,7 +188,7 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t *m_datalogger_buffer;                                  // Buffer that stores the datalogging data
-        uint32_t m_datalogger_buffer_size;                             // size of the datalogging buffer
+        datalogging::buffer_size_t m_datalogger_buffer_size;           // size of the datalogging buffer
         datalogging::trigger_callback_t m_datalogger_trigger_callback; // Callback to call upon datalogging acquisition triggers
 #endif
     };

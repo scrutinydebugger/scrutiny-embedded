@@ -164,8 +164,8 @@ namespace scrutiny
         struct ThreadSafeData
         {
             datalogging::DataLogger::State datalogger_state;
-            uint32_t bytes_to_acquire_from_trigger_to_completion;
-            uint32_t write_counter_since_trigger;
+            datalogging::buffer_size_t bytes_to_acquire_from_trigger_to_completion;
+            datalogging::buffer_size_t write_counter_since_trigger;
         };
 
         struct

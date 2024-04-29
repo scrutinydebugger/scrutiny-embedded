@@ -314,12 +314,12 @@ namespace scrutiny
             return false;
         }
 
-        uint32_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
+        datalogging::buffer_size_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
         {
             return (m_state == State::TRIGGERED) ? m_remaining_data_to_write : 0;
         }
 
-        uint32_t DataLogger::data_counter_since_trigger(void) const
+        datalogging::buffer_size_t DataLogger::data_counter_since_trigger(void) const
         {
             // This counter gets reset when trigger happens.
             return (m_state == State::TRIGGERED) ? m_encoder.get_data_write_counter() : 0;

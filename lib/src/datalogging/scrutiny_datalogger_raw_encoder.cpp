@@ -20,16 +20,16 @@ namespace scrutiny
         /// @param buffer Output buffer
         /// @param max_size Maximum size to copy
         /// @return Number of bytes written
-        uint32_t RawFormatReader::read(uint8_t *buffer, const uint32_t max_size)
+        datalogging::buffer_size_t RawFormatReader::read(uint8_t *buffer, const datalogging::buffer_size_t max_size)
         {
-            uint32_t output_size = 0;
+            datalogging::buffer_size_t output_size = 0;
             if (error())
             {
                 return 0;
             }
 
-            const uint32_t write_cursor = m_encoder->get_write_cursor();
-            const uint32_t buffer_end = m_encoder->get_buffer_effective_size(); // Encoder may not use the full buffer
+            const datalogging::buffer_size_t write_cursor = m_encoder->get_write_cursor();
+            const datalogging::buffer_size_t buffer_end = m_encoder->get_buffer_effective_size(); // Encoder may not use the full buffer
             if (m_read_cursor == write_cursor && m_read_started)
             {
                 m_finished = true;
@@ -41,9 +41,9 @@ namespace scrutiny
             // Otherwise a 1 loop and 1 memcpy
             while (output_size < max_size)
             {
-                uint32_t transfer_size;
-                const uint32_t new_max = max_size - output_size;
-                const uint32_t right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
+                datalogging::buffer_size_t transfer_size;
+                const datalogging::buffer_size_t new_max = max_size - output_size;
+                const datalogging::buffer_size_t right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
                 transfer_size = right_hand_start_point - m_read_cursor;
                 transfer_size = SCRUTINY_MIN(transfer_size, new_max);
                 memcpy(&buffer[output_size], &m_encoder->m_buffer[m_read_cursor], transfer_size);
@@ -69,7 +69,7 @@ namespace scrutiny
         }
 
         /// @brief Returns the total number of bytes that the reader will read
-        uint32_t RawFormatReader::get_total_size(void) const
+        datalogging::buffer_size_t RawFormatReader::get_total_size(void) const
         {
             if (error())
             {
@@ -104,7 +104,7 @@ namespace scrutiny
                 }
             }
 
-            uint32_t cursor = m_next_entry_write_index * m_entry_size;
+            datalogging::buffer_size_t cursor = m_next_entry_write_index * m_entry_size;
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
@@ -146,7 +146,12 @@ namespace scrutiny
         }
 
         /// @brief  Init the encoder
-        void RawFormatEncoder::init(MainHandler *main_handler, Timebase *timebase_for_log, datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size)
+        void RawFormatEncoder::init(
+            MainHandler *main_handler,
+            Timebase *timebase_for_log,
+            datalogging::Configuration *config,
+            uint8_t *buffer,
+            datalogging::buffer_size_t buffer_size)
         {
             m_main_handler = main_handler;
             m_timebase_for_log = timebase_for_log;
@@ -223,7 +228,7 @@ namespace scrutiny
             m_reader.reset();
         }
 
-        uint32_t RawFormatEncoder::remaining_bytes_to_full() const
+        datalogging::buffer_size_t RawFormatEncoder::remaining_bytes_to_full() const
         {
             if (m_full)
             {
