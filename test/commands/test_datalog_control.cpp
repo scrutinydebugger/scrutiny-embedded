@@ -755,10 +755,10 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 4] = {0x85, 6, 0, 0, 16};
     uint16_t cursor = 5;
     cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
-    cursor += codecs::encode_16_bits_big_endian(0xabcd, &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(reader->get_entry_count(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(reader->get_total_size(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
+    cursor += codecs::encode_16_bits_big_endian((uint16_t)0xabcd, &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian((uint32_t)reader->get_entry_count(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian((uint32_t)reader->get_total_size(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian((uint32_t)scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
