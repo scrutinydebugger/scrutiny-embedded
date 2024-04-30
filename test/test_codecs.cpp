@@ -36,11 +36,11 @@ TEST_F(TestCodecs, EncodeBigEndian)
     uint8_t outbuffer[8];
 
     uint8_t buffer16[2] = {0x12, 0x34};
-    scrutiny::codecs::encode_16_bits_big_endian(0x1234u, outbuffer);
+    scrutiny::codecs::encode_16_bits_big_endian((uint16_t)0x1234u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer16, sizeof(buffer16));
 
     uint8_t buffer32[4] = {0x12, 0x34, 0x56, 0x78};
-    scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, outbuffer);
+    scrutiny::codecs::encode_32_bits_big_endian((uint32_t)0x12345678u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer32, sizeof(buffer32));
 
     uint8_t buffer_float[4] = {0x40, 0x49, 0x0f, 0xda};
@@ -49,7 +49,7 @@ TEST_F(TestCodecs, EncodeBigEndian)
 
 #if SCRUTINY_SUPPORT_64BITS
     uint8_t buffer64[8] = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
-    scrutiny::codecs::encode_64_bits_big_endian(0x123456789abcdef0u, outbuffer);
+    scrutiny::codecs::encode_64_bits_big_endian((uint64_t)0x123456789abcdef0u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer64, sizeof(buffer64));
 #endif
 }
@@ -76,11 +76,11 @@ TEST_F(TestCodecs, EncodeLittleEndian)
     uint8_t outbuffer[8];
 
     uint8_t buffer16[2] = {0x34, 0x12};
-    scrutiny::codecs::encode_16_bits_little_endian(0x1234u, outbuffer);
+    scrutiny::codecs::encode_16_bits_little_endian((uint16_t)0x1234u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer16, sizeof(buffer16));
 
     uint8_t buffer32[4] = {0x78, 0x56, 0x34, 0x12};
-    scrutiny::codecs::encode_32_bits_little_endian(0x12345678u, outbuffer);
+    scrutiny::codecs::encode_32_bits_little_endian((uint32_t)0x12345678u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer32, sizeof(buffer32));
 
     uint8_t buffer_float[4] = {0xda, 0x0f, 0x49, 0x40};
@@ -89,7 +89,7 @@ TEST_F(TestCodecs, EncodeLittleEndian)
 
 #if SCRUTINY_SUPPORT_64BITS
     uint8_t buffer64[8] = {0xf0, 0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12};
-    scrutiny::codecs::encode_64_bits_little_endian(0x123456789abcdef0u, outbuffer);
+    scrutiny::codecs::encode_64_bits_little_endian((uint64_t)0x123456789abcdef0u, outbuffer);
     EXPECT_BUF_EQ(outbuffer, buffer64, sizeof(buffer64));
 #endif
 }

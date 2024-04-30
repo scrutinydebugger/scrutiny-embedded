@@ -25,12 +25,18 @@ namespace scrutiny
             return sizeof(uint8_t);
         }
 
+        template <class T>
+        inline uint8_t encode_8_bits(const T value, uint8_t *buff) = delete;
+
         inline uint8_t encode_16_bits_big_endian(const uint16_t value, uint8_t *buff)
         {
             buff[0] = static_cast<uint8_t>((value >> 8) & 0xFF);
             buff[1] = static_cast<uint8_t>((value >> 0) & 0xFF);
             return sizeof(uint16_t);
         }
+
+        template <class T>
+        inline uint8_t encode_16_bits_big_endian(const T value, uint8_t *buff) = delete;
 
         inline uint8_t encode_32_bits_big_endian(const uint32_t value, uint8_t *buff)
         {
@@ -41,6 +47,9 @@ namespace scrutiny
             return sizeof(uint32_t);
         }
 
+        template <class T>
+        inline uint8_t encode_32_bits_big_endian(const T value, uint8_t *buff) = delete;
+
         inline uint8_t encode_float_big_endian(const float value, uint8_t *buff)
         {
             uint32_t uv;
@@ -48,6 +57,10 @@ namespace scrutiny
             encode_32_bits_big_endian(uv, buff);
             return sizeof(float);
         }
+
+        template <class T>
+        inline uint8_t encode_float_big_endian(const T value, uint8_t *buff) = delete;
+
 #if SCRUTINY_SUPPORT_64BITS
         inline uint8_t encode_64_bits_big_endian(const uint64_t value, uint8_t *buff)
         {
@@ -62,6 +75,9 @@ namespace scrutiny
 
             return sizeof(uint64_t);
         }
+
+        template <class T>
+        inline uint8_t encode_64_bits_big_endian(const T value, uint8_t *buff) = delete;
 #endif
 
         inline uint8_t encode_16_bits_little_endian(const uint16_t value, uint8_t *buff)
@@ -70,6 +86,9 @@ namespace scrutiny
             buff[0] = static_cast<uint8_t>((value >> 0) & 0xFFu);
             return sizeof(uint16_t);
         }
+
+        template <class T>
+        inline uint8_t encode_16_bits_little_endian(const T value, uint8_t *buff) = delete;
 
         inline uint8_t encode_32_bits_little_endian(const uint32_t value, uint8_t *buff)
         {
@@ -80,6 +99,9 @@ namespace scrutiny
             return sizeof(uint32_t);
         }
 
+        template <class T>
+        inline uint8_t encode_32_bits_little_endian(const T value, uint8_t *buff) = delete;
+
         inline uint8_t encode_float_little_endian(const float value, uint8_t *buff)
         {
             uint32_t uv;
@@ -87,6 +109,9 @@ namespace scrutiny
             encode_32_bits_little_endian(uv, buff);
             return sizeof(float);
         }
+
+        template <class T>
+        inline uint8_t encode_float_little_endian(const T value, uint8_t *buff) = delete;
 
 #if SCRUTINY_SUPPORT_64BITS
         inline uint8_t encode_64_bits_little_endian(const uint64_t value, uint8_t *buff)
@@ -101,6 +126,9 @@ namespace scrutiny
             buff[0] = static_cast<uint8_t>((value >> 0) & 0xFFu);
             return sizeof(uint64_t);
         }
+        template <class T>
+        inline uint8_t encode_64_bits_little_endian(const T value, uint8_t *buff) = delete;
+
         inline uint64_t decode_64_bits_big_endian(const uint8_t *buff)
         {
             uint_fast64_t v = 0;
