@@ -216,3 +216,20 @@ TEST_F(TestRxParsing, TestRx_BadCRC)
 
     ASSERT_FALSE(comm.request_received());
 }
+
+//=============================================================================
+TEST_F(TestRxParsing, TestRx_ReceiveResponseBit_Ignore)
+{
+    uint8_t data[12] = {0x81, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68};
+    add_crc(data, sizeof(data) - 4);
+    EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::None);
+    comm.receive_data(data, sizeof(data));
+
+    EXPECT_FALSE(comm.request_received());
+    EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::InvalidCommand);
+
+    tb.step(SCRUTINY_COMM_RX_TIMEOUT_US * 10);
+    data[0] = 0x1;
+    comm.receive_data(data, 1);
+    EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::None);
+}

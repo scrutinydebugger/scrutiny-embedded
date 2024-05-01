@@ -164,7 +164,7 @@ namespace scrutiny
         /// @brief The display name to be broadcasted during discovery phase. This value will be shown to the user.
         const char *display_name;
 
-        /// @brief When true, memory write are enabled. When false, no memory writ is permitted.
+        /// @brief When true, memory write are enabled. When false, no memory write is permitted.
         bool memory_write_enable;
 
     private:

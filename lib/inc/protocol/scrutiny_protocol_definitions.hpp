@@ -78,7 +78,8 @@ namespace scrutiny
         {
             None,
             Overflow,
-            Disabled
+            Disabled,
+            InvalidCommand
         };
 
         enum class TxError : uint8_t
