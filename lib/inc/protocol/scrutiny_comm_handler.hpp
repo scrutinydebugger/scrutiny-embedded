@@ -60,7 +60,7 @@ namespace scrutiny
 
             /// @brief Tells if the Request object has a CRC that matches its payload content.
             /// @param req The request to check
-            /// @return True if the CRC is valid. False otherwise
+            /// @return True if the CRC is valid. False o therwise
             bool check_crc(const Request *req) const;
 
             // Writes the CRC property of the response based on the payload content.
@@ -162,17 +162,20 @@ namespace scrutiny
             bool m_first_heartbeat_received;     // Flag indicating if the first heartbeat has been received.
 
             // Reception
-            uint8_t *m_rx_buffer;            // The reception buffer
-            uint16_t m_rx_buffer_size;       // The reception buffer size
-            uint8_t *m_tx_buffer;            // The transmission buffer
-            uint16_t m_tx_buffer_size;       // The transmission buffer size
-            Request m_active_request;        // The request presently being received
-            RxFSMState m_rx_state;           // Reception Finite State Machine state
-            RxError m_rx_error;              // Last reception error code
-            bool m_request_received;         // Flag indicating if a full request has been received
-            uint8_t m_crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
-            uint8_t m_length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
-            uint16_t m_data_bytes_received;  // Number of bytes part of the data payload received up to now
+            uint8_t *m_rx_buffer;      // The reception buffer
+            uint16_t m_rx_buffer_size; // The reception buffer size
+            uint8_t *m_tx_buffer;      // The transmission buffer
+            uint16_t m_tx_buffer_size; // The transmission buffer size
+            Request m_active_request;  // The request presently being received
+            RxFSMState m_rx_state;     // Reception Finite State Machine state
+            RxError m_rx_error;        // Last reception error code
+            bool m_request_received;   // Flag indicating if a full request has been received
+            union
+            {
+                uint8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
+                uint8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
+                uint16_t data_bytes_received;  // Number of bytes part of the data payload received up to now
+            } m_per_state_data;
             timestamp_t m_last_rx_timestamp; // Timestamp at which the last chunk of data was received
 
             // Transmission

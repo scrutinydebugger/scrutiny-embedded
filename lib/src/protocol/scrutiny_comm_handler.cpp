@@ -86,15 +86,22 @@ namespace scrutiny
             // Process each bytes
             while (i < len && !m_request_received && m_rx_state != RxFSMState::Error)
             {
-
                 switch (m_rx_state) // FSM
                 {
                 case RxFSMState::WaitForCommand:
                 {
-                    m_active_request.command_id = data[i] & 0x7F;
-                    m_rx_state = RxFSMState::WaitForSubfunction;
-                    i += 1;
-                    break;
+                    if ((data[i] & 0x80) != 0) // Invalid command
+                    {
+                        m_rx_error = RxError::InvalidCommand;
+                        m_rx_state = RxFSMState::Error;
+                    }
+                    else
+                    {
+                        m_active_request.command_id = data[i];
+                        m_rx_state = RxFSMState::WaitForSubfunction;
+                        i += 1;
+                        break;
+                    }
                 }
 
                 case RxFSMState::WaitForSubfunction:
@@ -102,32 +109,33 @@ namespace scrutiny
                     m_active_request.subfunction_id = data[i];
                     m_rx_state = RxFSMState::WaitForLength;
                     i += 1;
+                    m_per_state_data.length_bytes_received = 0;
                     break;
                 }
 
                 case RxFSMState::WaitForLength:
                 {
                     bool next_state = false;
-                    if (m_length_bytes_received == 0)
+                    if (m_per_state_data.length_bytes_received == 0)
                     {
                         if ((len - i) >= 2)
                         {
                             m_active_request.data_length = (static_cast<uint16_t>(data[i]) << 8u) | (static_cast<uint16_t>(data[i + 1]));
-                            m_length_bytes_received = 2;
+                            m_per_state_data.length_bytes_received = 2;
                             i += 2;
                             next_state = true;
                         }
                         else
                         {
                             m_active_request.data_length = static_cast<uint16_t>(data[i]) << 8u;
-                            m_length_bytes_received = 1;
+                            m_per_state_data.length_bytes_received = 1;
                             i += 1;
                         }
                     }
                     else
                     {
                         m_active_request.data_length |= static_cast<uint16_t>(data[i]);
-                        m_length_bytes_received = 2;
+                        m_per_state_data.length_bytes_received = 2;
                         i += 1;
                         next_state = true;
                     }
@@ -136,10 +144,12 @@ namespace scrutiny
                     {
                         if (m_active_request.data_length == 0)
                         {
+                            m_per_state_data.crc_bytes_received = 0;
                             m_rx_state = RxFSMState::WaitForCRC;
                         }
                         else
                         {
+                            m_per_state_data.data_bytes_received = 0;
                             m_rx_state = RxFSMState::WaitForData;
                         }
                     }
@@ -156,14 +166,14 @@ namespace scrutiny
                     }
 
                     const uint16_t available_bytes = static_cast<uint16_t>(len - i);
-                    const uint16_t missing_bytes = m_active_request.data_length - m_data_bytes_received;
+                    const uint16_t missing_bytes = m_active_request.data_length - m_per_state_data.data_bytes_received;
                     const uint16_t data_bytes_to_read = (available_bytes >= missing_bytes) ? missing_bytes : available_bytes;
 
-                    memcpy(&m_rx_buffer[m_data_bytes_received], &data[i], data_bytes_to_read);
-                    m_data_bytes_received += data_bytes_to_read;
+                    memcpy(&m_rx_buffer[m_per_state_data.data_bytes_received], &data[i], data_bytes_to_read);
+                    m_per_state_data.data_bytes_received += data_bytes_to_read;
                     i += data_bytes_to_read;
 
-                    if (m_data_bytes_received >= m_active_request.data_length)
+                    if (m_per_state_data.data_bytes_received >= m_active_request.data_length)
                     {
                         m_rx_state = RxFSMState::WaitForCRC;
                     }
@@ -173,19 +183,19 @@ namespace scrutiny
 
                 case RxFSMState::WaitForCRC:
                 {
-                    if (m_crc_bytes_received == 0)
+                    if (m_per_state_data.crc_bytes_received == 0)
                     {
                         m_active_request.crc = static_cast<uint32_t>(data[i]) << 24u;
                     }
-                    else if (m_crc_bytes_received == 1)
+                    else if (m_per_state_data.crc_bytes_received == 1)
                     {
                         m_active_request.crc |= static_cast<uint32_t>(data[i]) << 16u;
                     }
-                    else if (m_crc_bytes_received == 2)
+                    else if (m_per_state_data.crc_bytes_received == 2)
                     {
                         m_active_request.crc |= static_cast<uint32_t>(data[i]) << 8u;
                     }
-                    else if (m_crc_bytes_received == 3)
+                    else if (m_per_state_data.crc_bytes_received == 3)
                     {
                         m_active_request.crc |= static_cast<uint32_t>(data[i]) << 0;
                         m_state = State::Idle;
@@ -200,7 +210,7 @@ namespace scrutiny
                         }
                     }
 
-                    m_crc_bytes_received++;
+                    m_per_state_data.crc_bytes_received++;
                     i += 1;
                     break;
                 }
@@ -502,9 +512,6 @@ namespace scrutiny
             m_active_request.reset();
             m_rx_state = RxFSMState::WaitForCommand;
             m_request_received = false;
-            m_crc_bytes_received = 0;
-            m_length_bytes_received = 0;
-            m_data_bytes_received = 0;
             m_rx_error = RxError::None;
             m_last_rx_timestamp = m_timebase->get_timestamp();
 

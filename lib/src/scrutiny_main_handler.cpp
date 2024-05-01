@@ -407,7 +407,6 @@ namespace scrutiny
 
         if (m_comm_handler.request_received() && !m_processing_request)
         {
-
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
