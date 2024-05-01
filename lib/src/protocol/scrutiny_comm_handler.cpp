@@ -100,8 +100,8 @@ namespace scrutiny
                         m_active_request.command_id = data[i];
                         m_rx_state = RxFSMState::WaitForSubfunction;
                         i += 1;
-                        break;
                     }
+                    break;
                 }
 
                 case RxFSMState::WaitForSubfunction:
