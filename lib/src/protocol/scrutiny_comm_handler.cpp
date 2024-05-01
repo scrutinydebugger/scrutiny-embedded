@@ -63,18 +63,15 @@ namespace scrutiny
             }
 
             // Handle rx timeouts. Start a new reception if no data for too long
-            if (m_rx_state != RxFSMState::WaitForCommand && len != 0)
+            if (len != 0)
             {
                 if (m_timebase->has_expired(m_last_rx_timestamp, SCRUTINY_COMM_RX_TIMEOUT_US * 10))
                 {
                     reset_rx();
                     m_state = State::Idle;
                 }
-            }
 
-            // Update rx timestamp
-            if (len != 0)
-            {
+                // Update rx timestamp
                 m_last_rx_timestamp = m_timebase->get_timestamp();
 
                 if (m_state == State::Idle)
@@ -82,7 +79,6 @@ namespace scrutiny
                     m_state = State::Receiving;
                 }
             }
-
             // Process each bytes
             while (i < len && !m_request_received && m_rx_state != RxFSMState::Error)
             {
