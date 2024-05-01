@@ -175,6 +175,7 @@ namespace scrutiny
 
                     if (m_per_state_data.data_bytes_received >= m_active_request.data_length)
                     {
+                        m_per_state_data.crc_bytes_received = 0;
                         m_rx_state = RxFSMState::WaitForCRC;
                     }
 
