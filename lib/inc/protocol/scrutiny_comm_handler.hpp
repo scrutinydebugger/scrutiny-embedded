@@ -60,7 +60,7 @@ namespace scrutiny
 
             /// @brief Tells if the Request object has a CRC that matches its payload content.
             /// @param req The request to check
-            /// @return True if the CRC is valid. False o therwise
+            /// @return True if the CRC is valid. False otherwise
             bool check_crc(const Request *req) const;
 
             // Writes the CRC property of the response based on the payload content.

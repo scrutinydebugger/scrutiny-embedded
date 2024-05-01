@@ -487,7 +487,7 @@ namespace scrutiny
             header[3] = (response->data_length >> 8) & 0xFF;
             header[4] = response->data_length & 0xFF;
 
-            uint32_t crc = tools::crc32(header, sizeof(header));
+            const uint32_t crc = tools::crc32(header, sizeof(header));
             response->crc = tools::crc32(response->data, response->data_length, crc);
         }
 
