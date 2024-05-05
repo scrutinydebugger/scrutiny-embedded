@@ -122,6 +122,9 @@
         "projects/testapp/src/file2.cpp": {
             "docstring": "Placeholder file for variable extraction test"
         },
+        "projects/testapp/src/file3.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
         "projects/testapp/src/comm_channels/udp_bridge.cpp": {
             "docstring": "Class that open a UDP port and handle a single client."
         },
@@ -129,6 +132,9 @@
             "docstring": "Placeholder file for variable extraction test"
         },
         "projects/testapp/include/file2.hpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/include/file3.hpp": {
             "docstring": "Placeholder file for variable extraction test"
         },
         "projects/testapp/include/comm_channels/udp_bridge.hpp": {
