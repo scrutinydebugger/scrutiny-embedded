@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/file1.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/file2.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/file3.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.cpp

@@ -8,6 +8,7 @@
 
 #include "file1.hpp"
 #include "file2.hpp"
+#include "file3.hpp"
 #include "argument_parser.hpp"
 #include "scrutiny.hpp"
 #include "abstract_comm_channel.hpp"
@@ -255,6 +256,7 @@ void init_all_values()
 {
     file1SetValues();
     file2SetValues();
+    file3SetValues();
     funcInFile1(1, 2);
     file2func1();
     file2func1(123);
