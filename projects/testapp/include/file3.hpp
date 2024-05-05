@@ -65,7 +65,7 @@ namespace FileNamespace
                     File3EnumInClass p2 : 10;
                     File3EnumInClass p3 : 10;
                 } field3_enum_bitfields;
-            };
+            } field3;
         } m_file3_complex_struct;
     };
 }

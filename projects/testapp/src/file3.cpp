@@ -20,9 +20,9 @@ void file3SetValues()
 
     file3_test_class.m_file3_complex_struct.field1 = 0x11223344;
     file3_test_class.m_file3_complex_struct.field2 = 0x55667788;
-    file3_test_class.m_file3_complex_struct.field3_u32 = 0x12345678;
-    file3_test_class.m_file3_complex_struct.field3_u16.p0 = 0xBCDE;
-    file3_test_class.m_file3_complex_struct.field3_u8.p3 = 0xAA;
-    file3_test_class.m_file3_complex_struct.field3_enum_bitfields.p0 = FileNamespace::File3TestClass::File3EnumInClass::CCC;
+    file3_test_class.m_file3_complex_struct.field3.field3_u32 = 0x12345678;
+    file3_test_class.m_file3_complex_struct.field3.field3_u16.p0 = 0xBCDE;
+    file3_test_class.m_file3_complex_struct.field3.field3_u8.p3 = 0xAA;
+    file3_test_class.m_file3_complex_struct.field3.field3_enum_bitfields.p0 = FileNamespace::File3TestClass::File3EnumInClass::CCC;
     // Should read field3 = AA34BCC2
 }
