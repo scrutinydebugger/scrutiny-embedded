@@ -66,7 +66,16 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "cinttypes": "cpp",
-        "*.in": "plaintext"
+        "*.in": "plaintext",
+        "udp_bridge.h": "c",
+        "buffer": "c",
+        "socket": "c",
+        "executor": "cpp",
+        "io_context": "cpp",
+        "netfwd": "cpp",
+        "future": "cpp",
+        "nix_serial_port_bridge.h": "c",
+        "unistd.h": "c"
     },
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },

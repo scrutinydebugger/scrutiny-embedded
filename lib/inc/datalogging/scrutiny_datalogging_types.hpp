@@ -27,11 +27,7 @@ namespace scrutiny
         constexpr unsigned int MAX_OPERANDS = 4;
         static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
 
-#if SCRUTINY_DATALOGGING_BUFFER_32BITS
-        typedef uint32_t buffer_size_t;
-#else
-        typedef uint16_t buffer_size_t;
-#endif
+        typedef ctypes::scrutiny_c_datalogging_buffer_size_t buffer_size_t;
 
         enum class EncodingType : uint8_t
         {
@@ -181,7 +177,7 @@ namespace scrutiny
         };
 
         /// @brief Datalogging Trigger callback
-        typedef void (*trigger_callback_t)();
+        typedef ctypes::scrutiny_c_datalogging_trigger_callback_t trigger_callback_t;
 
     }
 }

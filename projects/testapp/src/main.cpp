@@ -418,6 +418,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             }
 
             scrutiny_handler.receive_data(buffer, static_cast<uint16_t>(len_received));
+
             scrutiny_handler.process(timestep_us * 10);
 
             uint16_t data_to_send = scrutiny_handler.data_to_send();

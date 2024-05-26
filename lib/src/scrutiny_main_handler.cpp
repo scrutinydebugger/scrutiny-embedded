@@ -507,6 +507,7 @@ namespace scrutiny
         RuntimePublishedValue rpv;
         const bool found = get_rpv(id, &rpv);
         return (found) ? rpv.type : VariableType::unknown;
+        
     }
 
     void MainHandler::process_request(const protocol::Request *const request, protocol::Response *const response)
