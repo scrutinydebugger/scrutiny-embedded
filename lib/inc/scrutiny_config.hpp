@@ -82,7 +82,7 @@ namespace scrutiny
         /// @brief Sets the buffer used to store data when doing a datalogging acquisition
         /// @param datalogger_buffer The datalogging buffer
         /// @param datalogger_buffer_size The datalogging buffer size
-        void set_datalogging_buffers(uint8_t *datalogger_buffer, const uint32_t datalogger_buffer_size);
+        void set_datalogging_buffers(uint8_t *datalogger_buffer, const datalogging::buffer_size_t datalogger_buffer_size);
 
         /// @brief Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
         /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
