@@ -12,7 +12,7 @@ LOGLEVEL=debug
 
 scrutiny get-firmware-id "${BINFILE}" --output "${WORKDIR}"  --loglevel ${LOGLEVEL}
 scrutiny elf2varmap "${BINFILE}" --output "${WORKDIR}" --loglevel ${LOGLEVEL}
-scrutiny make-metadata  --output "${WORKDIR}" --project-name "Scrutiny TestAPP" --author $(whoami) --version "1.0.0" --loglevel ${LOGLEVEL}
+scrutiny make-metadata  --output "${WORKDIR}" --project-name "Scrutiny C TestAPP" --author $(whoami) --version "1.0.0" --loglevel ${LOGLEVEL}
 scrutiny add-alias "${WORKDIR}" --file "${SCRIPT_DIR}/../assets/aliases.json" --loglevel ${LOGLEVEL}
 
 scrutiny tag-firmware-id "${BINFILE}" "${TAGGED_FILE}"  --loglevel ${LOGLEVEL}

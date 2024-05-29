@@ -18,14 +18,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} scrutiny-embedded)
 
 
-if (GENERATE_SIZE_HEADERS)
-set(GENERATED_HEADER_NAME ${CMAKE_CURRENT_BINARY_DIR}/generated/scrutiny_c_sizes.hpp)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    BYPRODUCTS GENERATED_HEADER_NAME
-    COMMAND ${CMAKE_OBJDUMP}
-)
-endif()
-
 # ----- INSTALL -----
 install(FILES "scrutiny_cwrapper.h" 
     DESTINATION ${INSTALL_FOLDER}/cwrapper
