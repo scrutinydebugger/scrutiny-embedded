@@ -31,18 +31,19 @@ void process_scrutiny_loop()
     if (c != -1)
     {
         uint8_t uc = static_cast<uint8_t>(c);
-        scrutiny_handler.comm()->receive_data(&uc, 1);  // Data from Serial port pushed into scrutiny-embedded lib
+        scrutiny_handler.receive_data(&uc, 1);  // Data from Serial port pushed into scrutiny-embedded lib
     }
+    
+    scrutiny_handler.process(timestep_us * 10); // Timesteps are counted in multiple of 100ns
     
     // Sends data
     uint8_t buffer[16];
-    if (scrutiny_handler.comm()->data_to_send() > 0)
+    if (scrutiny_handler.data_to_send() > 0)
     {
-        uint16_t nread = scrutiny_handler.comm()->pop_data(buffer, sizeof(buffer));  // Reads data from scrutiny lib
+        uint16_t nread = scrutiny_handler.pop_data(buffer, sizeof(buffer));  // Reads data from scrutiny lib
         Serial.write(buffer, nread);                         // Sends data to the serial port
     }
 
-    scrutiny_handler.process(timestep_us * 10); // Timesteps are counted in multiple of 100ns
 
     last_call_us = current_us;  
 }

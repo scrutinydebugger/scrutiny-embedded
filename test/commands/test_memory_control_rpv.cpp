@@ -229,14 +229,14 @@ TEST_F(TestMemoryControlRPV, TestReadSingleRPV)
     uint8_t expected_response[9 + 2 + 4] = {0x83, 4, 0, 0, 2 + 4, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78};
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
@@ -268,14 +268,14 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPV)
     uint8_t expected_response[9 + 6 + 4 + 4 + 2] = {0x83, 4, 0, 0, 6 + 4 + 4 + 2, 0x11, 0x22, 0x12, 0x34, 0x56, 0x78, 0x33, 0x44, 0x3f, 0xab, 0x85, 0x1f, 0x55, 0x66, 0xab, 0xcd};
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
@@ -338,14 +338,14 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     }
     add_crc(request_data, request_buffer_size - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
+    scrutiny_handler.receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
     delete[] request_data;
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     index = 5;
@@ -391,12 +391,12 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
     uint8_t request_data[8 + 3] = {3, 4, 0, 3, 0x11, 0x22, 0x33}; // Incomplete ID
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
 
@@ -428,12 +428,12 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
     uint8_t request_data[8 + 4] = {3, 4, 0, 4, 0x11, 0x22, 0x99, 0x99}; // 0x9999 doesn't exists
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 
@@ -478,13 +478,13 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     // Make request
     add_crc(request_data, request_buffer_size - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, request_buffer_size);
+    scrutiny_handler.receive_data(request_data, request_buffer_size);
     scrutiny_handler.process(0);
     delete[] request_data;
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow));
 
@@ -530,14 +530,14 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
     uint8_t expected_response[9 + 2 + 1] = {0x83, 5, 0, 0, 3, 0x10, 0x02, 4}; // id + length
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 
@@ -580,14 +580,14 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
     uint8_t expected_response[9 + 6] = {0x83, 5, 0, 0, (2 + 1) * 2, 0x10, 0x02, 4, 0x10, 0x06, 4};
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 
@@ -690,13 +690,13 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     add_crc(request_data, required_request_size - 4);
     add_crc(expected_response, required_response_size - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, required_request_size);
+    scrutiny_handler.receive_data(request_data, required_request_size);
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     EXPECT_EQ(n_to_read, required_response_size);
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, required_response_size);
 
@@ -761,13 +761,13 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         request_data[3] = i;
         add_crc(request_data, 4 + i);
 
-        scrutiny_handler.comm()->receive_data(request_data, request_size);
+        scrutiny_handler.receive_data(request_data, request_size);
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer)) << " i=" << i;
         ASSERT_EQ(n_to_read, 9u) << " i=" << i;
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
         scrutiny_handler.process(0);
 
         ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << " i=" << i;
@@ -821,14 +821,14 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 
     add_crc(request_data, request_size - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, request_size);
+    scrutiny_handler.receive_data(request_data, request_size);
     scrutiny_handler.process(0);
 
     uint8_t tx_buffer[32];
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_EQ(n_to_read, 9u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow));
@@ -881,13 +881,13 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     add_crc(request_data, request_size - 4);
     add_crc(expected_response, response_size - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, request_size);
+    scrutiny_handler.receive_data(request_data, request_size);
     scrutiny_handler.process(0);
 
     uint8_t tx_buffer[response_size];
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_EQ(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, response_size);

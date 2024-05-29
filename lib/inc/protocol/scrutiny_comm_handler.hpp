@@ -39,7 +39,7 @@ namespace scrutiny
             /// @brief Move data from the outside world (received by the server) to the scrutiny lib
             /// @param data Buffer containing the received data
             /// @param len Number of bytes to read
-            void receive_data(uint8_t *data, uint16_t len);
+            void receive_data(uint8_t const *data, uint16_t len);
 
             /// @brief Send a response to the server
             /// @param response The response object

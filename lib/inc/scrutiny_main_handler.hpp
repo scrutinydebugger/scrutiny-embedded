@@ -53,6 +53,23 @@ namespace scrutiny
         /// @param timestep_100ns The time elapsed since last call to this function, in multiple of 100ns.
         void process(const timediff_t timestep_100ns);
 
+        inline void receive_data(uint8_t const *data, uint16_t const len)
+        {
+            m_comm_handler.receive_data(data, len);
+        }
+
+        inline uint16_t pop_data(uint8_t *buffer, uint16_t len)
+        {
+            uint16_t const size = m_comm_handler.pop_data(buffer, len);
+            check_finished_sending();
+            return size;
+        }
+
+        inline uint16_t data_to_send(void) const
+        {
+            return m_comm_handler.data_to_send();
+        }
+
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief Returns the state of the datalogger. Thread safe
         inline datalogging::DataLogger::State get_datalogger_state(void) const
@@ -122,6 +139,7 @@ namespace scrutiny
 
     private:
         void process_loops(void);
+        void check_finished_sending(void);
         void process_request(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
         protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);

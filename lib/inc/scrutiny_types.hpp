@@ -142,7 +142,6 @@ namespace scrutiny
     /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and a ID that can be read/written by the server
     struct RuntimePublishedValue
     {
-    public:
         uint16_t id;
         VariableType type;
     };

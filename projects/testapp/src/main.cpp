@@ -417,14 +417,15 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 cout << endl;
             }
 
-            scrutiny_handler.comm()->receive_data(buffer, static_cast<uint16_t>(len_received));
+            scrutiny_handler.receive_data(buffer, static_cast<uint16_t>(len_received));
+            scrutiny_handler.process(timestep_us * 10);
 
-            uint16_t data_to_send = scrutiny_handler.comm()->data_to_send();
+            uint16_t data_to_send = scrutiny_handler.data_to_send();
             data_to_send = min(data_to_send, static_cast<uint16_t>(sizeof(buffer)));
 
             if (data_to_send > 0)
             {
-                scrutiny_handler.comm()->pop_data(buffer, data_to_send);
+                scrutiny_handler.pop_data(buffer, data_to_send);
                 channel->send(buffer, data_to_send);
 
                 cout << "out: (" << dec << data_to_send << ")\t";
@@ -435,7 +436,6 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 cout << endl;
             }
 
-            scrutiny_handler.process(timestep_us * 10);
             vf_loop.process(timestep_us * 10);
             ff_loop.process();
 #if SCRUTINY_BUILD_WINDOWS
