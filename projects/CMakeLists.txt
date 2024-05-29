@@ -10,6 +10,6 @@ if (SCRUTINY_BUILD_TESTAPP)
     add_subdirectory(testapp)
 endif()
 
-if (SCRUTINY_BUILD_TESTAPP AND SCRUTINY_BUILD_C_WRAPPER)
+if (SCRUTINY_BUILD_TESTAPP AND SCRUTINY_BUILD_CWRAPPER)
     add_subdirectory(c_testapp)
 endif()

@@ -102,6 +102,7 @@ pipeline {
                     steps{
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
+                        SCRUTINY_BUILD_CWRAPPER=0 \
                         SCRUTINY_BUILD_TEST=0 \
                         SCRUTINY_BUILD_TESTAPP=0 \
                         scripts/build.sh
