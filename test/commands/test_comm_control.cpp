@@ -68,14 +68,14 @@ TEST_F(TestCommControl, TestDiscover)
     add_crc(request_data, sizeof(request_data) - 4);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -89,10 +89,10 @@ TEST_F(TestCommControl, TestDiscoverWrongMagic)
     request_data[4] = ~request_data[4];
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_EQ(n_to_read, 0u); // No data because we are not connected and discover is invalid. We stay silent
 }
 
@@ -111,13 +111,13 @@ TEST_F(TestCommControl, TestDiscoverWrongMagicWhileConnected)
 
     uint8_t tx_buffer[32];
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     // Now we expect an InvalidRequest response
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code));
     scrutiny_handler.process(0);
@@ -153,12 +153,12 @@ TEST_F(TestCommControl, TestHeartbeat)
 
         add_crc(request_data, sizeof(request_data) - 4);
         add_crc(expected_response, sizeof(expected_response) - 4);
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US / 2);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_EQ(n_to_read, sizeof(expected_response)) << "challenge=" << static_cast<uint32_t>(challenge);
-        uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
         EXPECT_EQ(nread, n_to_read) << "challenge=" << static_cast<uint32_t>(challenge);
 
         ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response)) << "challenge=" << static_cast<uint32_t>(challenge);
@@ -197,14 +197,14 @@ TEST_F(TestCommControl, TestGetParams)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->connect();
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -223,15 +223,15 @@ TEST_F(TestCommControl, TestConnect)
     add_crc(request_data, sizeof(request_data) - 4);
 
     ASSERT_FALSE(scrutiny_handler.comm()->is_connected());
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     uint32_t session_id = scrutiny_handler.comm()->get_session_id();
@@ -262,15 +262,15 @@ TEST_F(TestCommControl, TestDisconnect)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     ASSERT_TRUE(scrutiny_handler.comm()->is_connected());
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
     scrutiny_handler.process(0); // We need a subsequent call to process because disconnection hapens once the response is completely sent.
 

@@ -67,15 +67,15 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -132,15 +132,15 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Processing
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -175,13 +175,13 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
         request_data[3] = static_cast<uint8_t>(length_to_test);
         add_crc(request_data, length_to_receive - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, length_to_receive);
+        scrutiny_handler.receive_data(request_data, length_to_receive);
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_GT(n_to_read, 0u) << "[ i=" << static_cast<uint32_t>(i) << "]";
         ASSERT_LT(n_to_read, sizeof(tx_buffer)) << "[i=" << static_cast<uint32_t>(i) << "]";
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
         // Now we expect an InvalidRequest response
         ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code)) << "[i=" << static_cast<uint32_t>(i) << "]";
         scrutiny_handler.process(0);
@@ -225,12 +225,12 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
         request_data[index + 1] = static_cast<uint8_t>(length >> 0);
         add_crc(request_data, length_to_receive - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, length_to_receive);
+        scrutiny_handler.receive_data(request_data, length_to_receive);
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         if (length < 2) // Below 2, we don't overflow the tx buffer
         {
@@ -283,12 +283,12 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
         request_data[index + 1] = static_cast<uint8_t>(window_size >> 0);
         add_crc(request_data, sizeof(request_data) - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
         {
@@ -337,12 +337,12 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
         request_data[index + 1] = static_cast<uint8_t>(window_size >> 0);
         add_crc(request_data, sizeof(request_data) - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[i=" << static_cast<uint32_t>(i) << "]";
 
@@ -384,15 +384,15 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -434,15 +434,15 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -491,15 +491,15 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -555,15 +555,15 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -591,14 +591,14 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
@@ -625,14 +625,14 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Process
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
-    uint16_t nread = scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
@@ -675,12 +675,12 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
         // We don't care about the data to write here. We just check if it's accepted or refused.
         add_crc(request_data, sizeof(request_data) - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
         {
@@ -731,12 +731,12 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
         // We don't care about the data to write here. We just check if it's accepted or refused.
         add_crc(request_data, sizeof(request_data) - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         if (i < 2 || i > 10) // Sliding window is completely out of readonly region
         {
@@ -794,12 +794,12 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         request_data[3] = (i >> 0) & 0xFF;
         add_crc(request_data, 4 + i);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << "[i=" << static_cast<uint32_t>(i) << "]";
 

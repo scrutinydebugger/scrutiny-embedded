@@ -7,7 +7,6 @@
 //   Copyright (c) 2021-2023 Scrutiny Debugger
 
 #include <string.h>
-
 #include "scrutiny_setup.hpp"
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_software_id.hpp"
@@ -442,6 +441,17 @@ namespace scrutiny
             }
         }
 
+        check_finished_sending();
+
+        // Some commands affect loops and datalogging, so we reprocess right away
+        process_loops();
+#if SCRUTINY_ENABLE_DATALOGGING
+        process_datalogging_logic();
+#endif
+    }
+
+    void MainHandler::check_finished_sending()
+    {
         if (m_processing_request)
         {
             if (!m_comm_handler.transmitting()) // Will be false if NoResponseToSend or if finished transmitting
@@ -457,11 +467,6 @@ namespace scrutiny
                 }
             }
         }
-
-        process_loops();
-#if SCRUTINY_ENABLE_DATALOGGING
-        process_datalogging_logic();
-#endif
     }
 
     bool MainHandler::rpv_exists(const uint16_t id) const

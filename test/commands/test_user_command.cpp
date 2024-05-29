@@ -79,13 +79,13 @@ TEST_F(TestUserCommand, TestCommandCalled)
     uint8_t expected_response[9 + 4] = {0x84, 0xAA, 0, 0, 4, 0x11, 0x22, 0x33, 0x44};
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_EQ(n_to_read, sizeof(expected_response));
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     COMPARE_BUF(tx_buffer, expected_response, sizeof(expected_response));
 }
 
@@ -102,12 +102,12 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     uint8_t request_data[8] = {4, 0, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
 }
 
@@ -124,11 +124,11 @@ TEST_F(TestUserCommand, TestNoCallback)
     uint8_t request_data[8] = {4, 0, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
 }

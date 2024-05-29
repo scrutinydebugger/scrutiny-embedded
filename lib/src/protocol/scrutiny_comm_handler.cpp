@@ -47,7 +47,7 @@ namespace scrutiny
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t *data, uint16_t len)
+        void CommHandler::receive_data(uint8_t const *data, uint16_t len)
         {
             uint16_t i = 0;
 
@@ -376,6 +376,7 @@ namespace scrutiny
             if (m_nbytes_sent >= m_nbytes_to_send)
             {
                 reset_tx();
+                wait_next_request();
             }
 
             return i;

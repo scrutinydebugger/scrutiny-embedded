@@ -106,14 +106,14 @@ TEST_F(TestDatalogControl, TestUnsupported)
         uint8_t request_data[8] = {5, subfn, 0, 0};
         add_crc(request_data, sizeof(request_data) - 4);
 
-        scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
         scrutiny_handler.process(0);
 
-        uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         ASSERT_GT(n_to_read, 0);
 
-        scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+        scrutiny_handler.pop_data(tx_buffer, n_to_read);
         ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
         scrutiny_handler.process(0);
     }
@@ -273,13 +273,13 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
     request_data[3] = payload_size & 0xFF;
     add_crc(request_data, 4 + payload_size);
 
-    scrutiny_handler.comm()->receive_data(request_data, payload_size + 8);
+    scrutiny_handler.receive_data(request_data, payload_size + 8);
     scrutiny_handler.process(0);
 
     uint8_t tx_buffer[32]{0};
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     if (check_response)
     {
@@ -318,14 +318,14 @@ TEST_F(TestDatalogControl, TestGetSetup)
     expected_response[10] = SCRUTINY_DATALOGGING_MAX_SIGNAL;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
 
@@ -526,14 +526,14 @@ TEST_F(TestDatalogControl, TestArmTriggerNotConfigured)
     uint8_t request_data[8] = {5, 3, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 3, protocol::ResponseCode::FailureToProceed));
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
@@ -557,14 +557,14 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     uint8_t arm_expected_response[9] = {0x85, 3, 0, 0, 0};
     add_crc(arm_expected_response, sizeof(arm_expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(arm_request_data, sizeof(arm_request_data));
+    scrutiny_handler.receive_data(arm_request_data, sizeof(arm_request_data));
     scrutiny_handler.process(0);
 
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     EXPECT_BUF_EQ(tx_buffer, arm_expected_response, sizeof(arm_expected_response));
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
@@ -578,14 +578,14 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     uint8_t diarm_expected_response[9] = {0x85, 4, 0, 0, 0};
     add_crc(diarm_expected_response, sizeof(diarm_expected_response) - 4);
 
-    scrutiny_handler.comm()->receive_data(disarm_request_data, sizeof(disarm_request_data));
+    scrutiny_handler.receive_data(disarm_request_data, sizeof(disarm_request_data));
     scrutiny_handler.process(0);
 
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
 
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     EXPECT_BUF_EQ(tx_buffer, diarm_expected_response, sizeof(diarm_expected_response));
     EXPECT_TRUE(scrutiny_handler.datalogger()->armed()); // Still true
@@ -607,12 +607,12 @@ void TestDatalogControl::check_get_status(datalogging::DataLogger::State expecte
     cursor += codecs::encode_32_bits_big_endian(expected_counter, &expected_response[cursor]);
 
     add_crc(expected_response, sizeof(expected_response) - 4);
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     ASSERT_GT(n_to_read, 0);
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     EXPECT_TRUE( // More verbose than raw data check in case of failure
         IS_PROTOCOL_RESPONSE(
@@ -658,7 +658,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
 
     // Empty transmit buffer
     uint8_t dummy_buffer[32]{0};
-    scrutiny_handler.comm()->pop_data(dummy_buffer, sizeof(dummy_buffer));
+    scrutiny_handler.pop_data(dummy_buffer, sizeof(dummy_buffer));
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow));
     scrutiny_handler.process(0);
 
@@ -709,12 +709,12 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     uint8_t request_data_before[8] = {5, 6, 0, 0};
     add_crc(request_data_before, sizeof(request_data_before) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data_before, sizeof(request_data_before));
+    scrutiny_handler.receive_data(request_data_before, sizeof(request_data_before));
     scrutiny_handler.process(0);
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     // Expect a failure because there is no daa available.
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::FailureToProceed));
@@ -741,12 +741,12 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     uint8_t request_data_after[8] = {5, 6, 0, 0};
     add_crc(request_data_after, sizeof(request_data_after) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+    scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
     scrutiny_handler.process(0);
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::OK));
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
@@ -773,12 +773,12 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
     uint8_t request_data_before[8] = {5, 7, 0, 0};
     add_crc(request_data_before, sizeof(request_data_before) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data_before, sizeof(request_data_before));
+    scrutiny_handler.receive_data(request_data_before, sizeof(request_data_before));
     scrutiny_handler.process(0);
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     // Expect a failure because there is no daa available.
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::FailureToProceed));
@@ -816,12 +816,12 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     uint8_t request_data_after[8] = {5, 7, 0, 0};
     add_crc(request_data_after, sizeof(request_data_after) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+    scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
     scrutiny_handler.process(0);
-    n_to_read = scrutiny_handler.comm()->data_to_send();
+    n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK));
 
@@ -906,12 +906,12 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             uint8_t request_data_after[8] = {5, 7, 0, 0};
             add_crc(request_data_after, sizeof(request_data_after) - 4);
 
-            scrutiny_handler.comm()->receive_data(request_data_after, sizeof(request_data_after));
+            scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
             scrutiny_handler.process(0);
-            uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+            uint16_t n_to_read = scrutiny_handler.data_to_send();
             ASSERT_GT(n_to_read, 0) << error_msg;
             ASSERT_LT(n_to_read, sizeof(validation_txbuffer)) << error_msg;
-            scrutiny_handler.comm()->pop_data(validation_txbuffer, n_to_read);
+            scrutiny_handler.pop_data(validation_txbuffer, n_to_read);
             scrutiny_handler.process(0);
 
             ASSERT_TRUE(IS_PROTOCOL_RESPONSE(validation_txbuffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK)) << error_msg;
@@ -963,15 +963,15 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
     uint8_t request_data[8] = {5, 8, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);
 
-    scrutiny_handler.comm()->receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
     scrutiny_handler.process(0);
 
-    uint16_t n_to_read = scrutiny_handler.comm()->data_to_send();
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LE(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.comm()->pop_data(tx_buffer, n_to_read);
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 8, protocol::ResponseCode::OK));
     EXPECT_FALSE(scrutiny_handler.datalogging_ownership_taken());

@@ -47,19 +47,19 @@ void loop()
     if (c != -1)
     {
         uint8_t uc = static_cast<uint8_t>(c);
-        scrutiny_handler.comm()->receive_data(&uc, 1);
-    }
-
-    uint8_t buffer[16];
-    uint32_t data_to_send = scrutiny_handler.comm()->data_to_send();
-    data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
-    if (data_to_send > 0)
-    {
-        scrutiny_handler.comm()->pop_data(buffer, data_to_send);
-        Serial.write(buffer, data_to_send);
+        scrutiny_handler.receive_data(&uc, 1);
     }
 
     scrutiny_handler.process(timestep_us * 10);
+
+    uint8_t buffer[16];
+    uint32_t data_to_send = scrutiny_handler.data_to_send();
+    data_to_send = min(data_to_send, static_cast<uint32_t>(sizeof(buffer)));
+    if (data_to_send > 0)
+    {
+        scrutiny_handler.pop_data(buffer, data_to_send);
+        Serial.write(buffer, data_to_send);
+    }
 
     last_call_us = current_us;
 }
