@@ -46,7 +46,7 @@ void memdump(uintptr_t startAddr, uint32_t length)
         }
         for (unsigned int i = 0; i < nToPrint; i++)
         {
-            printf("0x%02x:\t", (uint32_t)ptr[i]);
+            printf("%02x", (uint32_t)ptr[i]);
         }
         printf("\n");
         addr += nToPrint;
