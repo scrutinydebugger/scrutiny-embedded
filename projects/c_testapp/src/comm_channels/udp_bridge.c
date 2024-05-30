@@ -1,5 +1,5 @@
 //    udp_bridge.c
-//        Module that open a UDP port and handle a single client.
+//        UDP interface fopr the C testapp. Used to talk with the server
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

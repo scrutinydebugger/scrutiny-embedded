@@ -1,5 +1,5 @@
 //    nix_serial_port_bridge.c
-//        Module that make a *Nix Serial port available as a communication channel for the Testapp
+//        Serial interface fopr the C testapp. Used to talk with the server
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

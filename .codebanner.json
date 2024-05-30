@@ -6,7 +6,9 @@
     ],
     "include_patterns": [
         "*.cpp",
-        "*.hpp"
+        "*.hpp",
+        "*.h",
+        "*.c"
     ],
     "exclude_patterns": [
         "projects/platformio/*"
@@ -16,6 +18,7 @@
     "repo": "github.com/scrutinydebugger/scrutiny-embedded",
     "copyright_owner": "Scrutiny Debugger",
     "copyright_start_date": "2021",
+    "copyright_end_date": null,
     "files": {
         "lib/inc/scrutiny.hpp": {
             "docstring": "Main .h file to be included in a project"
@@ -241,6 +244,48 @@
         },
         "test/datalogging/raw_format_parser.cpp": {
             "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
+        },
+        "lib/inc/static_analysis_build_config.hpp": {
+            "docstring": "Stubbed configuration file used for static analysis with hardcoded values instead of values coming from cmake"
+        },
+        "lib/inc/scrutiny_c_compatible_types.h": {
+            "docstring": "Types declaration that are valid in both C and C++. The C++ library extend them, the C-Wrapper uses them directly"
+        },
+        "projects/c_testapp/include/argument_parser.h": {
+            "docstring": "For CLI parsing"
+        },
+        "projects/c_testapp/include/tools.h": {
+            "docstring": "Some tools used across the C TestApp project"
+        },
+        "projects/c_testapp/include/comm_channels/abstract_comm_channel.h": {
+            "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
+        },
+        "projects/c_testapp/include/comm_channels/nix_serial_port_bridge.h": {
+            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/include/comm_channels/udp_bridge.h": {
+            "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.hpp": {
+            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/src/main.c": {
+            "docstring": "Entry point of C TestApp"
+        },
+        "projects/c_testapp/src/argument_parser.c": {
+            "docstring": "For CLI parsing"
+        },
+        "projects/c_testapp/src/include_test.c": {
+            "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
+        },
+        "projects/c_testapp/src/comm_channels/win_serial_port_bridge.c": {
+            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/src/comm_channels/nix_serial_port_bridge.c": {
+            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/src/comm_channels/udp_bridge.c": {
+            "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
         }
     }
 }

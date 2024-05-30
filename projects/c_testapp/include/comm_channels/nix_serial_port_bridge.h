@@ -1,10 +1,10 @@
 //    nix_serial_port_bridge.h
-//        CommChannel extension that make a *Nix Serial port available as a communication channel for the Testapp
+//        Serial interface fopr the C testapp. Used to talk with the server
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2023 Scrutiny Debugger
+//   Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___NIX_SERIAL_PORT_BRIDGE_H___
 #define ___NIX_SERIAL_PORT_BRIDGE_H___

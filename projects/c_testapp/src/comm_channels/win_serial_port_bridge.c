@@ -1,11 +1,10 @@
-//    win_serial_port_bridge.cpp
-//        Class that make a Windows Serial port available as a communication channel for the
-//        Testapp
+//    win_serial_port_bridge.c
+//        Serial interface fopr the C testapp. Used to talk with the server
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021-2023 Scrutiny Debugger
+//   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_setup.hpp"
 
