@@ -52,7 +52,7 @@ enum EnumA instance_enumA;
 static enum EnumA staticInstance_enumA;
 
 struct File2StructWithEnumA instance_structWithEnumA;
-static struct File2StructWithEnumA static_instance_structWithEnumA;
+static volatile struct File2StructWithEnumA static_instance_structWithEnumA;
 
 void file2SetValues()
 {
@@ -105,6 +105,7 @@ void file2func1(int x)
 {
     (void)x;
     static double file2func1Var = 963258741.123;
+    file2func1Var += (double)x;
     (void)file2func1Var;
 }
 

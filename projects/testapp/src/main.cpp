@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
     static_assert(sizeof(char) == 1, "testapp doesn't support char bigger than 8 bits (yet)");
 
     int errorcode = 0;
-    static int staticIntInMainFunc = 22222;
+    static volatile int staticIntInMainFunc = 22222;
     (void)staticIntInMainFunc;
     init_all_values();
 

@@ -31,7 +31,7 @@
 
 void mainfunc1()
 {
-    static int mainfunc1Var = 7777777;
+    static volatile int mainfunc1Var = 7777777;
     (void)mainfunc1Var;
 }
 
@@ -445,7 +445,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 int main(int argc, char *argv[])
 {
     int errorcode = 0;
-    static int staticIntInMainFunc = 22222;
+    static volatile int staticIntInMainFunc = 22222;
     (void)staticIntInMainFunc;
     init_all_values();
 

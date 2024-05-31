@@ -20,7 +20,6 @@ float file1GlobalFloat;
 double file1GlobalDouble;
 bool file1GlobalBool;
 
-
 static char file1StaticChar;
 static int file1StaticInt;
 static short file1StaticShort;
@@ -46,9 +45,8 @@ namespace NamespaceInFile1
     {
         unsigned long file1GlobalNestedVar1;
         static unsigned long file1StaticNestedVar1;
-    }	
+    }
 }
-
 
 void file1SetValues()
 {
@@ -68,7 +66,7 @@ void file1SetValues()
     file1StructAStaticInstance.structAMemberUInt = 147258u;
     file1StructAStaticInstance.structAMemberFloat = 88.88f;
     file1StructAStaticInstance.structAMemberDouble = 99.99;
-    file1StructAStaticInstance.structAMemberBool = true ;
+    file1StructAStaticInstance.structAMemberBool = true;
 
     NamespaceInFile1::NamespaceInFile1Nested1::file1StaticNestedVar1 = 945612345u;
 
@@ -77,7 +75,7 @@ void file1SetValues()
     file1GlobalShort = -999;
     file1GlobalLong = -100000;
     file1GlobalUnsignedChar = 55u;
-    file1GlobalUnsignedInt = 100001u; 
+    file1GlobalUnsignedInt = 100001u;
     file1GlobalUnsignedShort = 50000u;
     file1GlobalUnsignedLong = 100002u;
     file1GlobalFloat = 3.1415926f;
@@ -88,14 +86,14 @@ void file1SetValues()
     file1StructAInstance.structAMemberUInt = 258147;
     file1StructAInstance.structAMemberFloat = 77.77f;
     file1StructAInstance.structAMemberDouble = 66.66;
-    file1StructAInstance.structAMemberBool = false ;
+    file1StructAInstance.structAMemberBool = false;
 
     file1StructBInstance.structBMemberInt = 55555;
     file1StructBInstance.structBMemberStructA.structAMemberInt = -199999;
     file1StructBInstance.structBMemberStructA.structAMemberUInt = 33333;
     file1StructBInstance.structBMemberStructA.structAMemberFloat = 33.33f;
     file1StructBInstance.structBMemberStructA.structAMemberDouble = 22.22;
-    file1StructBInstance.structBMemberStructA.structAMemberBool = true ;
+    file1StructBInstance.structBMemberStructA.structAMemberBool = true;
 
     file1StructCInstance.structCMemberInt = 888874;
     file1StructCInstance.nestedStructInstance.nestedStructMemberInt = 2298744;
@@ -113,10 +111,7 @@ void file1SetValues()
 
 int funcInFile1(int a, int b)
 {
-    static long long staticLongInFuncFile1 = -0x123456789abcdef;
+    static volatile long long staticLongInFuncFile1 = -0x123456789abcdef;
     (void)staticLongInFuncFile1;
-    return a+b;
+    return a + b;
 }
-
-
-

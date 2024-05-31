@@ -93,7 +93,7 @@ void file1SetValues()
 
 int funcInFile1(int a, int b)
 {
-    static long long staticLongInFuncFile1 = -0x123456789abcdef;
+    static volatile long long staticLongInFuncFile1 = -0x123456789abcdef;
     (void)staticLongInFuncFile1;
     return a+b;
 }
