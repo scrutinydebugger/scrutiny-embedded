@@ -23,6 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "file1.h"
+#include "file2.h"
+
 #define max(a,b) ((a) > (b)) ? (a) : (b)
 #define min(a,b) ((a) < (b)) ? (a) : (b)
 
@@ -212,6 +215,12 @@ int TestAppRPVWriteCallback(const scrutiny_c_runtime_published_value_t rpv, cons
 
 void init_all_values()
 {
+    file1SetValues();
+    file2SetValues();
+    funcInFile1(1, 2);
+    file2func1(123);
+    mainfunc1();
+
     rpvStorage.rpv_id_1000 = -10;
     rpvStorage.rpv_id_1001 = -30000;
     rpvStorage.rpv_id_1002 = 0xABCDEF;
@@ -225,6 +234,8 @@ void init_all_values()
     rpvStorage.rpv_id_2003 = 0x111111111111u;
     rpvStorage.rpv_id_3001 = 2.71828;
 #endif
+
+
 }
 
 void process_interactive_data()
@@ -256,7 +267,7 @@ void my_user_command(
     uint16_t *response_data_length,
     const uint16_t response_max_data_length)
 {
-    printf("User command: Subfunction #%u\n", (unsigned int)subfunction);
+    printf("User command: Subfunction #%u with %u data bytes\n", (unsigned int)subfunction, (unsigned int) request_data_length);
 
     if (response_max_data_length < 1)
     {
