@@ -316,7 +316,13 @@ void my_user_command(
     uint16_t *response_data_length,
     const uint16_t response_max_data_length)
 {
-    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction) << std::endl;
+    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction)
+              << " with " << request_data_length << " data bytes: ";
+    for (uint32_t i = 0; i < request_data_length; i++)
+    {
+        std::cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(request_data[i]);
+    }
+    std::cout << std::endl;
 
     if (response_max_data_length < 1)
     {

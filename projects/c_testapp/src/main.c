@@ -70,8 +70,6 @@ scrutiny_c_runtime_published_value_t rpvs[] = {
 
     {0x3000, SCRUTINY_C_VARIABLE_TYPE_float32},
 
-    {0x5001, SCRUTINY_C_VARIABLE_TYPE_uint16},
-
 #if SCRUTINY_SUPPORT_64BITS
     {0x1003, SCRUTINY_C_VARIABLE_TYPE_sint64},
     {0x2003, SCRUTINY_C_VARIABLE_TYPE_uint64},
@@ -267,7 +265,14 @@ void my_user_command(
     uint16_t *response_data_length,
     const uint16_t response_max_data_length)
 {
-    printf("User command: Subfunction #%u with %u data bytes\n", (unsigned int)subfunction, (unsigned int) request_data_length);
+    printf("User command: Subfunction #%u with %u data bytes: ", 
+        (unsigned int)subfunction, 
+        (unsigned int) request_data_length);
+    for (uint32_t i = 0; i < request_data_length; i++)
+    {
+        printf("%02x", (unsigned int) request_data[i]);
+    }
+    printf("\n");
 
     if (response_max_data_length < 1)
     {
