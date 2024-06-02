@@ -34,9 +34,9 @@ extern "C"
     size_t const SCRUTINY_C_LOOP_HANDLER_FF_SIZE = sizeof(scrutiny::FixedFrequencyLoopHandler);
     size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE = sizeof(scrutiny::VariableFrequencyLoopHandler);
 
-    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t bufsize)
+    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t size)
     {
-        if (bufsize < SCRUTINY_C_MAIN_HANDLER_SIZE || mem == nullptr)
+        if (size < SCRUTINY_C_MAIN_HANDLER_SIZE || mem == nullptr)
         {
             return nullptr;
         }
