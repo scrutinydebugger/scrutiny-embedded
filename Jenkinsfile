@@ -181,6 +181,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -242,6 +243,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -273,6 +275,7 @@ pipeline {
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
                                 SCRUTINY_DATALOGGING_BUFFER_32BITS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -304,6 +307,7 @@ pipeline {
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_DATALOGGING_BUFFER_32BITS=1 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
                             }
