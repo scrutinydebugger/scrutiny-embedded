@@ -62,7 +62,7 @@ namespace scrutiny
         }
 
         /// @brief Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
-        /// @param buffer Buffer top write the data into
+        /// @param buffer Buffer to write the data into
         /// @param len Maximum length of the data to read
         /// @return Number of bytes actually read
         inline uint16_t pop_data(uint8_t *buffer, uint16_t len)

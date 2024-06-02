@@ -61,7 +61,7 @@ extern "C"
     /// @brief Wrapper for `MainHandler::pop_data()`.
     /// Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
     /// @param main_handler The `MainHandler` object to work on.
-    /// @param buffer Buffer top write the data into
+    /// @param buffer Buffer to write the data into
     /// @param len Maximum length of the data to read
     /// @return Number of bytes actually read
     uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *main_handler, uint8_t *buffer, uint16_t len);
@@ -76,7 +76,7 @@ extern "C"
 
     /// @brief Wrapper for `Config::Config()`.
     /// Construct `scrutiny::Config` object at a given address. Fails if `mem` is NULL or if the size is not big enough.
-    /// @param mem Address at which to initialize the `Config`
+    /// @param mem Address at which to initialize the `Config` object
     /// @param size Size of the allocated memory.
     /// @return A pointer to the `Config` object or NULL in case of failure.
     scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t size);
@@ -95,7 +95,7 @@ extern "C"
         uint8_t *tx_buffer,
         uint16_t const tx_buffer_size);
 
-    /// @brief Wrapper for `Config::set_forbidden_address_range`
+    /// @brief Wrapper for `Config::set_forbidden_address_range()`
     /// Defines some memory section that are to be left untouched
     /// @param config The `scrutiny::Config` object to work on
     /// @param ranges Array of ranges represented by the `AddressRange` object.
@@ -129,7 +129,7 @@ extern "C"
         scrutiny_c_rpv_read_callback_t rd_cb,
         scrutiny_c_rpv_write_callback_t wr_cb);
 
-    /// @brief Wrapper for `Config::set_loops`
+    /// @brief Wrapper for `Config::set_loops()`
     /// Defines the different loops (tasks) in the application.
     /// @param config The `scrutiny::Config` object to work on
     /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
@@ -138,7 +138,7 @@ extern "C"
     /// @param loop_count Number of `scrutiny::LoopHandlers`
     void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint8_t const loop_count);
 
-    /// @brief Wrapper for `Config::set_user_command_callback`
+    /// @brief Wrapper for `Config::set_user_command_callback()`
     /// Sets a callback to be called by Scrutiny after a request to the UserCommand function.
     /// This generic feature allows the integrator to pass down some custom request/data to the application by leveraging the already
     /// existing Scrutiny protocol.
@@ -154,7 +154,7 @@ extern "C"
     /// @param buffer_size The datalogging buffer size
     void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, uint8_t *buffer, scrutiny_c_datalogging_buffer_size_t buffer_size);
 
-    /// @brief Wrapper for `Config::set_datalogging_trigger_callback`
+    /// @brief Wrapper for `Config::set_datalogging_trigger_callback()`
     /// Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
     /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
     /// the integrator responsibility to ensure thread safety
@@ -209,7 +209,7 @@ extern "C"
     /// @brief Wrapper for `VariableFrequencyLoopHandler::process()`
     /// Process function be called at each iteration of the loop.
     /// @param loop_handler The `VariableFrequencyLoopHandler` object to work on
-    /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
+    /// @param timestep_100ns Time delta since last call to `process()` in multiple of 100ns
     void scrutiny_c_loop_handler_variable_freq_process(scrutiny_c_loop_handler_vf_t *loop_handler, scrutiny_c_timediff_t timestep_100ns);
 
 #ifdef __cplusplus
