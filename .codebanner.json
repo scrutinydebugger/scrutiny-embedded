@@ -286,6 +286,18 @@
         },
         "projects/c_testapp/src/comm_channels/udp_bridge.c": {
             "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
+        },
+        "projects/c_testapp/include/file2.h": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/c_testapp/include/file1.h": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/c_testapp/src/file1.c": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/c_testapp/src/file2.c": {
+            "docstring": "Placeholder file for variable extraction test"
         }
     }
 }

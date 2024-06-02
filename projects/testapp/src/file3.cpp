@@ -1,3 +1,11 @@
+//    file3.cpp
+//        Placeholder file for variable extraction test
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021 Scrutiny Debugger
+
 #include "file3.hpp"
 
 File3Union file3_union;
