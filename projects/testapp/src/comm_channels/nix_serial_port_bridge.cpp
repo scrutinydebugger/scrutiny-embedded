@@ -166,7 +166,7 @@ int NixSerialPortBridge::receive(uint8_t *buffer, int len)
     return n;
 }
 
-void NixSerialPortBridge::send(const uint8_t *buffer, int len)
+void NixSerialPortBridge::send(uint8_t const *buffer, int len)
 {
     if (m_fd > 0)
     {

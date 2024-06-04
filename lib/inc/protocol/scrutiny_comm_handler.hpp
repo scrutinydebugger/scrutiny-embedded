@@ -34,17 +34,23 @@ namespace scrutiny
             /// @param tx_buffer_size Transmission buffer size
             /// @param timebase Pointer to a timebase object to keep track of time
             /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are connected to the same channel
-            void init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t session_counter_seed = 0);
+            void init(
+                uint8_t *const rx_buffer,
+                uint16_t const rx_buffer_size,
+                uint8_t *const tx_buffer,
+                uint16_t const tx_buffer_size,
+                Timebase *const timebase,
+                uint32_t const session_counter_seed = 0);
 
             /// @brief Move data from the outside world (received by the server) to the scrutiny lib
             /// @param data Buffer containing the received data
             /// @param len Number of bytes to read
-            void receive_data(uint8_t const *data, uint16_t const len);
+            void receive_data(uint8_t const *const data, uint16_t const len);
 
             /// @brief Send a response to the server
             /// @param response The response object
             /// @return true on success, false on failure
-            bool send_response(Response *response);
+            bool send_response(Response const *const response);
 
             /// @brief Reset the communication handler and put it back to an idle state
             void reset();
@@ -61,15 +67,15 @@ namespace scrutiny
             /// @brief Tells if the Request object has a CRC that matches its payload content.
             /// @param req The request to check
             /// @return True if the CRC is valid. False otherwise
-            bool check_crc(const Request *req) const;
+            bool check_crc(Request const *const req) const;
 
             // Writes the CRC property of the response based on the payload content.
-            void add_crc(Response *response) const;
+            void add_crc(Response *const response) const;
 
             /// @brief Trigger a heartbeat, resetting the watchdog timeout
             /// @param challenge A challenge value to be used to compute a response. This value must change at each call otherwise the heartbeat will be ignored
             /// @return True if the heartbeat was effective. False if it was ignored
-            bool heartbeat(const uint16_t challenge);
+            bool heartbeat(uint16_t const challenge);
 
             /// @brief Periodic process function to call
             void process(void);
@@ -84,7 +90,7 @@ namespace scrutiny
             inline void wait_next_request(void) { reset_rx(); }
 
             /// @brief Returns true if a request has been received. Will stay true until call to wait_next_request()
-            inline bool request_received(void) { return m_request_received; }
+            inline bool request_received(void) const { return m_request_received; }
 
             /// @brief Returns the request that has been received
             inline Request *get_request(void) { return &m_active_request; }

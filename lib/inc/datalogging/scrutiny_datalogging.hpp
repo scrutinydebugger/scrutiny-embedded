@@ -35,7 +35,7 @@ namespace scrutiny
         /// @param val Output value
         /// @param variable_type Output variable type
         /// @return true on success. false on failure
-        bool fetch_operand(const MainHandler *const main_handler, const Operand *const operand, AnyType *const val, VariableType *const variable_type);
+        bool fetch_operand(MainHandler const *const main_handler, Operand const *const operand, AnyType *const val, VariableType *const variable_type);
     }
 }
 

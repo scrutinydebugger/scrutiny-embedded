@@ -133,8 +133,8 @@ TEST_F(TestRawEncoder, BasicEncoding)
     memcpy(&compare_buf[28], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[32]);
 
-    const uint8_t chunk_size = sizeof(dst_buffer);
-    const uint8_t nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
+    uint8_t const chunk_size = sizeof(dst_buffer);
+    uint8_t const nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
     for (uint8_t i = 0; i < nbchunk; i++)
     {

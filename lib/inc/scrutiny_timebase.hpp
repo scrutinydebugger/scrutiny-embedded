@@ -23,7 +23,7 @@ namespace scrutiny
 
         /// @brief Move the time forward by a step
         /// @param timestep_100ns Time step to do, in multiple of 100ns.
-        inline void step(const timediff_t timestep_100ns)
+        inline void step(timediff_t const timestep_100ns)
         {
             m_time_100ns += timestep_100ns;
         }
@@ -37,7 +37,7 @@ namespace scrutiny
         /// @brief Returns the number of 100ns elapsed since the timestamp has been taken
         /// @param timestamp The timestamp
         /// @return Time delta in multiple of 100ns
-        inline timediff_t elapsed_since(const timestamp_t timestamp) const
+        inline timediff_t elapsed_since(timestamp_t const timestamp) const
         {
             return m_time_100ns - timestamp;
         }
@@ -45,7 +45,7 @@ namespace scrutiny
         /// @brief Returns the number of microseconds elapsed since the timestamp has been taken
         /// @param timestamp The timestamp
         /// @return Time delta in multiple of 100ns
-        inline timediff_t elapsed_us_since(const timestamp_t timestamp) const
+        inline timediff_t elapsed_us_since(timestamp_t const timestamp) const
         {
             return elapsed_since(timestamp) / 10;
         }
@@ -54,14 +54,14 @@ namespace scrutiny
         /// @param timestamp Timestamp to check against
         /// @param timeout_100ns Maximum time delta since the timestamp
         /// @return true if expired
-        inline bool has_expired(const timestamp_t timestamp, const timediff_t timeout_100ns) const
+        inline bool has_expired(timestamp_t const timestamp, timediff_t const timeout_100ns) const
         {
             return (elapsed_since(timestamp) >= timeout_100ns);
         }
 
         /// @brief Put back the timebase at the given timestamp (default 0)
         /// @param val timestamp to use a actual value
-        inline void reset(const timestamp_t val = 0)
+        inline void reset(timestamp_t const val = 0)
         {
             m_time_100ns = val;
         }

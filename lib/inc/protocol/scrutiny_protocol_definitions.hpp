@@ -120,8 +120,8 @@ namespace scrutiny
 
         namespace CommControl
         {
-            extern const uint8_t DISCOVER_MAGIC[4];
-            extern const uint8_t CONNECT_MAGIC[4];
+            extern uint8_t const DISCOVER_MAGIC[4];
+            extern uint8_t const CONNECT_MAGIC[4];
 
             enum class Subfunction : uint8_t
             {

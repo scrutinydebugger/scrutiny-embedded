@@ -150,7 +150,7 @@ struct AllTypeResult
 };
 static AllTypeResult dest_buffer_for_rpv_write;
 
-static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType *inval)
+static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval)
 {
     if (rpv.id == 0x1000 && rpv.type == scrutiny::VariableType::uint8)
     {
@@ -321,7 +321,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
-    const uint16_t nb_vals = static_cast<uint16_t>(expected_encoding.size());
+    uint16_t const nb_vals = static_cast<uint16_t>(expected_encoding.size());
     // Make request
     uint16_t request_buffer_size = 8 + nb_vals * 2;
     uint8_t *request_data = new uint8_t[request_buffer_size];
@@ -332,7 +332,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     unsigned int index = 4;
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
-        const uint16_t id = p->first;
+        uint16_t const id = p->first;
         request_data[index++] = (id >> 8) & 0xFF;
         request_data[index++] = (id) & 0xFF;
     }
@@ -351,7 +351,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     index = 5;
     for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
-        const uint16_t id = p->first;
+        uint16_t const id = p->first;
         ASSERT_LE(index, static_cast<unsigned int>(nread - 2)); // safety check
 
         EXPECT_EQ(tx_buffer[index], (id >> 8) & 0xFF) << "index=" << index << ", ID = " << id;
@@ -373,7 +373,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
 TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
     const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
@@ -410,7 +410,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
     const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
@@ -447,7 +447,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
     const scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
@@ -725,7 +725,7 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
     const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];

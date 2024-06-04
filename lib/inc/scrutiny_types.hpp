@@ -120,9 +120,9 @@ namespace scrutiny
     };
 
     /// @brief Callback called on Runtime Published Value read
-    typedef bool (*RpvReadCallback)(const RuntimePublishedValue rpv, AnyType *outval);
+    typedef bool (*RpvReadCallback)(RuntimePublishedValue const rpv, AnyType *outval);
     /// @brief Callback called on Runtime Published Value write
-    typedef bool (*RpvWriteCallback)(const RuntimePublishedValue rpv, const AnyType *inval);
+    typedef bool (*RpvWriteCallback)(RuntimePublishedValue const rpv, AnyType const *inval);
 
     /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
     struct MemoryBlock

@@ -20,7 +20,7 @@
 
 typedef struct
 {
-    const char *m_port_name;
+    char const *m_port_name;
     uint32_t m_baudrate;
     int m_fd;
 } nix_serial_port_t;

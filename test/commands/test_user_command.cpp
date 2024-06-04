@@ -39,7 +39,7 @@ protected:
     }
 };
 
-void my_callback1(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length)
+void my_callback1(uint8_t const subfunction, uint8_t const *request_data, uint16_t const request_data_length, uint8_t *response_data, uint16_t *response_data_length, uint16_t const response_max_data_length)
 {
     EXPECT_EQ(subfunction, 0xAA);
     EXPECT_EQ(request_data_length, 0x3);
@@ -57,7 +57,7 @@ void my_callback1(const uint8_t subfunction, const uint8_t *request_data, const 
     *response_data_length = 4;
 }
 
-void my_callback2(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length)
+void my_callback2(uint8_t const subfunction, uint8_t const *request_data, uint16_t const request_data_length, uint8_t *response_data, uint16_t *response_data_length, uint16_t const response_max_data_length)
 {
     (void)subfunction;         // Silence unused parameters warning
     (void)request_data;        // Silence unused parameters warning

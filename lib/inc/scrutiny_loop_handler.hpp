@@ -76,7 +76,7 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(const char *name = "") : m_name(name)
+        LoopHandler(char const *name = "") : m_name(name)
         {
         }
 
@@ -95,7 +95,7 @@ namespace scrutiny
         inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void) { return &m_loop2main_msg; }
 
         /// @brief Returns the name of the loop. May be nullptr if not set.
-        inline const char *get_name(void) const { return m_name; }
+        inline char const *get_name(void) const { return m_name; }
 #if SCRUTINY_ENABLE_DATALOGGING
 
         inline void allow_datalogging(bool val)
@@ -124,7 +124,7 @@ namespace scrutiny
         scrutiny::IPCMessage<Main2LoopMessage> m_main2loop_msg;
         /// @brief  Atomic message transferred from the Loop Handler to the Main Handler
         scrutiny::IPCMessage<Loop2MainMessage> m_loop2main_msg;
-        const char *m_name;
+        char const *m_name;
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
@@ -146,7 +146,7 @@ namespace scrutiny
         /// @brief Constructor
         /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
         /// @param name The name of the loop
-        explicit FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = "") : LoopHandler(name),
+        explicit FixedFrequencyLoopHandler(timediff_t timestep_100ns, char const *name = "") : LoopHandler(name),
                                                                                                m_timestep_100ns(timestep_100ns)
         {
         }
@@ -160,7 +160,7 @@ namespace scrutiny
         virtual uint32_t get_timestep_100ns(void) const override { return m_timestep_100ns; }
 
     protected:
-        const uint32_t m_timestep_100ns;
+        uint32_t const m_timestep_100ns;
     };
 
     /// @brief Handler for Variable Frequency loops. (Variable delta-time between each call to process)
@@ -170,7 +170,7 @@ namespace scrutiny
     public:
         /// @brief Constructor
         /// @param name The name of the loop
-        explicit VariableFrequencyLoopHandler(const char *name = "") : LoopHandler(name)
+        explicit VariableFrequencyLoopHandler(char const *name = "") : LoopHandler(name)
         {
         }
 

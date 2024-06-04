@@ -27,8 +27,8 @@ protected:
     void fill_buffer_incremental(uint8_t *buffer, uint32_t length);
     unsigned int encode_addr(uint8_t *buffer, void *addr);
 
-    ::testing::AssertionResult COMPARE_BUF(const uint8_t *candidate, const uint8_t *expected, const uint32_t size);
-    ::testing::AssertionResult CHECK_SET(const uint8_t *buffer, const uint8_t val, const uint32_t size);
+    ::testing::AssertionResult COMPARE_BUF(uint8_t const *candidate, uint8_t const *expected, uint32_t const size);
+    ::testing::AssertionResult CHECK_SET(uint8_t const *buffer, uint8_t const val, uint32_t const size);
     ::testing::AssertionResult IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code);
 };
 

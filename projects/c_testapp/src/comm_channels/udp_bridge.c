@@ -140,9 +140,9 @@ comm_channel_status_e _udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer,
 }
 
 
-comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, const uint8_t *buffer, int len, int flags)
+comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len, int flags)
 {
-    int ret = sendto(bridge->m_sock, (const char *)buffer, len, flags, &bridge->m_last_packet_addr, sizeof(bridge->m_last_packet_addr));
+    int ret = sendto(bridge->m_sock, (char const *)buffer, len, flags, &bridge->m_last_packet_addr, sizeof(bridge->m_last_packet_addr));
 
     if (ret < 0)
     {
@@ -151,7 +151,7 @@ comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, const uint8_t *buff
     return COMM_CHANNEL_STATUS_success;
 }
 
-comm_channel_status_e udp_bridge_send(udp_bridge_t* bridge, const uint8_t *buffer, int len) 
+comm_channel_status_e udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len) 
 { 
     return _udp_bridge_send(bridge, buffer, len, 0); 
 }
