@@ -39,7 +39,12 @@
 static uint64_t micros()
 {
     struct timespec now;
-    timespec_get(&now, TIME_UTC);
+    #if SCRUTINY_BUILD_WINDOWS
+    timespec_get(&now, TIME_UTC);   // Careful, not monotonic
+    #else
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    #endif
+
     return ((uint64_t) now.tv_sec) * 1000000 + ((uint64_t) now.tv_nsec) / 1000;
 }
 
@@ -412,7 +417,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 
         if (len_received > 0)
         {
-            printf("%" PRIu64 "\tin: (%d)\t", time_since_start, len_received);
+            printf("%" PRIu64 "  in:  (%2d)  ", time_since_start, len_received);
             for (int i = 0; i < len_received; i++)
             {
                 printf("%02x", (unsigned int)buffer[i]);
@@ -435,7 +440,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
                 ERR_BREAK("Failed to start comm channel");
             }
 
-            printf("%" PRIu64 "\tout:  (%d)\t", time_since_start, data_to_send);
+            printf("%" PRIu64 "  out: (%2d)  ", time_since_start, data_to_send);
             for (int i = 0; i < data_to_send; i++)
             {
                 printf("%02x", (unsigned int)buffer[i]);

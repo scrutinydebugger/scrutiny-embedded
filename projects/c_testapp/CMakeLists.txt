@@ -67,7 +67,7 @@ else()
         ${COMPILER_NO_PIE_OPTION}  
         -gdwarf-4
         -O0
-        -Wall -Wextra -Wpedantic -Werror
+        -Wall -Wextra -Wpedantic -Werror 
     )
 
     target_link_options(${PROJECT_NAME} PUBLIC

@@ -417,7 +417,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
 
             if (len_received > 0)
             {
-                cout << dec << time_since_start_us << "\tin: (" << len_received << ")\t";
+                cout << dec << setw(0) << time_since_start_us << "  in:  (" << setw(2) << setfill(' ') << len_received << ")  ";
                 for (int i = 0; i < len_received; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
@@ -437,7 +437,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 scrutiny_handler.pop_data(buffer, data_to_send);
                 channel->send(buffer, data_to_send);
 
-                cout << dec << time_since_start_us << "\tout: (" << data_to_send << ")\t";
+                cout << dec << setw(0) << time_since_start_us << "  out: (" << setw(2) << setfill(' ') << len_received << ")  ";
                 for (unsigned int i = 0; i < data_to_send; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
