@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <time.h>
 
 #include "file1.h"
 #include "file2.h"
@@ -34,6 +35,13 @@
 #ifndef min
 #define min(a,b) ((a) < (b)) ? (a) : (b)
 #endif
+
+static uint64_t micros()
+{
+    struct timespec now;
+    timespec_get(&now, TIME_UTC);
+    return ((uint64_t) now.tv_sec) * 1000000 + ((uint64_t) now.tv_nsec) / 1000;
+}
 
 void mainfunc1()
 {
@@ -379,11 +387,12 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
     scrutiny_c_config_set_session_counter_seed(config, 0xdeadbeef);
     
     scrutiny_c_main_handler_init(scrutiny_handler, config);
-
-//    chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;
-//    last_timestamp = chrono::steady_clock::now();
-//    now_timestamp = chrono::steady_clock::now();
     
+    uint64_t start_timestamp, last_timestamp, now_timestamp;
+    start_timestamp = micros();
+    last_timestamp = micros();
+    now_timestamp = micros();
+
     if (channel->start(channel->handle) != COMM_CHANNEL_STATUS_success){
         ERR_RETURN("Failed to start comm channel");
     }
@@ -397,12 +406,13 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
             ERR_BREAK("Error while receiving");
         }
 
-        //now_timestamp = chrono::steady_clock::now();
-        //uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
+        now_timestamp = micros();
+        uint64_t time_since_start = (now_timestamp - start_timestamp);
+        uint32_t timestep_us = (uint32_t)(now_timestamp - last_timestamp);
 
         if (len_received > 0)
         {
-            printf("in:  (%d)\t", len_received);
+            printf("%" PRIu64 "\tin: (%d)\t", time_since_start, len_received);
             for (int i = 0; i < len_received; i++)
             {
                 printf("%02x", (unsigned int)buffer[i]);
@@ -410,7 +420,6 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
             printf("\n");
         }
 
-        uint32_t timestep_us = 10*1000;
         scrutiny_c_main_handler_receive_data(scrutiny_handler, buffer, (uint16_t)len_received);
 
         scrutiny_c_main_handler_process(scrutiny_handler, timestep_us * 10);
@@ -426,7 +435,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
                 ERR_BREAK("Failed to start comm channel");
             }
 
-            printf("out:  (%d)\t", data_to_send);
+            printf("%" PRIu64 "\tout:  (%d)\t", time_since_start, data_to_send);
             for (int i = 0; i < data_to_send; i++)
             {
                 printf("%02x", (unsigned int)buffer[i]);
@@ -441,7 +450,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 #else
         usleep(10000);
 #endif
-        //last_timestamp = now_timestamp;
+        last_timestamp = now_timestamp;
     }
 
     if (channel->stop(channel->handle) != COMM_CHANNEL_STATUS_success){

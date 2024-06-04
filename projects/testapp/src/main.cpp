@@ -398,7 +398,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.session_counter_seed = 0xdeadbeef;
     scrutiny_handler.init(&config);
 
-    chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;
+    chrono::time_point<chrono::steady_clock> start_timestamp, last_timestamp, now_timestamp;
+    start_timestamp = chrono::steady_clock::now();
     last_timestamp = chrono::steady_clock::now();
     now_timestamp = chrono::steady_clock::now();
 
@@ -411,11 +412,12 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
+            uint32_t time_since_start_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
             uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
 
             if (len_received > 0)
             {
-                cout << "in:  (" << dec << len_received << ")\t";
+                cout << dec << time_since_start_us << "\tin: (" << len_received << ")\t";
                 for (int i = 0; i < len_received; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
@@ -435,7 +437,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 scrutiny_handler.pop_data(buffer, data_to_send);
                 channel->send(buffer, data_to_send);
 
-                cout << "out: (" << dec << data_to_send << ")\t";
+                cout << dec << time_since_start_us << "\tout: (" << data_to_send << ")\t";
                 for (unsigned int i = 0; i < data_to_send; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
