@@ -40,7 +40,7 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
     c_testapp_strncpy(cmd, argv[1], sizeof(cmd));
     size_t len = strlen(cmd);
     for (size_t i=0; i<len; i++){
-        cmd[i] = tolower(cmd[i]);
+        cmd[i] = (char)tolower(cmd[i]);
     }
 
     if (strcmp(cmd, "memdump") == 0)
@@ -157,20 +157,20 @@ c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(c
     int base1 = 10;
     int base2 = 10;
     char start_address[32] = {0};
-    strncpy(start_address, parser->m_argv[parser->m_region_index + region_offset], sizeof(start_address));
+    c_testapp_strncpy(start_address, parser->m_argv[parser->m_region_index + region_offset], sizeof(start_address));
 
     if (strnlen(start_address, sizeof(start_address)) > 2 && start_address[0] == '0' && start_address[1] == 'x')
     {
-        strncpy(start_address, &start_address[2], sizeof(start_address)-2);
+        c_testapp_strncpy(start_address, &start_address[2], sizeof(start_address)-2);
         base1 = 16;
     }
     
     char length[32] = {0};
-    strncpy(length, parser->m_argv[parser->m_region_index + region_offset +1], sizeof(length));
+    c_testapp_strncpy(length, parser->m_argv[parser->m_region_index + region_offset +1], sizeof(length));
 
     if (strnlen(length, sizeof(length)) > 2 && length[0] == '0' && length[1] == 'x')
     {
-        strncpy(length, &length[2], sizeof(length)-2);
+        c_testapp_strncpy(length, &length[2], sizeof(length)-2);
         base2 = 16;
     }
 

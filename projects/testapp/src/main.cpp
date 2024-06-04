@@ -334,7 +334,7 @@ void my_user_command(
     {
         *response_data_length = 8;
         response_data[0] = subfunction;
-        for (int i = 0; i < 7; i++)
+        for (uint8_t i = 0; i < 7; i++)
         {
             response_data[i + 1] = i;
         }
@@ -343,9 +343,9 @@ void my_user_command(
     {
         *response_data_length = response_max_data_length;
         response_data[0] = subfunction;
-        for (int i = 1; i < response_max_data_length; i++)
+        for (uint16_t i = 1; i < response_max_data_length; i++)
         {
-            response_data[i] = i;
+            response_data[i] = static_cast<uint8_t>(i);
         }
     }
     else if (subfunction == 2)
@@ -358,7 +358,7 @@ void my_user_command(
     }
     else if (subfunction == 4)
     {
-        const uint16_t max_echo_size = std::min(request_data_length, static_cast<uint16_t>(response_max_data_length - 1));
+        const uint16_t max_echo_size = min(request_data_length, static_cast<uint16_t>(response_max_data_length - 1));
         response_data[0] = subfunction;
         for (uint16_t i = 0; i < max_echo_size; i++)
         {

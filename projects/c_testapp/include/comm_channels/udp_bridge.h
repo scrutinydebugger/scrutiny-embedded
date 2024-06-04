@@ -40,7 +40,7 @@ typedef struct{
     SOCKADDR m_last_packet_addr; // SOCKADDR = sockaddr for linux, SOCKADDR for windows
 
 #if SCRUTINY_BUILD_WINDOWS
-    static WSAData wsa_data;
+    struct WSAData wsa_data;
 #endif
 } udp_bridge_t;
 

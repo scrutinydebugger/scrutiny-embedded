@@ -21,7 +21,12 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_size, trigger_callback_t trigger_callback)
+        void DataLogger::init(
+            MainHandler *main_handler,
+            Timebase *timebase,
+            uint8_t *const buffer,
+            const buffer_size_t buffer_size,
+            trigger_callback_t trigger_callback)
         {
             m_timebase = timebase;
             m_main_handler = main_handler;
@@ -276,7 +281,7 @@ namespace scrutiny
             m_encoder.reset_write_counter(); // Completion logic uses that counter directly without processing
 
             const uint64_t multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
-            m_remaining_data_to_write = static_cast<uint32_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
+            m_remaining_data_to_write = static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
             if (!m_encoder.buffer_full())
             {
                 m_remaining_data_to_write = SCRUTINY_MAX(m_remaining_data_to_write, m_encoder.remaining_bytes_to_full());

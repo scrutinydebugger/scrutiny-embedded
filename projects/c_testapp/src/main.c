@@ -22,12 +22,18 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "file1.h"
 #include "file2.h"
 
+#ifndef max
 #define max(a,b) ((a) > (b)) ? (a) : (b)
+#endif
+
+#ifndef min
 #define min(a,b) ((a) < (b)) ? (a) : (b)
+#endif
 
 void mainfunc1()
 {
@@ -41,7 +47,7 @@ void memdump(uintptr_t startAddr, uint32_t length)
     while (addr < startAddr + length)
     {
         uint8_t *ptr = (uint8_t*)(addr);
-        printf("0x%016lx:\t", (uint64_t)addr);
+        printf("0x%016" PRIx64 ":\t", (uint64_t)addr);
         uintptr_t nToPrint = startAddr + length - addr;
         if (nToPrint > 16)
         {
@@ -49,7 +55,7 @@ void memdump(uintptr_t startAddr, uint32_t length)
         }
         for (unsigned int i = 0; i < nToPrint; i++)
         {
-            printf("%02x", (uint32_t)ptr[i]);
+            printf("%02"PRIx32, (uint32_t)ptr[i]);
         }
         printf("\n");
         addr += nToPrint;
@@ -284,7 +290,7 @@ void my_user_command(
     {
         *response_data_length = 8;
         response_data[0] = subfunction;
-        for (int i = 0; i < 7; i++)
+        for (uint8_t i = 0; i < 7; i++)
         {
             response_data[i + 1] = i;
         }
@@ -293,9 +299,9 @@ void my_user_command(
     {
         *response_data_length = response_max_data_length;
         response_data[0] = subfunction;
-        for (int i = 1; i < response_max_data_length; i++)
+        for (uint16_t i = 1; i < response_max_data_length; i++)
         {
-            response_data[i] = i;
+            response_data[i] = (uint8_t)i;
         }
     }
     else if (subfunction == 2)
@@ -408,6 +414,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
         scrutiny_c_main_handler_receive_data(scrutiny_handler, buffer, (uint16_t)len_received);
 
         scrutiny_c_main_handler_process(scrutiny_handler, timestep_us * 10);
+
         uint16_t data_to_send =  scrutiny_c_main_handler_data_to_send(scrutiny_handler);
         data_to_send = min(data_to_send, (uint16_t)sizeof(buffer));
 
@@ -509,6 +516,8 @@ int main(int argc, char *argv[])
             channel.stop = win_serial_port_stop;
             channel.send = win_serial_port_send;
             channel.receive = win_serial_port_receive;
+
+            win_serial_port_init(&serial, parser.m_serial_config.port_name, parser.m_serial_config.baudrate);
             #else
             nix_serial_port_t serial;
             channel.handle = &serial;

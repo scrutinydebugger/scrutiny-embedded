@@ -266,7 +266,7 @@
         "projects/c_testapp/include/comm_channels/udp_bridge.h": {
             "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
         },
-        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.hpp": {
+        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.h": {
             "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/src/main.c": {

@@ -6,116 +6,135 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
+#include "scrutiny_cwrapper.h"
 
 #if !SCRUTINY_BUILD_WINDOWS
 #error "File designed for windows"
 #endif
 
-#include "win_serial_port_bridge.hpp"
-#include <cstdlib>
-#include <cstdint>
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stddef.h>
 #include <windows.h>
 #include <winbase.h>
-#include <cstring>
-#include <string>
-#include <system_error>
 #include <fileapi.h>
+#include <errhandlingapi.h>
+#include <inttypes.h>
 
-WinSerialPortBridge::WinSerialPortBridge(const std::string &port_name, uint32_t baudrate) : m_port_name(port_name),
-                                                                                            m_baudrate(baudrate),
-                                                                                            m_serial_handle(INVALID_HANDLE_VALUE)
+#include "win_serial_port_bridge.h"
+#include "tools.h"
+
+comm_channel_status_e win_serial_port_init(win_serial_port_t *serial_port, char *const port_name, uint32_t const baudrate)
 {
+    serial_port->m_portname = port_name;
+    serial_port->m_baudrate = baudrate;
+    serial_port->m_serial_handle = INVALID_HANDLE_VALUE;
+    return COMM_CHANNEL_STATUS_success;
 }
 
-void WinSerialPortBridge::start()
-{
-    std::string comport = std::string("\\\\.\\") + m_port_name;
-    m_serial_handle = CreateFile(comport.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
-    if (m_serial_handle == INVALID_HANDLE_VALUE)
+comm_channel_status_e win_serial_port_start(win_serial_port_t *serial_port)
+{
+    char const* prefix = "\\\\.\\";
+    size_t const prefix_len = strlen(prefix);
+    char portname[255] = {0};
+    strcpy_s(portname, sizeof(portname), prefix);
+    c_testapp_strncpy(&portname[prefix_len], serial_port->m_portname, sizeof(portname)-prefix_len);
+
+    serial_port->m_serial_handle = CreateFile(portname, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+    if (serial_port->m_serial_handle == INVALID_HANDLE_VALUE)
     {
-        throw_system_error(std::string("Cannot open port ") + comport);
+        fprintf(stderr, "Cannot open port %s. err=%" PRIu32, serial_port->m_portname, GetLastError());
+        return COMM_CHANNEL_STATUS_error;
     }
 
     DCB serial_params;
-    std::memset(&serial_params, 0, sizeof(DCB));
+    memset(&serial_params, 0, sizeof(DCB));
     serial_params.DCBlength = sizeof(serial_params);
 
     BOOL HResult;
-    HResult = GetCommState(m_serial_handle, &serial_params);
+    HResult = GetCommState(serial_port->m_serial_handle, &serial_params);
     if (HResult == FALSE)
     {
-        stop();
-        throw_system_error("Cannot open port. GetCommState failed");
+        win_serial_port_stop(serial_port);
+        fprintf(stderr, "Cannot open port %s. GetCommState failed", serial_port->m_portname);
+        return COMM_CHANNEL_STATUS_error;
     }
-    serial_params.BaudRate = m_baudrate;
+
+    serial_params.BaudRate = serial_port->m_baudrate;
     serial_params.ByteSize = 8;
     serial_params.StopBits = ONESTOPBIT;
     serial_params.Parity = NOPARITY;
     serial_params.fRtsControl = RTS_CONTROL_DISABLE;
     serial_params.fDtrControl = DTR_CONTROL_DISABLE;
-    HResult = SetCommState(m_serial_handle, &serial_params);
+    HResult = SetCommState(serial_port->m_serial_handle, &serial_params);
     if (HResult == FALSE)
     {
-        stop();
-        throw_system_error("Cannot open port. SetCommState failed");
+        win_serial_port_stop(serial_port);
+        fprintf(stderr, "Cannot open port %s. SetCommState failed", serial_port->m_portname);
+        return COMM_CHANNEL_STATUS_error;
     }
 
-    HResult = PurgeComm(m_serial_handle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+    HResult = PurgeComm(serial_port->m_serial_handle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
     if (HResult == FALSE)
     {
-        stop();
-        throw_system_error("Cannot open port. PurgeComm failed");
+        win_serial_port_stop(serial_port);
+        fprintf(stderr, "Cannot open port %s. PurgeComm failed", serial_port->m_portname);
+        return COMM_CHANNEL_STATUS_error;
     }
+
+    return COMM_CHANNEL_STATUS_success;
 }
 
-void WinSerialPortBridge::stop()
+comm_channel_status_e win_serial_port_stop(win_serial_port_t *serial_port)
 {
-    if (m_serial_handle != INVALID_HANDLE_VALUE)
+    if (serial_port->m_serial_handle != INVALID_HANDLE_VALUE)
     {
-        CloseHandle(m_serial_handle);
+        CloseHandle(serial_port->m_serial_handle);
     }
 
-    m_serial_handle = INVALID_HANDLE_VALUE;
+    serial_port->m_serial_handle = INVALID_HANDLE_VALUE;
+    return COMM_CHANNEL_STATUS_success;
 }
 
-void WinSerialPortBridge::throw_system_error(const std::string &msg)
-{
-    throw std::system_error(GetLastError(), std::system_category(), msg.c_str());
-}
-
-int WinSerialPortBridge::receive(uint8_t *buffer, int len)
+comm_channel_status_e win_serial_port_receive(win_serial_port_t *serial_port, uint8_t *buffer, int len, int *ret)
 {
     DWORD nbRead = 0;
     BOOL HResult;
-    if (m_serial_handle != INVALID_HANDLE_VALUE)
+    if (serial_port->m_serial_handle != INVALID_HANDLE_VALUE)
     {
-        HResult = ReadFile(m_serial_handle, buffer, len, &nbRead, NULL);
+        HResult = ReadFile(serial_port->m_serial_handle, buffer, len, &nbRead, NULL);
         if (HResult == FALSE)
         {
-            stop();
-            throw_system_error("Cannot read port");
+            win_serial_port_stop(serial_port);
+            fprintf(stderr, "Cannot read port %s.", serial_port->m_portname);
+            return COMM_CHANNEL_STATUS_error;
         }
     }
 
-    return static_cast<int>(nbRead);
+    *ret = nbRead;
+    return COMM_CHANNEL_STATUS_success;
 }
 
-void WinSerialPortBridge::send(const uint8_t *buffer, int len)
+comm_channel_status_e win_serial_port_send(win_serial_port_t *serial_port, uint8_t const *buffer, int len)
 {
     BOOL HResult;
 
-    if (m_serial_handle != INVALID_HANDLE_VALUE)
+    if (serial_port->m_serial_handle != INVALID_HANDLE_VALUE)
     {
-        HResult = WriteFile(m_serial_handle, buffer, len, NULL, NULL);
+        HResult = WriteFile(serial_port->m_serial_handle, buffer, len, NULL, NULL);
         if (HResult == FALSE)
         {
-            stop();
-            throw_system_error("Cannot write port");
+            win_serial_port_stop(serial_port);
+            fprintf(stderr, "Cannot write port %s.", serial_port->m_portname);
+            return COMM_CHANNEL_STATUS_error;
         }
 
-        FlushFileBuffers(m_serial_handle); // Do not check result as this may fail on virtual driver.
+        FlushFileBuffers(serial_port->m_serial_handle); // Do not check result as this may fail on virtual driver.
     }
+
+    return COMM_CHANNEL_STATUS_success;
 }

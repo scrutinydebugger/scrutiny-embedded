@@ -16,7 +16,7 @@
 
 #if SCRUTINY_BUILD_WINDOWS
 #include <windows.h>
-WSAData UdpBridge::wsa_data;
+static struct WSAData wsa_data;
 #else
 #include <fcntl.h> // For non-blocking
 #endif
@@ -24,7 +24,7 @@ WSAData UdpBridge::wsa_data;
 comm_channel_status_e udp_bridge_global_init()
 {
 #if SCRUTINY_BUILD_WINDOWS
-    int ret = WSAStartup(MAKEWORD(2, 2), &UdpBridge::wsa_data); // Assume one UDP bridge will be running globally. We don't need more really
+    int ret = WSAStartup(MAKEWORD(2, 2), &wsa_data); // Assume one UDP bridge will be running globally. We don't need more really
     if (ret != 0)
     {
         ERR_RETURN("WSAStartup Failed");

@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/main.c
     ${CMAKE_CURRENT_LIST_DIR}/src/file1.c
     ${CMAKE_CURRENT_LIST_DIR}/src/file2.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/tools.c
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.c
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.c
     ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/udp_bridge.c
