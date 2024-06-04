@@ -11,7 +11,9 @@
 #include "scrutiny_tools.hpp"
 #include <stdint.h>
 
+#if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Condition always true
+#endif
 namespace scrutiny
 {
     namespace codecs
@@ -124,5 +126,3 @@ namespace scrutiny
         }
     }
 }
-
-#pragma warning(default : 4127) // Condition always true
