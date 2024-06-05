@@ -9,3 +9,7 @@ option(SCRUTINY_BUILD_TESTAPP "Build the test application" OFF)
 if (SCRUTINY_BUILD_TESTAPP)
     add_subdirectory(testapp)
 endif()
+
+if (SCRUTINY_BUILD_TESTAPP AND SCRUTINY_BUILD_CWRAPPER)
+    add_subdirectory(c_testapp)
+endif()

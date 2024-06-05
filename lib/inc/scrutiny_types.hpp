@@ -14,111 +14,78 @@
 
 namespace scrutiny
 {
+    namespace ctypes
+    {
+#include "scrutiny_c_compatible_types.h"
+    }
+
     /// @brief Represents an storage endianness
     enum class Endianness : uint8_t
     {
-        LITTLE,
-        BIG
+        LITTLE = ctypes::SCRUTINY_C_ENDIANNESS_LITTLE,
+        BIG = ctypes::SCRUTINY_C_ENDIANNESS_BIG
     };
 
     /// @brief Represents an address range with a start an a end.
-    struct AddressRange
-    {
-        void *start;
-        void *end;
-    };
+    typedef ctypes::scrutiny_c_address_range_t AddressRange;
 
     /// @brief User Command Callback function
-    typedef void (*user_command_callback_t)(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length);
+    typedef ctypes::scrutiny_c_user_command_callback_t user_command_callback_t;
 
     /// @brief Represent a type type, meaning a type without its size. uint8, uin16, int32 all have type type uint.
     enum class VariableTypeType : uint8_t
     {
-        _sint = 0 << 4,
-        _uint = 1 << 4,
-        _float = 2 << 4,
-        _boolean = 3 << 4,
-        _cfloat = 4 << 4,
-        _undef = 0xF << 4
+        _sint = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_sint,
+        _uint = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_uint,
+        _float = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_float,
+        _boolean = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean,
+        _cfloat = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat,
+        _undef = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_undef
     };
 
     /// @brief Represent a type size
     enum class VariableTypeSize : uint8_t
     {
-        _8 = 0,
-        _16 = 1,
-        _32 = 2,
-        _64 = 3,
-        _128 = 4,
-        _256 = 5,
-        _undef = 0xF
+        _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
+        _16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_16,
+        _32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_32,
+        _64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_64,
+        _128 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_128,
+        _256 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_256,
+        _undef = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_undef
     };
 
     /// @brief  Represent a datatype. Must match the python core module enum
     enum class VariableType : uint8_t
     {
-        sint8 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_8),       // cppcheck-suppress[badBitmaskCheck]
-        sint16 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_16),     // cppcheck-suppress[badBitmaskCheck]
-        sint32 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_32),     // cppcheck-suppress[badBitmaskCheck]
-        uint8 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_8),       // cppcheck-suppress[badBitmaskCheck]
-        uint16 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_16),     // cppcheck-suppress[badBitmaskCheck]
-        uint32 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_32),     // cppcheck-suppress[badBitmaskCheck]
-        float8 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_8),     // cppcheck-suppress[badBitmaskCheck]
-        float16 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_16),   // cppcheck-suppress[badBitmaskCheck]
-        float32 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_32),   // cppcheck-suppress[badBitmaskCheck]
-        cfloat8 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_8),   // cppcheck-suppress[badBitmaskCheck]
-        cfloat16 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_16), // cppcheck-suppress[badBitmaskCheck]
-        cfloat32 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_32), // cppcheck-suppress[badBitmaskCheck]
-        boolean = static_cast<uint8_t>(VariableTypeType::_boolean) | static_cast<uint8_t>(VariableTypeSize::_8),  // cppcheck-suppress[badBitmaskCheck]
+        sint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint8,
+        sint16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint16,
+        sint32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint32,
+        uint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint8,
+        uint16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint16,
+        uint32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint32,
+        float8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float8,
+        float16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float16,
+        float32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float32,
+        cfloat8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat8,
+        cfloat16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat16,
+        cfloat32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat32,
+        boolean = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean,
 
 #if SCRUTINY_SUPPORT_64BITS
-        uint64 = static_cast<uint8_t>(VariableTypeType::_uint) | static_cast<uint8_t>(VariableTypeSize::_64),     // cppcheck-suppress[badBitmaskCheck]
-        sint64 = static_cast<uint8_t>(VariableTypeType::_sint) | static_cast<uint8_t>(VariableTypeSize::_64),     // cppcheck-suppress[badBitmaskCheck]
-        float64 = static_cast<uint8_t>(VariableTypeType::_float) | static_cast<uint8_t>(VariableTypeSize::_64),   // cppcheck-suppress[badBitmaskCheck]
-        cfloat64 = static_cast<uint8_t>(VariableTypeType::_cfloat) | static_cast<uint8_t>(VariableTypeSize::_64), // cppcheck-suppress[badBitmaskCheck]
+        uint64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint64,
+        sint64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint64,
+        float64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float64,
+        cfloat64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat64,
 #endif
-        unknown = 0xFF
+        unknown = ctypes::SCRUTINY_C_VARIABLE_TYPE_unknown
     };
 
     /// @brief Union structure to pass any type of data to a function.
-    union AnyType
-    {
-        uint8_t uint8;
-        uint16_t uint16;
-        uint32_t uint32;
-
-        int8_t sint8;
-        int16_t sint16;
-        int32_t sint32;
-
-        float float32;
-        bool boolean;
-#if SCRUTINY_SUPPORT_64BITS
-        int64_t sint64;
-        uint64_t uint64;
-        double float64;
-#endif
-    };
+    typedef ctypes::scrutiny_c_any_type_t AnyType;
 
     /// @brief The fast version of AnyType
-    union AnyTypeFast
-    {
-        uint_fast8_t uint8;
-        uint_fast16_t uint16;
-        uint_fast32_t uint32;
-
-        int_fast8_t sint8;
-        int_fast16_t sint16;
-        int_fast32_t sint32;
-
-        float float32;
-        bool boolean;
-#if SCRUTINY_SUPPORT_64BITS
-        uint_fast64_t uint64;
-        int_fast64_t sint64;
-        double float64;
-#endif
-    };
+    typedef ctypes::scrutiny_c_any_type_fast_t AnyTypeFast;
 
 #if SCRUTINY_SUPPORT_64BITS
     typedef uint64_t uint_biggest_t;
@@ -142,6 +109,12 @@ namespace scrutiny
     /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and a ID that can be read/written by the server
     struct RuntimePublishedValue
     {
+        inline void to_c_struct(ctypes::scrutiny_c_runtime_published_value_t *rpv_c) const
+        {
+            rpv_c->id = id;
+            rpv_c->type = static_cast<ctypes::scrutiny_c_variable_type_e>(type);
+        }
+
         uint16_t id;
         VariableType type;
     };

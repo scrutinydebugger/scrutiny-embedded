@@ -46,7 +46,7 @@ namespace scrutiny
             /// @param buffer The logging buffer
             /// @param buffer_size Size of the logging buffer
             /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread safety)
-            void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const uint32_t buffer_sizem, trigger_callback_t trigger_callback = nullptr);
+            void init(MainHandler *main_handler, Timebase *timebase, uint8_t *const buffer, const buffer_size_t buffer_sizem, trigger_callback_t trigger_callback = nullptr);
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase_for_log The timebase used for time logging

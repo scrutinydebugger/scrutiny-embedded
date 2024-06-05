@@ -47,7 +47,7 @@ namespace scrutiny
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t const *data, uint16_t len)
+        void CommHandler::receive_data(uint8_t const *data, uint16_t const len)
         {
             uint16_t i = 0;
 

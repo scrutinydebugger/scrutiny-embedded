@@ -83,10 +83,10 @@ namespace scrutiny
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    void Config::set_datalogging_buffers(uint8_t *datalogger_buffer, const datalogging::buffer_size_t datalogger_buffer_size)
+    void Config::set_datalogging_buffers(uint8_t *buffer, const datalogging::buffer_size_t buffer_size)
     {
-        m_datalogger_buffer = datalogger_buffer;
-        m_datalogger_buffer_size = datalogger_buffer_size;
+        m_datalogger_buffer = buffer;
+        m_datalogger_buffer_size = buffer_size;
     }
 
     bool Config::has_at_least_one_loop_with_datalogging(void) const

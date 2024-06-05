@@ -316,7 +316,13 @@ void my_user_command(
     uint16_t *response_data_length,
     const uint16_t response_max_data_length)
 {
-    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction) << std::endl;
+    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction)
+              << " with " << request_data_length << " data bytes: ";
+    for (uint32_t i = 0; i < request_data_length; i++)
+    {
+        std::cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(request_data[i]);
+    }
+    std::cout << std::endl;
 
     if (response_max_data_length < 1)
     {
@@ -328,7 +334,7 @@ void my_user_command(
     {
         *response_data_length = 8;
         response_data[0] = subfunction;
-        for (int i = 0; i < 7; i++)
+        for (uint8_t i = 0; i < 7; i++)
         {
             response_data[i + 1] = i;
         }
@@ -337,9 +343,9 @@ void my_user_command(
     {
         *response_data_length = response_max_data_length;
         response_data[0] = subfunction;
-        for (int i = 1; i < response_max_data_length; i++)
+        for (uint16_t i = 1; i < response_max_data_length; i++)
         {
-            response_data[i] = i;
+            response_data[i] = static_cast<uint8_t>(i);
         }
     }
     else if (subfunction == 2)
@@ -352,7 +358,7 @@ void my_user_command(
     }
     else if (subfunction == 4)
     {
-        const uint16_t max_echo_size = std::min(request_data_length, static_cast<uint16_t>(response_max_data_length - 1));
+        const uint16_t max_echo_size = min(request_data_length, static_cast<uint16_t>(response_max_data_length - 1));
         response_data[0] = subfunction;
         for (uint16_t i = 0; i < max_echo_size; i++)
         {
@@ -392,7 +398,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     config.session_counter_seed = 0xdeadbeef;
     scrutiny_handler.init(&config);
 
-    chrono::time_point<chrono::steady_clock> last_timestamp, now_timestamp;
+    chrono::time_point<chrono::steady_clock> start_timestamp, last_timestamp, now_timestamp;
+    start_timestamp = chrono::steady_clock::now();
     last_timestamp = chrono::steady_clock::now();
     now_timestamp = chrono::steady_clock::now();
 
@@ -405,11 +412,12 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
+            uint32_t time_since_start_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
             uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
 
             if (len_received > 0)
             {
-                cout << "in:  (" << dec << len_received << ")\t";
+                cout << dec << setw(0) << time_since_start_us << "  in:  (" << setw(2) << setfill(' ') << len_received << ")  ";
                 for (int i = 0; i < len_received; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
@@ -418,6 +426,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             }
 
             scrutiny_handler.receive_data(buffer, static_cast<uint16_t>(len_received));
+
             scrutiny_handler.process(timestep_us * 10);
 
             uint16_t data_to_send = scrutiny_handler.data_to_send();
@@ -428,7 +437,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
                 scrutiny_handler.pop_data(buffer, data_to_send);
                 channel->send(buffer, data_to_send);
 
-                cout << "out: (" << dec << data_to_send << ")\t";
+                cout << dec << setw(0) << time_since_start_us << "  out: (" << setw(2) << setfill(' ') << len_received << ")  ";
                 for (unsigned int i = 0; i < data_to_send; i++)
                 {
                     cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(buffer[i]);
@@ -459,7 +468,7 @@ int main(int argc, char *argv[])
     static_assert(sizeof(char) == 1, "testapp doesn't support char bigger than 8 bits (yet)");
 
     int errorcode = 0;
-    static int staticIntInMainFunc = 22222;
+    static volatile int staticIntInMainFunc = 22222;
     (void)staticIntInMainFunc;
     init_all_values();
 

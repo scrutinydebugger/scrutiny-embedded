@@ -53,11 +53,18 @@ namespace scrutiny
         /// @param timestep_100ns The time elapsed since last call to this function, in multiple of 100ns.
         void process(const timediff_t timestep_100ns);
 
+        /// @brief Pass data received from the server to the scrutiny-embedded lib input stream.
+        /// @param data Pointer to the data buffer
+        /// @param len Length of the data
         inline void receive_data(uint8_t const *data, uint16_t const len)
         {
             m_comm_handler.receive_data(data, len);
         }
 
+        /// @brief Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
+        /// @param buffer Buffer to write the data into
+        /// @param len Maximum length of the data to read
+        /// @return Number of bytes actually read
         inline uint16_t pop_data(uint8_t *buffer, uint16_t len)
         {
             uint16_t const size = m_comm_handler.pop_data(buffer, len);
@@ -65,6 +72,8 @@ namespace scrutiny
             return size;
         }
 
+        /// @brief Tells how much data is available in the scrutiny-embedded lib output stream
+        /// @return Number of bytes available
         inline uint16_t data_to_send(void) const
         {
             return m_comm_handler.data_to_send();

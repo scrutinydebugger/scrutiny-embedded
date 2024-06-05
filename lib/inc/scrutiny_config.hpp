@@ -36,29 +36,33 @@ namespace scrutiny
         void set_buffers(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size);
 
         /// @brief Define some memory section that are to be left untouched
-        /// @param range Array of ranges represented by tge AddressRange object. This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
-        /// Consider using scrutiny::tools::make_address_range to generate these objects in a one-liner
+        /// @param range Array of ranges represented by the `AddressRange` object.
+        /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
+        /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
         /// @param count Number of ranges in the given array
         void set_forbidden_address_range(const AddressRange *range, const uint8_t count);
 
         /// @brief Defines some memory sections that are read-only.
-        /// @param range Array of ranges represented by tge AddressRange object. This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
-        /// Consider using scrutiny::tools::make_address_range to generate these objects in a one-liner
+        /// @param ranges Array of ranges represented by the `scrutiny::AddressRange` object.
+        /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
+        /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
         /// @param count Number of ranges in the given array
-        void set_readonly_address_range(const AddressRange *range, const uint8_t count);
+        void set_readonly_address_range(const AddressRange *ranges, const uint8_t count);
 
-        /// @brief Configure the Runtime Published Values
-        /// @param array Array of runtimePublishedValues that contains the definition of each RPV. This array must be allocated outside of Scrutiny and stay
+        /// @brief Configures the Runtime Published Values
+        /// @param array Array of `scrutiny::RuntimePublishedValues` that contains the definition of each RPV.
+        /// This array must be allocated outside of Scrutiny and stay
         /// allocated forever as no copy will be made
-        /// @param nbr Number of RPB in the array
+        /// @param nbr Number of RPV in the array
         /// @param rd_cb Callback to call to read a RPV
         /// @param wr_cb Callback to call to write a RPV
         void set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb = nullptr, RpvWriteCallback wr_cb = nullptr);
 
         /// @brief Defines the different loops (tasks) in the application.
-        /// @param loops Arrays of pointer to the LoopHandlers. This array must be allocated outside of Scrutiny and stay
+        /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
+        /// This array must be allocated outside of Scrutiny and stay
         /// allocated forever as no copy will be made
-        /// @param loop_count Number of LoopHandlers
+        /// @param loop_count Number of `scrutiny::LoopHandlers`
         void set_loops(LoopHandler **loops, uint8_t loop_count);
 
         /// @brief Sets a callback to be called by Scrutiny after a request to the UserCommand function.
@@ -80,9 +84,9 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
 
         /// @brief Sets the buffer used to store data when doing a datalogging acquisition
-        /// @param datalogger_buffer The datalogging buffer
-        /// @param datalogger_buffer_size The datalogging buffer size
-        void set_datalogging_buffers(uint8_t *datalogger_buffer, const datalogging::buffer_size_t datalogger_buffer_size);
+        /// @param buffer The datalogging buffer
+        /// @param buffer_size The datalogging buffer size
+        void set_datalogging_buffers(uint8_t *buffer, const datalogging::buffer_size_t buffer_size);
 
         /// @brief Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
         /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
