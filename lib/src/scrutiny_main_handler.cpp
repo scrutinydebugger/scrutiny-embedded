@@ -312,6 +312,7 @@ namespace scrutiny
             break;
         }
     }
+    
     void MainHandler::process_datalogging_logic(void)
     {
         if (m_datalogging.error != DataloggingError::NoError)
@@ -450,7 +451,7 @@ namespace scrutiny
 #endif
     }
 
-    void MainHandler::check_finished_sending()
+    void MainHandler::check_finished_sending(void)
     {
         if (m_processing_request)
         {

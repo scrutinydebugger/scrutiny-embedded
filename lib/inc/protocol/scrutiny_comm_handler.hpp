@@ -39,7 +39,7 @@ namespace scrutiny
                 uint16_t const rx_buffer_size,
                 uint8_t *const tx_buffer,
                 uint16_t const tx_buffer_size,
-                Timebase *const timebase,
+                Timebase const *const timebase,
                 uint32_t const session_counter_seed = 0);
 
             /// @brief Move data from the outside world (received by the server) to the scrutiny lib
@@ -53,13 +53,13 @@ namespace scrutiny
             bool send_response(Response const *const response);
 
             /// @brief Reset the communication handler and put it back to an idle state
-            void reset();
+            void reset(void);
 
             /// @brief Get a response object that will use the transmit buffer has a payload content
             Response *prepare_response(void);
 
             // Reads data from the scrutiny lib so that it can be sent to the outside world (to the server)
-            uint16_t pop_data(uint8_t *buffer, uint16_t len);
+            uint16_t pop_data(uint8_t *const buffer, uint16_t len);
 
             /// @brief Returns the number of bytes pending to be sent.
             uint16_t data_to_send(void) const;
@@ -93,7 +93,7 @@ namespace scrutiny
             inline bool request_received(void) const { return m_request_received; }
 
             /// @brief Returns the request that has been received
-            inline Request *get_request(void) { return &m_active_request; }
+            inline Request const *get_request(void) const { return &m_active_request; }
 
             /// @brief Gets the last error encountered in reception task
             inline RxError get_rx_error(void) const { return m_rx_error; }
@@ -158,7 +158,7 @@ namespace scrutiny
             void reset_rx();
             void reset_tx();
 
-            Timebase *m_timebase;                // Pointer to the timebase given by the MainHandler
+            Timebase const *m_timebase;          // Pointer to the timebase given by the MainHandler
             State m_state;                       // Internal state, idle, receiving, transmitting
             bool m_enabled;                      // Enable flag
             uint32_t m_session_id;               // Actual session ID

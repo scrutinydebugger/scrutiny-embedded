@@ -26,7 +26,7 @@ namespace scrutiny
     namespace protocol
     {
         //==============================================================
-        void ReadMemoryBlocksRequestParser::validate()
+        void ReadMemoryBlocksRequestParser::validate(void)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint32_t cursor = 0;
@@ -53,7 +53,7 @@ namespace scrutiny
             }
         }
 
-        void ReadMemoryBlocksRequestParser::init(Request const *request)
+        void ReadMemoryBlocksRequestParser::init(Request const *const request)
         {
             m_buffer = request->data;
             m_request_datasize = request->data_length;
@@ -61,7 +61,7 @@ namespace scrutiny
             validate();
         }
 
-        void ReadMemoryBlocksRequestParser::next(MemoryBlock *memblock)
+        void ReadMemoryBlocksRequestParser::next(MemoryBlock *const memblock)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint16_t length;
@@ -92,7 +92,7 @@ namespace scrutiny
             }
         }
 
-        void ReadMemoryBlocksRequestParser::reset()
+        void ReadMemoryBlocksRequestParser::reset(void)
         {
             m_bytes_read = 0;
             m_invalid = false;
@@ -102,7 +102,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void WriteMemoryBlocksRequestParser::init(Request const *request, bool masked_write)
+        void WriteMemoryBlocksRequestParser::init(Request const *const request, bool const masked_write)
         {
             m_buffer = request->data;
             m_size_limit = request->data_length;
@@ -111,7 +111,7 @@ namespace scrutiny
             validate();
         }
 
-        void WriteMemoryBlocksRequestParser::validate()
+        void WriteMemoryBlocksRequestParser::validate(void)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint16_t cursor = 0;
@@ -149,7 +149,7 @@ namespace scrutiny
             }
         }
 
-        void WriteMemoryBlocksRequestParser::next(MemoryBlock *memblock)
+        void WriteMemoryBlocksRequestParser::next(MemoryBlock *const memblock)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             uint16_t length;
@@ -199,7 +199,7 @@ namespace scrutiny
             }
         }
 
-        void WriteMemoryBlocksRequestParser::reset()
+        void WriteMemoryBlocksRequestParser::reset(void)
         {
             m_bytes_read = 0;
             m_invalid = false;
@@ -209,7 +209,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void ReadMemoryBlocksResponseEncoder::init(Response *response, uint16_t const max_size)
+        void ReadMemoryBlocksResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -217,7 +217,7 @@ namespace scrutiny
             reset();
         }
 
-        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock *memblock)
+        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
         {
             constexpr unsigned int addr_size = sizeof(void *);
 
@@ -241,7 +241,7 @@ namespace scrutiny
             m_response->data_length = m_cursor;
         }
 
-        void ReadMemoryBlocksResponseEncoder::reset()
+        void ReadMemoryBlocksResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -249,7 +249,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void WriteMemoryBlocksResponseEncoder::init(Response *response, uint16_t max_size)
+        void WriteMemoryBlocksResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -257,7 +257,7 @@ namespace scrutiny
             reset();
         }
 
-        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock *memblock)
+        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
         {
             constexpr unsigned int addr_size = sizeof(void *);
 
@@ -272,7 +272,7 @@ namespace scrutiny
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
 
-        void WriteMemoryBlocksResponseEncoder::reset()
+        void WriteMemoryBlocksResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -280,7 +280,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void GetRPVDefinitionResponseEncoder::init(Response *response, uint16_t const max_size)
+        void GetRPVDefinitionResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -288,7 +288,7 @@ namespace scrutiny
             reset();
         }
 
-        void GetRPVDefinitionResponseEncoder::write(RuntimePublishedValue const *rpv)
+        void GetRPVDefinitionResponseEncoder::write(RuntimePublishedValue const *const rpv)
         {
             // id (2) + type (1) + address size (2,4,8)
             if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
@@ -302,7 +302,7 @@ namespace scrutiny
             m_response->data_length = m_cursor;
         }
 
-        void GetRPVDefinitionResponseEncoder::reset()
+        void GetRPVDefinitionResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -310,7 +310,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void ReadRPVResponseEncoder::init(Response *response, uint16_t const max_size)
+        void ReadRPVResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -318,7 +318,7 @@ namespace scrutiny
             reset();
         }
 
-        void ReadRPVResponseEncoder::write(RuntimePublishedValue const *rpv, AnyType v)
+        void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
         {
             uint8_t const typesize = tools::get_type_size(rpv->type);
             // id (2) + type (1)
@@ -340,7 +340,7 @@ namespace scrutiny
             }
         }
 
-        void ReadRPVResponseEncoder::reset()
+        void ReadRPVResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -348,7 +348,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void WriteRPVResponseEncoder::init(Response *response, uint16_t const max_size)
+        void WriteRPVResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
             m_buffer = response->data;
@@ -356,7 +356,7 @@ namespace scrutiny
             reset();
         }
 
-        void WriteRPVResponseEncoder::write(RuntimePublishedValue const *rpv)
+        void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
         {
             uint8_t const typesize = tools::get_type_size(rpv->type);
             // id (2) + datalen (1)
@@ -372,7 +372,7 @@ namespace scrutiny
             m_response->data_length = m_cursor;
         }
 
-        void WriteRPVResponseEncoder::reset()
+        void WriteRPVResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -380,7 +380,7 @@ namespace scrutiny
 
         //==============================================================
 
-        void ReadRPVRequestParser::init(Request const *request)
+        void ReadRPVRequestParser::init(Request const *const request)
         {
             m_buffer = request->data;
             m_request_len = request->data_length;
@@ -388,7 +388,7 @@ namespace scrutiny
             validate();
         }
 
-        void ReadRPVRequestParser::validate()
+        void ReadRPVRequestParser::validate(void)
         {
             // It's a list of 16 bits value. So we need an even number of bytes
             if ((m_request_len & 0x01) != 0)
@@ -398,7 +398,7 @@ namespace scrutiny
             }
         }
 
-        bool ReadRPVRequestParser::next(uint16_t *id)
+        bool ReadRPVRequestParser::next(uint16_t *const id)
         {
             if (m_finished || m_invalid)
             {
@@ -422,7 +422,7 @@ namespace scrutiny
             return !m_invalid; // cppcheck-suppress[knownConditionTrueFalse]
         }
 
-        void ReadRPVRequestParser::reset()
+        void ReadRPVRequestParser::reset(void)
         {
             m_bytes_read = 0;
             m_invalid = false;
@@ -439,7 +439,7 @@ namespace scrutiny
             reset();
         }
 
-        bool WriteRPVRequestParser::next(RuntimePublishedValue *rpv, AnyType *v)
+        bool WriteRPVRequestParser::next(RuntimePublishedValue *const rpv, AnyType *const v)
         {
             bool ok_to_process = false;
             // We can't parse the request if a previous entry was not found.
@@ -507,7 +507,7 @@ namespace scrutiny
             return ok_to_process;
         }
 
-        void WriteRPVRequestParser::reset()
+        void WriteRPVRequestParser::reset(void)
         {
             m_bytes_read = 0;
             m_invalid = false;
@@ -968,7 +968,9 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        ResponseCode CodecV1_0::encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_get_setup(
+            ResponseData::DataLogControl::GetSetup const *const response_data,
+            Response *const response)
         {
             constexpr uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding) + sizeof(response_data->max_signal_count);
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
@@ -984,7 +986,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode CodecV1_0::encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_status(
+            ResponseData::DataLogControl::GetStatus const *const response_data,
+            Response *const response)
         {
             constexpr uint16_t state_len = sizeof(response_data->state);
             constexpr uint16_t bytes_to_acquire_len = sizeof(response_data->bytes_to_acquire_from_trigger_to_completion);
@@ -1007,7 +1011,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode CodecV1_0::encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response)
+        ResponseCode CodecV1_0::encode_response_datalogging_get_acquisition_metadata(
+            ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
+            Response *const response)
         {
             constexpr uint16_t acquisition_id_size = sizeof(response_data->acquisition_id);
             constexpr uint16_t config_id_size = sizeof(response_data->config_id);
@@ -1033,7 +1039,10 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished)
+        ResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(
+            ResponseData::DataLogControl::ReadAcquisition const *const response_data,
+            Response *const response,
+            bool *const finished)
         {
             constexpr uint16_t minimum_datalen = 16;
             if (minimum_datalen > MINIMUM_TX_BUFFER_SIZE && minimum_datalen > response->data_max_length)
@@ -1062,9 +1071,9 @@ namespace scrutiny
         }
 
         ResponseCode CodecV1_0::decode_datalogging_configure_request(
-            Request const *request,
-            RequestData::DataLogControl::Configure *request_data,
-            datalogging::Configuration *config)
+            Request const *const request,
+            RequestData::DataLogControl::Configure *const request_data,
+            datalogging::Configuration *const config)
         {
             if (request->data_length < 16)
             {

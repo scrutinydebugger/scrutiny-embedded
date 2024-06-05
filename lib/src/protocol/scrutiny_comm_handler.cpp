@@ -25,7 +25,7 @@ namespace scrutiny
             uint16_t const rx_buffer_size,
             uint8_t *const tx_buffer,
             uint16_t const tx_buffer_size,
-            Timebase *const timebase,
+            Timebase const *const timebase,
             uint32_t const session_counter_seed)
         {
             m_rx_buffer = rx_buffer;
@@ -293,7 +293,7 @@ namespace scrutiny
             return true;
         }
 
-        uint16_t CommHandler::pop_data(uint8_t *buffer, uint16_t len)
+        uint16_t CommHandler::pop_data(uint8_t *const buffer, uint16_t len)
         {
             static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
 

@@ -147,11 +147,11 @@ namespace scrutiny
 
         /// @brief  Init the encoder
         void RawFormatEncoder::init(
-            MainHandler *main_handler,
-            Timebase *timebase_for_log,
-            datalogging::Configuration *config,
-            uint8_t *buffer,
-            datalogging::buffer_size_t buffer_size)
+            MainHandler const *const main_handler,
+            Timebase const *const timebase_for_log,
+            datalogging::Configuration const *const config,
+            uint8_t *const buffer,
+            datalogging::buffer_size_t const buffer_size)
         {
             m_main_handler = main_handler;
             m_timebase_for_log = timebase_for_log;

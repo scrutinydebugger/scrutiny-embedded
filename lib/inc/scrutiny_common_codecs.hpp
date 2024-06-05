@@ -19,7 +19,7 @@ namespace scrutiny
     namespace codecs
     {
 
-        inline uint8_t encode_8_bits(uint8_t const value, uint8_t *buff)
+        inline uint8_t encode_8_bits(uint8_t const value, uint8_t *const buff)
         {
             buff[0] = value;
             return sizeof(uint8_t);
@@ -129,7 +129,7 @@ namespace scrutiny
         template <class T>
         inline uint8_t encode_64_bits_little_endian(T const value, uint8_t *buff) = delete;
 
-        inline uint64_t decode_64_bits_big_endian(uint8_t const *buff)
+        inline uint64_t decode_64_bits_big_endian(uint8_t const *const buff)
         {
             uint_fast64_t v = 0;
             v |= ((static_cast<uint_fast64_t>(buff[0]) << 56) & 0xFF00000000000000u);
@@ -144,7 +144,7 @@ namespace scrutiny
         }
 #endif
 
-        inline uint32_t decode_32_bits_big_endian(uint8_t const *buff)
+        inline uint32_t decode_32_bits_big_endian(uint8_t const *const buff)
         {
             uint_fast32_t v = 0;
             v |= ((static_cast<uint_fast32_t>(buff[0]) << 24) & 0xFF000000u);
@@ -154,7 +154,7 @@ namespace scrutiny
             return static_cast<uint32_t>(v);
         }
 
-        inline float decode_float_big_endian(uint8_t const *buff)
+        inline float decode_float_big_endian(uint8_t const *const buff)
         {
             static_assert(sizeof(float) == 4, "Expect float to be 4 bytes");
             uint32_t const temp = decode_32_bits_big_endian(buff);
@@ -163,7 +163,7 @@ namespace scrutiny
             return v;
         }
 
-        inline uint16_t decode_16_bits_big_endian(uint8_t const *buff)
+        inline uint16_t decode_16_bits_big_endian(uint8_t const *const buff)
         {
             uint_fast16_t v = 0;
             v |= ((static_cast<uint_fast16_t>(buff[0]) << 8) & 0xFF00u);
@@ -172,7 +172,7 @@ namespace scrutiny
         }
 
 #if SCRUTINY_SUPPORT_64BITS
-        inline uint64_t decode_64_bits_little_endian(uint8_t const *buff)
+        inline uint64_t decode_64_bits_little_endian(uint8_t const *const buff)
         {
             uint_fast64_t v = 0;
             v |= ((static_cast<uint_fast64_t>(buff[7]) << 56) & 0xFF00000000000000u);
@@ -186,7 +186,7 @@ namespace scrutiny
             return static_cast<uint64_t>(v);
         }
 #endif
-        inline uint32_t decode_32_bits_little_endian(uint8_t const *buff)
+        inline uint32_t decode_32_bits_little_endian(uint8_t const *const buff)
         {
             uint_fast32_t v = 0;
             v |= ((static_cast<uint_fast32_t>(buff[3]) << 24) & 0xFF000000u);
@@ -196,7 +196,7 @@ namespace scrutiny
             return static_cast<uint32_t>(v);
         }
 
-        inline float decode_float_little_endian(uint8_t const *buff)
+        inline float decode_float_little_endian(uint8_t const *const buff)
         {
             static_assert(sizeof(float) == 4, "Expect float to be 4 bytes");
             uint32_t const temp = decode_32_bits_little_endian(buff);
@@ -205,7 +205,7 @@ namespace scrutiny
             return v;
         }
 
-        inline uint16_t decode_16_bits_little_endian(uint8_t const *buff)
+        inline uint16_t decode_16_bits_little_endian(uint8_t const *const buff)
         {
             uint_fast16_t v = 0;
             v |= ((static_cast<uint_fast16_t>(buff[1]) << 8) & 0xFF00u);
@@ -213,12 +213,12 @@ namespace scrutiny
             return static_cast<uint16_t>(v);
         }
 
-        uint8_t decode_address_big_endian(uint8_t const *buf, uintptr_t *addr);
-        uint8_t encode_address_big_endian(void const *ptr, uint8_t *buf);
-        uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *buf);
+        uint8_t decode_address_big_endian(uint8_t const *const buf, uintptr_t *const addr);
+        uint8_t encode_address_big_endian(void const *const addr, uint8_t *const buf);
+        uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *const buf);
 
-        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *val, VariableType const vartype, uint8_t *buffer);
-        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *val, uint8_t const typesize, uint8_t *buffer);
+        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, VariableType const vartype, uint8_t *const buffer);
+        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, uint8_t const typesize, uint8_t *const buffer);
     }
 }
 

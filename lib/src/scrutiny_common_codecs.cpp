@@ -18,7 +18,7 @@ namespace scrutiny
 {
     namespace codecs
     {
-        uint8_t decode_address_big_endian(uint8_t const *buf, uintptr_t *addr)
+        uint8_t decode_address_big_endian(uint8_t const *const buf, uintptr_t *const addr)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -55,12 +55,12 @@ namespace scrutiny
             return static_cast<uint8_t>(addr_size);
         }
 
-        uint8_t encode_address_big_endian(void const *addr, uint8_t *buf)
+        uint8_t encode_address_big_endian(void const *const addr, uint8_t *const buf)
         {
             return encode_address_big_endian(reinterpret_cast<uintptr_t>(addr), buf);
         }
 
-        uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *buf)
+        uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *const buf)
         {
             constexpr unsigned int addr_size = sizeof(void *);
             static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -94,13 +94,13 @@ namespace scrutiny
             return static_cast<uint8_t>(addr_size);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *val, VariableType const vartype, uint8_t *buffer)
+        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType const vartype, uint8_t *const buffer)
         {
             uint8_t const typesize = tools::get_type_size(vartype);
             return encode_anytype_big_endian(val, typesize, buffer);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *val, uint8_t const typesize, uint8_t *buffer)
+        uint8_t encode_anytype_big_endian(AnyType const *const val, uint8_t const typesize, uint8_t *const buffer)
         {
 
             switch (typesize)

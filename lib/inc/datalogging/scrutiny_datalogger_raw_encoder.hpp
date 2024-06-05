@@ -36,7 +36,7 @@ namespace scrutiny
             explicit RawFormatReader(RawFormatEncoder const *const encoder) : m_encoder(encoder)
             {
             }
-            datalogging::buffer_size_t read(uint8_t *buffer, datalogging::buffer_size_t const max_size);
+            datalogging::buffer_size_t read(uint8_t *const buffer, datalogging::buffer_size_t const max_size);
             inline bool finished(void) const { return m_finished; }
             void reset(void);
             inline bool error(void) const;
@@ -61,7 +61,12 @@ namespace scrutiny
             {
             }
 
-            void init(MainHandler *main_handler, Timebase *timebase, datalogging::Configuration *config, uint8_t *buffer, datalogging::buffer_size_t buffer_size);
+            void init(
+                MainHandler const *const main_handler,
+                Timebase const *const timebase,
+                datalogging::Configuration const *const config,
+                uint8_t *const buffer,
+                datalogging::buffer_size_t const buffer_size);
             void encode_next_entry(void);
             void reset(void);
             inline void reset_write_counter(void) { m_entry_write_counter = 0; }
@@ -86,8 +91,8 @@ namespace scrutiny
             datalogging::buffer_size_t m_buffer_size = 0;
             datalogging::Configuration const *m_config = nullptr;
             RawFormatReader m_reader;
-            MainHandler *m_main_handler = nullptr;
-            Timebase *m_timebase_for_log = nullptr;
+            MainHandler const *m_main_handler = nullptr;
+            Timebase const *m_timebase_for_log = nullptr;
 
             datalogging::buffer_size_t m_max_entries = 0;
             datalogging::buffer_size_t m_next_entry_write_index = 0;

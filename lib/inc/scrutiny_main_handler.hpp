@@ -146,6 +146,9 @@ namespace scrutiny
         /// @brief Returns a pointer the the given configuration
         inline Config *get_config(void) { return &m_config; }
 
+        /// @brief Returns a pointer the the given configuration in read-only
+        inline Config const *get_config_ro(void) const { return &m_config; }
+
     private:
         void process_loops(void);
         void check_finished_sending(void);

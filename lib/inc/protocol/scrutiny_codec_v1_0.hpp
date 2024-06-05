@@ -40,12 +40,12 @@ namespace scrutiny
         class ReadMemoryBlocksRequestParser
         {
         public:
-            void init(Request const *request);
-            void next(MemoryBlock *memblock);
-            inline bool finished() { return m_finished; };
-            inline bool is_valid() { return !m_invalid; };
-            inline uint16_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
-            void reset();
+            void init(Request const *const request);
+            void next(MemoryBlock *const memblock);
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            inline uint16_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
+            void reset(void);
 
         protected:
             void validate();
@@ -60,10 +60,10 @@ namespace scrutiny
         class ReadMemoryBlocksResponseEncoder
         {
         public:
-            void init(Response *response, uint16_t const max_size);
-            void write(MemoryBlock *memblock);
-            inline bool overflow() { return m_overflow; };
-            void reset();
+            void init(Response *const response, uint16_t const max_size);
+            void write(MemoryBlock const *const memblock);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -76,15 +76,15 @@ namespace scrutiny
         class WriteMemoryBlocksRequestParser
         {
         public:
-            void init(Request const *request, bool masked_write);
-            void next(MemoryBlock *memblock);
-            inline bool finished() { return m_finished; };
-            inline bool is_valid() { return !m_invalid; };
-            inline uint32_t required_tx_buffer_size() { return m_required_tx_buffer_size; }
-            void reset();
+            void init(Request const *const request, bool const masked_write);
+            void next(MemoryBlock *const memblock);
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            inline uint32_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
+            void reset(void);
 
         protected:
-            void validate();
+            void validate(void);
 
             uint8_t *m_buffer;
             uint16_t m_bytes_read;
@@ -98,10 +98,10 @@ namespace scrutiny
         class WriteMemoryBlocksResponseEncoder
         {
         public:
-            void init(Response *response, uint16_t max_size);
-            void write(MemoryBlock *memblock);
-            inline bool overflow() { return m_overflow; };
-            void reset();
+            void init(Response *const response, uint16_t const max_size);
+            void write(MemoryBlock const *const memblock);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -114,10 +114,10 @@ namespace scrutiny
         class GetRPVDefinitionResponseEncoder
         {
         public:
-            void init(Response *response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *rpv);
-            inline bool overflow() { return m_overflow; };
-            void reset();
+            void init(Response *const response, uint16_t const max_size);
+            void write(RuntimePublishedValue const *const rpv);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -130,10 +130,10 @@ namespace scrutiny
         class ReadRPVResponseEncoder
         {
         public:
-            void init(Response *response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *rpv, AnyType v);
-            inline bool overflow() { return m_overflow; };
-            void reset();
+            void init(Response *const response, uint16_t const max_size);
+            void write(RuntimePublishedValue const *const rpv, AnyType const v);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -146,14 +146,14 @@ namespace scrutiny
         class ReadRPVRequestParser
         {
         public:
-            void init(Request const *request);
-            bool next(uint16_t *id);
-            inline bool finished() { return m_finished; };
-            inline bool is_valid() { return !m_invalid; };
-            void reset();
+            void init(Request const *const request);
+            bool next(uint16_t *const id);
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            void reset(void);
 
         protected:
-            void validate();
+            void validate(void);
 
             uint8_t *m_buffer;
             uint16_t m_bytes_read;
@@ -165,10 +165,10 @@ namespace scrutiny
         class WriteRPVResponseEncoder
         {
         public:
-            void init(Response *response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *rpv);
-            inline bool overflow() { return m_overflow; };
-            void reset();
+            void init(Response *const response, uint16_t const max_size);
+            void write(RuntimePublishedValue const *const rpv);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -182,10 +182,10 @@ namespace scrutiny
         {
         public:
             void init(Request const *const request, MainHandler const *const main_handler);
-            bool next(RuntimePublishedValue *rpv, AnyType *v);
-            inline bool finished() const { return m_finished; };
-            inline bool is_valid() const { return !m_invalid; };
-            void reset();
+            bool next(RuntimePublishedValue *const rpv, AnyType *const v);
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            void reset(void);
 
         protected:
             uint8_t *m_buffer;
@@ -427,14 +427,14 @@ namespace scrutiny
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode encode_response_datalogging_get_setup(const ResponseData::DataLogControl::GetSetup *response_data, Response *response);
-            ResponseCode encode_response_datalogging_status(const ResponseData::DataLogControl::GetStatus *response_data, Response *response);
-            ResponseCode encode_response_datalogging_get_acquisition_metadata(const ResponseData::DataLogControl::GetAcquisitionMetadata *response_data, Response *response);
-            ResponseCode encode_response_datalogging_read_acquisition(const ResponseData::DataLogControl::ReadAcquisition *response_data, Response *response, bool *finished);
+            ResponseCode encode_response_datalogging_get_setup(ResponseData::DataLogControl::GetSetup const *const response_data, Response *const response);
+            ResponseCode encode_response_datalogging_status(ResponseData::DataLogControl::GetStatus const *const response_data, Response *const response);
+            ResponseCode encode_response_datalogging_get_acquisition_metadata(ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data, Response *const response);
+            ResponseCode encode_response_datalogging_read_acquisition(ResponseData::DataLogControl::ReadAcquisition const *const response_data, Response *const response, bool *const finished);
             ResponseCode decode_datalogging_configure_request(
-                Request const *request,
-                RequestData::DataLogControl::Configure *request_data,
-                datalogging::Configuration *config);
+                Request const *const request,
+                RequestData::DataLogControl::Configure *const request_data,
+                datalogging::Configuration *const config);
 #endif
 
         protected:

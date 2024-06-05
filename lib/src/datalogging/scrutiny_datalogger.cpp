@@ -22,8 +22,8 @@ namespace scrutiny
     namespace datalogging
     {
         void DataLogger::init(
-            MainHandler *main_handler,
-            Timebase *timebase,
+            MainHandler const *const main_handler,
+            Timebase const *const timebase,
             uint8_t *const buffer,
             buffer_size_t const buffer_size,
             trigger_callback_t trigger_callback)
@@ -127,7 +127,7 @@ namespace scrutiny
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::RPV)
                     {
-                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }
@@ -172,7 +172,7 @@ namespace scrutiny
                 {
                     if (m_config.items_to_log[i].type == LoggableType::RPV)
                     {
-                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }

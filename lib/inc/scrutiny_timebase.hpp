@@ -29,7 +29,7 @@ namespace scrutiny
         }
 
         /// @brief Returns a timestamp that can be used to measure time delta with has_expired() and elapsed_since()
-        inline timestamp_t get_timestamp() const
+        inline timestamp_t get_timestamp(void) const
         {
             return m_time_100ns;
         };

@@ -47,7 +47,7 @@ namespace scrutiny
             }
         }
 
-        bool is_supported_type(VariableType vt)
+        bool is_supported_type(VariableType const vt)
         {
             VariableTypeType tt = get_var_type_type(vt);
             uint8_t ts = get_type_size(vt);
