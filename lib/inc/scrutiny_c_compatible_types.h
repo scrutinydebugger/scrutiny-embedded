@@ -1,4 +1,11 @@
-// No ifdef guards on purpose
+//    scrutiny_c_compatible_types.h
+//        Types declaration that are valid in both C and C++. The C++ library extend them,
+//        the C-Wrapper uses them directly
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021 Scrutiny Debugger
 
 #include <stdint.h>
 #include "scrutiny_setup.hpp"
