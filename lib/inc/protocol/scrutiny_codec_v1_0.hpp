@@ -181,7 +181,7 @@ namespace scrutiny
         class WriteRPVRequestParser
         {
         public:
-            void init(Request const *request, MainHandler const *main_handler);
+            void init(Request const *const request, MainHandler const *const main_handler);
             bool next(RuntimePublishedValue *rpv, AnyType *v);
             inline bool finished() const { return m_finished; };
             inline bool is_valid() const { return !m_invalid; };

@@ -431,7 +431,7 @@ namespace scrutiny
 
         // ==================================
 
-        void WriteRPVRequestParser::init(Request const *request, MainHandler *main_handler)
+        void WriteRPVRequestParser::init(Request const *const request, MainHandler const *const main_handler)
         {
             m_buffer = request->data;
             m_request_len = request->data_length;
