@@ -10,8 +10,8 @@ For the integration guide, see : https://scrutinydebugger.com/guide-instrumentat
 The following example is taken from the Arduino example and show how to initialize the library and how the glue code between Scrutiny Embedded Lib and a serial port can be written.
 
 ```c++
-#include <scrutiny.h>
 #include <stdint.h>
+#include "scrutiny.hpp"
 
 scrutiny::MainHandler scrutiny_handler; // Main scrutiny handler
 
