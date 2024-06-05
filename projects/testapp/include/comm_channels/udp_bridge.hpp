@@ -43,16 +43,16 @@ public:
     static void global_init();
     static void global_close();
 
-    void send(const uint8_t *buffer, int len, int flags = 0);
+    void send(uint8_t const *buffer, int len, int flags = 0);
     int receive(uint8_t *buffer, int len, int flags = 0);
 
     virtual void start();
     virtual void stop();
-    virtual void send(const uint8_t *buffer, int len) { send(buffer, len, 0); }
+    virtual void send(uint8_t const *buffer, int len) { send(buffer, len, 0); }
     virtual int receive(uint8_t *buffer, int len) { return receive(buffer, len, 0); }
 
     void set_nonblocking();
-    static void throw_system_error(const char *msg);
+    static void throw_system_error(char const *msg);
 
 private:
     uint16_t m_port;

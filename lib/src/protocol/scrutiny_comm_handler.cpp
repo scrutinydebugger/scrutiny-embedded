@@ -20,7 +20,13 @@ namespace scrutiny
 
         uint32_t CommHandler::s_session_counter = 0;
 
-        void CommHandler::init(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size, Timebase *timebase, const uint32_t session_counter_seed)
+        void CommHandler::init(
+            uint8_t *const rx_buffer,
+            uint16_t const rx_buffer_size,
+            uint8_t *const tx_buffer,
+            uint16_t const tx_buffer_size,
+            Timebase const *const timebase,
+            uint32_t const session_counter_seed)
         {
             m_rx_buffer = rx_buffer;
             m_rx_buffer_size = rx_buffer_size;
@@ -47,7 +53,7 @@ namespace scrutiny
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t const *data, uint16_t const len)
+        void CommHandler::receive_data(uint8_t const *const data, uint16_t const len)
         {
             uint16_t i = 0;
 
@@ -161,9 +167,9 @@ namespace scrutiny
                         break;
                     }
 
-                    const uint16_t available_bytes = static_cast<uint16_t>(len - i);
-                    const uint16_t missing_bytes = m_active_request.data_length - m_per_state_data.data_bytes_received;
-                    const uint16_t data_bytes_to_read = (available_bytes >= missing_bytes) ? missing_bytes : available_bytes;
+                    uint16_t const available_bytes = static_cast<uint16_t>(len - i);
+                    uint16_t const missing_bytes = m_active_request.data_length - m_per_state_data.data_bytes_received;
+                    uint16_t const data_bytes_to_read = (available_bytes >= missing_bytes) ? missing_bytes : available_bytes;
 
                     memcpy(&m_rx_buffer[m_per_state_data.data_bytes_received], &data[i], data_bytes_to_read);
                     m_per_state_data.data_bytes_received += data_bytes_to_read;
@@ -250,7 +256,7 @@ namespace scrutiny
             return &m_active_response;
         }
 
-        bool CommHandler::send_response(Response *response)
+        bool CommHandler::send_response(Response const *const response)
         {
             m_tx_error = TxError::None;
             if (m_enabled == false)
@@ -287,7 +293,7 @@ namespace scrutiny
             return true;
         }
 
-        uint16_t CommHandler::pop_data(uint8_t *buffer, uint16_t len)
+        uint16_t CommHandler::pop_data(uint8_t *const buffer, uint16_t len)
         {
             static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
 
@@ -298,7 +304,7 @@ namespace scrutiny
 
             uint16_t i = 0u;
 
-            const uint16_t nbytes_to_send = static_cast<uint16_t>(m_nbytes_to_send - m_nbytes_sent);
+            uint16_t const nbytes_to_send = static_cast<uint16_t>(m_nbytes_to_send - m_nbytes_sent);
             if (len > nbytes_to_send)
             {
                 len = nbytes_to_send;
@@ -333,19 +339,19 @@ namespace scrutiny
 
             if (m_nbytes_sent >= 5u && i < len)
             {
-                const uint16_t data_byte_sent = (m_nbytes_sent - 5);
+                uint16_t const data_byte_sent = (m_nbytes_sent - 5);
                 if (data_byte_sent < m_active_response.data_length)
                 {
-                    const uint16_t remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent - 5);
-                    const uint16_t user_request_remaining = (len - i);
-                    const uint16_t data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes; // Don't read more than available.
+                    uint16_t const remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent - 5);
+                    uint16_t const user_request_remaining = (len - i);
+                    uint16_t const data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes; // Don't read more than available.
                     memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
 
                     i += data_bytes_to_copy;
                     m_nbytes_sent += data_bytes_to_copy;
                 }
 
-                const uint16_t crc_position = m_active_response.data_length + 5u; // Will fit as per static_assert above.
+                uint16_t const crc_position = m_active_response.data_length + 5u; // Will fit as per static_assert above.
                 while (i < len)
                 {
                     if (m_nbytes_sent == crc_position)
@@ -435,7 +441,7 @@ namespace scrutiny
             }
         }
 
-        bool CommHandler::heartbeat(const uint16_t challenge)
+        bool CommHandler::heartbeat(uint16_t const challenge)
         {
             bool success = false;
             if (!m_session_active || !m_enabled)
@@ -463,7 +469,7 @@ namespace scrutiny
             return m_nbytes_to_send - m_nbytes_sent;
         }
 
-        bool CommHandler::check_crc(const Request *req) const
+        bool CommHandler::check_crc(Request const *const req) const
         {
             uint32_t crc = 0;
             uint8_t header_data[4];
@@ -476,7 +482,7 @@ namespace scrutiny
             return (crc == req->crc);
         }
 
-        void CommHandler::add_crc(Response *response) const
+        void CommHandler::add_crc(Response *const response) const
         {
             if (response->data_length > m_tx_buffer_size)
                 return;
@@ -488,7 +494,7 @@ namespace scrutiny
             header[3] = (response->data_length >> 8) & 0xFF;
             header[4] = response->data_length & 0xFF;
 
-            const uint32_t crc = tools::crc32(header, sizeof(header));
+            uint32_t const crc = tools::crc32(header, sizeof(header));
             response->crc = tools::crc32(response->data, response->data_length, crc);
         }
 

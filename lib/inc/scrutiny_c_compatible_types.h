@@ -11,12 +11,12 @@
 #include "scrutiny_setup.hpp"
 
 typedef void (*scrutiny_c_user_command_callback_t)(
-    const uint8_t subfunction,
-    const uint8_t *request_data,
-    const uint16_t request_data_length,
+    uint8_t const subfunction,
+    uint8_t const *request_data,
+    uint16_t const request_data_length,
     uint8_t *response_data,
     uint16_t *response_data_length,
-    const uint16_t response_max_data_length);
+    uint16_t const response_max_data_length);
 
 typedef enum
 {
@@ -134,9 +134,9 @@ typedef struct
 } scrutiny_c_runtime_published_value_t;
 
 /// @brief Callback called on Runtime Published Value read
-typedef int (*scrutiny_c_rpv_read_callback_t)(const scrutiny_c_runtime_published_value_t rpv, scrutiny_c_any_type_t *outval);
+typedef int (*scrutiny_c_rpv_read_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t *outval);
 /// @brief Callback called on Runtime Published Value write
-typedef int (*scrutiny_c_rpv_write_callback_t)(const scrutiny_c_runtime_published_value_t rpv, const scrutiny_c_any_type_t *inval);
+typedef int (*scrutiny_c_rpv_write_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t const *inval);
 
 #if SCRUTINY_ENABLE_DATALOGGING
 typedef void (*scrutiny_c_datalogging_trigger_callback_t)();

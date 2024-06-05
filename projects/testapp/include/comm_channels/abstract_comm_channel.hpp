@@ -15,11 +15,11 @@
 
 class AbstractCommChannel
 {
-    public:
+public:
     virtual void start() = 0;
     virtual void stop() = 0;
-    virtual void send(const uint8_t* buffer, int len) = 0;
-    virtual int receive(uint8_t* buffer, int len) = 0;
+    virtual void send(uint8_t const *buffer, int len) = 0;
+    virtual int receive(uint8_t *buffer, int len) = 0;
 };
 
-#endif  // ___ABSTRACT_COMM_CHANNEL_H___
+#endif // ___ABSTRACT_COMM_CHANNEL_H___

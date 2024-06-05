@@ -91,7 +91,7 @@ void UdpBridge::set_nonblocking()
 #endif
 }
 
-void UdpBridge::throw_system_error(const char *msg)
+void UdpBridge::throw_system_error(char const *msg)
 {
     // GETSOCKETERRNO() is a cross-platform macro defined in udp_bridge.h
     throw std::system_error(GETSOCKETERRNO(), std::system_category(), msg);
@@ -134,9 +134,9 @@ int UdpBridge::receive(uint8_t *buffer, int len, int flags)
     return ret;
 }
 
-void UdpBridge::send(const uint8_t *buffer, int len, int flags)
+void UdpBridge::send(uint8_t const *buffer, int len, int flags)
 {
-    int ret = sendto(m_sock, reinterpret_cast<const char *>(buffer), len, flags, &m_last_packet_addr, sizeof(m_last_packet_addr));
+    int ret = sendto(m_sock, reinterpret_cast<char const *>(buffer), len, flags, &m_last_packet_addr, sizeof(m_last_packet_addr));
 
     if (ret < 0)
     {

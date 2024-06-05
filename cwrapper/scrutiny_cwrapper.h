@@ -38,7 +38,7 @@ extern "C"
     /// @param mem Address at which to initialize the `MainHandler`
     /// @param size Size of the allocated memory.
     /// @return A pointer to the `MainHandler` object or NULL in case of failure.
-    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t size);
+    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t const size);
 
     /// @brief Wrapper for `MainHandler::init()`.
     /// Initialize The MainHandler
@@ -49,7 +49,7 @@ extern "C"
     /// @brief Wrapper for `MainHandler::process()`
     /// @param main_handler The `MainHandler` object to work on.
     /// @param timestep Amount of time elapsed since the last call to this function expressed as multiple of 100ns.
-    void scrutiny_c_main_handler_process(scrutiny_c_main_handler_t *main_handler, scrutiny_c_timediff_t timestep);
+    void scrutiny_c_main_handler_process(scrutiny_c_main_handler_t *main_handler, scrutiny_c_timediff_t const timestep);
 
     /// @brief Wrapper for `MainHandler::receive_data()`.
     /// Pass data received from the server to the scrutiny-embedded lib input stream.
@@ -64,7 +64,7 @@ extern "C"
     /// @param buffer Buffer to write the data into
     /// @param len Maximum length of the data to read
     /// @return Number of bytes actually read
-    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *main_handler, uint8_t *buffer, uint16_t len);
+    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *main_handler, uint8_t *buffer, uint16_t const len);
 
     /// @brief Wrapper for `MainHandler::data_to_send()`.
     /// Tells how much data is available in the scrutiny-embedded lib output stream
@@ -79,7 +79,7 @@ extern "C"
     /// @param mem Address at which to initialize the `Config` object
     /// @param size Size of the allocated memory.
     /// @return A pointer to the `Config` object or NULL in case of failure.
-    scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t size);
+    scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t const size);
 
     /// @brief Wrapper for `Config::set_buffers()`
     /// Set the buffers used for communications. The bigger the buffer, the more data can be processed by a single request.
@@ -124,10 +124,10 @@ extern "C"
     /// @param wr_cb Callback to call to write a RPV
     void scrutiny_c_config_set_published_values(
         scrutiny_c_config_t *config,
-        scrutiny_c_runtime_published_value_t *array,
-        uint16_t nbr,
-        scrutiny_c_rpv_read_callback_t rd_cb,
-        scrutiny_c_rpv_write_callback_t wr_cb);
+        scrutiny_c_runtime_published_value_t const *const array,
+        uint16_t const nbr,
+        scrutiny_c_rpv_read_callback_t const rd_cb,
+        scrutiny_c_rpv_write_callback_t const wr_cb);
 
     /// @brief Wrapper for `Config::set_loops()`
     /// Defines the different loops (tasks) in the application.
@@ -204,7 +204,7 @@ extern "C"
     /// @param size Size of the allocated memory.
     /// @param name The name of the loop
     /// @return A pointer to the `VariableFrequencyLoopHandler` object or NULL in case of failure.
-    scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, const char *name);
+    scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, char const *name);
 
     /// @brief Wrapper for `VariableFrequencyLoopHandler::process()`
     /// Process function be called at each iteration of the loop.

@@ -15,7 +15,7 @@ namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize get_required_type_size(const uint_fast8_t newsize)
+        VariableTypeSize get_required_type_size(uint_fast8_t const newsize)
         {
             if (newsize <= 1)
             {
@@ -47,7 +47,7 @@ namespace scrutiny
             }
         }
 
-        bool is_supported_type(VariableType vt)
+        bool is_supported_type(VariableType const vt)
         {
             VariableTypeType tt = get_var_type_type(vt);
             uint8_t ts = get_type_size(vt);
@@ -88,7 +88,7 @@ namespace scrutiny
             }
         }
 
-        uint32_t crc32(const uint8_t *data, const uint32_t size, const uint32_t start_value)
+        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value)
         {
             uint32_t crc = ~start_value;
 

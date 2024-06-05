@@ -34,7 +34,7 @@ extern "C"
     size_t const SCRUTINY_C_LOOP_HANDLER_FF_SIZE = sizeof(scrutiny::FixedFrequencyLoopHandler);
     size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE = sizeof(scrutiny::VariableFrequencyLoopHandler);
 
-    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t size)
+    scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t const size)
     {
         if (size < SCRUTINY_C_MAIN_HANDLER_SIZE || mem == nullptr)
         {
@@ -48,12 +48,12 @@ extern "C"
         get_main_handler(mh)->init(get_config(config));
     }
 
-    void scrutiny_c_main_handler_process(scrutiny_c_main_handler_t *mh, scrutiny_c_timediff_t timestep)
+    void scrutiny_c_main_handler_process(scrutiny_c_main_handler_t *mh, scrutiny_c_timediff_t const timestep)
     {
         get_main_handler(mh)->process(timestep);
     }
 
-    scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t bufsize)
+    scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t const bufsize)
     {
         if (bufsize < SCRUTINY_C_CONFIG_SIZE || mem == nullptr)
         {
@@ -84,13 +84,13 @@ extern "C"
 
     void scrutiny_c_config_set_published_values(
         scrutiny_c_config_t *config,
-        scrutiny_c_runtime_published_value_t *array,
-        uint16_t nbr,
-        scrutiny_c_rpv_read_callback_t rd_cb,
-        scrutiny_c_rpv_write_callback_t wr_cb)
+        scrutiny_c_runtime_published_value_t const *const array,
+        uint16_t const nbr,
+        scrutiny_c_rpv_read_callback_t const rd_cb,
+        scrutiny_c_rpv_write_callback_t const wr_cb)
     {
         get_config(config)->set_published_values(
-            reinterpret_cast<scrutiny::RuntimePublishedValue *>(array), // should match as per static_assert above
+            reinterpret_cast<scrutiny::RuntimePublishedValue const *const>(array), // should match as per static_assert above
             nbr,
             reinterpret_cast<scrutiny::RpvReadCallback>(rd_cb),   // Expect signature to match
             reinterpret_cast<scrutiny::RpvWriteCallback>(wr_cb)); // Expect signature to match
@@ -167,7 +167,7 @@ extern "C"
         get_loop_handler_ff(loop_handler)->process();
     }
 
-    scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, const char *name)
+    scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, char const *name)
     {
         if (size < SCRUTINY_C_LOOP_HANDLER_VF_SIZE || mem == nullptr)
         {

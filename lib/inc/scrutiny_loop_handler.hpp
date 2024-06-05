@@ -76,7 +76,7 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(const char *name = "") : m_name(name)
+        LoopHandler(char const *name = "") : m_name(name)
         {
         }
 
@@ -88,6 +88,9 @@ namespace scrutiny
         /// @brief Return the timebase used by the Loop Handler
         inline Timebase *get_timebase(void) { return &m_timebase; }
 
+        /// @brief Return the a readonly pointer to the timebase used by the Loop Handler
+        inline Timebase *get_timebase_ro(void) { return &m_timebase; }
+
         /// @brief Returns the IPC object to send a message to the Loop Handler
         inline scrutiny::IPCMessage<Main2LoopMessage> *ipc_main2loop(void) { return &m_main2loop_msg; }
 
@@ -95,15 +98,18 @@ namespace scrutiny
         inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void) { return &m_loop2main_msg; }
 
         /// @brief Returns the name of the loop. May be nullptr if not set.
-        inline const char *get_name(void) const { return m_name; }
+        inline char const *get_name(void) const { return m_name; }
 #if SCRUTINY_ENABLE_DATALOGGING
 
-        inline void allow_datalogging(bool val)
+        inline void allow_datalogging(bool const val)
         {
             m_support_datalogging = val;
         }
 
-        inline bool datalogging_allowed(void) { return m_support_datalogging; }
+        inline bool datalogging_allowed(void) const
+        {
+            return m_support_datalogging;
+        }
 
         inline bool owns_datalogger(void) const
         {
@@ -113,18 +119,18 @@ namespace scrutiny
 
     protected:
         /// @brief Initialize the Loop Handler
-        void init(MainHandler *main_handler);
+        void init(MainHandler *const main_handler);
 
         /// @brief Process method common to both FixedFreqLoop and VariableFreqLoop
         /// @param timestep_100ns Timestep since last call
-        void process_common(timediff_t timestep_100ns);
+        void process_common(timediff_t const timestep_100ns);
 
         Timebase m_timebase;
         /// @brief  Atomic message transferred from the Main Handler to the Loop Handler
         scrutiny::IPCMessage<Main2LoopMessage> m_main2loop_msg;
         /// @brief  Atomic message transferred from the Loop Handler to the Main Handler
         scrutiny::IPCMessage<Loop2MainMessage> m_loop2main_msg;
-        const char *m_name;
+        char const *m_name;
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
@@ -146,8 +152,8 @@ namespace scrutiny
         /// @brief Constructor
         /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
         /// @param name The name of the loop
-        explicit FixedFrequencyLoopHandler(timediff_t timestep_100ns, const char *name = "") : LoopHandler(name),
-                                                                                               m_timestep_100ns(timestep_100ns)
+        explicit FixedFrequencyLoopHandler(timediff_t const timestep_100ns, char const *name = "") : LoopHandler(name),
+                                                                                                     m_timestep_100ns(timestep_100ns)
         {
         }
         /// @brief Process function be called at each iteration of the loop.
@@ -160,7 +166,7 @@ namespace scrutiny
         virtual uint32_t get_timestep_100ns(void) const override { return m_timestep_100ns; }
 
     protected:
-        const uint32_t m_timestep_100ns;
+        uint32_t const m_timestep_100ns;
     };
 
     /// @brief Handler for Variable Frequency loops. (Variable delta-time between each call to process)
@@ -170,7 +176,7 @@ namespace scrutiny
     public:
         /// @brief Constructor
         /// @param name The name of the loop
-        explicit VariableFrequencyLoopHandler(const char *name = "") : LoopHandler(name)
+        explicit VariableFrequencyLoopHandler(char const *name = "") : LoopHandler(name)
         {
         }
 

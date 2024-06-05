@@ -30,7 +30,7 @@ namespace scrutiny
                 class eq
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 == v2;
                     }
@@ -40,7 +40,7 @@ namespace scrutiny
                 class neq
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 != v2;
                     }
@@ -50,7 +50,7 @@ namespace scrutiny
                 class gt
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 > v2;
                     }
@@ -60,7 +60,7 @@ namespace scrutiny
                 class get
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 >= v2;
                     }
@@ -70,7 +70,7 @@ namespace scrutiny
                 class lt
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 < v2;
                     }
@@ -80,7 +80,7 @@ namespace scrutiny
                 class let
                 {
                 public:
-                    static inline bool eval(const T1 v1, const T2 v2)
+                    static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 <= v2;
                     }
@@ -89,7 +89,7 @@ namespace scrutiny
             }
 
             template <template <class, class> class OPERATOR>
-            bool RelationalCompare(const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool RelationalCompare(VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 constexpr uint_biggest_t UINT_2_INT_MAX = static_cast<uint_biggest_t>(-1) >> 1;
 
@@ -148,43 +148,43 @@ namespace scrutiny
                 return false;
             }
 
-            bool EqualCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool EqualCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::eq>(operand_types, operand_vals);
             }
 
-            bool NotEqualCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool NotEqualCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
             }
 
-            bool GreaterThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool GreaterThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::gt>(operand_types, operand_vals);
             }
 
-            bool GreaterOrEqualThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool GreaterOrEqualThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
             }
 
-            bool LessThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool LessThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
             }
 
-            bool LessOrEqualThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool LessOrEqualThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::let>(operand_types, operand_vals);
             }
 
-            bool ChangeMoreThanCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool ChangeMoreThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 // We can reasonably make the assumption that the delta will be a human-sized value.
                 // Therefore, a float is adequate for it. Will avoid bloating this code for no reason
@@ -253,7 +253,7 @@ namespace scrutiny
                 return outval;
             }
 
-            bool IsWithinCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool IsWithinCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 float operands_vals_float[3];
@@ -277,12 +277,12 @@ namespace scrutiny
                         return false;
                     }
                 }
-                const float diffabs = SCRUTINY_FABS(operands_vals_float[0] - operands_vals_float[1]);
-                const float margin = SCRUTINY_FABS(operands_vals_float[2]);
+                float const diffabs = SCRUTINY_FABS(operands_vals_float[0] - operands_vals_float[1]);
+                float const margin = SCRUTINY_FABS(operands_vals_float[2]);
                 return diffabs <= margin;
             }
 
-            bool AlwaysTrueCondition::evaluate(ConditionSharedData *data, const VariableTypeCompare operand_types[], const AnyTypeCompare operand_vals[])
+            bool AlwaysTrueCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 static_cast<void>(operand_types);

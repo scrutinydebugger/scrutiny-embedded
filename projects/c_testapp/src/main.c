@@ -277,12 +277,12 @@ void datalogging_callback()
 }
 
 void my_user_command(
-    const uint8_t subfunction,
-    const uint8_t *request_data,
-    const uint16_t request_data_length,
+    uint8_t const  subfunction,
+    uint8_t const  *request_data,
+    uint16_t const  request_data_length,
     uint8_t *response_data,
     uint16_t *response_data_length,
-    const uint16_t response_max_data_length)
+    uint16_t const  response_max_data_length)
 {
     printf("User command: Subfunction #%u with %u data bytes: ", 
         (unsigned int)subfunction, 
@@ -327,7 +327,7 @@ void my_user_command(
     }
     else if (subfunction == 4)
     {
-        const uint16_t max_echo_size = min(request_data_length, (uint16_t)(response_max_data_length - 1));
+        uint16_t const  max_echo_size = min(request_data_length, (uint16_t)(response_max_data_length - 1));
         response_data[0] = subfunction;
         for (uint16_t i = 0; i < max_echo_size; i++)
         {

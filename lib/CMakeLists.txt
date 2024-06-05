@@ -20,7 +20,7 @@ add_library(${PROJECT_NAME} STATIC
 
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/datalogging.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogging.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogging_trigger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/datalogging/scrutiny_datalogger_raw_encoder.cpp

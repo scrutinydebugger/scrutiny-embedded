@@ -20,7 +20,7 @@ namespace scrutiny
         /// @param buffer Output buffer
         /// @param max_size Maximum size to copy
         /// @return Number of bytes written
-        datalogging::buffer_size_t RawFormatReader::read(uint8_t *buffer, const datalogging::buffer_size_t max_size)
+        datalogging::buffer_size_t RawFormatReader::read(uint8_t *const buffer, datalogging::buffer_size_t const max_size)
         {
             datalogging::buffer_size_t output_size = 0;
             if (error())
@@ -28,8 +28,8 @@ namespace scrutiny
                 return 0;
             }
 
-            const datalogging::buffer_size_t write_cursor = m_encoder->get_write_cursor();
-            const datalogging::buffer_size_t buffer_end = m_encoder->get_buffer_effective_size(); // Encoder may not use the full buffer
+            datalogging::buffer_size_t const write_cursor = m_encoder->get_write_cursor();
+            datalogging::buffer_size_t const buffer_end = m_encoder->get_buffer_effective_size(); // Encoder may not use the full buffer
             if (m_read_cursor == write_cursor && m_read_started)
             {
                 m_finished = true;
@@ -42,8 +42,8 @@ namespace scrutiny
             while (output_size < max_size)
             {
                 datalogging::buffer_size_t transfer_size;
-                const datalogging::buffer_size_t new_max = max_size - output_size;
-                const datalogging::buffer_size_t right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
+                datalogging::buffer_size_t const new_max = max_size - output_size;
+                datalogging::buffer_size_t const right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
                 transfer_size = right_hand_start_point - m_read_cursor;
                 transfer_size = SCRUTINY_MIN(transfer_size, new_max);
                 memcpy(&buffer[output_size], &m_encoder->m_buffer[m_read_cursor], transfer_size);
@@ -116,9 +116,9 @@ namespace scrutiny
                 {
                     RuntimePublishedValue rpv;
                     AnyType outval;
-                    const uint16_t rpv_id = m_config->items_to_log[i].data.rpv.id;
+                    uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    const uint8_t typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
+                    uint8_t const typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
                     m_main_handler->get_rpv_read_callback()(rpv, &outval);   // We assume that this is not nullptr. We rely on datalogger::configure
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
@@ -147,11 +147,11 @@ namespace scrutiny
 
         /// @brief  Init the encoder
         void RawFormatEncoder::init(
-            MainHandler *main_handler,
-            Timebase *timebase_for_log,
-            datalogging::Configuration *config,
-            uint8_t *buffer,
-            datalogging::buffer_size_t buffer_size)
+            MainHandler const *const main_handler,
+            Timebase const *const timebase_for_log,
+            datalogging::Configuration const *const config,
+            uint8_t *const buffer,
+            datalogging::buffer_size_t const buffer_size)
         {
             m_main_handler = main_handler;
             m_timebase_for_log = timebase_for_log;

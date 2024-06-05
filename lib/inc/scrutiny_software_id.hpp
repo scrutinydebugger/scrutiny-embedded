@@ -25,6 +25,6 @@ namespace scrutiny
 {
     /// @brief The Scrutiny software ID used to identify the firmware with a unique hash.
     /// The offline toolchain will generate and inject its value after the binary has been produced.
-    extern const uint8_t software_id[SCRUTINY_SOFTWARE_ID_LENGTH];
+    extern uint8_t const software_id[SCRUTINY_SOFTWARE_ID_LENGTH];
 }
 #endif // ___SCRUTINY_SOFTWARE_ID_H___

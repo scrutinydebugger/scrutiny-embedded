@@ -11,6 +11,6 @@
 
 #include <stddef.h>
 
-size_t c_testapp_strncpy(char *const dst, const char *const src, const size_t maxlen);
+size_t c_testapp_strncpy(char *const dst, const char *const src, size_t const maxlen);
 
 #endif

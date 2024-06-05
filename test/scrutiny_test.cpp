@@ -43,7 +43,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     }
 }
 
-::testing::AssertionResult ScrutinyTest::COMPARE_BUF(const uint8_t *candidate, const uint8_t *expected, const uint32_t size)
+::testing::AssertionResult ScrutinyTest::COMPARE_BUF(uint8_t const *candidate, uint8_t const *expected, uint32_t const size)
 {
     for (uint32_t i = 0; i < size; ++i)
     {
@@ -58,7 +58,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult ScrutinyTest::CHECK_SET(const uint8_t *buffer, const uint8_t val, const uint32_t size)
+::testing::AssertionResult ScrutinyTest::CHECK_SET(uint8_t const *buffer, uint8_t const val, uint32_t const size)
 {
     for (uint32_t i = 0; i < size; ++i)
     {

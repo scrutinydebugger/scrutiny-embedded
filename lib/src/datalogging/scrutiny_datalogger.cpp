@@ -22,10 +22,10 @@ namespace scrutiny
     namespace datalogging
     {
         void DataLogger::init(
-            MainHandler *main_handler,
-            Timebase *timebase,
+            MainHandler const *const main_handler,
+            Timebase const *const timebase,
             uint8_t *const buffer,
-            const buffer_size_t buffer_size,
+            buffer_size_t const buffer_size,
             trigger_callback_t trigger_callback)
         {
             m_timebase = timebase;
@@ -127,7 +127,7 @@ namespace scrutiny
                     }
                     else if (m_config.trigger.operands[i].type == OperandType::RPV)
                     {
-                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }
@@ -172,7 +172,7 @@ namespace scrutiny
                 {
                     if (m_config.items_to_log[i].type == LoggableType::RPV)
                     {
-                        if (!m_main_handler->get_config()->is_read_published_values_configured())
+                        if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }
@@ -280,7 +280,7 @@ namespace scrutiny
             m_trigger_timestamp = m_timebase->get_timestamp();
             m_encoder.reset_write_counter(); // Completion logic uses that counter directly without processing
 
-            const uint64_t multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
+            uint64_t const multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
             m_remaining_data_to_write = static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
             if (!m_encoder.buffer_full())
             {

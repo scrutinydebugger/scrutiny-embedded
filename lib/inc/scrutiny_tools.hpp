@@ -29,7 +29,7 @@ namespace scrutiny
         /// @param start Start address
         /// @param end End address
         /// @return AddressRange object
-        inline AddressRange make_address_range(const uintptr_t start, const uintptr_t end)
+        inline AddressRange make_address_range(uintptr_t const start, uintptr_t const end)
         {
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
         }
@@ -38,7 +38,7 @@ namespace scrutiny
         /// @param start Start address
         /// @param end End address
         /// @return AddressRange object
-        inline AddressRange make_address_range(const void *start, const void *end)
+        inline AddressRange make_address_range(void const *start, void const *end)
         {
             return {const_cast<void *>(start), const_cast<void *>(end)};
         }
@@ -47,7 +47,7 @@ namespace scrutiny
         /// @param start Start address
         /// @param size Address range size
         /// @return AddressRange object
-        inline AddressRange make_address_range(const void *start, size_t size)
+        inline AddressRange make_address_range(void const *start, size_t size)
         {
             size = (size == 0) ? 1 : size;
             return {const_cast<void *>(start), reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(start) + size - 1)};
@@ -56,7 +56,7 @@ namespace scrutiny
         /// @brief Returns the size of a given type in bytes
         /// @param vt The VariableType object
         /// @return Size in bytes
-        inline uint8_t get_type_size(const VariableType vt)
+        inline uint8_t get_type_size(VariableType const vt)
         {
             if (vt == VariableType::unknown)
             {
@@ -69,7 +69,7 @@ namespace scrutiny
         /// @brief Returns the size of a given TypeSize in bytes
         /// @param ts The VariableTypeSize object
         /// @return Size in bytes
-        inline uint8_t get_type_size(const VariableTypeSize ts)
+        inline uint8_t get_type_size(VariableTypeSize const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -82,7 +82,7 @@ namespace scrutiny
         /// @brief Returns the Type Type of a given data type.
         /// @param vt The VariableTypeSize object
         /// @return The VariableTypeType enum object
-        inline VariableTypeType get_var_type_type(const VariableType vt)
+        inline VariableTypeType get_var_type_type(VariableType const vt)
         {
             return static_cast<VariableTypeType>(static_cast<unsigned int>(vt) & 0xF0);
         }
@@ -91,7 +91,7 @@ namespace scrutiny
         /// @param tt The type type (uint, int, float, etc)
         /// @param ts The type size (8,16, 32)
         /// @return The VariableType enum object
-        inline VariableType make_type(const VariableTypeType tt, const VariableTypeSize ts)
+        inline VariableType make_type(VariableTypeType const tt, VariableTypeSize const ts)
         {
             if (tt == VariableTypeType::_boolean)
             {
@@ -106,35 +106,35 @@ namespace scrutiny
         }
 
         /// @brief Returns true if given Variable Type is a floating point type, regardless of its size
-        inline bool is_float_type(const VariableType vt)
+        inline bool is_float_type(VariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_float;
         }
 
         /// @brief Returns true if given Variable Type is a unsigned int type, regardless of its size
-        inline bool is_uint_type(const VariableType vt)
+        inline bool is_uint_type(VariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_uint;
         }
 
         /// @brief Returns true if given Variable Type is a signed int type, regardless of its size
-        inline bool is_sint_type(const VariableType vt)
+        inline bool is_sint_type(VariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_sint;
         }
 
 #if SCRUTINY_SUPPORT_64BITS
-        inline int_biggest_t read_biggest_sint(const AnyType &v)
+        inline int_biggest_t read_biggest_sint(AnyType const &v)
         {
             return v.sint64;
         }
 
-        inline int_biggest_t read_biggest_uint(const AnyType &v)
+        inline int_biggest_t read_biggest_uint(AnyType const &v)
         {
             return v.uint64;
         }
 
-        inline double read_biggest_float(const AnyType &v)
+        inline double read_biggest_float(AnyType const &v)
         {
             return v.float64;
         }
@@ -154,17 +154,17 @@ namespace scrutiny
             v.float64 = val;
         }
 #else
-        inline int_biggest_t read_biggest_sint(const AnyType &v)
+        inline int_biggest_t read_biggest_sint(AnyType const &v)
         {
             return v.sint32;
         }
 
-        inline int_biggest_t read_biggest_uint(const AnyType &v)
+        inline int_biggest_t read_biggest_uint(AnyType const &v)
         {
             return v.uint32;
         }
 
-        inline float read_biggest_float(const AnyType &v)
+        inline float read_biggest_float(AnyType const &v)
         {
             return v.float32;
         }
@@ -188,7 +188,7 @@ namespace scrutiny
         /// @param s The string
         /// @param maxlen Maximum length to check
         /// @return Minimum between the string length and maxlen param
-        inline size_t strnlen(const char *const s, const size_t maxlen)
+        inline size_t strnlen(char const *const s, size_t const maxlen)
         {
             size_t n = 0;
             if (s == nullptr)
@@ -213,7 +213,7 @@ namespace scrutiny
         /// @param src Source string
         /// @param maxlen Maximum length to copy
         /// @return Number of characters copied.
-        inline size_t strncpy(char *const dst, const char *const src, const size_t maxlen)
+        inline size_t strncpy(char *const dst, char const *const src, size_t const maxlen)
         {
             size_t n = 0;
             for (; n < maxlen; n++)
@@ -235,7 +235,7 @@ namespace scrutiny
         /// @brief Portable function that tells if a float is a finite value, meaning is not NaNs, inf, -inf
         /// @param val The float to test
         /// @return true if finite value
-        inline bool is_float_finite(const float val)
+        inline bool is_float_finite(float const val)
         {
 #if SCRUTINY_BUILD_AVR_GCC
             static_assert(sizeof(float) == 4, "Expect float to be 32 bits");
@@ -249,19 +249,19 @@ namespace scrutiny
         }
 
         /// @brief Returns true if the type is supported by scrutiny
-        bool is_supported_type(VariableType vt);
+        bool is_supported_type(VariableType const vt);
 
         /// @brief Returns which variable type to use to store a given size
         /// @param size Given size in bytes
         /// @return The size to use.
-        VariableTypeSize get_required_type_size(uint8_t size);
+        VariableTypeSize get_required_type_size(uint8_t const size);
 
         /// @brief Computes a standard CRC32
         /// @param data Input data
         /// @param size Size of data in bytes
         /// @param start_value Start value of CRC. This value can be used to chain CRC calculation.
         /// @return The CRC32 value of the data
-        uint32_t crc32(const uint8_t *data, const uint32_t size, const uint32_t start_value = 0);
+        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value = 0);
     }
 
 }

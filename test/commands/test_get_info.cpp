@@ -225,7 +225,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
 TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::GetInfo;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetSpecialMemoryLocation);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetSpecialMemoryLocation);
     const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
@@ -271,7 +271,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
-static bool rpv_write_callback(scrutiny::RuntimePublishedValue rpv, const scrutiny::AnyType *inval)
+static bool rpv_write_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval)
 {
     static_cast<void>(rpv);
     static_cast<void>(inval);
@@ -365,7 +365,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
 TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
 {
     const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::GetInfo;
-    const uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
     const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
@@ -393,7 +393,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
 
-void dummy_callback(const uint8_t subfunction, const uint8_t *request_data, const uint16_t request_data_length, uint8_t *response_data, uint16_t *response_data_length, const uint16_t response_max_data_length)
+void dummy_callback(uint8_t const subfunction, uint8_t const *request_data, uint16_t const request_data_length, uint8_t *response_data, uint16_t *response_data_length, uint16_t const response_max_data_length)
 {
     static_cast<void>(subfunction);
     static_cast<void>(request_data);

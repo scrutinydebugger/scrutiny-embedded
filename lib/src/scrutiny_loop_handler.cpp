@@ -15,7 +15,7 @@
 
 namespace scrutiny
 {
-    void LoopHandler::init(MainHandler *main_handler)
+    void LoopHandler::init(MainHandler *const main_handler)
     {
         m_main2loop_msg.clear();
         m_loop2main_msg.clear();
@@ -28,7 +28,7 @@ namespace scrutiny
 #endif
     }
 
-    void LoopHandler::process_common(timediff_t timestep_100ns)
+    void LoopHandler::process_common(timediff_t const timestep_100ns)
     {
         m_timebase.step(timestep_100ns);
 
@@ -113,7 +113,7 @@ namespace scrutiny
     {
         process_common(m_timestep_100ns);
     }
-    void VariableFrequencyLoopHandler::process(timediff_t timestep_100ns)
+    void VariableFrequencyLoopHandler::process(timediff_t const timestep_100ns)
     {
         process_common(timestep_100ns);
     }

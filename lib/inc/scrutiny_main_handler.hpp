@@ -31,32 +31,32 @@ namespace scrutiny
 
         /// @brief Initialize the scrutiny Main Handler
         /// @param config A pointer to configuration object. A copy will be made, therefore given configuration can be on the stack.
-        void init(const Config *config);
+        void init(Config const *const config);
 
         /// @brief Gets the Runtime Published Definition from its ID
         /// @param id The RPV ID
         /// @param rpv The Runtime Published Value object to writes to
         /// @return true if the RPV has been found, false otherwise
-        bool get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const;
+        bool get_rpv(uint16_t const id, RuntimePublishedValue *const rpv) const;
 
         /// @brief Tells if a Runtime Published Values with the given ID has been defined.
         /// @param id The RPV ID
         /// @return True if RPV exists in configuration.
-        bool rpv_exists(const uint16_t id) const;
+        bool rpv_exists(uint16_t const id) const;
 
         /// @brief Returns the type of a Runtime Published Value identified by its ID
         /// @param id The RPV ID
         /// @return The VariableType object of the RPV.  VariableType::Unknown if the given ID is not set in the configuration.
-        VariableType get_rpv_type(const uint16_t id) const;
+        VariableType get_rpv_type(uint16_t const id) const;
 
         /// @brief Periodic process loop to be called as fast as possible
         /// @param timestep_100ns The time elapsed since last call to this function, in multiple of 100ns.
-        void process(const timediff_t timestep_100ns);
+        void process(timediff_t const timestep_100ns);
 
         /// @brief Pass data received from the server to the scrutiny-embedded lib input stream.
         /// @param data Pointer to the data buffer
         /// @param len Length of the data
-        inline void receive_data(uint8_t const *data, uint16_t const len)
+        inline void receive_data(uint8_t const *const data, uint16_t const len)
         {
             m_comm_handler.receive_data(data, len);
         }
@@ -65,7 +65,7 @@ namespace scrutiny
         /// @param buffer Buffer to write the data into
         /// @param len Maximum length of the data to read
         /// @return Number of bytes actually read
-        inline uint16_t pop_data(uint8_t *buffer, uint16_t len)
+        inline uint16_t pop_data(uint8_t *const buffer, uint16_t const len)
         {
             uint16_t const size = m_comm_handler.pop_data(buffer, len);
             check_finished_sending();
@@ -106,14 +106,14 @@ namespace scrutiny
         /// @param src  Source buffer
         /// @param size Size of data to transfer
         /// @return true on success, false on failure
-        bool read_memory(void *dst, const void *src, const uint32_t size) const;
+        bool read_memory(void *const dst, void const *const src, uint32_t const size) const;
 
         /// @brief Reads a variable from a memory location. Ensure the respect of forbidden regions and will not make unaligned memory access
         /// @param addr Address at which the variable is stored
         /// @param variable_type Type of variable to read
         /// @param val The output value
         /// @return true on success, false on failure
-        bool fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const;
+        bool fetch_variable(void const *const addr, VariableType const variable_type, AnyType *const val) const;
 
         /// @brief Reads a bitfield variable from a memory location. Ensure the respect of forbidden regions and will not make unaligned memory access
         /// @param addr Address at which the variable is stored
@@ -124,12 +124,12 @@ namespace scrutiny
         /// @param output_type The output variable type deduced from the VariableTypeType and the size
         /// @return true on success, false on failure
         bool fetch_variable_bitfield(
-            const void *addr,
-            const VariableTypeType var_tt,
-            const uint_fast8_t bitoffset,
-            const uint_fast8_t bitsize,
-            AnyType *val,
-            VariableType *output_type) const;
+            void const *const addr,
+            VariableTypeType const var_tt,
+            uint_fast8_t const bitoffset,
+            uint_fast8_t const bitsize,
+            AnyType *const val,
+            VariableType *const output_type) const;
 
         /// @brief Returns a pointer to the datalogger object
         inline datalogging::DataLogger *datalogger(void) { return &m_datalogging.datalogger; }
@@ -146,24 +146,27 @@ namespace scrutiny
         /// @brief Returns a pointer the the given configuration
         inline Config *get_config(void) { return &m_config; }
 
+        /// @brief Returns a pointer the the given configuration in read-only
+        inline Config const *get_config_ro(void) const { return &m_config; }
+
     private:
         void process_loops(void);
         void check_finished_sending(void);
-        void process_request(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_get_info(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_comm_control(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_memory_control(const protocol::Request *const request, protocol::Response *const response);
-        protocol::ResponseCode process_user_command(const protocol::Request *const request, protocol::Response *const response);
+        void process_request(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode process_get_info(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode process_comm_control(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode process_memory_control(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode process_user_command(protocol::Request const *const request, protocol::Response *const response);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        protocol::ResponseCode process_datalog_control(const protocol::Request *const request, protocol::Response *const response);
-        void process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg);
+        protocol::ResponseCode process_datalog_control(protocol::Request const *const request, protocol::Response *const response);
+        void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
-        bool touches_forbidden_region(const MemoryBlock *block) const;
-        bool touches_forbidden_region(const void *addr_start, const size_t length) const;
-        bool touches_readonly_region(const MemoryBlock *block) const;
-        bool touches_readonly_region(const void *addr_start, const size_t length) const;
+        bool touches_forbidden_region(MemoryBlock const *const block) const;
+        bool touches_forbidden_region(void const *const addr_start, size_t const length) const;
+        bool touches_readonly_region(MemoryBlock const *const block) const;
+        bool touches_readonly_region(void const *const addr_start, size_t const length) const;
         void check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time
@@ -197,7 +200,6 @@ namespace scrutiny
 
         struct
         {
-
             datalogging::DataLogger datalogger; // The Datalogger object
             ThreadSafeData threadsafe_data;     // Data that got read from the datalogger through IPC
 
@@ -212,7 +214,6 @@ namespace scrutiny
             uint8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
             uint32_t read_acquisition_crc;            // CRC of the datalogging buffer content
         } m_datalogging;                              // All data related to the datalogging feature
-
 #endif
     };
 }

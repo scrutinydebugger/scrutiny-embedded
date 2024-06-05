@@ -102,7 +102,7 @@ TEST_F(TestDatalogControl, TestUnsupported)
 
     for (uint16_t i = 0; i <= 255u; i++)
     {
-        const uint8_t subfn = static_cast<uint8_t>(i);
+        uint8_t const subfn = static_cast<uint8_t>(i);
         uint8_t request_data[8] = {5, subfn, 0, 0};
         add_crc(request_data, sizeof(request_data) - 4);
 
@@ -892,7 +892,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or rearm)
         datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
         reader->reset();
-        const uint32_t total_data_length = reader->read(reference_data, sizeof(reference_data));
+        uint32_t const total_data_length = reader->read(reference_data, sizeof(reference_data));
         ASSERT_GT(total_data_length, 0.95f * sizeof(big_dlbuffer));
         uint32_t expected_crc = tools::crc32(reference_data, total_data_length);
         ASSERT_TRUE(reader->finished()) << "iteration=" << iteration;

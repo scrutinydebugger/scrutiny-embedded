@@ -31,7 +31,7 @@ namespace scrutiny
     {
     }
 
-    void MainHandler::init(const Config *config)
+    void MainHandler::init(Config const *const config)
     {
         m_processing_request = false;
         m_disconnect_pending = false;
@@ -102,7 +102,7 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    bool MainHandler::read_memory(void *dst, const void *src, const uint32_t size) const
+    bool MainHandler::read_memory(void *dst, void const *const src, uint32_t const size) const
     {
         if (touches_forbidden_region(src, size))
         {
@@ -113,7 +113,7 @@ namespace scrutiny
         return true;
     }
 
-    bool MainHandler::fetch_variable(const void *addr, const VariableType variable_type, AnyType *val) const
+    bool MainHandler::fetch_variable(void const *const addr, VariableType const variable_type, AnyType *const val) const
     {
         uint8_t typesize = tools::get_type_size(variable_type);
         if (typesize == 0 || typesize > sizeof(AnyType))
@@ -130,20 +130,20 @@ namespace scrutiny
     }
 
     bool MainHandler::fetch_variable_bitfield(
-        const void *addr,
-        const VariableTypeType var_tt,
-        const uint_fast8_t bitoffset,
-        const uint_fast8_t bitsize,
-        AnyType *val,
-        VariableType *output_type) const
+        void const *const addr,
+        VariableTypeType const var_tt,
+        uint_fast8_t const bitoffset,
+        uint_fast8_t const bitsize,
+        AnyType *const val,
+        VariableType *const output_type) const
     {
         bool success = true;
-        const uint_fast8_t fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
-        const uint_fast8_t output_required_size = ((bitsize - 1) >> 3) + 1;
-        const VariableTypeSize fetch_type_size = tools::get_required_type_size(fetch_required_size);
-        const VariableTypeSize output_type_size = tools::get_required_type_size(output_required_size);
-        const VariableType fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
-        const VariableType output_variable_type = tools::make_type(var_tt, output_type_size);
+        uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
+        uint_fast8_t const output_required_size = ((bitsize - 1) >> 3) + 1;
+        VariableTypeSize const fetch_type_size = tools::get_required_type_size(fetch_required_size);
+        VariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
+        VariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
+        VariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
 
         if (touches_forbidden_region(addr, tools::get_type_size(fetch_type_size)))
         {
@@ -272,7 +272,7 @@ namespace scrutiny
         return success;
     }
 
-    void MainHandler::process_datalogging_loop_msg(LoopHandler *sender, LoopHandler::Loop2MainMessage *msg)
+    void MainHandler::process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg)
     {
         switch (msg->message_id)
         {
@@ -312,6 +312,7 @@ namespace scrutiny
             break;
         }
     }
+    
     void MainHandler::process_datalogging_logic(void)
     {
         if (m_datalogging.error != DataloggingError::NoError)
@@ -385,7 +386,7 @@ namespace scrutiny
         }
     }
 
-    void MainHandler::process(const timediff_t timestep_100ns)
+    void MainHandler::process(timediff_t const timestep_100ns)
     {
         if (!m_enabled)
         {
@@ -450,7 +451,7 @@ namespace scrutiny
 #endif
     }
 
-    void MainHandler::check_finished_sending()
+    void MainHandler::check_finished_sending(void)
     {
         if (m_processing_request)
         {
@@ -469,9 +470,9 @@ namespace scrutiny
         }
     }
 
-    bool MainHandler::rpv_exists(const uint16_t id) const
+    bool MainHandler::rpv_exists(uint16_t const id) const
     {
-        const uint16_t rpv_count = m_config.get_rpv_count();
+        uint16_t const rpv_count = m_config.get_rpv_count();
         bool found = false;
         for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
         {
@@ -485,9 +486,9 @@ namespace scrutiny
         return found;
     }
 
-    bool MainHandler::get_rpv(const uint16_t id, RuntimePublishedValue *rpv) const
+    bool MainHandler::get_rpv(uint16_t const id, RuntimePublishedValue *const rpv) const
     {
-        const uint16_t rpv_count = m_config.get_rpv_count();
+        uint16_t const rpv_count = m_config.get_rpv_count();
         bool found = false;
         for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
         {
@@ -502,15 +503,14 @@ namespace scrutiny
         return found;
     }
 
-    VariableType MainHandler::get_rpv_type(const uint16_t id) const
+    VariableType MainHandler::get_rpv_type(uint16_t const id) const
     {
         RuntimePublishedValue rpv;
-        const bool found = get_rpv(id, &rpv);
+        bool const found = get_rpv(id, &rpv);
         return (found) ? rpv.type : VariableType::unknown;
-        
     }
 
-    void MainHandler::process_request(const protocol::Request *const request, protocol::Response *const response)
+    void MainHandler::process_request(protocol::Request const *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
         response->reset();
@@ -561,7 +561,7 @@ namespace scrutiny
     }
 
     // ============= [GetInfo] ============
-    protocol::ResponseCode MainHandler::process_get_info(const protocol::Request *const request, protocol::Response *const response)
+    protocol::ResponseCode MainHandler::process_get_info(protocol::Request const *const request, protocol::Response *const response)
     {
         union
         {
@@ -593,7 +593,7 @@ namespace scrutiny
 
             struct
             {
-                const RuntimePublishedValue *rpvs;
+                RuntimePublishedValue const *rpvs;
                 protocol::RequestData::GetInfo::GetRPVDefinition request_data;
                 protocol::GetRPVDefinitionResponseEncoder *response_encoder;
             } get_prv_def;
@@ -681,7 +681,7 @@ namespace scrutiny
                     break;
                 }
 
-                const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
+                uint8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
@@ -699,7 +699,7 @@ namespace scrutiny
                     break;
                 }
 
-                const uint8_t index = stack.get_special_memory_region_location.request_data.region_index;
+                uint8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
@@ -772,7 +772,7 @@ namespace scrutiny
         case protocol::GetInfo::Subfunction::GetLoopDefinition:
         {
             m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
-            const uint8_t loop_id = stack.get_loop_def.request_data.loop_id;
+            uint8_t const loop_id = stack.get_loop_def.request_data.loop_id;
             if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
             {
                 code = protocol::ResponseCode::FailureToProceed;
@@ -792,8 +792,8 @@ namespace scrutiny
                 stack.get_loop_def.response_data.loop_type_specific.fixed_freq.timestep_100ns = m_config.m_loops[loop_id]->get_timestep_100ns();
             }
 
-            const char *const loop_name = m_config.m_loops[loop_id]->get_name();
-            const uint8_t loop_name_length = static_cast<uint8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
+            char const *const loop_name = m_config.m_loops[loop_id]->get_name();
+            uint8_t const loop_name_length = static_cast<uint8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
             stack.get_loop_def.response_data.loop_name_length = loop_name_length;
             stack.get_loop_def.response_data.loop_name = loop_name;
 
@@ -812,7 +812,7 @@ namespace scrutiny
     }
 
     // ============= [CommControl] ============
-    protocol::ResponseCode MainHandler::process_comm_control(const protocol::Request *const request, protocol::Response *const response)
+    protocol::ResponseCode MainHandler::process_comm_control(protocol::Request const *const request, protocol::Response *const response)
     {
         union
         {
@@ -860,7 +860,7 @@ namespace scrutiny
             stack.discover.response_data.display_name = m_config.display_name;
             stack.discover.response_data.display_name_length = static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
 
-            code = m_codec.encode_response_comm_discover(response, &stack.discover.response_data);
+            code = m_codec.encode_response_comm_discover(&stack.discover.response_data, response);
             break;
         }
 
@@ -877,7 +877,7 @@ namespace scrutiny
                 break;
             }
 
-            const bool success = m_comm_handler.heartbeat(stack.heartbeat.request_data.challenge);
+            bool const success = m_comm_handler.heartbeat(stack.heartbeat.request_data.challenge);
             if (!success)
             {
                 code = protocol::ResponseCode::InvalidRequest;
@@ -966,7 +966,7 @@ namespace scrutiny
         return code;
     }
 
-    protocol::ResponseCode MainHandler::process_memory_control(const protocol::Request *const request, protocol::Response *const response)
+    protocol::ResponseCode MainHandler::process_memory_control(protocol::Request const *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
@@ -1061,7 +1061,7 @@ namespace scrutiny
         case protocol::MemoryControl::Subfunction::Write: // fall through
         case protocol::MemoryControl::Subfunction::WriteMasked:
         {
-            const bool masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
+            bool const masked = static_cast<protocol::MemoryControl::Subfunction>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
             code = protocol::ResponseCode::OK;
 
             if (m_config.memory_write_enable == false)
@@ -1149,7 +1149,7 @@ namespace scrutiny
 
             while (!stack.read_rpv.readrpv_parser->finished())
             {
-                const bool ok_to_process = stack.read_rpv.readrpv_parser->next(&stack.read_rpv.id);
+                bool const ok_to_process = stack.read_rpv.readrpv_parser->next(&stack.read_rpv.id);
 
                 if (!stack.read_rpv.readrpv_parser->is_valid())
                 {
@@ -1159,14 +1159,14 @@ namespace scrutiny
 
                 if (ok_to_process)
                 {
-                    const bool rpv_found = get_rpv(stack.read_rpv.id, &stack.read_rpv.rpv);
+                    bool const rpv_found = get_rpv(stack.read_rpv.id, &stack.read_rpv.rpv);
                     if (!rpv_found)
                     {
                         code = protocol::ResponseCode::FailureToProceed;
                         break;
                     }
 
-                    const bool callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v);
+                    bool const callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v);
                     if (!callback_success)
                     {
                         code = protocol::ResponseCode::FailureToProceed;
@@ -1205,7 +1205,7 @@ namespace scrutiny
 
             while (!stack.write_rpv.writerpv_parser->finished())
             {
-                const bool ok_to_process = stack.write_rpv.writerpv_parser->next(&stack.write_rpv.rpv, &stack.write_rpv.v);
+                bool const ok_to_process = stack.write_rpv.writerpv_parser->next(&stack.write_rpv.rpv, &stack.write_rpv.v);
 
                 if (!stack.write_rpv.writerpv_parser->is_valid())
                 {
@@ -1218,7 +1218,7 @@ namespace scrutiny
                     continue;
                 }
 
-                const bool write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v);
+                bool const write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v);
                 if (!write_success)
                 {
                     code = protocol::ResponseCode::FailureToProceed;
@@ -1248,24 +1248,24 @@ namespace scrutiny
         return code;
     }
 
-    bool MainHandler::touches_forbidden_region(const MemoryBlock *block) const
+    bool MainHandler::touches_forbidden_region(MemoryBlock const *const block) const
     {
         return touches_forbidden_region(block->start_address, block->length);
     }
 
-    bool MainHandler::touches_forbidden_region(const void *addr_start, const size_t length) const
+    bool MainHandler::touches_forbidden_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_forbidden_address_range_set())
         {
             return false;
         }
 
-        const uintptr_t block_start = reinterpret_cast<uintptr_t>(addr_start);
-        const uintptr_t block_end = block_start + length;
+        uintptr_t const block_start = reinterpret_cast<uintptr_t>(addr_start);
+        uintptr_t const block_end = block_start + length;
 
         for (unsigned int i = 0; i < m_config.forbidden_ranges_count(); i++)
         {
-            const AddressRange &range = m_config.forbidden_ranges()[i];
+            AddressRange const &range = m_config.forbidden_ranges()[i];
 
             if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
@@ -1280,23 +1280,23 @@ namespace scrutiny
         return false;
     }
 
-    bool MainHandler::touches_readonly_region(const MemoryBlock *block) const
+    bool MainHandler::touches_readonly_region(MemoryBlock const *const block) const
     {
         return touches_readonly_region(block->start_address, block->length);
     }
 
-    bool MainHandler::touches_readonly_region(const void *addr_start, const size_t length) const
+    bool MainHandler::touches_readonly_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_readonly_address_range_set())
         {
             return false;
         }
 
-        const uintptr_t block_start = reinterpret_cast<uintptr_t>(addr_start);
-        const uintptr_t block_end = block_start + length;
+        uintptr_t const block_start = reinterpret_cast<uintptr_t>(addr_start);
+        uintptr_t const block_end = block_start + length;
         for (unsigned int i = 0; i < m_config.readonly_ranges_count(); i++)
         {
-            const AddressRange &range = m_config.readonly_ranges()[i];
+            AddressRange const &range = m_config.readonly_ranges()[i];
 
             if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
             {
@@ -1311,7 +1311,7 @@ namespace scrutiny
         return false;
     }
 
-    protocol::ResponseCode MainHandler::process_user_command(const protocol::Request *const request, protocol::Response *const response)
+    protocol::ResponseCode MainHandler::process_user_command(protocol::Request const *const request, protocol::Response *const response)
     {
         protocol::ResponseCode code = protocol::ResponseCode::FailureToProceed;
 
@@ -1339,7 +1339,7 @@ namespace scrutiny
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    protocol::ResponseCode MainHandler::process_datalog_control(const protocol::Request *const request, protocol::Response *const response)
+    protocol::ResponseCode MainHandler::process_datalog_control(protocol::Request const *const request, protocol::Response *const response)
     {
         union
         {

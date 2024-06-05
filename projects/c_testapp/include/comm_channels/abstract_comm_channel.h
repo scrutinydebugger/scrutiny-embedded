@@ -20,12 +20,12 @@ typedef enum
 
 typedef comm_channel_status_e (*comm_channel_start_t)(void *channel);
 typedef comm_channel_status_e (*comm_channel_stop_t)(void *channel);
-typedef comm_channel_status_e (*comm_channel_send_t)(void *channel, const uint8_t *buffer, int len);
-typedef comm_channel_status_e (*comm_channel_receive_t)(void *channel, uint8_t *buffer, int len, int* ret);
+typedef comm_channel_status_e (*comm_channel_send_t)(void *channel, uint8_t const *buffer, int len);
+typedef comm_channel_status_e (*comm_channel_receive_t)(void *channel, uint8_t *buffer, int len, int *ret);
 
 typedef struct
 {
-    void* handle;
+    void *handle;
     comm_channel_start_t start;
     comm_channel_stop_t stop;
     comm_channel_send_t send;

@@ -104,7 +104,7 @@ int WinSerialPortBridge::receive(uint8_t *buffer, int len)
     return static_cast<int>(nbRead);
 }
 
-void WinSerialPortBridge::send(const uint8_t *buffer, int len)
+void WinSerialPortBridge::send(uint8_t const *buffer, int len)
 {
     BOOL HResult;
 

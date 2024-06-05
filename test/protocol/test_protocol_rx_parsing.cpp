@@ -35,7 +35,7 @@ TEST_F(TestRxParsing, TestRx_ZeroLen_AllInOne)
     comm.receive_data(data, sizeof(data));
 
     ASSERT_TRUE(comm.request_received());
-    scrutiny::protocol::Request *req = comm.get_request();
+    scrutiny::protocol::Request const *req = comm.get_request();
     EXPECT_EQ(req->command_id, 1);
     EXPECT_EQ(req->subfunction_id, 2);
     EXPECT_EQ(req->data_length, 0);
@@ -55,7 +55,7 @@ TEST_F(TestRxParsing, TestRx_ZeroLen_BytePerByte)
     }
 
     ASSERT_TRUE(comm.request_received());
-    scrutiny::protocol::Request *req = comm.get_request();
+    scrutiny::protocol::Request const *req = comm.get_request();
     EXPECT_EQ(req->command_id, 1);
     EXPECT_EQ(req->subfunction_id, 2);
     EXPECT_EQ(req->data_length, 0);
@@ -71,7 +71,7 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_AllInOne)
     comm.receive_data(data, sizeof(data));
 
     ASSERT_TRUE(comm.request_received());
-    scrutiny::protocol::Request *req = comm.get_request();
+    scrutiny::protocol::Request const *req = comm.get_request();
     EXPECT_EQ(req->command_id, 1);
     EXPECT_EQ(req->subfunction_id, 2);
     EXPECT_EQ(req->data_length, 3);
@@ -94,7 +94,7 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
     }
 
     ASSERT_TRUE(comm.request_received());
-    scrutiny::protocol::Request *req = comm.get_request();
+    scrutiny::protocol::Request const *req = comm.get_request();
     EXPECT_EQ(req->command_id, 1);
     EXPECT_EQ(req->subfunction_id, 2);
     EXPECT_EQ(req->data_length, 3);
@@ -119,7 +119,7 @@ TEST_F(TestRxParsing, TestRx_Discover_2_parts)
         comm.receive_data(&data[i], sizeof(data) - i);
 
         ASSERT_TRUE(comm.request_received()) << "i=" << i;
-        scrutiny::protocol::Request *req = comm.get_request();
+        scrutiny::protocol::Request const *req = comm.get_request();
         EXPECT_EQ(req->command_id, 1) << "i=" << i;
         EXPECT_EQ(req->subfunction_id, 2) << "i=" << i;
         EXPECT_EQ(req->data_length, 4) << "i=" << i;

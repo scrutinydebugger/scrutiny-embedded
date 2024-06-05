@@ -52,7 +52,7 @@ namespace scrutiny
                                      : "memory");
         }
 
-        inline void send(const T &indata)
+        inline void send(T const &indata)
         {
             data = indata;
             commit();
@@ -104,7 +104,7 @@ namespace scrutiny
 
         /// @brief Sends a message to the receiver. Meant to be used by the producer
         /// @param indata Data to be sent
-        inline void send(const T &indata)
+        inline void send(T const &indata)
         {
             data = indata;
             commit();
@@ -112,7 +112,7 @@ namespace scrutiny
 
         /// @brief Sends a message to the receiver. Meant to be used by the producer
         /// @param indata Data to be sent
-        inline void send(const T &&indata)
+        inline void send(T const &&indata)
         {
             data = std::move(indata);
             commit();

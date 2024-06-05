@@ -48,7 +48,7 @@ namespace scrutiny
 #endif
     }
 
-    void Config::set_buffers(uint8_t *rx_buffer, const uint16_t rx_buffer_size, uint8_t *tx_buffer, const uint16_t tx_buffer_size)
+    void Config::set_buffers(uint8_t *rx_buffer, uint16_t const rx_buffer_size, uint8_t *tx_buffer, uint16_t const tx_buffer_size)
     {
         m_rx_buffer = rx_buffer;
         m_rx_buffer_size = rx_buffer_size;
@@ -56,19 +56,19 @@ namespace scrutiny
         m_tx_buffer_size = tx_buffer_size;
     }
 
-    void Config::set_forbidden_address_range(const AddressRange *range, const uint8_t count)
+    void Config::set_forbidden_address_range(AddressRange const *range, uint8_t const count)
     {
         m_forbidden_address_ranges = range;
         m_forbidden_range_count = count;
     }
 
-    void Config::set_readonly_address_range(const AddressRange *range, const uint8_t count)
+    void Config::set_readonly_address_range(AddressRange const *range, uint8_t const count)
     {
         m_readonly_address_ranges = range;
         m_readonly_range_count = count;
     }
 
-    void Config::set_published_values(RuntimePublishedValue *array, uint16_t nbr, RpvReadCallback rd_cb, RpvWriteCallback wr_cb)
+    void Config::set_published_values(RuntimePublishedValue const *const array, uint16_t const nbr, RpvReadCallback const rd_cb, RpvWriteCallback const wr_cb)
     {
         m_rpvs = array;
         m_rpv_count = nbr;
@@ -83,7 +83,7 @@ namespace scrutiny
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    void Config::set_datalogging_buffers(uint8_t *buffer, const datalogging::buffer_size_t buffer_size)
+    void Config::set_datalogging_buffers(uint8_t *buffer, datalogging::buffer_size_t const buffer_size)
     {
         m_datalogger_buffer = buffer;
         m_datalogger_buffer_size = buffer_size;
