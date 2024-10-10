@@ -254,7 +254,7 @@ namespace scrutiny
         /// @brief Returns which variable type to use to store a given size
         /// @param size Given size in bytes
         /// @return The size to use.
-        VariableTypeSize get_required_type_size(uint8_t const size);
+        VariableTypeSize get_required_type_size(uint_fast8_t const size);
 
         /// @brief Computes a standard CRC32
         /// @param data Input data
