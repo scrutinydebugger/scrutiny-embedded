@@ -63,13 +63,13 @@ namespace scrutiny
 
             void init(
                 MainHandler const *const main_handler,
-                Timebase const *const timebase,
                 datalogging::Configuration const *const config,
                 uint8_t *const buffer,
                 datalogging::buffer_size_t const buffer_size);
             void encode_next_entry(void);
             void reset(void);
             inline void reset_write_counter(void) { m_entry_write_counter = 0; }
+            inline void set_timebase(Timebase const *const timebase_for_log) { m_timebase_for_log = timebase_for_log; }
             inline datalogging::buffer_size_t get_entry_write_counter(void) const { return m_entry_write_counter; }
             inline datalogging::buffer_size_t get_data_write_counter(void) const { return m_entry_write_counter * m_entry_size; }
             inline datalogging::EncodingType get_encoding(void) const { return ENCODING; }

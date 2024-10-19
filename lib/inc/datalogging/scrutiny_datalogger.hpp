@@ -42,13 +42,11 @@ namespace scrutiny
 
             /// @brief Initializes the datalogger
             /// @param main_handler A pointer to the main handler to be used to access memory and RPVs
-            /// @param timebase The timebase used to keep track of time
             /// @param buffer The logging buffer
             /// @param buffer_size Size of the logging buffer
             /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread safety)
             void init(
                 MainHandler const *const main_handler,
-                Timebase const *const timebase,
                 uint8_t *const buffer,
                 buffer_size_t const buffer_size,
                 trigger_callback_t trigger_callback = nullptr);
@@ -56,7 +54,7 @@ namespace scrutiny
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase_for_log The timebase used for time logging
             /// @param config_id A configuration ID that will be attached to the acquisition for validation.
-            void configure(Timebase *timebase_for_log, uint16_t config_id = 0);
+            void configure(Timebase *timebase, uint16_t config_id = 0);
 
             /// @brief Periodic process. To be called as fast as possible
             void process(void);
