@@ -52,7 +52,7 @@ namespace scrutiny
                 trigger_callback_t trigger_callback = nullptr);
 
             /// @brief Configure the datalogger with a configuration received by the server
-            /// @param timebase_for_log The timebase used for time logging
+            /// @param timebase The timebase used for time logging & trigger management
             /// @param config_id A configuration ID that will be attached to the acquisition for validation.
             void configure(Timebase *timebase, uint16_t config_id = 0);
 
@@ -133,8 +133,7 @@ namespace scrutiny
             buffer_size_t m_buffer_size;           // The datalogging buffer size
             trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
-            Timebase const *m_timebase;              // Pointer to the timebase for internal time tracking
-            Timebase const *m_timebase_for_log;      // Pointer to timebase for time logging (can be in a different time domain)
+            Timebase const *m_timebase;              // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
             State m_state;                           // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded

@@ -125,9 +125,9 @@ namespace scrutiny
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
                 {
-                    // No check for m_timebase_for_log == nullptr.
+                    // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    codecs::encode_32_bits_big_endian(m_timebase_for_log->get_timestamp(), &m_buffer[cursor]);
+                    codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }
