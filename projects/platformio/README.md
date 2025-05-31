@@ -37,8 +37,8 @@ Scrutiny ready
 ```
 On the oled display
 
-Launching the scrutiny-python project server using this command
+Launching the scrutiny-main project server using this command
 ```
-./scripts/with-venv.sh scrutiny launch-server --config config/serial.json
+./scripts/with-venv.sh scrutiny server --config config/serial.json
 ```
 should result in a successful connection.
