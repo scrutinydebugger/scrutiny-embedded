@@ -1,7 +1,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_cwrapper.h"
 #include <new>
-#include <cstddef>
+#include <stddef.h>
 
 static_assert(sizeof(scrutiny_c_runtime_published_value_t) == sizeof(scrutiny::RuntimePublishedValue), "C/C++ RPV type mismatch");
 static_assert(offsetof(scrutiny_c_runtime_published_value_t, id) == offsetof(scrutiny::RuntimePublishedValue, id), "C/C++ RPV type mismatch");
