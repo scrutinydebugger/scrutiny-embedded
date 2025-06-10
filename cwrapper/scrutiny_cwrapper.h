@@ -196,7 +196,8 @@ extern "C"
     /// @brief Wrapper for `FixedFrequencyLoopHandler::process()`
     /// Process function be called at each iteration of the loop.
     /// @param loop_handler The `FixedFrequencyLoopHandler` object to work on
-    void scrutiny_c_loop_handler_fixed_freq_process(scrutiny_c_loop_handler_ff_t *loop_handler);
+    /// @param timestep_100n The real, used when graphing with MeasuredTime
+    void scrutiny_c_loop_handler_fixed_freq_process(scrutiny_c_loop_handler_ff_t *loop_handler, scrutiny_c_timediff_t const timestep_100n);
 
     /// @brief Wrapper for `VariableFrequencyLoopHandler::VariableFrequencyLoopHandler()`.
     /// Construct `scrutiny::VariableFrequencyLoopHandler` object at a given address. Fails if `mem` is NULL or if the size is not big enough.

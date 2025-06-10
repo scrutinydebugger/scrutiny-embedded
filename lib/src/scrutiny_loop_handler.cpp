@@ -113,9 +113,14 @@ namespace scrutiny
     {
         process_common(m_timestep_100ns);
     }
-    void VariableFrequencyLoopHandler::process(timediff_t const timestep_100ns)
+
+    void FixedFrequencyLoopHandler::process(timediff_t const timestep_100ns)
     {
         process_common(timestep_100ns);
     }
 
+    void VariableFrequencyLoopHandler::process(timediff_t const timestep_100ns)
+    {
+        process_common(timestep_100ns);
+    }
 }

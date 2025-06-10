@@ -446,7 +446,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             }
 
             vf_loop.process(timestep_us * 10);
-            ff_loop.process();
+            ff_loop.process(timestep_us * 10);
 #if SCRUTINY_BUILD_WINDOWS
             Sleep(10);
 #else
