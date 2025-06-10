@@ -447,9 +447,10 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
             }
             printf("\n");
         }
-
-        scrutiny_c_loop_handler_variable_freq_process(vf_loop, timestep_us*10);
-        scrutiny_c_loop_handler_fixed_freq_process(ff_loop);
+        
+        uint32_t const timestep_100ns = timestep_us*10;
+        scrutiny_c_loop_handler_variable_freq_process(vf_loop, timestep_100ns);
+        scrutiny_c_loop_handler_fixed_freq_process(ff_loop, timestep_100ns);
 #if SCRUTINY_BUILD_WINDOWS
         Sleep(10);
 #else

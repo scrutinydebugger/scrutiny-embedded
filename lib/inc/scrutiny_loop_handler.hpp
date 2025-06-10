@@ -156,8 +156,13 @@ namespace scrutiny
                                                                                                      m_timestep_100ns(timestep_100ns)
         {
         }
+
         /// @brief Process function be called at each iteration of the loop.
-        void process(void);
+        void process();
+
+        /// @brief Process function be called at each iteration of the loop.
+        /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
+        void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
         virtual LoopType loop_type(void) const override { return LoopType::FIXED_FREQ; }
@@ -185,7 +190,7 @@ namespace scrutiny
 
         /// @brief Process function be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
-        void process(timediff_t timestep_100ns);
+        void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
         virtual LoopType loop_type(void) const override { return LoopType::VARIABLE_FREQ; }

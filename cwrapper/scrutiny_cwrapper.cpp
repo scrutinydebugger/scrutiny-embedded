@@ -162,9 +162,9 @@ extern "C"
         return reinterpret_cast<scrutiny_c_loop_handler_ff_t *>(new (mem) scrutiny::FixedFrequencyLoopHandler(timestep_100ns, name)); // Placement new
     }
 
-    void scrutiny_c_loop_handler_fixed_freq_process(scrutiny_c_loop_handler_ff_t *loop_handler)
+    void scrutiny_c_loop_handler_fixed_freq_process(scrutiny_c_loop_handler_ff_t *loop_handler, scrutiny_c_timediff_t const timestep_100n)
     {
-        get_loop_handler_ff(loop_handler)->process();
+        get_loop_handler_ff(loop_handler)->process(timestep_100n);
     }
 
     scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, char const *name)
