@@ -12,19 +12,16 @@
 
 #include "argument_parser.hpp"
 
-
-ArgumentParser::ArgumentParser() :
-    m_valid(false),
-    m_command(TestAppCommand::None),
-    m_region_index(0),
-    m_argc(0),
-    m_argv(nullptr),
-    m_last_error()
+ArgumentParser::ArgumentParser() : m_valid(false),
+                                   m_command(TestAppCommand::None),
+                                   m_region_index(0),
+                                   m_argc(0),
+                                   m_argv(SCRUTINY_NULL),
+                                   m_last_error()
 {
-
 }
 
-void ArgumentParser::parse(int argc, char* argv[])
+void ArgumentParser::parse(int argc, char *argv[])
 {
     m_argc = argc;
     m_argv = argv;
@@ -36,7 +33,8 @@ void ArgumentParser::parse(int argc, char* argv[])
     }
 
     std::string cmd(argv[1]);
-    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return static_cast<unsigned char>(std::tolower(c)); });
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c)
+                   { return static_cast<unsigned char>(std::tolower(c)); });
 
     if (cmd == "memdump")
     {
@@ -57,7 +55,7 @@ void ArgumentParser::parse(int argc, char* argv[])
         if (argc >= 3)
         {
             int32_t port = atoi(m_argv[2]);
-            if (port > 0 && port <0x10000)
+            if (port > 0 && port < 0x10000)
             {
                 m_udp_port = static_cast<uint16_t>(port);
                 m_valid = true;
@@ -81,21 +79,21 @@ void ArgumentParser::parse(int argc, char* argv[])
 
             m_serial_config.port_name = argv[2];
             bool arg_error = false;
-            for (int32_t i=3; i<argc; i++)
+            for (int32_t i = 3; i < argc; i++)
             {
                 std::string arg(argv[i]);
 
                 if (arg == "--baudrate")
                 {
-                    if (i+1 >= argc)
+                    if (i + 1 >= argc)
                     {
                         m_last_error = "Missing baudrate";
                         arg_error = true;
                         break;
                     }
-                    
-                    int32_t baudrate = atoi(m_argv[i+1]);
-                    if(baudrate <= 0 || baudrate > 0x7FFFFFFF)
+
+                    int32_t baudrate = atoi(m_argv[i + 1]);
+                    if (baudrate <= 0 || baudrate > 0x7FFFFFFF)
                     {
                         m_last_error = "Invalid baudrate";
                         arg_error = true;
@@ -136,9 +134,9 @@ bool ArgumentParser::has_another_memory_region()
     return true;
 }
 
-void ArgumentParser::next_memory_region(MemoryRegion* region)
+void ArgumentParser::next_memory_region(MemoryRegion *region)
 {
-    constexpr uint32_t region_offset = 2;
+    SCRUTINY_CONSTEXPR uint32_t region_offset = 2;
     if (m_command != TestAppCommand::Memdump || !m_valid)
     {
         throw Error::WrongCommand;
@@ -165,9 +163,8 @@ void ArgumentParser::next_memory_region(MemoryRegion* region)
         base2 = 16;
     }
 
-    region->start_address = static_cast<std::uintptr_t>(strtoll(start_address.c_str(), NULL, base1));
+    region->start_address = static_cast<uintptr_t>(strtoll(start_address.c_str(), NULL, base1));
     region->length = static_cast<uint32_t>(strtol(length.c_str(), NULL, base2));
 
     m_region_index += 2;
-
 }

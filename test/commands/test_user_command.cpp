@@ -25,11 +25,11 @@ protected:
     uint8_t _tx_buffer[TX_BUFFER_SIZE];
 
     TestUserCommand() : ScrutinyTest(),
-                        tb{},
-                        scrutiny_handler{},
-                        config{},
-                        _rx_buffer{0},
-                        _tx_buffer{0}
+                        tb(),
+                        scrutiny_handler(),
+                        config(),
+                        _rx_buffer(),
+                        _tx_buffer()
     {
     }
 
@@ -91,8 +91,8 @@ TEST_F(TestUserCommand, TestCommandCalled)
 
 TEST_F(TestUserCommand, TestResponseOverflow)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::UserCommand;
-    const scrutiny::protocol::ResponseCode code = scrutiny::protocol::ResponseCode::Overflow;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::UserCommand;
+    const scrutiny::protocol::ResponseCode::E code = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
     config.set_user_command_callback(my_callback2);
@@ -113,8 +113,8 @@ TEST_F(TestUserCommand, TestResponseOverflow)
 
 TEST_F(TestUserCommand, TestNoCallback)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::UserCommand;
-    const scrutiny::protocol::ResponseCode code = scrutiny::protocol::ResponseCode::UnsupportedFeature;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::UserCommand;
+    const scrutiny::protocol::ResponseCode::E code = scrutiny::protocol::ResponseCode::UnsupportedFeature;
 
     uint8_t tx_buffer[32];
     // No callback set on purpose

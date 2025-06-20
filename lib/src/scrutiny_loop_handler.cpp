@@ -32,7 +32,7 @@ namespace scrutiny
     {
         m_timebase.step(timestep_100ns);
 
-        Loop2MainMessage msg_out{};
+        Loop2MainMessage msg_out;
         static_cast<void>(msg_out);
 
         if (m_main2loop_msg.has_content() && !m_loop2main_msg.has_content())

@@ -25,8 +25,8 @@ namespace scrutiny
     namespace datalogging
     {
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
-        using DataEncoder = RawFormatEncoder;
-        using DataReader = RawFormatReader;
+        typedef RawFormatEncoder DataEncoder;
+        typedef RawFormatReader DataReader;
 #endif
     }
 }

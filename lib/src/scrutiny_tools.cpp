@@ -15,7 +15,7 @@ namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize get_required_type_size(uint_fast8_t const newsize)
+        VariableTypeSize::E get_required_type_size(uint_fast8_t const newsize)
         {
             if (newsize <= 1)
             {
@@ -47,9 +47,9 @@ namespace scrutiny
             }
         }
 
-        bool is_supported_type(VariableType const vt)
+        bool is_supported_type(VariableType::E const vt)
         {
-            VariableTypeType tt = get_var_type_type(vt);
+            VariableTypeType::E tt = get_var_type_type(vt);
             uint8_t ts = get_type_size(vt);
 
             if (ts == 0)

@@ -17,7 +17,7 @@
 
 #include <windows.h>
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 
 class WinSerialPortBridge : public AbstractCommChannel
 {

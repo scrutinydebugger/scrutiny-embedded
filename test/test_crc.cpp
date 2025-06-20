@@ -7,7 +7,7 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include <gtest/gtest.h>
-#include <cstdint>
+#include <stdint.h>
 
 #include "scrutiny_tools.hpp"
 

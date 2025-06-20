@@ -26,25 +26,25 @@ protected:
     uint8_t readonly_buffer[128];
     uint8_t readonly_buffer2[128];
 
-    scrutiny::AddressRange readonly_ranges[2] = {
-        scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
-        scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2))};
-
-    scrutiny::AddressRange forbidden_ranges[2] = {
-        scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer)),
-        scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2))};
+    scrutiny::AddressRange readonly_ranges[2];
+    scrutiny::AddressRange forbidden_ranges[2]; 
 
     TestVariableFetching() : ScrutinyTest(),
-                             tb{},
-                             scrutiny_handler{},
-                             config{},
-                             _rx_buffer{},
-                             _tx_buffer{},
-                             forbidden_buffer{},
-                             forbidden_buffer2{},
-                             readonly_buffer{},
-                             readonly_buffer2{}
+                             tb(),
+                             scrutiny_handler(),
+                             config(),
+                             _rx_buffer(),
+                             _tx_buffer(),
+                             forbidden_buffer(),
+                             forbidden_buffer2(),
+                             readonly_buffer(),
+                             readonly_buffer2()
     {
+        readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
+        readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
+
+        forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
+        forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2));
     }
 
     virtual void SetUp()
@@ -203,7 +203,7 @@ TEST_F(TestVariableFetching, Bitfield)
 #endif
 
     scrutiny::AnyType outval;
-    scrutiny::VariableType outtype;
+    scrutiny::VariableType::E outtype;
     bool success;
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[0], scrutiny::VariableTypeType::_uint, 2, 3, &outval, &outtype);
     EXPECT_TRUE(success);

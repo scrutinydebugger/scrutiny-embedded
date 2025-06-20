@@ -8,7 +8,7 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -73,7 +73,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode code)
+::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId::E cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode::E code)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
@@ -87,7 +87,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode>(buffer[2]) << " but expected " << code;
+        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2]) << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
@@ -100,13 +100,13 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
+#pragma warning(disable : 4127) // Get rid of SCRUTINY_CONSTEXPR always true condition warning.
 #endif
 
 unsigned int ScrutinyTest::encode_addr(uint8_t *buffer, void *addr)
 {
-    std::uintptr_t ptr = reinterpret_cast<std::uintptr_t>(addr);
-    constexpr unsigned int addr_size = sizeof(ptr);
+    uintptr_t ptr = reinterpret_cast<uintptr_t>(addr);
+    SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(ptr);
 
     unsigned int i = addr_size - 1;
 
@@ -145,7 +145,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode val)
+        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode::E val)
         {
             switch (val)
             {
@@ -191,7 +191,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State val)
+        std::ostream &operator<<(std::ostream &out, DataLogger::State::E val)
         {
             switch (val)
             {

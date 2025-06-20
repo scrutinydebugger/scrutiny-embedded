@@ -4,11 +4,16 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+set(GTEST_RELEASE release-1.12.1)       # Last one to support C++11
+if (CMAKE_CXX_STANDARD EQUAL 98)
+    set(GTEST_RELEASE release-1.8.1)    # Last one to support C++98
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.12.1
+  GIT_TAG ${GTEST_RELEASE}
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -38,7 +43,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_datalog_control.cpp
     )
-    
+
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp

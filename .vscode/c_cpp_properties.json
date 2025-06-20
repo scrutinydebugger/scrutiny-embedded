@@ -3,6 +3,7 @@
         {
             "name": "dev",
             "compileCommands": "${workspaceRoot}/build-dev/compile_commands.json",
+            "cppStandard": "c++11"
         }
     ],
     "version": 4

@@ -11,7 +11,7 @@
 #include <thread>
 #include <chrono>
 #include <cstdlib>
-#include <cstdint>
+#include <stdint.h>
 
 #if SCRUTINY_BUILD_WINDOWS
 #include <windows.h>

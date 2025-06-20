@@ -18,7 +18,7 @@
 #include "abstract_comm_channel.hpp"
 
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 #include <cstdlib>
 #include "abstract_comm_channel.hpp"
 

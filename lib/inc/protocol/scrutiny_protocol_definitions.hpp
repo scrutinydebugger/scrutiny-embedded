@@ -52,42 +52,58 @@ namespace scrutiny
             uint32_t crc;
         };
 
-        enum class CommandId : uint8_t
+        class CommandId
         {
-            GetInfo = 0x01,
-            CommControl = 0x02,
-            MemoryControl = 0x03,
-            UserCommand = 0x04,
-            DataLogControl = 0x05
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                GetInfo = 0x01,
+                CommControl = 0x02,
+                MemoryControl = 0x03,
+                UserCommand = 0x04,
+                DataLogControl = 0x05
+            };
         };
 
-        enum class ResponseCode : uint8_t
+        class ResponseCode
         {
-            OK = 0,
-            InvalidRequest = 1,
-            UnsupportedFeature = 2,
-            Overflow = 3,
-            Busy = 4,
-            FailureToProceed = 5,
-            Forbidden = 6,
-            NoResponseToSend = 0xFE,
-            ProcessAgain = 0xFF
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                OK = 0,
+                InvalidRequest = 1,
+                UnsupportedFeature = 2,
+                Overflow = 3,
+                Busy = 4,
+                FailureToProceed = 5,
+                Forbidden = 6,
+                NoResponseToSend = 0xFE,
+                ProcessAgain = 0xFF
+            };
         };
 
-        enum class RxError : uint8_t
+        class RxError
         {
-            None,
-            Overflow,
-            Disabled,
-            InvalidCommand
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                None,
+                Overflow,
+                Disabled,
+                InvalidCommand
+            };
         };
 
-        enum class TxError : uint8_t
+        class TxError
         {
-            None,
-            Overflow,
-            Busy,
-            Disabled
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                None,
+                Overflow,
+                Busy,
+                Disabled
+            };
         };
 
         struct Version
@@ -98,23 +114,31 @@ namespace scrutiny
 
         namespace GetInfo
         {
-            enum class Subfunction : uint8_t
+            class Subfunction
             {
-                GetprotocolVersion = 1,
-                GetSoftwareId = 2,
-                GetSupportedFeatures = 3,
-                GetSpecialMemoryRegionCount = 4,
-                GetSpecialMemoryLocation = 5,
-                GetRuntimePublishedValuesCount = 6,
-                GetRuntimePublishedValuesDefinition = 7,
-                GetLoopCount = 8,
-                GetLoopDefinition = 9
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    GetprotocolVersion = 1,
+                    GetSoftwareId = 2,
+                    GetSupportedFeatures = 3,
+                    GetSpecialMemoryRegionCount = 4,
+                    GetSpecialMemoryLocation = 5,
+                    GetRuntimePublishedValuesCount = 6,
+                    GetRuntimePublishedValuesDefinition = 7,
+                    GetLoopCount = 8,
+                    GetLoopDefinition = 9
+                };
             };
 
-            enum class MemoryRegionType : uint8_t
+            class MemoryRegionType
             {
-                ReadOnly = 0,
-                Forbidden = 1
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    ReadOnly = 0,
+                    Forbidden = 1
+                };
             };
         }
 
@@ -123,40 +147,52 @@ namespace scrutiny
             extern uint8_t const DISCOVER_MAGIC[4];
             extern uint8_t const CONNECT_MAGIC[4];
 
-            enum class Subfunction : uint8_t
+            class Subfunction
             {
-                Discover = 1,
-                Heartbeat = 2,
-                GetParams = 3,
-                Connect = 4,
-                Disconnect = 5
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    Discover = 1,
+                    Heartbeat = 2,
+                    GetParams = 3,
+                    Connect = 4,
+                    Disconnect = 5
+                };
             };
         }
 
         namespace MemoryControl
         {
-            enum class Subfunction : uint8_t
+            class Subfunction
             {
-                Read = 1,
-                Write = 2,
-                WriteMasked = 3,
-                ReadRPV = 4,
-                WriteRPV = 5
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    Read = 1,
+                    Write = 2,
+                    WriteMasked = 3,
+                    ReadRPV = 4,
+                    WriteRPV = 5
+                };
             };
         }
 
         namespace DataLogControl
         {
-            enum class Subfunction : uint8_t
+            class Subfunction
             {
-                GetSetup = 1,
-                ConfigureDatalog = 2,
-                ArmTrigger = 3,
-                DisarmTrigger = 4,
-                GetStatus = 5,
-                GetAcquisitionMetadata = 6,
-                ReadAcquisition = 7,
-                ResetDatalogger = 8
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    GetSetup = 1,
+                    ConfigureDatalog = 2,
+                    ArmTrigger = 3,
+                    DisarmTrigger = 4,
+                    GetStatus = 5,
+                    GetAcquisitionMetadata = 6,
+                    ReadAcquisition = 7,
+                    ResetDatalogger = 8
+                };
             };
         }
 

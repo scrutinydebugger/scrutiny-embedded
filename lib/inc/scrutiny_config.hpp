@@ -56,7 +56,7 @@ namespace scrutiny
         /// @param nbr Number of RPV in the array
         /// @param rd_cb Callback to call to read a RPV
         /// @param wr_cb Callback to call to write a RPV
-        void set_published_values(RuntimePublishedValue const *array, uint16_t const nbr, RpvReadCallback const rd_cb = nullptr, RpvWriteCallback const wr_cb = nullptr);
+        void set_published_values(RuntimePublishedValue const *array, uint16_t const nbr, RpvReadCallback const rd_cb = SCRUTINY_NULL, RpvWriteCallback const wr_cb = SCRUTINY_NULL);
 
         /// @brief Defines the different loops (tasks) in the application.
         /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
@@ -100,32 +100,32 @@ namespace scrutiny
         /// @brief Returns true if a callback has been set to support the UserCallback service call
         inline bool is_user_command_callback_set(void) const
         {
-            return m_user_command_callback != nullptr;
+            return m_user_command_callback != SCRUTINY_NULL;
         }
 
         /// @brief Returns true if the communication buffers were sets
-        inline bool is_buffer_set(void) const { return (m_rx_buffer != nullptr) && (m_tx_buffer != nullptr); }
+        inline bool is_buffer_set(void) const { return (m_rx_buffer != SCRUTINY_NULL) && (m_tx_buffer != SCRUTINY_NULL); }
 
         /// @brief Returns true if forbidden regions have been defined
-        inline bool is_forbidden_address_range_set(void) const { return m_forbidden_address_ranges != nullptr; }
+        inline bool is_forbidden_address_range_set(void) const { return m_forbidden_address_ranges != SCRUTINY_NULL; }
 
         /// @brief Returns true if read-only regions have been defined
-        inline bool is_readonly_address_range_set(void) const { return m_readonly_address_ranges != nullptr; }
+        inline bool is_readonly_address_range_set(void) const { return m_readonly_address_ranges != SCRUTINY_NULL; }
 
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Read callback has been given
-        inline bool is_read_published_values_configured(void) const { return (m_rpv_read_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_read_published_values_configured(void) const { return (m_rpv_read_callback != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0); };
 
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Write callback has been given
-        inline bool is_write_published_values_configured(void) const { return (m_rpv_write_callback != nullptr && m_rpvs != nullptr && m_rpv_count > 0); };
+        inline bool is_write_published_values_configured(void) const { return (m_rpv_write_callback != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0); };
 
         /// @brief Returns true if a list of loops (tasks) were defined
-        inline bool is_loop_handlers_configured(void) const { return m_loops != nullptr && m_loop_count > 0; }
+        inline bool is_loop_handlers_configured(void) const { return m_loops != SCRUTINY_NULL && m_loop_count > 0; }
 #if SCRUTINY_ENABLE_DATALOGGING
 
         /// @brief Returns true if the datalogging feature has been configured to a working point.
         inline bool is_datalogging_configured(void) const
         {
-            return (m_datalogger_buffer != nullptr && m_datalogger_buffer_size != 0);
+            return (m_datalogger_buffer != SCRUTINY_NULL && m_datalogger_buffer_size != 0);
         };
 
         /// @brief Returns true if at least one loop support datalogging

@@ -31,32 +31,54 @@ namespace scrutiny
         /// @return AddressRange object
         inline AddressRange make_address_range(uintptr_t const start, uintptr_t const end)
         {
+            #if SCRUTINY_HAS_CPP11
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
+            #else
+            AddressRange range;
+            range.start = reinterpret_cast<void *>(start); 
+            range.end= reinterpret_cast<void *>(end);
+            return range;
+            #endif
         }
 
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
         /// @param end End address
         /// @return AddressRange object
-        inline AddressRange make_address_range(void const *start, void const *end)
+        inline AddressRange make_address_range(void * const start, void * const end)
         {
-            return {const_cast<void *>(start), const_cast<void *>(end)};
+            #if SCRUTINY_HAS_CPP11
+            return {start, end};
+            #else
+            AddressRange range;
+            range.start = start; 
+            range.end = end;
+            return range;
+            #endif
         }
 
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
         /// @param size Address range size
         /// @return AddressRange object
-        inline AddressRange make_address_range(void const *start, size_t size)
+        inline AddressRange make_address_range(void * const start, size_t size)
         {
             size = (size == 0) ? 1 : size;
-            return {const_cast<void *>(start), reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(start) + size - 1)};
+            uintptr_t const end = reinterpret_cast<uintptr_t>(start) + size - 1;
+            #if SCRUTINY_HAS_CPP11
+            return {start, reinterpret_cast<void *>(end)};
+            #else
+            AddressRange range;
+            range.start = start; 
+            range.end= reinterpret_cast<void *>(end);
+            return range;
+            #endif
         }
 
         /// @brief Returns the size of a given type in bytes
         /// @param vt The VariableType object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableType const vt)
+        inline uint8_t get_type_size(VariableType::E const vt)
         {
             if (vt == VariableType::unknown)
             {
@@ -69,7 +91,7 @@ namespace scrutiny
         /// @brief Returns the size of a given TypeSize in bytes
         /// @param ts The VariableTypeSize object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableTypeSize const ts)
+        inline uint8_t get_type_size(VariableTypeSize::E const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -82,16 +104,16 @@ namespace scrutiny
         /// @brief Returns the Type Type of a given data type.
         /// @param vt The VariableTypeSize object
         /// @return The VariableTypeType enum object
-        inline VariableTypeType get_var_type_type(VariableType const vt)
+        inline VariableTypeType::E get_var_type_type(VariableType::E const vt)
         {
-            return static_cast<VariableTypeType>(static_cast<unsigned int>(vt) & 0xF0);
+            return static_cast<VariableTypeType::E>(static_cast<unsigned int>(vt) & 0xF0);
         }
 
         /// @brief Creates a VariableType from a TypeType and a size.
         /// @param tt The type type (uint, int, float, etc)
         /// @param ts The type size (8,16, 32)
         /// @return The VariableType enum object
-        inline VariableType make_type(VariableTypeType const tt, VariableTypeSize const ts)
+        inline VariableType::E make_type(VariableTypeType::E const tt, VariableTypeSize::E const ts)
         {
             if (tt == VariableTypeType::_boolean)
             {
@@ -102,23 +124,23 @@ namespace scrutiny
                 return VariableType::unknown;
             }
 
-            return static_cast<VariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
+            return static_cast<VariableType::E>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 
         /// @brief Returns true if given Variable Type is a floating point type, regardless of its size
-        inline bool is_float_type(VariableType const vt)
+        inline bool is_float_type(VariableType::E const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_float;
         }
 
         /// @brief Returns true if given Variable Type is a unsigned int type, regardless of its size
-        inline bool is_uint_type(VariableType const vt)
+        inline bool is_uint_type(VariableType::E const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_uint;
         }
 
         /// @brief Returns true if given Variable Type is a signed int type, regardless of its size
-        inline bool is_sint_type(VariableType const vt)
+        inline bool is_sint_type(VariableType::E const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_sint;
         }
@@ -191,7 +213,7 @@ namespace scrutiny
         inline size_t strnlen(char const *const s, size_t const maxlen)
         {
             size_t n = 0;
-            if (s == nullptr)
+            if (s == SCRUTINY_NULL)
             {
                 return 0;
             }
@@ -238,7 +260,7 @@ namespace scrutiny
         inline bool is_float_finite(float const val)
         {
 #if SCRUTINY_BUILD_AVR_GCC
-            static_assert(sizeof(float) == 4, "Expect float to be 32 bits");
+            SCRUTINY_STATIC_ASSERT(sizeof(float) == 4, "Expect float to be 32 bits");
             uint32_t uv;
             memcpy(&uv, &val, 4);
             uint16_t exponent = (uv >> 23) & 0xFF;
@@ -249,12 +271,12 @@ namespace scrutiny
         }
 
         /// @brief Returns true if the type is supported by scrutiny
-        bool is_supported_type(VariableType const vt);
+        bool is_supported_type(VariableType::E const vt);
 
         /// @brief Returns which variable type to use to store a given size
         /// @param size Given size in bytes
         /// @return The size to use.
-        VariableTypeSize get_required_type_size(uint_fast8_t const size);
+        VariableTypeSize::E get_required_type_size(uint_fast8_t const size);
 
         /// @brief Computes a standard CRC32
         /// @param data Input data

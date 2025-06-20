@@ -45,29 +45,32 @@ protected:
     uint8_t readonly_buffer[128];
     uint8_t readonly_buffer2[128];
 
-    scrutiny::AddressRange readonly_ranges[2] = {
-        scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
-        scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2))};
-
-    scrutiny::AddressRange forbidden_ranges[2] = {
-        scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer)),
-        scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2))};
-
-    scrutiny::RuntimePublishedValue rpvs[2] = {
-        {0x1234, scrutiny::VariableType::uint32},
-        {0x5678, scrutiny::VariableType::float32}};
+    scrutiny::AddressRange readonly_ranges[2];
+    scrutiny::AddressRange forbidden_ranges[2];
+    scrutiny::RuntimePublishedValue rpvs[2];
 
     TestTriggerConditions() : ScrutinyTest(),
-                              tb{},
-                              scrutiny_handler{},
-                              config{},
-                              _rx_buffer{0},
-                              _tx_buffer{0},
-                              forbidden_buffer{0},
-                              forbidden_buffer2{0},
-                              readonly_buffer{0},
-                              readonly_buffer2{0}
+                              tb(),
+                              scrutiny_handler(),
+                              config(),
+                              _rx_buffer(),
+                              _tx_buffer(),
+                              forbidden_buffer(),
+                              forbidden_buffer2(),
+                              readonly_buffer(),
+                              readonly_buffer2()
     {
+        readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
+        readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
+
+        forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
+        forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer2));      
+        
+        rpvs[0].id = 0x1234;
+        rpvs[0].type = scrutiny::VariableType::uint32;
+        rpvs[1].id = 0x5678;
+        rpvs[1].type = scrutiny::VariableType::float32;
+
     }
 
     virtual void SetUp()
@@ -86,14 +89,14 @@ protected:
 TEST_F(TestTriggerConditions, AlwaysTrue)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
-    EXPECT_TRUE(cond.always_true.evaluate(cond.data(), nullptr, nullptr));
+    EXPECT_TRUE(cond.always_true.evaluate(cond.data(), SCRUTINY_NULL, SCRUTINY_NULL));
 }
 
 TEST_F(TestTriggerConditions, OperatorEQ)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -108,7 +111,7 @@ TEST_F(TestTriggerConditions, OperatorNEQ)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.5f;
     vals[1]._float = 0.5f;
@@ -123,7 +126,7 @@ TEST_F(TestTriggerConditions, OperatorGT)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -140,7 +143,7 @@ TEST_F(TestTriggerConditions, OperatorGET)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -157,7 +160,7 @@ TEST_F(TestTriggerConditions, OperatorLT)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -174,7 +177,7 @@ TEST_F(TestTriggerConditions, OperatorLET)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -191,7 +194,7 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     for (int i = 0; i < 2; i++)
     {
@@ -258,7 +261,7 @@ TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
     for (int i = 0; i < 2; i++)
     {
         const int op0 = (i == 0) ? 0 : 1;
@@ -298,7 +301,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
     cond.cmt.reset(cond.data());
 
     // Test positive change
@@ -349,7 +352,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
 
     // ===== Float - Sint
     cond.cmt.reset(cond.data());
@@ -578,7 +581,7 @@ TEST_F(TestTriggerConditions, IsWithin)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[3];
-    scrutiny::datalogging::VariableTypeCompare valtypes[3];
+    scrutiny::datalogging::VariableTypeCompare::E valtypes[3];
 
     cond.within.reset(cond.data());
     // Test positive change

@@ -10,20 +10,25 @@
 #include "scrutiny_ipc.hpp"
 #include <stdlib.h>
 #include <thread>
+#include <stdint.h>
 #include <chrono>
 
-enum class SomeEnum
+class SomeEnum
 {
-    VAL1,
-    VAL2,
-    VAL3
+    public:
+    enum E
+    {
+        VAL1,
+        VAL2,
+        VAL3
+    };
 };
-
+    
 struct SomeData
 {
 public:
     uint32_t u32;
-    SomeEnum e;
+    SomeEnum::E e;
 };
 
 TEST(TestIPC, Basic)

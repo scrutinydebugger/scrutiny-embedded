@@ -3,9 +3,9 @@
 #include <new>
 #include <stddef.h>
 
-static_assert(sizeof(scrutiny_c_runtime_published_value_t) == sizeof(scrutiny::RuntimePublishedValue), "C/C++ RPV type mismatch");
-static_assert(offsetof(scrutiny_c_runtime_published_value_t, id) == offsetof(scrutiny::RuntimePublishedValue, id), "C/C++ RPV type mismatch");
-static_assert(offsetof(scrutiny_c_runtime_published_value_t, type) == offsetof(scrutiny::RuntimePublishedValue, type), "C/C++ RPV type mismatch");
+SCRUTINY_STATIC_ASSERT(sizeof(scrutiny_c_runtime_published_value_t) == sizeof(scrutiny::RuntimePublishedValue), "C/C++ RPV type mismatch");
+SCRUTINY_STATIC_ASSERT(offsetof(scrutiny_c_runtime_published_value_t, id) == offsetof(scrutiny::RuntimePublishedValue, id), "C/C++ RPV type mismatch");
+SCRUTINY_STATIC_ASSERT(offsetof(scrutiny_c_runtime_published_value_t, type) == offsetof(scrutiny::RuntimePublishedValue, type), "C/C++ RPV type mismatch");
 
 static inline scrutiny::Config *get_config(scrutiny_c_config_t *config)
 {
@@ -36,9 +36,9 @@ extern "C"
 
     scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t const size)
     {
-        if (size < SCRUTINY_C_MAIN_HANDLER_SIZE || mem == nullptr)
+        if (size < SCRUTINY_C_MAIN_HANDLER_SIZE || mem == SCRUTINY_NULL)
         {
-            return nullptr;
+            return SCRUTINY_NULL;
         }
         return reinterpret_cast<scrutiny_c_main_handler_t *>(new (mem) scrutiny::MainHandler); // Placement new
     }
@@ -55,9 +55,9 @@ extern "C"
 
     scrutiny_c_config_t *scrutiny_c_config_construct(void *mem, size_t const bufsize)
     {
-        if (bufsize < SCRUTINY_C_CONFIG_SIZE || mem == nullptr)
+        if (bufsize < SCRUTINY_C_CONFIG_SIZE || mem == SCRUTINY_NULL)
         {
-            return nullptr;
+            return SCRUTINY_NULL;
         }
         return reinterpret_cast<scrutiny_c_config_t *>(new (mem) scrutiny::Config); // Placement new
     }
@@ -155,9 +155,9 @@ extern "C"
 
     scrutiny_c_loop_handler_ff_t *scrutiny_c_loop_handler_fixed_freq_construct(void *mem, size_t const size, uint32_t const timestep_100ns, char const *name)
     {
-        if (size < SCRUTINY_C_LOOP_HANDLER_FF_SIZE || mem == nullptr)
+        if (size < SCRUTINY_C_LOOP_HANDLER_FF_SIZE || mem == SCRUTINY_NULL)
         {
-            return nullptr;
+            return SCRUTINY_NULL;
         }
         return reinterpret_cast<scrutiny_c_loop_handler_ff_t *>(new (mem) scrutiny::FixedFrequencyLoopHandler(timestep_100ns, name)); // Placement new
     }
@@ -169,9 +169,9 @@ extern "C"
 
     scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, char const *name)
     {
-        if (size < SCRUTINY_C_LOOP_HANDLER_VF_SIZE || mem == nullptr)
+        if (size < SCRUTINY_C_LOOP_HANDLER_VF_SIZE || mem == SCRUTINY_NULL)
         {
-            return nullptr;
+            return SCRUTINY_NULL;
         }
         return reinterpret_cast<scrutiny_c_loop_handler_vf_t *>(new (mem) scrutiny::VariableFrequencyLoopHandler(name)); // Placement new
     }

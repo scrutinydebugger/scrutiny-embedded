@@ -295,7 +295,7 @@ namespace scrutiny
 
         uint16_t CommHandler::pop_data(uint8_t *const buffer, uint16_t len)
         {
-            static_assert(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
+            SCRUTINY_STATIC_ASSERT(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
 
             if (m_state != State::Transmitting)
             {
@@ -351,7 +351,7 @@ namespace scrutiny
                     m_nbytes_sent += data_bytes_to_copy;
                 }
 
-                uint16_t const crc_position = m_active_response.data_length + 5u; // Will fit as per static_assert above.
+                uint16_t const crc_position = m_active_response.data_length + 5u; // Will fit as per SCRUTINY_STATIC_ASSERT above.
                 while (i < len)
                 {
                     if (m_nbytes_sent == crc_position)

@@ -15,11 +15,11 @@ class TestTxParsing : public ScrutinyTest
 {
 public:
     TestTxParsing() : ScrutinyTest(),
-                      comm{},
-                      response_buffer{},
-                      response{},
-                      _rx_buffer{},
-                      _tx_buffer{}
+                      comm(),
+                      response_buffer(),
+                      response(),
+                      _rx_buffer(),
+                      _tx_buffer()
     {
     }
 
@@ -163,9 +163,9 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
 
 TEST_F(TestTxParsing, TestSendsOverflow)
 {
-    static_assert(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
+    SCRUTINY_STATIC_ASSERT(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
 
-    constexpr uint16_t datalen = sizeof(_tx_buffer) + 1;
+    SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(_tx_buffer) + 1;
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
     response.response_code = 0x03;
@@ -184,9 +184,9 @@ TEST_F(TestTxParsing, TestSendsOverflow)
 TEST_F(TestTxParsing, TestSendsFullBuffer)
 {
     uint8_t buf[sizeof(_tx_buffer) + scrutiny::protocol::RESPONSE_OVERHEAD];
-    static_assert(sizeof(_tx_buffer) < 0xFFFF, "buffer too big");
+    SCRUTINY_STATIC_ASSERT(sizeof(_tx_buffer) < 0xFFFF, "buffer too big");
 
-    constexpr uint16_t datalen = sizeof(_tx_buffer);
+    SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(_tx_buffer);
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
     response.response_code = 0x03;
@@ -214,8 +214,8 @@ TEST_F(TestTxParsing, TestSendsFullBuffer)
 
 TEST_F(TestTxParsing, TestSendsOverflowRestart)
 {
-    static_assert(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
-    constexpr uint16_t datalen = sizeof(_tx_buffer);
+    SCRUTINY_STATIC_ASSERT(sizeof(_tx_buffer) < 0xFFFE, "buffer too big");
+    SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(_tx_buffer);
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
     response.response_code = 0x03;

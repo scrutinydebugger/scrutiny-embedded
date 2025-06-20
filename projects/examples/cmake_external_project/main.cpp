@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstdint>
+#include <stdint.h>
 #include "scrutiny.hpp"
 
 uint8_t rx_buffer[128];

@@ -13,7 +13,7 @@
 #endif
 
 #include "nix_serial_port_bridge.hpp"
-#include <cstdint>
+#include <stdint.h>
 #include <cstdlib>
 #include <string>
 #include <cstring>
