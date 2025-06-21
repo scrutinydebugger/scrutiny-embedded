@@ -11,14 +11,14 @@
 
 #include <stdint.h>
 
-#include "scrutiny_setup.hpp"
 #include "scrutiny_protocol_definitions.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_types.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING
-#include "datalogging/scrutiny_datalogging_types.hpp"
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
 #endif
 
 namespace scrutiny
@@ -27,27 +27,36 @@ namespace scrutiny
 
     namespace protocol
     {
-        SCRUTINY_CONSTEXPR unsigned int REQUEST_OVERHEAD = 8;                                     // Number of bytes in a request that are not part of the payload
-        SCRUTINY_CONSTEXPR unsigned int RESPONSE_OVERHEAD = 9;                                    // Number of bytes in a response that are not part of the payload
-        SCRUTINY_CONSTEXPR unsigned int MAX_DISPLAY_NAME_LENGTH = 64;                             // Maximum length of a display name given on discover
-        SCRUTINY_CONSTEXPR unsigned int MAX_LOOP_NAME_LENGTH = 32;                                // Maximum length given to a loop
-        SCRUTINY_CONSTEXPR unsigned int MINIMUM_RX_BUFFER_SIZE = 32;                              // Minimum size of the reception buffer
-        SCRUTINY_CONSTEXPR unsigned int MINIMUM_TX_BUFFER_SIZE = 32;                              // Minimum size of the transmit buffer
-        SCRUTINY_CONSTEXPR uint16_t BUFFER_OVERFLOW_MARGIN = 16;                                  // This margin let us detect overflow in CommHandler with very few calculations.
+        SCRUTINY_CONSTEXPR unsigned int REQUEST_OVERHEAD = 8;         // Number of bytes in a request that are not part of the payload
+        SCRUTINY_CONSTEXPR unsigned int RESPONSE_OVERHEAD = 9;        // Number of bytes in a response that are not part of the payload
+        SCRUTINY_CONSTEXPR unsigned int MAX_DISPLAY_NAME_LENGTH = 64; // Maximum length of a display name given on discover
+        SCRUTINY_CONSTEXPR unsigned int MAX_LOOP_NAME_LENGTH = 32;    // Maximum length given to a loop
+        SCRUTINY_CONSTEXPR unsigned int MINIMUM_RX_BUFFER_SIZE = 32;  // Minimum size of the reception buffer
+        SCRUTINY_CONSTEXPR unsigned int MINIMUM_TX_BUFFER_SIZE = 32;  // Minimum size of the transmit buffer
+        SCRUTINY_CONSTEXPR uint16_t BUFFER_OVERFLOW_MARGIN = 16;      // This margin let us detect overflow in CommHandler with very few calculations.
         SCRUTINY_CONSTEXPR unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum reception buffer size in bytes
         SCRUTINY_CONSTEXPR unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum transmission buffer size in bytes
 
         class ReadMemoryBlocksRequestParser
         {
-        public:
+          public:
             void init(Request const *const request);
             void next(MemoryBlock *const memblock);
-            inline bool finished(void) const { return m_finished; };
-            inline bool is_valid(void) const { return !m_invalid; };
-            inline uint16_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
+            inline bool finished(void) const
+            {
+                return m_finished;
+            };
+            inline bool is_valid(void) const
+            {
+                return !m_invalid;
+            };
+            inline uint16_t required_tx_buffer_size(void) const
+            {
+                return m_required_tx_buffer_size;
+            }
             void reset(void);
 
-        protected:
+          protected:
             void validate();
             uint8_t *m_buffer;
             uint16_t m_bytes_read;
@@ -59,13 +68,16 @@ namespace scrutiny
 
         class ReadMemoryBlocksResponseEncoder
         {
-        public:
+          public:
             void init(Response *const response, uint16_t const max_size);
             void write(MemoryBlock const *const memblock);
-            inline bool overflow(void) const { return m_overflow; };
+            inline bool overflow(void) const
+            {
+                return m_overflow;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
@@ -75,15 +87,24 @@ namespace scrutiny
 
         class WriteMemoryBlocksRequestParser
         {
-        public:
+          public:
             void init(Request const *const request, bool const masked_write);
             void next(MemoryBlock *const memblock);
-            inline bool finished(void) const { return m_finished; };
-            inline bool is_valid(void) const { return !m_invalid; };
-            inline uint32_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
+            inline bool finished(void) const
+            {
+                return m_finished;
+            };
+            inline bool is_valid(void) const
+            {
+                return !m_invalid;
+            };
+            inline uint32_t required_tx_buffer_size(void) const
+            {
+                return m_required_tx_buffer_size;
+            }
             void reset(void);
 
-        protected:
+          protected:
             void validate(void);
 
             uint8_t *m_buffer;
@@ -97,13 +118,16 @@ namespace scrutiny
 
         class WriteMemoryBlocksResponseEncoder
         {
-        public:
+          public:
             void init(Response *const response, uint16_t const max_size);
             void write(MemoryBlock const *const memblock);
-            inline bool overflow(void) const { return m_overflow; };
+            inline bool overflow(void) const
+            {
+                return m_overflow;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
@@ -113,13 +137,16 @@ namespace scrutiny
 
         class GetRPVDefinitionResponseEncoder
         {
-        public:
+          public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const { return m_overflow; };
+            inline bool overflow(void) const
+            {
+                return m_overflow;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
@@ -129,13 +156,16 @@ namespace scrutiny
 
         class ReadRPVResponseEncoder
         {
-        public:
+          public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv, AnyType const v);
-            inline bool overflow(void) const { return m_overflow; };
+            inline bool overflow(void) const
+            {
+                return m_overflow;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
@@ -145,14 +175,20 @@ namespace scrutiny
 
         class ReadRPVRequestParser
         {
-        public:
+          public:
             void init(Request const *const request);
             bool next(uint16_t *const id);
-            inline bool finished(void) const { return m_finished; };
-            inline bool is_valid(void) const { return !m_invalid; };
+            inline bool finished(void) const
+            {
+                return m_finished;
+            };
+            inline bool is_valid(void) const
+            {
+                return !m_invalid;
+            };
             void reset(void);
 
-        protected:
+          protected:
             void validate(void);
 
             uint8_t *m_buffer;
@@ -164,13 +200,16 @@ namespace scrutiny
 
         class WriteRPVResponseEncoder
         {
-        public:
+          public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const { return m_overflow; };
+            inline bool overflow(void) const
+            {
+                return m_overflow;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
@@ -180,14 +219,20 @@ namespace scrutiny
 
         class WriteRPVRequestParser
         {
-        public:
+          public:
             void init(Request const *const request, MainHandler const *const main_handler);
             bool next(RuntimePublishedValue *const rpv, AnyType *const v);
-            inline bool finished(void) const { return m_finished; };
-            inline bool is_valid(void) const { return !m_invalid; };
+            inline bool finished(void) const
+            {
+                return m_finished;
+            };
+            inline bool is_valid(void) const
+            {
+                return !m_invalid;
+            };
             void reset(void);
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
@@ -243,8 +288,7 @@ namespace scrutiny
                     uint8_t loop_id;
                     uint8_t loop_type;
                     bool support_datalogging;
-                    union
-                    {
+                    union {
                         struct
                         {
                             uint32_t timestep_100ns;
@@ -254,7 +298,7 @@ namespace scrutiny
                     uint8_t loop_name_length;
                     char const *loop_name;
                 };
-            }
+            } // namespace GetInfo
 
             namespace CommControl
             {
@@ -282,7 +326,7 @@ namespace scrutiny
                     uint8_t magic[sizeof(protocol::CommControl::CONNECT_MAGIC)];
                     uint32_t session_id;
                 };
-            }
+            } // namespace CommControl
 
 #if SCRUTINY_ENABLE_DATALOGGING
             namespace DataLogControl
@@ -317,10 +361,10 @@ namespace scrutiny
                     datalogging::DataReader *reader;
                     uint32_t *crc;
                 };
-            }
+            } // namespace DataLogControl
 
 #endif
-        }
+        } // namespace ResponseData
 
         namespace RequestData
         {
@@ -347,7 +391,7 @@ namespace scrutiny
                 {
                     uint8_t loop_id;
                 };
-            }
+            } // namespace GetInfo
 
             namespace CommControl
             {
@@ -371,7 +415,7 @@ namespace scrutiny
                 {
                     uint32_t session_id;
                 };
-            }
+            } // namespace CommControl
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
@@ -383,18 +427,24 @@ namespace scrutiny
                     uint16_t config_id;
                     // Rest is directly written to datalogger config. So not in this struct.
                 };
-            }
+            } // namespace DataLogControl
 #endif
-        }
+        } // namespace RequestData
 
         class CodecV1_0
         {
-        public:
+          public:
             ResponseCode::E encode_response_protocol_version(ResponseData::GetInfo::GetProtocolVersion const *const response_data, Response *const response);
             ResponseCode::E encode_response_software_id(Response *const response);
-            ResponseCode::E encode_response_special_memory_region_count(ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data, Response *const response);
-            ResponseCode::E encode_response_special_memory_region_location(ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data, Response *const response);
-            ResponseCode::E encode_response_supported_features(ResponseData::GetInfo::GetSupportedFeatures const *const response_data, Response *const response);
+            ResponseCode::E encode_response_special_memory_region_count(
+                ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
+                Response *const response);
+            ResponseCode::E encode_response_special_memory_region_location(
+                ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data,
+                Response *const response);
+            ResponseCode::E encode_response_supported_features(
+                ResponseData::GetInfo::GetSupportedFeatures const *const response_data,
+                Response *const response);
             ResponseCode::E encode_response_get_rpv_count(ResponseData::GetInfo::GetRPVCount const *const response_data, Response *const response);
             ResponseCode::E encode_response_get_loop_count(ResponseData::GetInfo::GetLoopCount const *const response_data, Response *const response);
             ResponseCode::E encode_response_get_loop_definition(ResponseData::GetInfo::GetLoopDefinition const *const response_data, Response *const response);
@@ -404,7 +454,9 @@ namespace scrutiny
             ResponseCode::E encode_response_comm_get_params(ResponseData::CommControl::GetParams const *const response_data, Response *const response);
             ResponseCode::E encode_response_comm_connect(ResponseData::CommControl::Connect const *const response_data, Response *const response);
 
-            ResponseCode::E decode_request_get_special_memory_region_location(Request const *const request, RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data);
+            ResponseCode::E decode_request_get_special_memory_region_location(
+                Request const *const request,
+                RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data);
             ResponseCode::E decode_request_get_rpv_definition(Request const *const request, RequestData::GetInfo::GetRPVDefinition *const request_data);
             ResponseCode::E decode_request_get_loop_definition(Request const *const request, RequestData::GetInfo::GetLoopDefinition *const request_data);
 
@@ -429,25 +481,28 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
             ResponseCode::E encode_response_datalogging_get_setup(ResponseData::DataLogControl::GetSetup const *const response_data, Response *const response);
             ResponseCode::E encode_response_datalogging_status(ResponseData::DataLogControl::GetStatus const *const response_data, Response *const response);
-            ResponseCode::E encode_response_datalogging_get_acquisition_metadata(ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data, Response *const response);
-            ResponseCode::E encode_response_datalogging_read_acquisition(ResponseData::DataLogControl::ReadAcquisition const *const response_data, Response *const response, bool *const finished);
+            ResponseCode::E encode_response_datalogging_get_acquisition_metadata(
+                ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
+                Response *const response);
+            ResponseCode::E encode_response_datalogging_read_acquisition(
+                ResponseData::DataLogControl::ReadAcquisition const *const response_data,
+                Response *const response,
+                bool *const finished);
             ResponseCode::E decode_datalogging_configure_request(
                 Request const *const request,
                 RequestData::DataLogControl::Configure *const request_data,
                 datalogging::Configuration *const config);
 #endif
 
-        protected:
-            union
-            {
+          protected:
+            union {
                 ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
                 WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
                 ReadRPVRequestParser m_memory_control_read_rpv_parser;
                 WriteRPVRequestParser m_memory_control_write_rpv_parser;
             } parsers;
 
-            union
-            {
+            union {
                 ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
                 WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
                 GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;
@@ -455,6 +510,6 @@ namespace scrutiny
                 WriteRPVResponseEncoder m_write_rpv_response_encoder;
             } encoders;
         };
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny
 #endif // ___SCRUTINY_CODEC_V1_0___

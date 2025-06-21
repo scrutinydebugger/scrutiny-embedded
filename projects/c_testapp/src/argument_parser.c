@@ -6,14 +6,13 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <ctype.h>
 
 #include "argument_parser.h"
 #include "tools.h"
-
 
 void c_testapp_argument_parser_init(c_testapp_argument_parser_t *parser)
 {
@@ -25,7 +24,7 @@ void c_testapp_argument_parser_init(c_testapp_argument_parser_t *parser)
     parser->m_last_error = "";
 }
 
-void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int argc, char* argv[])
+void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int argc, char *argv[])
 {
     parser->m_argc = argc;
     parser->m_argv = argv;
@@ -39,7 +38,8 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
     char cmd[255] = {0};
     c_testapp_strncpy(cmd, argv[1], sizeof(cmd));
     size_t len = strlen(cmd);
-    for (size_t i=0; i<len; i++){
+    for (size_t i = 0; i < len; i++)
+    {
         cmd[i] = (char)tolower(cmd[i]);
     }
 
@@ -56,13 +56,13 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
             parser->m_last_error = "Bad number of arguments";
         }
     }
-    else if ( strcmp(cmd, "udp-listen") == 0)
+    else if (strcmp(cmd, "udp-listen") == 0)
     {
         parser->m_command = C_TESTAPP_COMMAND_UdpListen;
         if (argc >= 3)
         {
             int32_t port = atoi(argv[2]);
-            if (port > 0 && port <0x10000)
+            if (port > 0 && port < 0x10000)
             {
                 parser->m_udp_port = (uint16_t)port;
                 parser->m_valid = 1;
@@ -74,7 +74,7 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
         }
         else
         {
-             parser->m_last_error = "Missing port";
+            parser->m_last_error = "Missing port";
         }
     }
     else if (strcmp(cmd, "serial-listen") == 0)
@@ -84,23 +84,23 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
         {
             parser->m_serial_config.baudrate = 115200;
 
-            c_testapp_strncpy(parser->m_serial_config.port_name, argv[2], sizeof(parser->m_serial_config.port_name)) ;
+            c_testapp_strncpy(parser->m_serial_config.port_name, argv[2], sizeof(parser->m_serial_config.port_name));
             int arg_error = 0;
-            for (int32_t i=3; i<argc; i++)
+            for (int32_t i = 3; i < argc; i++)
             {
-                char const* arg = argv[i];
+                char const *arg = argv[i];
 
                 if (strcmp(arg, "--baudrate") == 0)
                 {
-                    if (i+1 >= argc)
+                    if (i + 1 >= argc)
                     {
                         parser->m_last_error = "Missing baudrate";
                         arg_error = 1;
                         break;
                     }
-                    
-                    int32_t baudrate = atoi(parser->m_argv[i+1]);
-                    if(baudrate <= 0 || baudrate > 0x7FFFFFFF)
+
+                    int32_t baudrate = atoi(parser->m_argv[i + 1]);
+                    if (baudrate <= 0 || baudrate > 0x7FFFFFFF)
                     {
                         parser->m_last_error = "Invalid baudrate";
                         arg_error = 1;
@@ -161,20 +161,20 @@ c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(c
 
     if (strnlen(start_address, sizeof(start_address)) > 2 && start_address[0] == '0' && start_address[1] == 'x')
     {
-        c_testapp_strncpy(start_address, &start_address[2], sizeof(start_address)-2);
+        c_testapp_strncpy(start_address, &start_address[2], sizeof(start_address) - 2);
         base1 = 16;
     }
-    
+
     char length[32] = {0};
-    c_testapp_strncpy(length, parser->m_argv[parser->m_region_index + region_offset +1], sizeof(length));
+    c_testapp_strncpy(length, parser->m_argv[parser->m_region_index + region_offset + 1], sizeof(length));
 
     if (strnlen(length, sizeof(length)) > 2 && length[0] == '0' && length[1] == 'x')
     {
-        c_testapp_strncpy(length, &length[2], sizeof(length)-2);
+        c_testapp_strncpy(length, &length[2], sizeof(length) - 2);
         base2 = 16;
     }
 
-    region->start_address = (uintptr_t) strtoll(start_address, NULL, base1);
+    region->start_address = (uintptr_t)strtoll(start_address, NULL, base1);
     region->length = (uint32_t)(strtol(length, NULL, base2));
 
     parser->m_region_index += 2;

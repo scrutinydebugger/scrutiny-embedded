@@ -9,8 +9,8 @@
 #ifndef __SCRUTINY_TOOLS_H__
 #define __SCRUTINY_TOOLS_H__
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
@@ -31,48 +31,48 @@ namespace scrutiny
         /// @return AddressRange object
         inline AddressRange make_address_range(uintptr_t const start, uintptr_t const end)
         {
-            #if SCRUTINY_HAS_CPP11
+#if SCRUTINY_HAS_CPP11
             return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
-            #else
+#else
             AddressRange range;
-            range.start = reinterpret_cast<void *>(start); 
-            range.end= reinterpret_cast<void *>(end);
+            range.start = reinterpret_cast<void *>(start);
+            range.end = reinterpret_cast<void *>(end);
             return range;
-            #endif
+#endif
         }
 
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
         /// @param end End address
         /// @return AddressRange object
-        inline AddressRange make_address_range(void * const start, void * const end)
+        inline AddressRange make_address_range(void *const start, void *const end)
         {
-            #if SCRUTINY_HAS_CPP11
+#if SCRUTINY_HAS_CPP11
             return {start, end};
-            #else
+#else
             AddressRange range;
-            range.start = start; 
+            range.start = start;
             range.end = end;
             return range;
-            #endif
+#endif
         }
 
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
         /// @param size Address range size
         /// @return AddressRange object
-        inline AddressRange make_address_range(void * const start, size_t size)
+        inline AddressRange make_address_range(void *const start, size_t size)
         {
             size = (size == 0) ? 1 : size;
             uintptr_t const end = reinterpret_cast<uintptr_t>(start) + size - 1;
-            #if SCRUTINY_HAS_CPP11
+#if SCRUTINY_HAS_CPP11
             return {start, reinterpret_cast<void *>(end)};
-            #else
+#else
             AddressRange range;
-            range.start = start; 
-            range.end= reinterpret_cast<void *>(end);
+            range.start = start;
+            range.end = reinterpret_cast<void *>(end);
             return range;
-            #endif
+#endif
         }
 
         /// @brief Returns the size of a given type in bytes
@@ -284,8 +284,8 @@ namespace scrutiny
         /// @param start_value Start value of CRC. This value can be used to chain CRC calculation.
         /// @return The CRC32 value of the data
         uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value = 0);
-    }
+    } // namespace tools
 
-}
+} // namespace scrutiny
 
 #endif //__SCRUTINY_TOOLS_H__

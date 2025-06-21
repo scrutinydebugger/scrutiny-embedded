@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -17,7 +17,7 @@
 
 class TestCommControl : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -25,12 +25,13 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
-    TestCommControl() : ScrutinyTest(),
-                        tb(),
-                        scrutiny_handler(),
-                        config(),
-                        _rx_buffer(),
-                        _tx_buffer()
+    TestCommControl() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer()
     {
     }
 
@@ -55,7 +56,8 @@ TEST_F(TestCommControl, TestDiscover)
 
     uint8_t tx_buffer[64];
     // proto_maj, proto_min, magic, name_len, name
-    uint8_t expected_response[9 + 2 + sizeof(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH] = {0x82, 1, 0, 0, 2 + sizeof(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH}; // Version 1.0
+    uint8_t expected_response[9 + 2 + sizeof(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH] = {
+        0x82, 1, 0, 0, 2 + sizeof(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH}; // Version 1.0
 
     uint16_t index = 5;
     expected_response[index++] = 1;

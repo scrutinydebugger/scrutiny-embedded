@@ -1,7 +1,7 @@
 
+#include "Console.hpp"
 #include <SPI.h>
 #include <SSD1306AsciiSpi.h>
-#include "Console.hpp"
 
 SSD1306AsciiSpi display;
 

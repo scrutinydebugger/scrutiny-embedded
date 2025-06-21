@@ -12,10 +12,10 @@
 
 #include <stdint.h>
 
-#include "scrutiny_setup.hpp"
-#include "scrutiny_timebase.hpp"
 #include "scrutiny_protocol.hpp"
 #include "scrutiny_protocol_definitions.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_timebase.hpp"
 #include "scrutiny_tools.hpp"
 
 namespace scrutiny
@@ -26,14 +26,15 @@ namespace scrutiny
         /// Communication is half-duplex and works by polling with a request/response scheme.
         class CommHandler
         {
-        public:
+          public:
             /// @brief Initialize the CommHandler
             /// @param rx_buffer     Buffer for reception
             /// @param rx_buffer_size Reception buffer size
             /// @param tx_buffer Buffer for transmission
             /// @param tx_buffer_size Transmission buffer size
             /// @param timebase Pointer to a timebase object to keep track of time
-            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are connected to the same channel
+            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are connected to
+            /// the same channel
             void init(
                 uint8_t *const rx_buffer,
                 uint16_t const rx_buffer_size,
@@ -87,31 +88,58 @@ namespace scrutiny
             void disconnect(void);
 
             /// @brief Put the CommHandler in a state where the next request can be received.
-            inline void wait_next_request(void) { reset_rx(); }
+            inline void wait_next_request(void)
+            {
+                reset_rx();
+            }
 
             /// @brief Returns true if a request has been received. Will stay true until call to wait_next_request()
-            inline bool request_received(void) const { return m_request_received; }
+            inline bool request_received(void) const
+            {
+                return m_request_received;
+            }
 
             /// @brief Returns the request that has been received
-            inline Request const *get_request(void) const { return &m_active_request; }
+            inline Request const *get_request(void) const
+            {
+                return &m_active_request;
+            }
 
             /// @brief Gets the last error encountered in reception task
-            inline RxError::E get_rx_error(void) const { return m_rx_error; }
+            inline RxError::E get_rx_error(void) const
+            {
+                return m_rx_error;
+            }
 
             /// @brief Gets the last error encountered in transmission task
-            inline TxError::E get_tx_error(void) const { return m_tx_error; }
+            inline TxError::E get_tx_error(void) const
+            {
+                return m_tx_error;
+            }
 
             /// @brief Returns true if the CommHandler is presently transmitting. False otherwise
-            inline bool transmitting(void) const { return (m_state == State::Transmitting); }
+            inline bool transmitting(void) const
+            {
+                return (m_state == State::Transmitting);
+            }
 
             /// @brief Returns true if the CommHandler is presently receiving. False otherwise
-            inline bool receiving(void) const { return (m_state == State::Receiving); }
+            inline bool receiving(void) const
+            {
+                return (m_state == State::Receiving);
+            }
 
             /// @brief Returns true if the CommHandler is presently. Might be disabled if the configuration is invalid
-            inline bool is_enabled(void) const { return m_enabled; }
+            inline bool is_enabled(void) const
+            {
+                return m_enabled;
+            }
 
             /// @brief Enables the CommHandler
-            inline void enable(void) { m_enabled = true; }
+            inline void enable(void)
+            {
+                m_enabled = true;
+            }
 
             /// @brief Disables the CommHandler
             inline void disable(void)
@@ -121,25 +149,38 @@ namespace scrutiny
             }
 
             /// @brief Return true if a session is active with a server
-            inline bool is_connected(void) const { return m_session_active; }
+            inline bool is_connected(void) const
+            {
+                return m_session_active;
+            }
 
             /// @brief Returns the session ID given to the server upon connection
-            inline uint32_t get_session_id(void) const { return m_session_id; }
+            inline uint32_t get_session_id(void) const
+            {
+                return m_session_id;
+            }
 
             /// @brief Returns the size of the reception buffer
-            inline uint16_t rx_buffer_size(void) const { return m_rx_buffer_size; }
+            inline uint16_t rx_buffer_size(void) const
+            {
+                return m_rx_buffer_size;
+            }
 
             /// @brief Returns the size of the transmission buffer
-            inline uint16_t tx_buffer_size(void) const { return m_tx_buffer_size; }
+            inline uint16_t tx_buffer_size(void) const
+            {
+                return m_tx_buffer_size;
+            }
 
-        protected:
+          protected:
             void process_active_request(void);
             bool received_discover_request(void);
             bool received_connect_request(void);
 
             class RxFSMState
-            { 
-                public:
+            {
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     WaitForCommand,
@@ -150,17 +191,20 @@ namespace scrutiny
                     WaitForProcess,
                     Error
                 };
+                // clang-format on
             };
 
             class State
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     Idle,
                     Receiving,
                     Transmitting
                 };
+                // clang-format on
             };
 
             void reset_rx();
@@ -181,11 +225,10 @@ namespace scrutiny
             uint8_t *m_tx_buffer;      // The transmission buffer
             uint16_t m_tx_buffer_size; // The transmission buffer size
             Request m_active_request;  // The request presently being received
-            RxFSMState::E m_rx_state;     // Reception Finite State Machine state
-            RxError::E m_rx_error;        // Last reception error code
+            RxFSMState::E m_rx_state;  // Reception Finite State Machine state
+            RxError::E m_rx_error;     // Last reception error code
             bool m_request_received;   // Flag indicating if a full request has been received
-            union
-            {
+            union {
                 uint8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
                 uint8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
                 uint16_t data_bytes_received;  // Number of bytes part of the data payload received up to now
@@ -198,11 +241,10 @@ namespace scrutiny
             uint16_t m_nbytes_sent;     // Number of bytes sent up to now. Includes headers and CRC
             TxError::E m_tx_error;      // Last Transmission error code
 
-        private:
+          private:
             static uint32_t s_session_counter; // A counter to generate session ID
         };
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny
 
 #endif //___SCRUTINY_COMM_HANDLER_H___
-

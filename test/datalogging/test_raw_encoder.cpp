@@ -8,8 +8,8 @@
 
 #include <gtest/gtest.h>
 
-#include "scrutiny_test.hpp"
 #include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
 
@@ -17,7 +17,7 @@ using namespace scrutiny;
 
 class TestRawEncoder : public ScrutinyTest
 {
-protected:
+  protected:
     void check_canaries();
 
     MainHandler scrutiny_handler;
@@ -32,16 +32,17 @@ protected:
     uint8_t dlbuffer[128];
     uint8_t buffer_canary_2[512];
 
-    TestRawEncoder() : ScrutinyTest(),
-                       scrutiny_handler(),
-                       config(),
-                       dlconfig(),
-                       encoder(),
-                       _rx_buffer(),
-                       _tx_buffer(),
-                       buffer_canary_1(),
-                       dlbuffer(),
-                       buffer_canary_2()
+    TestRawEncoder() :
+        ScrutinyTest(),
+        scrutiny_handler(),
+        config(),
+        dlconfig(),
+        encoder(),
+        _rx_buffer(),
+        _tx_buffer(),
+        buffer_canary_1(),
+        dlbuffer(),
+        buffer_canary_2()
     {
     }
 

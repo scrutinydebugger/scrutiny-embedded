@@ -8,8 +8,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstdlib>
+#include <gtest/gtest.h>
 #include <stdint.h>
 
 #include "scrutiny.hpp"
@@ -21,7 +21,7 @@
 
 class ScrutinyTest : public ::testing::Test
 {
-protected:
+  protected:
     inline std::vector<uint8_t> make_payload_1(uint8_t v0)
     {
         std::vector<uint8_t> o;
@@ -65,8 +65,7 @@ protected:
         return o;
     }
 
-    template <typename T>
-    std::string NumberToString ( T Number )
+    template <typename T> std::string NumberToString(T Number)
     {
         std::ostringstream ss;
         ss << Number;
@@ -75,10 +74,9 @@ protected:
 
     inline float round(float const v)
     {
-        float const sign= (v >= 0) ? 1.0: -1.0;
-        return static_cast<float>(static_cast<int>(v+0.5*sign));
+        float const sign = (v >= 0) ? 1.0 : -1.0;
+        return static_cast<float>(static_cast<int>(v + 0.5 * sign));
     }
-
 
     void add_crc(uint8_t *data, uint16_t data_len);
     void add_crc(scrutiny::protocol::Response *response);
@@ -87,7 +85,11 @@ protected:
 
     ::testing::AssertionResult COMPARE_BUF(uint8_t const *candidate, uint8_t const *expected, uint32_t const size);
     ::testing::AssertionResult CHECK_SET(uint8_t const *buffer, uint8_t const val, uint32_t const size);
-    ::testing::AssertionResult IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId::E cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode::E code);
+    ::testing::AssertionResult IS_PROTOCOL_RESPONSE(
+        uint8_t *buffer,
+        scrutiny::protocol::CommandId::E cmd,
+        uint8_t subfunction,
+        scrutiny::protocol::ResponseCode::E code);
 };
 
 namespace scrutiny
@@ -96,7 +98,7 @@ namespace scrutiny
     {
         std::ostream &operator<<(std::ostream &out, ResponseCode val);
     }
-}
+} // namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 namespace scrutiny
@@ -105,6 +107,6 @@ namespace scrutiny
     {
         std::ostream &operator<<(std::ostream &out, DataLogger::State val);
     }
-}
+} // namespace scrutiny
 
 #endif

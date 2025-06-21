@@ -8,15 +8,13 @@
 
 #include <stdint.h>
 
-union File3Union
-{
+union File3Union {
     uint32_t u32_var;
     uint16_t u16_var;
     uint8_t u8_var;
 };
 
-union File3AnonymousBitfieldInUnion
-{
+union File3AnonymousBitfieldInUnion {
     struct
     {
         uint8_t bit1 : 1;
@@ -30,7 +28,7 @@ namespace FileNamespace
 {
     class File3TestClass
     {
-    public:
+      public:
         enum class File3EnumInClass : uint32_t
         {
             AAA,
@@ -43,8 +41,7 @@ namespace FileNamespace
         {
             uint32_t field1;
             uint32_t field2;
-            union
-            {
+            union {
                 uint32_t field3_u32;
                 struct
                 {
@@ -68,6 +65,6 @@ namespace FileNamespace
             } field3;
         } m_file3_complex_struct;
     };
-}
+} // namespace FileNamespace
 
 void file3SetValues();

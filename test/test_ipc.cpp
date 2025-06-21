@@ -6,22 +6,22 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include "scrutiny_ipc.hpp"
-#include <stdlib.h>
+#include <gtest/gtest.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #if SCRUTINY_HAS_CPP11
-    #include <thread>
-    #include <chrono>
+#include <chrono>
+#include <thread>
 #else
-    #include <pthread.h>
-    #include <ctime>
+#include <ctime>
+#include <pthread.h>
 #endif
 
 class SomeEnum
 {
-    public:
+  public:
     enum E
     {
         VAL1,
@@ -29,10 +29,10 @@ class SomeEnum
         VAL3
     };
 };
-    
+
 struct SomeData
 {
-public:
+  public:
     uint32_t u32;
     SomeEnum::E e;
 };
@@ -105,7 +105,7 @@ void thread_func()
     thread_data.thread_exit_value = my_value;
 }
 
-void* thread_func_pthread(void *)
+void *thread_func_pthread(void *)
 {
     thread_func();
     return NULL;
@@ -127,7 +127,7 @@ TEST(TestIPC, CheckWithThread)
 #else
     pthread_t thread;
     std::clock_t t1 = std::clock();
-    ASSERT_EQ( pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
+    ASSERT_EQ(pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
 #endif
     while (!thread_data.thread_exit)
     {
@@ -153,21 +153,20 @@ TEST(TestIPC, CheckWithThread)
         {
             thread_data.thread_exit = true;
         }
-        
-        #if SCRUTINY_HAS_CPP11
+
+#if SCRUTINY_HAS_CPP11
         if (std::chrono::high_resolution_clock::now() - t1 > std::chrono::seconds(TIMEOUT_SEC))
         {
             thread_data.thread_exit = true;
         }
-        #else
+#else
         std::clock_t t2 = std::clock();
         double elapsed_secs = double(t2 - t1) / CLOCKS_PER_SEC;
         if (elapsed_secs > TIMEOUT_SEC)
         {
             thread_data.thread_exit = true;
         }
-        #endif
-
+#endif
     }
 
 #if SCRUTINY_HAS_CPP11
@@ -178,6 +177,6 @@ TEST(TestIPC, CheckWithThread)
 
     EXPECT_FALSE(thread_data.error_found_in_main) << "At Iteration #" << thread_data.error_at_iter;
     EXPECT_FALSE(thread_data.error_found_in_thread) << "At Iteration #" << thread_data.error_at_iter;
-    EXPECT_GE(my_value, 1000);   // Local test > 3.5M
+    EXPECT_GE(my_value, 1000); // Local test > 3.5M
     EXPECT_GE(thread_data.thread_exit_value, 1000);
 }

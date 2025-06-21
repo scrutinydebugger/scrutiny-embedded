@@ -10,13 +10,13 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "scrutiny_test.hpp"
-#include "scrutiny.hpp"
 #include "raw_format_parser.hpp"
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 #include <algorithm>
 #include <cmath>
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace scrutiny;
 using namespace std;
@@ -53,7 +53,7 @@ static void trigger_callback(void)
 
 class TestDatalogger : public ScrutinyTest
 {
-protected:
+  protected:
     void check_canaries();
     Timebase tb;
     MainHandler scrutiny_handler;
@@ -76,20 +76,21 @@ protected:
     uint8_t dlbuffer[128];
     uint8_t buffer_canary_2[512];
 
-    TestDatalogger() : ScrutinyTest(),
-                       tb(),
-                       scrutiny_handler(),
-                       config(),
-                       datalogger(),
-                       _rx_buffer(),
-                       _tx_buffer(),
-                       forbidden_buffer(),
-                       forbidden_buffer2(),
-                       readonly_buffer(),
-                       readonly_buffer2(),
-                       buffer_canary_1(),
-                       dlbuffer(),
-                       buffer_canary_2()
+    TestDatalogger() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        datalogger(),
+        _rx_buffer(),
+        _tx_buffer(),
+        forbidden_buffer(),
+        forbidden_buffer2(),
+        readonly_buffer(),
+        readonly_buffer2(),
+        buffer_canary_1(),
+        dlbuffer(),
+        buffer_canary_2()
     {
         readonly_ranges[0] = tools::make_address_range(readonly_buffer, sizeof(readonly_buffer));
         readonly_ranges[1] = tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));

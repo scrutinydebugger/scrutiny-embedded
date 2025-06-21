@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 #include <string>
 
 #include "scrutiny.hpp"
@@ -31,7 +31,7 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
 
 class TestDatalogControl : public ScrutinyTest
 {
-protected:
+  protected:
     static SCRUTINY_CONSTEXPR uint32_t FIXED_FREQ_LOOP_TIMESTEP_US = 100u;
     Timebase tb;
     MainHandler scrutiny_handler;
@@ -48,24 +48,30 @@ protected:
 
     RuntimePublishedValue rpvs[1];
 
-
 #if SCRUTINY_ENABLE_DATALOGGING
     uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
-    void test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode::E expected_code, bool check_response = true, std::string error_msg = "");
+    void test_configure(
+        uint8_t loop_id,
+        uint16_t config_id,
+        datalogging::Configuration refconfig,
+        protocol::ResponseCode::E expected_code,
+        bool check_response = true,
+        std::string error_msg = "");
     void check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
     float m_some_var_logged1;
 #endif
 
-    TestDatalogControl() : ScrutinyTest(),
-                           tb(),
-                           scrutiny_handler(),
-                           config(),
-                           fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
-                           variable_freq_loop("Loop2"),
-                           fixed_freq_loop_no_datalogging(100)
+    TestDatalogControl() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
+        variable_freq_loop("Loop2"),
+        fixed_freq_loop_no_datalogging(100)
     {
         rpvs[0].id = 0x8888;
         rpvs[0].type = VariableType::float32;
@@ -134,7 +140,12 @@ TEST_F(TestDatalogControl, TestUnsupported)
 /// @param buffer The destination buffer
 /// @param max_size The buffer max size.
 /// @return  Number of bytes written. Will be 0 in case of overflow
-uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size)
+uint16_t TestDatalogControl::encode_datalogger_config(
+    uint8_t loop_id,
+    uint16_t config_id,
+    const datalogging::Configuration *dlconfig,
+    uint8_t *buffer,
+    uint16_t max_size)
 {
     uint16_t cursor = 0;
     if (max_size < 1 + 2 + 2 + 1 + 4 + 1 + 4 + 1)
@@ -270,7 +281,13 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
 /// @param expected_code Expected response code returned through CommHandler
 /// @param check_response When true, make sure the respons eis valid.
 /// @param error_msg Error message to log in case of failure
-void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode::E expected_code, bool check_response, std::string error_msg)
+void TestDatalogControl::test_configure(
+    uint8_t loop_id,
+    uint16_t config_id,
+    datalogging::Configuration refconfig,
+    protocol::ResponseCode::E expected_code,
+    bool check_response,
+    std::string error_msg)
 {
     uint8_t request_data[1024] = {5, 2};
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
@@ -603,7 +620,7 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
 void TestDatalogControl::check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter)
 {
     uint8_t tx_buffer[32] = {0};
-    uint16_t n_to_read= 0;
+    uint16_t n_to_read = 0;
 
     uint8_t request_data[8] = {5, 5, 0, 0};
     add_crc(request_data, sizeof(request_data) - 4);

@@ -6,14 +6,14 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 #include <cstring>
+#include <gtest/gtest.h>
 
 class TestMemoryControl : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -21,12 +21,13 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
-    TestMemoryControl() : ScrutinyTest(),
-                          tb(),
-                          scrutiny_handler(),
-                          config(),
-                          _rx_buffer(),
-                          _tx_buffer()
+    TestMemoryControl() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer()
     {
     }
 
@@ -263,8 +264,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start, end)};
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
@@ -317,8 +317,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     // indices [6,7,8,9] are readonly
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_range[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange readonly_range[] = {scrutiny::tools::make_address_range(start, end)};
     config.set_readonly_address_range(readonly_range, sizeof(readonly_range) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
@@ -654,8 +653,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start, end)};
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
@@ -710,8 +708,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start, end)};
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);

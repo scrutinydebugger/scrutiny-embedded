@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -15,7 +15,7 @@
 class TestGetInfo : public ScrutinyTest
 {
 
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -29,15 +29,19 @@ protected:
     scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
-    TestGetInfo() : ScrutinyTest(), tb(),
-                    scrutiny_handler(),
-                    config(),
-                    _rx_buffer(),
-                    _tx_buffer(),
-                    loops(),
-                    fixed_freq_loop(0x12345678, "Loop1"),
-                    variable_freq_loop("Loop2"),
-                    fixed_freq_loop_no_datalogging(100, "Loop3") {}
+    TestGetInfo() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer(),
+        loops(),
+        fixed_freq_loop(0x12345678, "Loop1"),
+        variable_freq_loop("Loop2"),
+        fixed_freq_loop_no_datalogging(100, "Loop3")
+    {
+    }
 
     virtual void SetUp()
     {
@@ -118,12 +122,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = {scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1)};
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start + 2, end + 2)};
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -163,12 +164,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = {scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1)};
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start + 2, end + 2)};
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -233,12 +231,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = {scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1)};
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = {scrutiny::tools::make_address_range(start + 2, end + 2)};
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -284,9 +279,7 @@ TEST_F(TestGetInfo, TestGetRPVCount)
     uint8_t tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+        {0x1122, scrutiny::VariableType::uint32}, {0x3344, scrutiny::VariableType::float32}, {0x5566, scrutiny::VariableType::uint16}};
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
@@ -321,9 +314,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
     uint8_t tx_buffer[64];
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+        {0x1122, scrutiny::VariableType::uint32}, {0x3344, scrutiny::VariableType::float32}, {0x5566, scrutiny::VariableType::uint16}};
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
@@ -371,9 +362,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     uint8_t tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+        {0x1122, scrutiny::VariableType::uint32}, {0x3344, scrutiny::VariableType::float32}, {0x5566, scrutiny::VariableType::uint16}};
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
@@ -393,7 +382,13 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
 
-void dummy_callback(uint8_t const subfunction, uint8_t const *request_data, uint16_t const request_data_length, uint8_t *response_data, uint16_t *response_data_length, uint16_t const response_max_data_length)
+void dummy_callback(
+    uint8_t const subfunction,
+    uint8_t const *request_data,
+    uint16_t const request_data_length,
+    uint8_t *response_data,
+    uint16_t *response_data_length,
+    uint16_t const response_max_data_length)
 {
     static_cast<void>(subfunction);
     static_cast<void>(request_data);

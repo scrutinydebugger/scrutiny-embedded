@@ -37,7 +37,6 @@ struct StructB file1StructBInstance;
 struct StructC file1StructCInstance;
 struct StructD file1StructDInstance;
 
-
 void file1SetValues()
 {
     file1StaticChar = 99;
@@ -61,7 +60,7 @@ void file1SetValues()
     file1GlobalShort = -999;
     file1GlobalLong = -100000;
     file1GlobalUnsignedChar = 55u;
-    file1GlobalUnsignedInt = 100001u; 
+    file1GlobalUnsignedInt = 100001u;
     file1GlobalUnsignedShort = 50000u;
     file1GlobalUnsignedLong = 100002u;
     file1GlobalFloat = 3.1415926f;
@@ -88,15 +87,11 @@ void file1SetValues()
     file1StructDInstance.bitfieldC = 222u;
     file1StructDInstance.bitfieldD = 1234567u;
     file1StructDInstance.bitfieldE = 777u;
-
 }
 
 int funcInFile1(int a, int b)
 {
     static volatile long long staticLongInFuncFile1 = -0x123456789abcdef;
     (void)staticLongInFuncFile1;
-    return a+b;
+    return a + b;
 }
-
-
-

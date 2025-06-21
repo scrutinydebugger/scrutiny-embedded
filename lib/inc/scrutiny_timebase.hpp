@@ -9,8 +9,8 @@
 #ifndef ___SCRUTINY_TIMEBASE_H___
 #define ___SCRUTINY_TIMEBASE_H___
 
-#include <stdint.h>
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 namespace scrutiny
 {
@@ -18,8 +18,11 @@ namespace scrutiny
     typedef uint32_t timediff_t;
     class Timebase
     {
-    public:
-        Timebase() : m_time_100ns(0) {}
+      public:
+        Timebase() :
+            m_time_100ns(0)
+        {
+        }
 
         /// @brief Move the time forward by a step
         /// @param timestep_100ns Time step to do, in multiple of 100ns.
@@ -66,9 +69,9 @@ namespace scrutiny
             m_time_100ns = val;
         }
 
-    protected:
+      protected:
         timestamp_t m_time_100ns;
     };
-}
+} // namespace scrutiny
 
 #endif

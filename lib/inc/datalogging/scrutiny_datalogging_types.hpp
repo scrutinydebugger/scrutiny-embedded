@@ -18,30 +18,30 @@
 #error "Not enabled"
 #endif
 
-
 namespace scrutiny
 {
     namespace datalogging
     {
         static SCRUTINY_CONSTEXPR unsigned int MAX_OPERANDS = 4;
-        #if SCRUTINY_HAS_CPP11
+#if SCRUTINY_HAS_CPP11
         static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
         static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
-        #endif
+#endif
 
         typedef ctypes::scrutiny_c_datalogging_buffer_size_t buffer_size_t;
 
         class EncodingType
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 RAW
             };
+            // clang-format on
         };
-            
-        union AnyTypeCompare
-        {
+
+        union AnyTypeCompare {
             uint_biggest_t _uint;
             int_biggest_t _sint;
             float _float;
@@ -49,18 +49,21 @@ namespace scrutiny
 
         class VariableTypeCompare
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 _float = static_cast<int>(scrutiny::VariableType::float32),
                 _uint = static_cast<int>(scrutiny::BiggestUint),
                 _sint = static_cast<int>(scrutiny::BiggestSint)
             };
+            // clang-format on
         };
 
         class OperandType
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 LITERAL = 0,
@@ -68,10 +71,10 @@ namespace scrutiny
                 VARBIT = 2,
                 RPV = 3
             };
+            // clang-format on
         };
 
-        union OperandData
-        {
+        union OperandData {
             struct
             {
                 float val;
@@ -102,7 +105,8 @@ namespace scrutiny
 
         class SupportedTriggerConditions
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 AlwaysTrue = 0,         // Always true
@@ -115,6 +119,7 @@ namespace scrutiny
                 ChangeMoreThan = 7,     // |Operand1[n] - Operand1[n-1]| > |Operand2| && sign(Operand1[n] - Operand1[n-1]) == sign(Operand2)
                 IsWithin = 8            // |Operand1 - Operand2| < |Operand3|
             };
+            // clang-format on
         };
 
         struct TriggerConfig
@@ -134,26 +139,27 @@ namespace scrutiny
             }
 
             SupportedTriggerConditions::E condition; // Selected condition
-            uint8_t operand_count;                // Number of given operands
-            uint32_t hold_time_100ns;             // Amount of time that the condition must be true for trigger to trig
-            Operand operands[MAX_OPERANDS];       // The operand definitions
+            uint8_t operand_count;                   // Number of given operands
+            uint32_t hold_time_100ns;                // Amount of time that the condition must be true for trigger to trig
+            Operand operands[MAX_OPERANDS];          // The operand definitions
         };
 
         class LoggableType
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 MEMORY = 0,
                 RPV = 1,
                 TIME = 2
             };
+            // clang-format on
         };
         struct LoggableItem
         {
             LoggableType::E type;
-            union
-            {
+            union {
                 struct
                 {
                     void *address;
@@ -191,9 +197,10 @@ namespace scrutiny
 
             LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
 
-            uint8_t items_count;    // Number of items to logs
-            uint16_t decimation;    // Decimation of the acquisition. Effectively reduce the sampling rate
-            uint8_t probe_location; // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
+            uint8_t items_count; // Number of items to logs
+            uint16_t decimation; // Decimation of the acquisition. Effectively reduce the sampling rate
+            // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
+            uint8_t probe_location;
             uint32_t timeout_100ns; // Time after which an acquisition is considered complete even if the buffer is not full
             TriggerConfig trigger;  // The trigger configuration
         };
@@ -201,7 +208,7 @@ namespace scrutiny
         /// @brief Datalogging Trigger callback
         typedef ctypes::scrutiny_c_datalogging_trigger_callback_t trigger_callback_t;
 
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_DATALOGGING_TYPES_H___

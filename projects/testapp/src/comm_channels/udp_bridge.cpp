@@ -6,12 +6,12 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "udp_bridge.hpp"
-#include <thread>
+#include "scrutiny_setup.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <stdint.h>
+#include <thread>
 
 #if SCRUTINY_BUILD_WINDOWS
 #include <windows.h>
@@ -20,8 +20,9 @@ WSAData UdpBridge::wsa_data;
 #include <fcntl.h> // For non-blocking
 #endif
 
-UdpBridge::UdpBridge(uint16_t port) : m_port(port),
-                                      m_sock(INVALID_SOCKET)
+UdpBridge::UdpBridge(uint16_t port) :
+    m_port(port),
+    m_sock(INVALID_SOCKET)
 {
 }
 

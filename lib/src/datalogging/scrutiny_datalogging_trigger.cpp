@@ -6,12 +6,12 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "datalogging/scrutiny_datalogging_trigger.hpp"
+#include "datalogging/scrutiny_datalogging.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_main_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
-#include "scrutiny_main_handler.hpp"
-#include "datalogging/scrutiny_datalogging.hpp"
-#include "datalogging/scrutiny_datalogging_trigger.hpp"
-#include "datalogging/scrutiny_datalogging_types.hpp"
 #include <string.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -26,67 +26,61 @@ namespace scrutiny
         {
             namespace relational_operators
             {
-                template <class T1, class T2>
-                class eq
+                template <class T1, class T2> class eq
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 == v2;
                     }
                 };
 
-                template <class T1, class T2>
-                class neq
+                template <class T1, class T2> class neq
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 != v2;
                     }
                 };
 
-                template <class T1, class T2>
-                class gt
+                template <class T1, class T2> class gt
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 > v2;
                     }
                 };
 
-                template <class T1, class T2>
-                class get
+                template <class T1, class T2> class get
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 >= v2;
                     }
                 };
 
-                template <class T1, class T2>
-                class lt
+                template <class T1, class T2> class lt
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 < v2;
                     }
                 };
 
-                template <class T1, class T2>
-                class let
+                template <class T1, class T2> class let
                 {
-                public:
+                  public:
                     static inline bool eval(T1 const v1, T2 const v2)
                     {
                         return v1 <= v2;
                     }
                 };
 
-            }
+            } // namespace relational_operators
 
             template <template <class, class> class OPERATOR>
             bool RelationalCompare(VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
@@ -160,13 +154,19 @@ namespace scrutiny
                 return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
             }
 
-            bool GreaterThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool GreaterThanCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::gt>(operand_types, operand_vals);
             }
 
-            bool GreaterOrEqualThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool GreaterOrEqualThanCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
@@ -178,13 +178,19 @@ namespace scrutiny
                 return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
             }
 
-            bool LessOrEqualThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool LessOrEqualThanCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::let>(operand_types, operand_vals);
             }
 
-            bool ChangeMoreThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool ChangeMoreThanCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 // We can reasonably make the assumption that the delta will be a human-sized value.
                 // Therefore, a float is adequate for it. Will avoid bloating this code for no reason
@@ -282,13 +288,16 @@ namespace scrutiny
                 return diffabs <= margin;
             }
 
-            bool AlwaysTrueCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool AlwaysTrueCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 static_cast<void>(operand_types);
                 static_cast<void>(operand_vals);
                 return true;
             }
-        }
-    }
-}
+        } // namespace trigger
+    }     // namespace datalogging
+} // namespace scrutiny

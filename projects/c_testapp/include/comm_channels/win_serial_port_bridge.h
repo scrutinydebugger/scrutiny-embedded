@@ -15,8 +15,8 @@
 
 #include "abstract_comm_channel.h"
 
-#include <windows.h>
 #include <stdint.h>
+#include <windows.h>
 
 typedef struct
 {

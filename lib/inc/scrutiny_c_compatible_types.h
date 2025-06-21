@@ -7,8 +7,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <stdint.h>
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 typedef void (*scrutiny_c_user_command_callback_t)(
     uint8_t const subfunction,
@@ -82,8 +82,7 @@ typedef enum
     SCRUTINY_C_VARIABLE_TYPE_unknown = 0xFF
 } scrutiny_c_variable_type_e;
 
-typedef union
-{
+typedef union {
     uint8_t uint8;
     uint16_t uint16;
     uint32_t uint32;
@@ -104,8 +103,7 @@ typedef union
 } scrutiny_c_any_type_t;
 
 /// @brief The fast version of AnyType
-typedef union
-{
+typedef union {
     uint_fast8_t uint8;
     uint_fast16_t uint16;
     uint_fast32_t uint32;

@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "scrutiny_config.hpp"
-#include "scrutiny_tools.hpp"
 #include "scrutiny_loop_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_tools.hpp"
 #include <string.h>
 
 namespace scrutiny
@@ -101,4 +101,4 @@ namespace scrutiny
         return false;
     }
 #endif
-}
+} // namespace scrutiny

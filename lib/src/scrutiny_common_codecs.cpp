@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "scrutiny_common_codecs.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 #include <stdint.h>
 
@@ -124,5 +124,5 @@ namespace scrutiny
             }
             return typesize;
         }
-    }
-}
+    } // namespace codecs
+} // namespace scrutiny

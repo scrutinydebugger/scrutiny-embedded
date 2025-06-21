@@ -28,7 +28,7 @@ namespace scrutiny
         typedef RawFormatEncoder DataEncoder;
         typedef RawFormatReader DataReader;
 #endif
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny
 
 #endif

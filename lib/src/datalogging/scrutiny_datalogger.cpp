@@ -6,12 +6,12 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogger.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "scrutiny_ipc.hpp"
-#include "scrutiny_tools.hpp"
 #include "scrutiny_main_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_tools.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -146,7 +146,8 @@ namespace scrutiny
                     else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
                     {
                         // Works with and without 64bits support
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) || m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * 8)
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) ||
+                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * 8)
                         {
                             m_config_valid = false;
                         }
@@ -156,7 +157,8 @@ namespace scrutiny
                             m_config_valid = false;
                         }
 
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize > tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize >
+                            tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
                         }
@@ -281,7 +283,8 @@ namespace scrutiny
             m_encoder.reset_write_counter(); // Completion logic uses that counter directly without processing
 
             uint64_t const multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
-            m_remaining_data_to_write = static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
+            m_remaining_data_to_write =
+                static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
             if (!m_encoder.buffer_full())
             {
                 m_remaining_data_to_write = SCRUTINY_MAX(m_remaining_data_to_write, m_encoder.remaining_bytes_to_full());
@@ -376,9 +379,7 @@ namespace scrutiny
                 }
 
                 bool condition_result = m_trigger.active_condition->evaluate(
-                    m_trigger.conditions.data(),
-                    reinterpret_cast<VariableTypeCompare::E *>(optypes),
-                    reinterpret_cast<AnyTypeCompare *>(opvals));
+                    m_trigger.conditions.data(), reinterpret_cast<VariableTypeCompare::E *>(optypes), reinterpret_cast<AnyTypeCompare *>(opvals));
 
                 if (condition_result)
                 {
@@ -396,5 +397,5 @@ namespace scrutiny
             }
             return outval;
         }
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny

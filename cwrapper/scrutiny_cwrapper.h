@@ -1,10 +1,10 @@
 #ifndef SCRUTINY_C_WRAPPER_H
 #define SCRUTINY_C_WRAPPER_H
 
+#include "scrutiny_c_compatible_types.h"
+#include "scrutiny_setup.hpp"
 #include "stddef.h"
 #include "stdint.h"
-#include "scrutiny_setup.hpp"
-#include "scrutiny_c_compatible_types.h"
 
 #ifdef __cplusplus
 extern "C"

@@ -6,12 +6,12 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "abstract_comm_channel.hpp"
+#include "argument_parser.hpp"
 #include "file1.hpp"
 #include "file2.hpp"
 #include "file3.hpp"
-#include "argument_parser.hpp"
 #include "scrutiny.hpp"
-#include "abstract_comm_channel.hpp"
 #include "udp_bridge.hpp"
 
 #if SCRUTINY_BUILD_WINDOWS
@@ -23,12 +23,12 @@ using SerialPortBridge = WinSerialPortBridge;
 using SerialPortBridge = NixSerialPortBridge;
 #endif
 
-#include <iostream>
-#include <iomanip>
-#include <stdint.h>
-#include <chrono>
-#include <thread>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <stdint.h>
+#include <thread>
 
 using namespace std;
 
@@ -316,8 +316,7 @@ void my_user_command(
     uint16_t *response_data_length,
     uint16_t const response_max_data_length)
 {
-    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction)
-              << " with " << request_data_length << " data bytes: ";
+    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction) << " with " << request_data_length << " data bytes: ";
     for (uint32_t i = 0; i < request_data_length; i++)
     {
         std::cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(request_data[i]);
@@ -477,8 +476,7 @@ int main(int argc, char *argv[])
 
     if (!parser.is_valid())
     {
-        cerr << "Invalid usage" << endl
-             << parser.error_message() << endl;
+        cerr << "Invalid usage" << endl << parser.error_message() << endl;
         errorcode = -1;
     }
     else

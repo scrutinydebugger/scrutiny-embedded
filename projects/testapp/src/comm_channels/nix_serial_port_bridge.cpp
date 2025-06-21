@@ -13,21 +13,21 @@
 #endif
 
 #include "nix_serial_port_bridge.hpp"
-#include <stdint.h>
 #include <cstdlib>
-#include <string>
 #include <cstring>
+#include <stdint.h>
+#include <string>
 #include <system_error>
 
 #include <errno.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <termios.h>
 #include <unistd.h>
 
-NixSerialPortBridge::NixSerialPortBridge(const std::string &port_name, uint32_t baudrate) : m_port_name(port_name),
-                                                                                            m_baudrate(baudrate),
-                                                                                            m_fd(-1)
+NixSerialPortBridge::NixSerialPortBridge(const std::string &port_name, uint32_t baudrate) :
+    m_port_name(port_name),
+    m_baudrate(baudrate),
+    m_fd(-1)
 {
 }
 

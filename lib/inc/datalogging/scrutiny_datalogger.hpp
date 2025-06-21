@@ -9,10 +9,10 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
-#include "scrutiny_setup.hpp"
-#include "datalogging/scrutiny_datalogging_types.hpp"
-#include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
+#include "datalogging/scrutiny_datalogging_trigger.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -28,21 +28,23 @@ namespace scrutiny
 
         class DataLogger
         {
-        public:
+          public:
             /// @brief The internal state of the datalogger
 
             class State
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
-                    IDLE,
-                    CONFIGURED,
-                    ARMED,
-                    TRIGGERED,
-                    ACQUISITION_COMPLETED,
+                    IDLE, 
+                    CONFIGURED, 
+                    ARMED, 
+                    TRIGGERED, 
+                    ACQUISITION_COMPLETED, 
                     ERROR
                 };
+                // clang-format on
             };
 
             /// @brief Initializes the datalogger
@@ -69,19 +71,34 @@ namespace scrutiny
 
             /// @brief Tells if data has been acquired and ready to be read
             /// @return True if data is acquired
-            inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
+            inline bool data_acquired(void) const
+            {
+                return m_state == State::ACQUISITION_COMPLETED;
+            }
 
             /// @brief  Returns the acquisition ID of the last acquisition
-            inline uint16_t get_acquisition_id(void) const { return m_acquisition_id; }
+            inline uint16_t get_acquisition_id(void) const
+            {
+                return m_acquisition_id;
+            }
 
             /// @brief Returns the configuration ID attached with the acquisition
-            inline uint16_t get_config_id(void) const { return m_config_id; }
+            inline uint16_t get_config_id(void) const
+            {
+                return m_config_id;
+            }
 
             /// @brief Tells if the datalogger is armed and waiting for a trigger
-            inline bool armed(void) const { return m_state == State::ARMED; }
+            inline bool armed(void) const
+            {
+                return m_state == State::ARMED;
+            }
 
             /// @brief Returns the Datalogger state
-            inline DataLogger::State::E get_state(void) const { return m_state; }
+            inline DataLogger::State::E get_state(void) const
+            {
+                return m_state;
+            }
 
             /// @brief Arm the trigger so that the datalogger actively check for trigger condition to start acquisition
             void arm_trigger(void);
@@ -94,22 +111,40 @@ namespace scrutiny
             bool check_trigger(void);
 
             /// @brief Returns a DataReader object that will iterate through each samples
-            inline DataReader *get_reader(void) { return m_encoder.get_reader(); }
+            inline DataReader *get_reader(void)
+            {
+                return m_encoder.get_reader();
+            }
 
             /// @brief Returns the internal DataEncoder object used to write the samples in the datalogging buffer
-            inline DataEncoder *get_encoder(void) { return &m_encoder; }
+            inline DataEncoder *get_encoder(void)
+            {
+                return &m_encoder;
+            }
 
             /// @brief Returns a pointer to the internal configuration object
-            inline Configuration *config(void) { return &m_config; }
+            inline Configuration *config(void)
+            {
+                return &m_config;
+            }
 
             /// @brief Returns true if the datalogger is in error state
-            inline bool in_error(void) const { return m_state == State::ERROR; }
+            inline bool in_error(void) const
+            {
+                return m_state == State::ERROR;
+            }
 
             /// @brief Returns true if the active configuration is valid. Must be called after a call to "configure"
-            inline bool config_valid(void) const { return m_config_valid; }
+            inline bool config_valid(void) const
+            {
+                return m_config_valid;
+            }
 
             /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition
-            inline buffer_size_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
+            inline buffer_size_t log_points_after_trigger(void) const
+            {
+                return m_log_points_after_trigger;
+            }
 
             /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete
             buffer_size_t get_bytes_to_acquire_from_trigger_to_completion(void) const;
@@ -126,7 +161,7 @@ namespace scrutiny
                 }
             }
 
-        protected:
+          protected:
             void process_acquisition(void);
             void stamp_trigger_point(void);
             bool acquisition_completed(void);
@@ -139,12 +174,13 @@ namespace scrutiny
             trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
             Timebase const *m_timebase;              // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::E m_state;                           // Internal state
+            State::E m_state;                        // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 
-            buffer_size_t m_remaining_data_to_write; // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
-            bool m_manual_trigger;                   // Indicates if a manual trigger have been requested
+            // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
+            buffer_size_t m_remaining_data_to_write;
+            bool m_manual_trigger; // Indicates if a manual trigger have been requested
 
             Configuration m_config;                   // The datalogger configuration object
             bool m_config_valid;                      // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
@@ -162,6 +198,6 @@ namespace scrutiny
                 trigger::BaseCondition *active_condition; // A pointer to the active condition object.
             } m_trigger;                                  // Data related to the graph trigger
         };
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny
 #endif // ___SCRUTINY_DATALOGGER_H___

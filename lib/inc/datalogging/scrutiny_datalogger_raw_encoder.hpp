@@ -10,10 +10,10 @@
 #ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 #define ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 
-#include <stdint.h>
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -32,17 +32,20 @@ namespace scrutiny
 
         class RawFormatReader
         {
-        public:
+          public:
             explicit RawFormatReader(RawFormatEncoder const *const encoder);
             datalogging::buffer_size_t read(uint8_t *const buffer, datalogging::buffer_size_t const max_size);
-            inline bool finished(void) const { return m_finished; }
+            inline bool finished(void) const
+            {
+                return m_finished;
+            }
             void reset(void);
             inline bool error(void) const;
             inline datalogging::buffer_size_t get_entry_count(void) const;
             datalogging::buffer_size_t get_total_size(void) const;
             inline datalogging::EncodingType::E get_encoding(void) const;
 
-        protected:
+          protected:
             RawFormatEncoder const *const m_encoder;
             datalogging::buffer_size_t m_read_cursor;
             bool m_finished;
@@ -53,7 +56,7 @@ namespace scrutiny
         {
             friend class RawFormatReader;
 
-        public:
+          public:
             static SCRUTINY_CONSTEXPR EncodingType::E ENCODING = EncodingType::RAW;
             RawFormatEncoder();
 
@@ -64,17 +67,50 @@ namespace scrutiny
                 datalogging::buffer_size_t const buffer_size);
             void encode_next_entry(void);
             void reset(void);
-            inline void reset_write_counter(void) { m_entry_write_counter = 0; }
-            inline void set_timebase(Timebase const *const timebase) { m_timebase = timebase; }
-            inline datalogging::buffer_size_t get_entry_write_counter(void) const { return m_entry_write_counter; }
-            inline datalogging::buffer_size_t get_data_write_counter(void) const { return m_entry_write_counter * m_entry_size; }
-            inline datalogging::EncodingType::E get_encoding(void) const { return ENCODING; }
-            inline datalogging::buffer_size_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
-            inline datalogging::buffer_size_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
-            inline bool error(void) const { return m_error; }
-            inline datalogging::buffer_size_t get_entry_count(void) const { return m_entries_count; }
-            inline datalogging::buffer_size_t get_buffer_effective_size(void) const { return m_entry_size * m_max_entries; }
-            inline bool buffer_full(void) const { return m_full; }
+            inline void reset_write_counter(void)
+            {
+                m_entry_write_counter = 0;
+            }
+            inline void set_timebase(Timebase const *const timebase)
+            {
+                m_timebase = timebase;
+            }
+            inline datalogging::buffer_size_t get_entry_write_counter(void) const
+            {
+                return m_entry_write_counter;
+            }
+            inline datalogging::buffer_size_t get_data_write_counter(void) const
+            {
+                return m_entry_write_counter * m_entry_size;
+            }
+            inline datalogging::EncodingType::E get_encoding(void) const
+            {
+                return ENCODING;
+            }
+            inline datalogging::buffer_size_t get_read_cursor(void) const
+            {
+                return m_first_valid_entry_index * m_entry_size;
+            }
+            inline datalogging::buffer_size_t get_write_cursor(void) const
+            {
+                return m_next_entry_write_index * m_entry_size;
+            }
+            inline bool error(void) const
+            {
+                return m_error;
+            }
+            inline datalogging::buffer_size_t get_entry_count(void) const
+            {
+                return m_entries_count;
+            }
+            inline datalogging::buffer_size_t get_buffer_effective_size(void) const
+            {
+                return m_entry_size * m_max_entries;
+            }
+            inline bool buffer_full(void) const
+            {
+                return m_full;
+            }
             datalogging::buffer_size_t remaining_bytes_to_full() const;
 
             RawFormatReader *get_reader(void)
@@ -82,7 +118,7 @@ namespace scrutiny
                 return &m_reader;
             };
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             datalogging::buffer_size_t m_buffer_size;
             datalogging::Configuration const *m_config;
@@ -100,10 +136,19 @@ namespace scrutiny
             bool m_error;
         };
 
-        datalogging::buffer_size_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
-        inline datalogging::EncodingType::E RawFormatReader::get_encoding(void) const { return m_encoder->get_encoding(); }
-        inline bool RawFormatReader::error(void) const { return m_encoder->error(); }
-    }
-}
+        datalogging::buffer_size_t RawFormatReader::get_entry_count(void) const
+        {
+            return m_encoder->get_entry_count();
+        }
+        inline datalogging::EncodingType::E RawFormatReader::get_encoding(void) const
+        {
+            return m_encoder->get_encoding();
+        }
+        inline bool RawFormatReader::error(void) const
+        {
+            return m_encoder->error();
+        }
+    } // namespace datalogging
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_DATALOGGER_RAW_ENCODER___

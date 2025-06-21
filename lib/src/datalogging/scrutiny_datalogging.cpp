@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
-#include "scrutiny_tools.hpp"
 #include "scrutiny_main_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_tools.hpp"
 #include <string.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -96,11 +96,7 @@ namespace scrutiny
         /// @param val The output value
         /// @param variable_type The output value data type
         /// @return true on success, false on failure
-        bool fetch_operand(
-            MainHandler const *const main_handler,
-            Operand const *const operand,
-            AnyType *const val,
-            VariableType::E *const variable_type)
+        bool fetch_operand(MainHandler const *const main_handler, Operand const *const operand, AnyType *const val, VariableType::E *const variable_type)
         {
             bool success = true;
             if (operand->type == OperandType::LITERAL)
@@ -143,5 +139,5 @@ namespace scrutiny
 
             return success;
         }
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny

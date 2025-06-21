@@ -23,12 +23,14 @@ namespace scrutiny
     /// It is designed for one producer and one consumer.  It is the responsibility of the sender to
     /// wait for message to be cleared before writing a new one
     /// @param T DataType to send
-    template <class T>
-    class IPCMessage
+    template <class T> class IPCMessage
     {
-    public:
+      public:
         T data;
-        IPCMessage() : m_written(false) {}
+        IPCMessage() :
+            m_written(false)
+        {
+        }
         inline bool has_content(void) const
         {
             return m_written;
@@ -36,12 +38,12 @@ namespace scrutiny
 
         inline void commit(void)
         {
-            __asm__ __volatile__("movl $1, %0" : "=m"(m_written) :: "memory");
+            __asm__ __volatile__("movl $1, %0" : "=m"(m_written)::"memory");
         }
 
         inline void clear(void)
         {
-            __asm__ __volatile__("movl $0, %0" : "=m"(m_written) :: "memory");
+            __asm__ __volatile__("movl $0, %0" : "=m"(m_written)::"memory");
         }
 
         inline void send(T const &indata)
@@ -57,10 +59,10 @@ namespace scrutiny
             return outdata;
         }
 
-    protected:
+      protected:
         volatile bool m_written;
     };
 
-}
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_IPC_H___

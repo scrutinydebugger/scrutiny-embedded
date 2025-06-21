@@ -1,5 +1,5 @@
-#include "scrutiny.hpp"
 #include "scrutiny_cwrapper.h"
+#include "scrutiny.hpp"
 #include <new>
 #include <stddef.h>
 

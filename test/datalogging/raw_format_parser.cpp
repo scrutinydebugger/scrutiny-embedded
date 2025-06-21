@@ -70,7 +70,7 @@ void RawFormatParser::parse(uint32_t entry_count)
 
     for (uint32_t i = 0; i < entry_count; i++)
     {
-        std::vector< std::vector<uint8_t> > entry(m_config->items_count);
+        std::vector<std::vector<uint8_t> > entry(m_config->items_count);
         for (uint16_t j = 0; j < m_config->items_count; j++)
         {
             uint32_t elem_size = 0;

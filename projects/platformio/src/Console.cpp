@@ -1,5 +1,5 @@
-#include <SSD1306AsciiSpi.h>
 #include "Console.hpp"
+#include <SSD1306AsciiSpi.h>
 
 extern SSD1306AsciiSpi display;
 

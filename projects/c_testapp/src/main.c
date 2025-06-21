@@ -14,38 +14,37 @@
 #include "win_serial_port_bridge.h"
 #include <windows.h>
 #else
-#include <unistd.h>
 #include "nix_serial_port_bridge.h"
+#include <unistd.h>
 #endif
 
-
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <time.h>
 
 #include "file1.h"
 #include "file2.h"
 
 #ifndef max
-#define max(a,b) ((a) > (b)) ? (a) : (b)
+#define max(a, b) ((a) > (b)) ? (a) : (b)
 #endif
 
 #ifndef min
-#define min(a,b) ((a) < (b)) ? (a) : (b)
+#define min(a, b) ((a) < (b)) ? (a) : (b)
 #endif
 
 static uint64_t micros()
 {
     struct timespec now;
-    #if SCRUTINY_BUILD_WINDOWS
-    timespec_get(&now, TIME_UTC);   // Careful, not monotonic
-    #else
+#if SCRUTINY_BUILD_WINDOWS
+    timespec_get(&now, TIME_UTC); // Careful, not monotonic
+#else
     clock_gettime(CLOCK_MONOTONIC, &now);
-    #endif
+#endif
 
-    return ((uint64_t) now.tv_sec) * 1000000 + ((uint64_t) now.tv_nsec) / 1000;
+    return ((uint64_t)now.tv_sec) * 1000000 + ((uint64_t)now.tv_nsec) / 1000;
 }
 
 void mainfunc1()
@@ -59,7 +58,7 @@ void memdump(uintptr_t startAddr, uint32_t length)
     uintptr_t addr = startAddr;
     while (addr < startAddr + length)
     {
-        uint8_t *ptr = (uint8_t*)(addr);
+        uint8_t *ptr = (uint8_t *)(addr);
         printf("0x%016" PRIx64 ":\t", (uint64_t)addr);
         uintptr_t nToPrint = startAddr + length - addr;
         if (nToPrint > 16)
@@ -68,7 +67,7 @@ void memdump(uintptr_t startAddr, uint32_t length)
         }
         for (unsigned int i = 0; i < nToPrint; i++)
         {
-            printf("%02"PRIx32, (uint32_t)ptr[i]);
+            printf("%02" PRIx32, (uint32_t)ptr[i]);
         }
         printf("\n");
         addr += nToPrint;
@@ -251,8 +250,6 @@ void init_all_values()
     rpvStorage.rpv_id_2003 = 0x111111111111u;
     rpvStorage.rpv_id_3001 = 2.71828;
 #endif
-
-
 }
 
 void process_interactive_data()
@@ -277,19 +274,17 @@ void datalogging_callback()
 }
 
 void my_user_command(
-    uint8_t const  subfunction,
-    uint8_t const  *request_data,
-    uint16_t const  request_data_length,
+    uint8_t const subfunction,
+    uint8_t const *request_data,
+    uint16_t const request_data_length,
     uint8_t *response_data,
     uint16_t *response_data_length,
-    uint16_t const  response_max_data_length)
+    uint16_t const response_max_data_length)
 {
-    printf("User command: Subfunction #%u with %u data bytes: ", 
-        (unsigned int)subfunction, 
-        (unsigned int) request_data_length);
+    printf("User command: Subfunction #%u with %u data bytes: ", (unsigned int)subfunction, (unsigned int)request_data_length);
     for (uint32_t i = 0; i < request_data_length; i++)
     {
-        printf("%02x", (unsigned int) request_data[i]);
+        printf("%02x", (unsigned int)request_data[i]);
     }
     printf("\n");
 
@@ -327,7 +322,7 @@ void my_user_command(
     }
     else if (subfunction == 4)
     {
-        uint16_t const  max_echo_size = min(request_data_length, (uint16_t)(response_max_data_length - 1));
+        uint16_t const max_echo_size = min(request_data_length, (uint16_t)(response_max_data_length - 1));
         response_data[0] = subfunction;
         for (uint16_t i = 0; i < max_echo_size; i++)
         {
@@ -342,42 +337,49 @@ void my_user_command(
     }
 }
 
-enum channel_type_e{
+enum channel_type_e
+{
     CHANNEL_TYPE_UDP,
     CHANNEL_TYPE_Serial
 };
 
-#define ERR_RETURN(msg) {fprintf(stderr, "%s\n", msg); return;}
-#define ERR_BREAK(msg) {fprintf(stderr, "%s\n", msg); break;}
+#define ERR_RETURN(msg)                                                                                                                                        \
+    {                                                                                                                                                          \
+        fprintf(stderr, "%s\n", msg);                                                                                                                          \
+        return;                                                                                                                                                \
+    }
+#define ERR_BREAK(msg)                                                                                                                                         \
+    {                                                                                                                                                          \
+        fprintf(stderr, "%s\n", msg);                                                                                                                          \
+        break;                                                                                                                                                 \
+    }
 
 void process_scrutiny_lib(comm_channel_interface_t *channel)
 {
 
     uint8_t buffer[1024];
-    scrutiny_c_main_handler_t* scrutiny_handler = scrutiny_c_main_handler_construct(malloc(SCRUTINY_C_MAIN_HANDLER_SIZE), SCRUTINY_C_MAIN_HANDLER_SIZE);
-    scrutiny_c_config_t* config = scrutiny_c_config_construct(malloc(SCRUTINY_C_CONFIG_SIZE), SCRUTINY_C_CONFIG_SIZE);
-    
-    scrutiny_c_loop_handler_ff_t* ff_loop = scrutiny_c_loop_handler_fixed_freq_construct(
-        malloc(SCRUTINY_C_LOOP_HANDLER_FF_SIZE), 
-        SCRUTINY_C_LOOP_HANDLER_FF_SIZE,
-        100000,
-        "100Hz Loop"
-        );
-    scrutiny_c_loop_handler_vf_t* vf_loop = scrutiny_c_loop_handler_variable_freq_construct(
-        malloc(SCRUTINY_C_LOOP_HANDLER_VF_SIZE), 
-        SCRUTINY_C_LOOP_HANDLER_VF_SIZE,
-        "Variable freq loop"
-        );
+    scrutiny_c_main_handler_t *scrutiny_handler = scrutiny_c_main_handler_construct(malloc(SCRUTINY_C_MAIN_HANDLER_SIZE), SCRUTINY_C_MAIN_HANDLER_SIZE);
+    scrutiny_c_config_t *config = scrutiny_c_config_construct(malloc(SCRUTINY_C_CONFIG_SIZE), SCRUTINY_C_CONFIG_SIZE);
 
-    if (scrutiny_handler == NULL) ERR_RETURN("Failed to allocate scrutiny_handler");
-    if (config == NULL) ERR_RETURN("Failed to allocate config");
-    if (ff_loop == NULL) ERR_RETURN("Failed to allocate ff_loop");
-    if (vf_loop == NULL) ERR_RETURN("Failed to allocate vf_loop");
-    
+    scrutiny_c_loop_handler_ff_t *ff_loop =
+        scrutiny_c_loop_handler_fixed_freq_construct(malloc(SCRUTINY_C_LOOP_HANDLER_FF_SIZE), SCRUTINY_C_LOOP_HANDLER_FF_SIZE, 100000, "100Hz Loop");
+    scrutiny_c_loop_handler_vf_t *vf_loop =
+        scrutiny_c_loop_handler_variable_freq_construct(malloc(SCRUTINY_C_LOOP_HANDLER_VF_SIZE), SCRUTINY_C_LOOP_HANDLER_VF_SIZE, "Variable freq loop");
+
+    if (scrutiny_handler == NULL)
+        ERR_RETURN("Failed to allocate scrutiny_handler");
+    if (config == NULL)
+        ERR_RETURN("Failed to allocate config");
+    if (ff_loop == NULL)
+        ERR_RETURN("Failed to allocate ff_loop");
+    if (vf_loop == NULL)
+        ERR_RETURN("Failed to allocate vf_loop");
+
     scrutiny_c_loop_handler_t *loops[] = {ff_loop, vf_loop};
 
     scrutiny_c_config_set_buffers(config, scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
-    scrutiny_c_config_set_published_values(config, rpvs, sizeof(rpvs) / sizeof(scrutiny_c_runtime_published_value_t), TestAppRPVReadCallback, TestAppRPVWriteCallback);
+    scrutiny_c_config_set_published_values(
+        config, rpvs, sizeof(rpvs) / sizeof(scrutiny_c_runtime_published_value_t), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     scrutiny_c_config_set_loops(config, loops, sizeof(loops) / sizeof(loops[0]));
     scrutiny_c_config_set_user_command_callback(config, my_user_command);
 
@@ -390,15 +392,16 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
     scrutiny_c_config_set_max_bitrate(config, 100000);
     scrutiny_c_config_set_display_name(config, "TestApp Executable");
     scrutiny_c_config_set_session_counter_seed(config, 0xdeadbeef);
-    
+
     scrutiny_c_main_handler_init(scrutiny_handler, config);
-    
+
     uint64_t start_timestamp, last_timestamp, now_timestamp;
     start_timestamp = micros();
     last_timestamp = micros();
     now_timestamp = micros();
 
-    if (channel->start(channel->handle) != COMM_CHANNEL_STATUS_success){
+    if (channel->start(channel->handle) != COMM_CHANNEL_STATUS_success)
+    {
         ERR_RETURN("Failed to start comm channel");
     }
 
@@ -407,7 +410,8 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
     {
         process_interactive_data();
 
-        if (channel->receive(channel->handle, buffer, sizeof(buffer), &len_received) != COMM_CHANNEL_STATUS_success){
+        if (channel->receive(channel->handle, buffer, sizeof(buffer), &len_received) != COMM_CHANNEL_STATUS_success)
+        {
             ERR_BREAK("Error while receiving");
         }
 
@@ -429,14 +433,15 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 
         scrutiny_c_main_handler_process(scrutiny_handler, timestep_us * 10);
 
-        uint16_t data_to_send =  scrutiny_c_main_handler_data_to_send(scrutiny_handler);
+        uint16_t data_to_send = scrutiny_c_main_handler_data_to_send(scrutiny_handler);
         data_to_send = min(data_to_send, (uint16_t)sizeof(buffer));
 
         if (data_to_send > 0)
         {
             scrutiny_c_main_handler_pop_data(scrutiny_handler, buffer, data_to_send);
-            
-            if (channel->send(channel->handle, buffer, data_to_send) != COMM_CHANNEL_STATUS_success){
+
+            if (channel->send(channel->handle, buffer, data_to_send) != COMM_CHANNEL_STATUS_success)
+            {
                 ERR_BREAK("Failed to start comm channel");
             }
 
@@ -447,8 +452,8 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
             }
             printf("\n");
         }
-        
-        uint32_t const timestep_100ns = timestep_us*10;
+
+        uint32_t const timestep_100ns = timestep_us * 10;
         scrutiny_c_loop_handler_variable_freq_process(vf_loop, timestep_100ns);
         scrutiny_c_loop_handler_fixed_freq_process(ff_loop, timestep_100ns);
 #if SCRUTINY_BUILD_WINDOWS
@@ -459,7 +464,8 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
         last_timestamp = now_timestamp;
     }
 
-    if (channel->stop(channel->handle) != COMM_CHANNEL_STATUS_success){
+    if (channel->stop(channel->handle) != COMM_CHANNEL_STATUS_success)
+    {
         ERR_RETURN("Error while stopping comm channel");
     }
 }
@@ -490,7 +496,7 @@ int main(int argc, char *argv[])
                 c_testapp_argument_parser_error_e err = c_testapp_argument_parser_next_memory_region(&parser, &region);
                 memdump(region.start_address, region.length);
 
-                if(err != C_TESTAPP_ARGPARSE_ERROR_NoError)
+                if (err != C_TESTAPP_ARGPARSE_ERROR_NoError)
                 {
                     fprintf(stderr, "Bad memory region arguments. %d\n", (int)err);
                     errorcode = -1;
@@ -524,7 +530,7 @@ int main(int argc, char *argv[])
         {
             printf("Serial comm on %s@%u baud\n", parser.m_serial_config.port_name, parser.m_serial_config.baudrate);
             comm_channel_interface_t channel;
-            #if SCRUTINY_BUILD_WINDOWS
+#if SCRUTINY_BUILD_WINDOWS
             win_serial_port_t serial;
             channel.handle = &serial;
             channel.start = win_serial_port_start;
@@ -533,7 +539,7 @@ int main(int argc, char *argv[])
             channel.receive = win_serial_port_receive;
 
             win_serial_port_init(&serial, parser.m_serial_config.port_name, parser.m_serial_config.baudrate);
-            #else
+#else
             nix_serial_port_t serial;
             channel.handle = &serial;
             channel.start = (comm_channel_start_t)nix_serial_port_start;
@@ -542,7 +548,7 @@ int main(int argc, char *argv[])
             channel.receive = (comm_channel_receive_t)nix_serial_port_receive;
 
             nix_serial_port_init(&serial, parser.m_serial_config.port_name, parser.m_serial_config.baudrate);
-            #endif
+#endif
 
             process_scrutiny_lib(&channel);
         }

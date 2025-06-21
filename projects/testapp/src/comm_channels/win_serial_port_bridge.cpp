@@ -17,16 +17,17 @@
 #include <cstdlib>
 #include <stdint.h>
 
-#include <windows.h>
-#include <winbase.h>
 #include <cstring>
+#include <fileapi.h>
 #include <string>
 #include <system_error>
-#include <fileapi.h>
+#include <winbase.h>
+#include <windows.h>
 
-WinSerialPortBridge::WinSerialPortBridge(const std::string &port_name, uint32_t baudrate) : m_port_name(port_name),
-                                                                                            m_baudrate(baudrate),
-                                                                                            m_serial_handle(INVALID_HANDLE_VALUE)
+WinSerialPortBridge::WinSerialPortBridge(const std::string &port_name, uint32_t baudrate) :
+    m_port_name(port_name),
+    m_baudrate(baudrate),
+    m_serial_handle(INVALID_HANDLE_VALUE)
 {
 }
 

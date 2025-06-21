@@ -6,27 +6,28 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <string.h>
-#include "scrutiny_setup.hpp"
 #include "scrutiny_main_handler.hpp"
-#include "scrutiny_software_id.hpp"
 #include "scrutiny_common_codecs.hpp"
 #include "scrutiny_loop_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_software_id.hpp"
+#include <string.h>
 
 namespace scrutiny
 {
-    MainHandler::MainHandler(void) : m_timebase(),
-                                     m_comm_handler(),
-                                     m_processing_request(false),
-                                     m_disconnect_pending(false),
-                                     m_config(),
-                                     m_enabled(false),
-                                     m_process_again_timestamp_taken(false),
-                                     m_process_again_timestamp(0),
-                                     m_codec()
+    MainHandler::MainHandler(void) :
+        m_timebase(),
+        m_comm_handler(),
+        m_processing_request(false),
+        m_disconnect_pending(false),
+        m_config(),
+        m_enabled(false),
+        m_process_again_timestamp_taken(false),
+        m_process_again_timestamp(0),
+        m_codec()
 #if SCRUTINY_ENABLE_DATALOGGING
-                                     ,
-                                     m_datalogging()
+        ,
+        m_datalogging()
 #endif
     {
     }
@@ -39,9 +40,7 @@ namespace scrutiny
         m_config = *config;
 
         m_comm_handler.init(
-            m_config.m_rx_buffer, m_config.m_rx_buffer_size,
-            m_config.m_tx_buffer, m_config.m_tx_buffer_size,
-            &m_timebase, m_config.session_counter_seed);
+            m_config.m_rx_buffer, m_config.m_rx_buffer_size, m_config.m_tx_buffer, m_config.m_tx_buffer_size, &m_timebase, m_config.session_counter_seed);
 
         check_config();
         if (!m_enabled)
@@ -81,12 +80,14 @@ namespace scrutiny
     void MainHandler::check_config()
     {
         m_enabled = true;
-        if (m_config.m_rx_buffer == SCRUTINY_NULL || m_config.m_rx_buffer_size < protocol::MINIMUM_RX_BUFFER_SIZE || m_config.m_rx_buffer_size > protocol::MAXIMUM_RX_BUFFER_SIZE)
+        if (m_config.m_rx_buffer == SCRUTINY_NULL || m_config.m_rx_buffer_size < protocol::MINIMUM_RX_BUFFER_SIZE ||
+            m_config.m_rx_buffer_size > protocol::MAXIMUM_RX_BUFFER_SIZE)
         {
             m_enabled = false;
         }
 
-        if (m_config.m_tx_buffer == SCRUTINY_NULL || m_config.m_tx_buffer_size < protocol::MINIMUM_TX_BUFFER_SIZE || m_config.m_tx_buffer_size > protocol::MAXIMUM_TX_BUFFER_SIZE)
+        if (m_config.m_tx_buffer == SCRUTINY_NULL || m_config.m_tx_buffer_size < protocol::MINIMUM_TX_BUFFER_SIZE ||
+            m_config.m_tx_buffer_size > protocol::MAXIMUM_TX_BUFFER_SIZE)
         {
             m_enabled = false;
         }
@@ -300,7 +301,8 @@ namespace scrutiny
         case LoopHandler::Loop2MainMessageID::DATALOGGER_STATUS_UPDATE:
         {
             m_datalogging.threadsafe_data.datalogger_state = msg->data.datalogger_status_update.state;
-            m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion = msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
+            m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion =
+                msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
             m_datalogging.threadsafe_data.write_counter_since_trigger = msg->data.datalogger_status_update.write_counter_since_trigger;
             if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
             {
@@ -563,8 +565,7 @@ namespace scrutiny
     // ============= [GetInfo] ============
     protocol::ResponseCode::E MainHandler::process_get_info(protocol::Request const *const request, protocol::Response *const response)
     {
-        union
-        {
+        union {
             struct
             {
                 protocol::ResponseData::GetInfo::GetProtocolVersion response_data;
@@ -667,7 +668,8 @@ namespace scrutiny
                 break;
             }
 
-            if (static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::ReadOnly)
+            if (static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) ==
+                protocol::GetInfo::MemoryRegionType::ReadOnly)
             {
                 if (!m_config.is_readonly_address_range_set())
                 {
@@ -685,7 +687,9 @@ namespace scrutiny
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
-            else if (static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
+            else if (
+                static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) ==
+                protocol::GetInfo::MemoryRegionType::Forbidden)
             {
                 if (!m_config.is_forbidden_address_range_set())
                 {
@@ -748,7 +752,8 @@ namespace scrutiny
             }
 
             stack.get_prv_def.rpvs = m_config.get_rpvs_array();
-            for (int32_t i = stack.get_prv_def.request_data.start_index; i < stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count; i++)
+            for (int32_t i = stack.get_prv_def.request_data.start_index; i < stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count;
+                 i++)
             {
                 stack.get_prv_def.response_encoder->write(&stack.get_prv_def.rpvs[i]);
                 if (stack.get_prv_def.response_encoder->overflow()) // If it doesn't fit the transmit buffer
@@ -814,8 +819,7 @@ namespace scrutiny
     // ============= [CommControl] ============
     protocol::ResponseCode::E MainHandler::process_comm_control(protocol::Request const *const request, protocol::Response *const response)
     {
-        union
-        {
+        union {
             struct
             {
                 protocol::RequestData::CommControl::Discover request_data;
@@ -858,7 +862,8 @@ namespace scrutiny
 
             // Magic validation is done by the codec.
             stack.discover.response_data.display_name = m_config.display_name;
-            stack.discover.response_data.display_name_length = static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
+            stack.discover.response_data.display_name_length =
+                static_cast<uint8_t>(strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
 
             code = m_codec.encode_response_comm_discover(&stack.discover.response_data, response);
             break;
@@ -971,8 +976,7 @@ namespace scrutiny
         protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
 
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
-        union
-        {
+        union {
             struct
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
@@ -1061,7 +1065,8 @@ namespace scrutiny
         case protocol::MemoryControl::Subfunction::Write: // fall through
         case protocol::MemoryControl::Subfunction::WriteMasked:
         {
-            bool const masked = static_cast<protocol::MemoryControl::Subfunction::E>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
+            bool const masked =
+                static_cast<protocol::MemoryControl::Subfunction::E>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
             code = protocol::ResponseCode::OK;
 
             if (m_config.memory_write_enable == false)
@@ -1319,7 +1324,8 @@ namespace scrutiny
         {
             uint16_t response_data_length = 0;
             // Calling user callback;
-            m_config.get_user_command_callback()(request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
+            m_config.get_user_command_callback()(
+                request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
             if (response_data_length > m_comm_handler.tx_buffer_size())
             {
                 code = protocol::ResponseCode::Overflow;
@@ -1341,8 +1347,7 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
     protocol::ResponseCode::E MainHandler::process_datalog_control(protocol::Request const *const request, protocol::Response *const response)
     {
-        union
-        {
+        union {
             struct
             {
                 protocol::ResponseData::DataLogControl::GetSetup response_data;
@@ -1381,7 +1386,8 @@ namespace scrutiny
 
         case protocol::DataLogControl::Subfunction::GetSetup:
         {
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_setup.response_data.buffer_size) >= sizeof(m_config.m_datalogger_buffer_size), "Data won't fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_setup.response_data.buffer_size) >= sizeof(m_config.m_datalogger_buffer_size), "Data won't fit in protocol");
 
             stack.get_setup.response_data.buffer_size = static_cast<uint32_t>(m_config.m_datalogger_buffer_size);
             stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
@@ -1428,7 +1434,8 @@ namespace scrutiny
             {
                 if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
                 {
-                    if (touches_forbidden_region(config->trigger.operands[i].data.var.addr, tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                    if (touches_forbidden_region(
+                            config->trigger.operands[i].data.var.addr, tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
@@ -1528,20 +1535,28 @@ namespace scrutiny
         }
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_status.response_data.write_counter_since_trigger) >= sizeof(m_datalogging.threadsafe_data.write_counter_since_trigger), "Data cannot fit in protocol");
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion) >= sizeof(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion), "Data cannot fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_status.response_data.write_counter_since_trigger) >= sizeof(m_datalogging.threadsafe_data.write_counter_since_trigger),
+                "Data cannot fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion) >=
+                    sizeof(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion),
+                "Data cannot fit in protocol");
 
             stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
-            stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion = static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
+            stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion =
+                static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
             stack.get_status.response_data.write_counter_since_trigger = static_cast<uint32_t>(m_datalogging.threadsafe_data.write_counter_since_trigger);
             code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
         case protocol::DataLogControl::Subfunction::GetAcquisitionMetadata:
         {
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
             SCRUTINY_STATIC_ASSERT(sizeof(stack.get_acq_metadata.response_data.data_size) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
 
             if (!datalogging_data_available())
             {
@@ -1643,4 +1658,4 @@ namespace scrutiny
     }
 #endif
 
-}
+} // namespace scrutiny

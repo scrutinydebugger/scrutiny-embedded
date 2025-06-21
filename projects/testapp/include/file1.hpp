@@ -9,7 +9,7 @@
 #ifndef ___FILE_1_H___
 #define ___FILE_1_H___
 
-#pragma pack(push,1)
+#pragma pack(push, 1)
 
 struct StructA
 {
@@ -29,12 +29,14 @@ struct StructB
 struct StructC
 {
     int structCMemberInt;
-    struct{
+    struct
+    {
         int nestedStructMemberInt;
         float nestedStructMemberFloat;
-        struct {
+        struct
+        {
             double nestedStructInstance2MemberDouble;
-        }nestedStructInstance2;
+        } nestedStructInstance2;
     } nestedStructInstance;
 };
 
@@ -52,4 +54,4 @@ void file1SetValues();
 
 #pragma pack(pop)
 
-#endif  // ___FILE_1_H___
+#endif // ___FILE_1_H___

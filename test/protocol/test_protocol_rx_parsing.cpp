@@ -13,7 +13,7 @@
 
 class TestRxParsing : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
 

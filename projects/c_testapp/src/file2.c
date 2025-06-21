@@ -21,7 +21,6 @@ double file2GlobalDouble;
 int file2GlobalArray1Int5[5];
 float file2GlobalArray2x2Float[2][2];
 
-
 static char file2StaticChar;
 static int file2StaticInt;
 static short file2StaticShort;
@@ -57,15 +56,15 @@ static volatile struct File2StructWithEnumA static_instance_structWithEnumA;
 void file2SetValues()
 {
     file2GlobalChar = 20;
-    file2GlobalInt =  2000;
-    file2GlobalShort =  998;
-    file2GlobalLong =  555555;
-    file2GlobalUnsignedChar =  254u;
-    file2GlobalUnsignedInt =  123456u;
-    file2GlobalUnsignedShort =  12345u;
-    file2GlobalUnsignedLong =  1234567u;
-    file2GlobalFloat =  0.1f;
-    file2GlobalDouble =  0.11111111111111;
+    file2GlobalInt = 2000;
+    file2GlobalShort = 998;
+    file2GlobalLong = 555555;
+    file2GlobalUnsignedChar = 254u;
+    file2GlobalUnsignedInt = 123456u;
+    file2GlobalUnsignedShort = 12345u;
+    file2GlobalUnsignedLong = 1234567u;
+    file2GlobalFloat = 0.1f;
+    file2GlobalDouble = 0.11111111111111;
 
     file2StaticChar = -66;
     file2StaticInt = -8745;
@@ -87,7 +86,7 @@ void file2SetValues()
     static_instance_structWithEnumA.a = 135;
     static_instance_structWithEnumA.b = 246;
     static_instance_structWithEnumA.instance_enumA = eVal3;
-    
+
     file2GlobalArray1Int5[0] = 1111;
     file2GlobalArray1Int5[1] = 2222;
     file2GlobalArray1Int5[2] = 3333;
@@ -100,7 +99,6 @@ void file2SetValues()
     file2GlobalArray2x2Float[1][1] = 4.4f;
 }
 
-
 void file2func1(int x)
 {
     (void)x;
@@ -108,7 +106,3 @@ void file2func1(int x)
     file2func1Var += (double)x;
     (void)file2func1Var;
 }
-
-
-
-

@@ -14,10 +14,10 @@
 #if SCRUTINY_BUILD_WINDOWS
 #include <winsock2.h>
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <errno.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 #if SCRUTINY_BUILD_WINDOWS
@@ -34,7 +34,8 @@ typedef int SOCKET;
 typedef struct sockaddr SOCKADDR;
 #endif
 
-typedef struct{
+typedef struct
+{
     uint16_t m_port;
     SOCKET m_sock;               // SOCKET = int for linux, SOCKET for windows
     SOCKADDR m_last_packet_addr; // SOCKADDR = sockaddr for linux, SOCKADDR for windows
@@ -44,19 +45,18 @@ typedef struct{
 #endif
 } udp_bridge_t;
 
-
 comm_channel_status_e udp_bridge_global_init();
 comm_channel_status_e udp_bridge_global_close();
 
-void udp_bridge_init(udp_bridge_t* bridge, uint16_t port);
-comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len, int flags);
-comm_channel_status_e _udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer, int len, int flags, int* ret);
+void udp_bridge_init(udp_bridge_t *bridge, uint16_t port);
+comm_channel_status_e _udp_bridge_send(udp_bridge_t *bridge, uint8_t const *buffer, int len, int flags);
+comm_channel_status_e _udp_bridge_receive(udp_bridge_t *bridge, uint8_t *buffer, int len, int flags, int *ret);
 
-comm_channel_status_e udp_bridge_start(udp_bridge_t* bridge);
-comm_channel_status_e udp_bridge_stop(udp_bridge_t* bridge);
-comm_channel_status_e udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len);
-comm_channel_status_e udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer, int len, int* ret);
+comm_channel_status_e udp_bridge_start(udp_bridge_t *bridge);
+comm_channel_status_e udp_bridge_stop(udp_bridge_t *bridge);
+comm_channel_status_e udp_bridge_send(udp_bridge_t *bridge, uint8_t const *buffer, int len);
+comm_channel_status_e udp_bridge_receive(udp_bridge_t *bridge, uint8_t *buffer, int len, int *ret);
 
-comm_channel_status_e udp_bridge_set_nonblocking(udp_bridge_t* bridge);
+comm_channel_status_e udp_bridge_set_nonblocking(udp_bridge_t *bridge);
 
 #endif // ___UDP_BRIDGE_H___

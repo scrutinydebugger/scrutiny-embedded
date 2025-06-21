@@ -24,10 +24,9 @@ namespace scrutiny
     /// It is designed for one producer and one consumer.  It is the responsibility of the sender to
     /// wait for message to be cleared before writing a new one
     /// @param T DataType to send
-    template <class T>
-    class IPCMessage
+    template <class T> class IPCMessage
     {
-    public:
+      public:
         T data;
         IPCMessage()
         {
@@ -77,9 +76,9 @@ namespace scrutiny
             return outdata;
         }
 
-    protected:
+      protected:
         std::atomic<bool> m_written;
     };
-}
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_IPC_STD_ATOMIC_H___

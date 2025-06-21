@@ -6,15 +6,15 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
 class TestCommHandler : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
     uint8_t response_buffer[256];

@@ -12,19 +12,18 @@
 #error "File designed for windows"
 #endif
 
-
-#include <stdlib.h>
+#include <errhandlingapi.h>
+#include <fileapi.h>
+#include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stddef.h>
-#include <windows.h>
+#include <stdlib.h>
 #include <winbase.h>
-#include <fileapi.h>
-#include <errhandlingapi.h>
-#include <inttypes.h>
+#include <windows.h>
 
-#include "win_serial_port_bridge.h"
 #include "tools.h"
+#include "win_serial_port_bridge.h"
 
 comm_channel_status_e win_serial_port_init(win_serial_port_t *serial_port, char *const port_name, uint32_t const baudrate)
 {
@@ -34,14 +33,13 @@ comm_channel_status_e win_serial_port_init(win_serial_port_t *serial_port, char 
     return COMM_CHANNEL_STATUS_success;
 }
 
-
 comm_channel_status_e win_serial_port_start(win_serial_port_t *serial_port)
 {
-    char const* prefix = "\\\\.\\";
+    char const *prefix = "\\\\.\\";
     size_t const prefix_len = strlen(prefix);
     char portname[255] = {0};
     strcpy_s(portname, sizeof(portname), prefix);
-    c_testapp_strncpy(&portname[prefix_len], serial_port->m_portname, sizeof(portname)-prefix_len);
+    c_testapp_strncpy(&portname[prefix_len], serial_port->m_portname, sizeof(portname) - prefix_len);
 
     serial_port->m_serial_handle = CreateFile(portname, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 

@@ -6,14 +6,14 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 #include <cstddef>
 #include <gtest/gtest.h>
-#include "scrutiny_test.hpp"
-#include "scrutiny.hpp"
 
 class TestVariableFetching : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -27,18 +27,19 @@ protected:
     uint8_t readonly_buffer2[128];
 
     scrutiny::AddressRange readonly_ranges[2];
-    scrutiny::AddressRange forbidden_ranges[2]; 
+    scrutiny::AddressRange forbidden_ranges[2];
 
-    TestVariableFetching() : ScrutinyTest(),
-                             tb(),
-                             scrutiny_handler(),
-                             config(),
-                             _rx_buffer(),
-                             _tx_buffer(),
-                             forbidden_buffer(),
-                             forbidden_buffer2(),
-                             readonly_buffer(),
-                             readonly_buffer2()
+    TestVariableFetching() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer(),
+        forbidden_buffer(),
+        forbidden_buffer2(),
+        readonly_buffer(),
+        readonly_buffer2()
     {
         readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
         readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));

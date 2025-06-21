@@ -6,9 +6,9 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
+#include <gtest/gtest.h>
 
 class TestCodecs : public ScrutinyTest
 {
