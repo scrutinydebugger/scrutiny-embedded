@@ -16,7 +16,7 @@ ArgumentParser::ArgumentParser() : m_valid(false),
                                    m_command(TestAppCommand::None),
                                    m_region_index(0),
                                    m_argc(0),
-                                   m_argv(SCRUTINY_NULL),
+                                   m_argv(nullptr),
                                    m_last_error()
 {
 }
@@ -136,7 +136,7 @@ bool ArgumentParser::has_another_memory_region()
 
 void ArgumentParser::next_memory_region(MemoryRegion *region)
 {
-    SCRUTINY_CONSTEXPR uint32_t region_offset = 2;
+    constexpr uint32_t region_offset = 2;
     if (m_command != TestAppCommand::Memdump || !m_valid)
     {
         throw Error::WrongCommand;

@@ -5,6 +5,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(testapp)
 
+if (CMAKE_CXX_STANDARD EQUAL 98)
+    message(SEND_ERROR "TestApp can only be built with C++11 or above")
+endif()
+
 add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
