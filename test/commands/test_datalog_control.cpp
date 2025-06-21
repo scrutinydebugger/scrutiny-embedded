@@ -102,8 +102,8 @@ protected:
 // Expect all subfunctions to return Unsupported feature if not supported
 TEST_F(TestDatalogControl, TestUnsupported)
 {
-    const protocol::CommandId cmd = protocol::CommandId::DataLogControl;
-    const protocol::ResponseCode failure = protocol::ResponseCode::UnsupportedFeature;
+    const protocol::CommandId::E cmd = protocol::CommandId::DataLogControl;
+    const protocol::ResponseCode::E failure = protocol::ResponseCode::UnsupportedFeature;
 
     uint8_t tx_buffer[32];
 
