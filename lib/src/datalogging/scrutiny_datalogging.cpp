@@ -1,4 +1,4 @@
-//    datalogging.cpp
+//    scrutiny_datalogging.cpp
 //        Implementation of some datalogging features
 //
 //   - License : MIT - See LICENSE file.

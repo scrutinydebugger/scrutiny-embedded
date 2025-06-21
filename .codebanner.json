@@ -11,7 +11,8 @@
         "*.c"
     ],
     "exclude_patterns": [
-        "projects/platformio/*"
+        "projects/platformio/*",
+        "projects/examples/*"
     ],
     "license": "MIT - See LICENSE file",
     "project": "Scrutiny Debugger",
@@ -188,9 +189,6 @@
         "lib/src/datalogging/scrutiny_datalogger.cpp": {
             "docstring": "The implementation of the datalogger object that should exist in each loop "
         },
-        "lib/src/datalogging/datalogging.cpp": {
-            "docstring": "Implementation of some datalogging features"
-        },
         "projects/testapp/src/include_test.cpp": {
             "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
         },
@@ -298,6 +296,27 @@
         },
         "projects/c_testapp/src/file2.c": {
             "docstring": "Placeholder file for variable extraction test"
+        },
+        "lib/inc/scrutiny_compiler.hpp": {
+            "docstring": "Macros for compiler feature and environment detection"
+        },
+        "lib/inc/ipc/scrutiny_ipc_std_atomic.hpp": {
+            "docstring": "An implementation of the Scrutiny IPC based on C++11 std::atomic."
+        },
+        "lib/inc/ipc/scrutiny_ipc_avr.hpp": {
+            "docstring": "An implementation of the Scrutiny IPC based on AVR intrinsics that disables interrupt for atomic store/load"
+        },
+        "lib/inc/ipc/scrutiny_ipc_x86.hpp": {
+            "docstring": "An implementation of the Scrutiny IPC that uses assembly x86 intrinsics. Meant for testing with C++98. From C++11, std::atomic covers the x86 case"
+        },
+        "lib/src/datalogging/scrutiny_datalogging.cpp": {
+            "docstring": "Implementation of some datalogging features"
+        },
+        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.hpp": {
+            "docstring": "Windows serial port abstraction"
+        },
+        "projects/c_testapp/src/tools.c": {
+            "docstring": "Miscelaneous tools for C TestApp"
         }
     }
 }

@@ -1,3 +1,11 @@
+//    scrutiny_ipc_avr.hpp
+//        An implementation of the Scrutiny IPC based on AVR intrinsics that disables interrupt
+//        for atomic store/load
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_IPC_AVR_H___
 #define ___SCRUTINY_IPC_AVR_H___

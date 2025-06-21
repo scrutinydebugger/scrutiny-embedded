@@ -1,3 +1,11 @@
+//    scrutiny_compiler.hpp
+//        Macros for compiler feature and environment detection
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021 Scrutiny Debugger
+
 #ifndef ___SCRUTINY_COMPILER_HPP___
 #define ___SCRUTINY_COMPILER_HPP___
 

@@ -1,5 +1,5 @@
 //    win_serial_port_bridge.hpp
-//        Serial interface fopr the C testapp. Used to talk with the server
+//        Windows serial port abstraction
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
