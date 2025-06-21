@@ -28,12 +28,12 @@ namespace scrutiny
 
         inline void commit(void)
         {
-            m_written = true;
+            __asm__ __volatile__("movl $1, %0" : "=m"(m_written) :: "memory");
         }
 
         inline void clear(void)
         {
-            m_written = false;
+            __asm__ __volatile__("movl $0, %0" : "=m"(m_written) :: "memory");
         }
 
         inline void send(T const &indata)
