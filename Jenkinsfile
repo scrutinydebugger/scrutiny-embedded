@@ -63,6 +63,34 @@ pipeline {
                         }
                     }
                 }
+                stage('GCC Full C++98'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                CMAKE_CXX_STANDARD=98   \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
                 stage('Clang Full'){
                     agent {
                         dockerfile {

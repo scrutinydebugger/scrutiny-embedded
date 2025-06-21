@@ -4,17 +4,16 @@ set -euo pipefail
 LIB_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../lib >/dev/null 2>&1 && pwd )"
 
 CPPCHECK_ARGS="-I $LIB_ROOT/inc $LIB_ROOT \
-    --error-exitcode=-1 \
-    --enable=all    \
-    --std=c++03
-    --suppress=memsetClassFloat   \
-    --suppress=missingIncludeSystem   \
-    --suppress=unusedFunction   \
-    --suppress=missingIncludeSystem \
-    --suppress=preprocessorErrorDirective \
-    --suppress=unmatchedSuppression \
-    --inline-suppr \
-    -j4 \
+    --error-exitcode=-1
+    --enable=all
+    --std=c++11
+    --suppress=memsetClassFloat
+    --suppress=missingIncludeSystem
+    --suppress=unusedFunction
+    --suppress=missingIncludeSystem
+    --suppress=preprocessorErrorDirective
+    --suppress=unmatchedSuppression
+    --inline-suppr
     -DSCRUTINY_STATIC_ANALYSIS"
 
 PLATFORMS="unix32 unix64 win32A win32W win64 avr8 elbrus-e1cp pic8 pic8-enhanced pic16 mips32 native"

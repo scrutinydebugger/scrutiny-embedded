@@ -419,7 +419,7 @@ namespace scrutiny
                 m_finished = true;
             }
 
-            return !m_invalid; // cppcheck-suppress[knownConditionTrueFalse]
+            return !m_invalid; 
         }
 
         void ReadRPVRequestParser::reset(void)
