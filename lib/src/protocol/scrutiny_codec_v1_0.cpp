@@ -550,8 +550,8 @@ namespace scrutiny
 
         ResponseCode::E CodecV1_0::encode_response_special_memory_region_count(ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data, Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_readonly_region);
-            SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionCount::nbr_forbidden_region);
+            SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = sizeof(response_data->nbr_readonly_region);
+            SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = sizeof(response_data->nbr_forbidden_region);
             SCRUTINY_CONSTEXPR uint16_t datalen = readonly_region_count_size + forbidden_region_count_size;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -566,8 +566,8 @@ namespace scrutiny
         ResponseCode::E CodecV1_0::encode_response_special_memory_region_location(ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data, Response *response)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
-            SCRUTINY_CONSTEXPR uint16_t region_type_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionLocation::region_type);
-            SCRUTINY_CONSTEXPR uint16_t region_index_size = sizeof(ResponseData::GetInfo::GetSpecialMemoryRegionLocation::region_index);
+            SCRUTINY_CONSTEXPR uint16_t region_type_size = sizeof(response_data->region_type);
+            SCRUTINY_CONSTEXPR uint16_t region_index_size = sizeof(response_data->region_index);
             SCRUTINY_CONSTEXPR uint16_t datalen = region_type_size + region_index_size + 2 * addr_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
