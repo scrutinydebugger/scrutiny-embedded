@@ -39,8 +39,8 @@ namespace scrutiny
         m_process_again_timestamp_taken = false;
         m_config = *config;
 
-        m_comm_handler.init(
-            m_config.m_rx_buffer, m_config.m_rx_buffer_size, m_config.m_tx_buffer, m_config.m_tx_buffer_size, &m_timebase, m_config.session_counter_seed);
+        m_comm_handler
+            .init(m_config.m_rx_buffer, m_config.m_rx_buffer_size, m_config.m_tx_buffer, m_config.m_tx_buffer_size, &m_timebase, m_config.session_counter_seed);
 
         check_config();
         if (!m_enabled)
@@ -1325,7 +1325,12 @@ namespace scrutiny
             uint16_t response_data_length = 0;
             // Calling user callback;
             m_config.get_user_command_callback()(
-                request->subfunction_id, request->data, request->data_length, response->data, &response_data_length, m_comm_handler.tx_buffer_size());
+                request->subfunction_id,
+                request->data,
+                request->data_length,
+                response->data,
+                &response_data_length,
+                m_comm_handler.tx_buffer_size());
             if (response_data_length > m_comm_handler.tx_buffer_size())
             {
                 code = protocol::ResponseCode::Overflow;
@@ -1387,7 +1392,8 @@ namespace scrutiny
         case protocol::DataLogControl::Subfunction::GetSetup:
         {
             SCRUTINY_STATIC_ASSERT(
-                sizeof(stack.get_setup.response_data.buffer_size) >= sizeof(m_config.m_datalogger_buffer_size), "Data won't fit in protocol");
+                sizeof(stack.get_setup.response_data.buffer_size) >= sizeof(m_config.m_datalogger_buffer_size),
+                "Data won't fit in protocol");
 
             stack.get_setup.response_data.buffer_size = static_cast<uint32_t>(m_config.m_datalogger_buffer_size);
             stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
@@ -1435,7 +1441,8 @@ namespace scrutiny
                 if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
                 {
                     if (touches_forbidden_region(
-                            config->trigger.operands[i].data.var.addr, tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                            config->trigger.operands[i].data.var.addr,
+                            tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
@@ -1553,10 +1560,12 @@ namespace scrutiny
         case protocol::DataLogControl::Subfunction::GetAcquisitionMetadata:
         {
             SCRUTINY_STATIC_ASSERT(
-                sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+                sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t),
+                "Data won't fit in protocol");
             SCRUTINY_STATIC_ASSERT(sizeof(stack.get_acq_metadata.response_data.data_size) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
             SCRUTINY_STATIC_ASSERT(
-                sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+                sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t),
+                "Data won't fit in protocol");
 
             if (!datalogging_data_available())
             {

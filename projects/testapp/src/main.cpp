@@ -70,24 +70,16 @@ static uint8_t scrutiny_rx_buffer[128];
 static uint8_t scrutiny_tx_buffer[256];
 
 scrutiny::RuntimePublishedValue rpvs[] = {
-    {0x1000, scrutiny::VariableType::sint8},
-    {0x1001, scrutiny::VariableType::sint16},
-    {0x1002, scrutiny::VariableType::sint32},
+    { 0x1000, scrutiny::VariableType::sint8 },   { 0x1001, scrutiny::VariableType::sint16 },  { 0x1002, scrutiny::VariableType::sint32 },
 
-    {0x2000, scrutiny::VariableType::uint8},
-    {0x2001, scrutiny::VariableType::uint16},
-    {0x2002, scrutiny::VariableType::uint32},
+    { 0x2000, scrutiny::VariableType::uint8 },   { 0x2001, scrutiny::VariableType::uint16 },  { 0x2002, scrutiny::VariableType::uint32 },
 
-    {0x3000, scrutiny::VariableType::float32},
-    {0x4000, scrutiny::VariableType::boolean},
+    { 0x3000, scrutiny::VariableType::float32 }, { 0x4000, scrutiny::VariableType::boolean },
 
-    {0x5000, scrutiny::VariableType::boolean},
-    {0x5001, scrutiny::VariableType::uint16},
+    { 0x5000, scrutiny::VariableType::boolean }, { 0x5001, scrutiny::VariableType::uint16 },
 
 #if SCRUTINY_SUPPORT_64BITS
-    {0x1003, scrutiny::VariableType::sint64},
-    {0x2003, scrutiny::VariableType::uint64},
-    {0x3001, scrutiny::VariableType::float64},
+    { 0x1003, scrutiny::VariableType::sint64 },  { 0x2003, scrutiny::VariableType::uint64 },  { 0x3001, scrutiny::VariableType::float64 },
 #endif
 
 };
@@ -380,7 +372,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     scrutiny::Config config;
     scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq loop");
     scrutiny::FixedFrequencyLoopHandler ff_loop(100000, "100Hz Loop");
-    scrutiny::LoopHandler *loops[] = {&ff_loop, &vf_loop};
+    scrutiny::LoopHandler *loops[] = { &ff_loop, &vf_loop };
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));

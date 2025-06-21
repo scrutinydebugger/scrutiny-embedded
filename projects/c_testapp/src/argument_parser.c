@@ -35,7 +35,7 @@ void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int ar
         return;
     }
 
-    char cmd[255] = {0};
+    char cmd[255] = { 0 };
     c_testapp_strncpy(cmd, argv[1], sizeof(cmd));
     size_t len = strlen(cmd);
     for (size_t i = 0; i < len; i++)
@@ -156,7 +156,7 @@ c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(c
 
     int base1 = 10;
     int base2 = 10;
-    char start_address[32] = {0};
+    char start_address[32] = { 0 };
     c_testapp_strncpy(start_address, parser->m_argv[parser->m_region_index + region_offset], sizeof(start_address));
 
     if (strnlen(start_address, sizeof(start_address)) > 2 && start_address[0] == '0' && start_address[1] == 'x')
@@ -165,7 +165,7 @@ c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(c
         base1 = 16;
     }
 
-    char length[32] = {0};
+    char length[32] = { 0 };
     c_testapp_strncpy(length, parser->m_argv[parser->m_region_index + region_offset + 1], sizeof(length));
 
     if (strnlen(length, sizeof(length)) > 2 && length[0] == '0' && length[1] == 'x')

@@ -71,34 +71,19 @@ namespace scrutiny
 
             /// @brief Tells if data has been acquired and ready to be read
             /// @return True if data is acquired
-            inline bool data_acquired(void) const
-            {
-                return m_state == State::ACQUISITION_COMPLETED;
-            }
+            inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
 
             /// @brief  Returns the acquisition ID of the last acquisition
-            inline uint16_t get_acquisition_id(void) const
-            {
-                return m_acquisition_id;
-            }
+            inline uint16_t get_acquisition_id(void) const { return m_acquisition_id; }
 
             /// @brief Returns the configuration ID attached with the acquisition
-            inline uint16_t get_config_id(void) const
-            {
-                return m_config_id;
-            }
+            inline uint16_t get_config_id(void) const { return m_config_id; }
 
             /// @brief Tells if the datalogger is armed and waiting for a trigger
-            inline bool armed(void) const
-            {
-                return m_state == State::ARMED;
-            }
+            inline bool armed(void) const { return m_state == State::ARMED; }
 
             /// @brief Returns the Datalogger state
-            inline DataLogger::State::E get_state(void) const
-            {
-                return m_state;
-            }
+            inline DataLogger::State::E get_state(void) const { return m_state; }
 
             /// @brief Arm the trigger so that the datalogger actively check for trigger condition to start acquisition
             void arm_trigger(void);
@@ -111,40 +96,22 @@ namespace scrutiny
             bool check_trigger(void);
 
             /// @brief Returns a DataReader object that will iterate through each samples
-            inline DataReader *get_reader(void)
-            {
-                return m_encoder.get_reader();
-            }
+            inline DataReader *get_reader(void) { return m_encoder.get_reader(); }
 
             /// @brief Returns the internal DataEncoder object used to write the samples in the datalogging buffer
-            inline DataEncoder *get_encoder(void)
-            {
-                return &m_encoder;
-            }
+            inline DataEncoder *get_encoder(void) { return &m_encoder; }
 
             /// @brief Returns a pointer to the internal configuration object
-            inline Configuration *config(void)
-            {
-                return &m_config;
-            }
+            inline Configuration *config(void) { return &m_config; }
 
             /// @brief Returns true if the datalogger is in error state
-            inline bool in_error(void) const
-            {
-                return m_state == State::ERROR;
-            }
+            inline bool in_error(void) const { return m_state == State::ERROR; }
 
             /// @brief Returns true if the active configuration is valid. Must be called after a call to "configure"
-            inline bool config_valid(void) const
-            {
-                return m_config_valid;
-            }
+            inline bool config_valid(void) const { return m_config_valid; }
 
             /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition
-            inline buffer_size_t log_points_after_trigger(void) const
-            {
-                return m_log_points_after_trigger;
-            }
+            inline buffer_size_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
 
             /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete
             buffer_size_t get_bytes_to_acquire_from_trigger_to_completion(void) const;

@@ -78,20 +78,14 @@ static uint8_t scrutiny_rx_buffer[128];
 static uint8_t scrutiny_tx_buffer[256];
 
 scrutiny_c_runtime_published_value_t rpvs[] = {
-    {0x1000, SCRUTINY_C_VARIABLE_TYPE_sint8},
-    {0x1001, SCRUTINY_C_VARIABLE_TYPE_sint16},
-    {0x1002, SCRUTINY_C_VARIABLE_TYPE_sint32},
+    { 0x1000, SCRUTINY_C_VARIABLE_TYPE_sint8 },   { 0x1001, SCRUTINY_C_VARIABLE_TYPE_sint16 }, { 0x1002, SCRUTINY_C_VARIABLE_TYPE_sint32 },
 
-    {0x2000, SCRUTINY_C_VARIABLE_TYPE_uint8},
-    {0x2001, SCRUTINY_C_VARIABLE_TYPE_uint16},
-    {0x2002, SCRUTINY_C_VARIABLE_TYPE_uint32},
+    { 0x2000, SCRUTINY_C_VARIABLE_TYPE_uint8 },   { 0x2001, SCRUTINY_C_VARIABLE_TYPE_uint16 }, { 0x2002, SCRUTINY_C_VARIABLE_TYPE_uint32 },
 
-    {0x3000, SCRUTINY_C_VARIABLE_TYPE_float32},
+    { 0x3000, SCRUTINY_C_VARIABLE_TYPE_float32 },
 
 #if SCRUTINY_SUPPORT_64BITS
-    {0x1003, SCRUTINY_C_VARIABLE_TYPE_sint64},
-    {0x2003, SCRUTINY_C_VARIABLE_TYPE_uint64},
-    {0x3001, SCRUTINY_C_VARIABLE_TYPE_float64},
+    { 0x1003, SCRUTINY_C_VARIABLE_TYPE_sint64 },  { 0x2003, SCRUTINY_C_VARIABLE_TYPE_uint64 }, { 0x3001, SCRUTINY_C_VARIABLE_TYPE_float64 },
 #endif
 
 };
@@ -375,11 +369,15 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
     if (vf_loop == NULL)
         ERR_RETURN("Failed to allocate vf_loop");
 
-    scrutiny_c_loop_handler_t *loops[] = {ff_loop, vf_loop};
+    scrutiny_c_loop_handler_t *loops[] = { ff_loop, vf_loop };
 
     scrutiny_c_config_set_buffers(config, scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     scrutiny_c_config_set_published_values(
-        config, rpvs, sizeof(rpvs) / sizeof(scrutiny_c_runtime_published_value_t), TestAppRPVReadCallback, TestAppRPVWriteCallback);
+        config,
+        rpvs,
+        sizeof(rpvs) / sizeof(scrutiny_c_runtime_published_value_t),
+        TestAppRPVReadCallback,
+        TestAppRPVWriteCallback);
     scrutiny_c_config_set_loops(config, loops, sizeof(loops) / sizeof(loops[0]));
     scrutiny_c_config_set_user_command_callback(config, my_user_command);
 

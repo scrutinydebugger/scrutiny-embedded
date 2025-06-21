@@ -56,10 +56,7 @@ namespace scrutiny
         /// @brief Pass data received from the server to the scrutiny-embedded lib input stream.
         /// @param data Pointer to the data buffer
         /// @param len Length of the data
-        inline void receive_data(uint8_t const *const data, uint16_t const len)
-        {
-            m_comm_handler.receive_data(data, len);
-        }
+        inline void receive_data(uint8_t const *const data, uint16_t const len) { m_comm_handler.receive_data(data, len); }
 
         /// @brief Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
         /// @param buffer Buffer to write the data into
@@ -74,10 +71,7 @@ namespace scrutiny
 
         /// @brief Tells how much data is available in the scrutiny-embedded lib output stream
         /// @return Number of bytes available
-        inline uint16_t data_to_send(void) const
-        {
-            return m_comm_handler.data_to_send();
-        }
+        inline uint16_t data_to_send(void) const { return m_comm_handler.data_to_send(); }
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief Returns the state of the datalogger. Thread safe

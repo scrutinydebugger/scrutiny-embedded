@@ -29,55 +29,37 @@ namespace scrutiny
                 template <class T1, class T2> class eq
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 == v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 == v2; }
                 };
 
                 template <class T1, class T2> class neq
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 != v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 != v2; }
                 };
 
                 template <class T1, class T2> class gt
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 > v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 > v2; }
                 };
 
                 template <class T1, class T2> class get
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 >= v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 >= v2; }
                 };
 
                 template <class T1, class T2> class lt
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 < v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 < v2; }
                 };
 
                 template <class T1, class T2> class let
                 {
                   public:
-                    static inline bool eval(T1 const v1, T2 const v2)
-                    {
-                        return v1 <= v2;
-                    }
+                    static inline bool eval(T1 const v1, T2 const v2) { return v1 <= v2; }
                 };
 
             } // namespace relational_operators

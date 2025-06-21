@@ -43,7 +43,7 @@ TEST_F(TestCommHandler, TestConsecutiveSend)
     response.data[2] = 0x33;
 
     add_crc(&response);
-    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     bool success;
@@ -115,7 +115,7 @@ TEST_F(TestCommHandler, TestConnectDisconnectBehaviour)
     comm.connect();
     ASSERT_NE(comm.get_session_id(), session_id);
 
-    uint8_t dummy_request[8] = {1, 1, 0, 0};
+    uint8_t dummy_request[8] = { 1, 1, 0, 0 };
     add_crc(dummy_request, sizeof(dummy_request) - 4);
 
     EXPECT_FALSE(comm.request_received());

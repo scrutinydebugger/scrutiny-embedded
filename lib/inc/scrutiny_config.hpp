@@ -73,17 +73,11 @@ namespace scrutiny
         /// This generic feature allows the integrator to pass down some custom request/data to the application by leveraging the already
         /// existing Scrutiny protocol.
         /// @param callback The callback
-        inline void set_user_command_callback(user_command_callback_t callback)
-        {
-            m_user_command_callback = callback;
-        };
+        inline void set_user_command_callback(user_command_callback_t callback) { m_user_command_callback = callback; };
 
         /// @brief Returns the actual user command callback. nullptr if unset
         /// @return The callback
-        inline user_command_callback_t get_user_command_callback(void)
-        {
-            return m_user_command_callback;
-        };
+        inline user_command_callback_t get_user_command_callback(void) { return m_user_command_callback; };
 
 #if SCRUTINY_ENABLE_DATALOGGING
 

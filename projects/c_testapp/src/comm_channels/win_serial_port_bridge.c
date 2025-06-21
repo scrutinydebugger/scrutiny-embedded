@@ -37,7 +37,7 @@ comm_channel_status_e win_serial_port_start(win_serial_port_t *serial_port)
 {
     char const *prefix = "\\\\.\\";
     size_t const prefix_len = strlen(prefix);
-    char portname[255] = {0};
+    char portname[255] = { 0 };
     strcpy_s(portname, sizeof(portname), prefix);
     c_testapp_strncpy(&portname[prefix_len], serial_port->m_portname, sizeof(portname) - prefix_len);
 

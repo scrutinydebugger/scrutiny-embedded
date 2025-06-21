@@ -541,7 +541,7 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 #else
 #error "Unsupported parser"
 #endif
-    uint8_t output_buffer[output_buffer_required_size] = {0};
+    uint8_t output_buffer[output_buffer_required_size] = { 0 };
     datalogger.get_reader()->reset();
     datalogger.get_reader()->read(output_buffer, sizeof(output_buffer));
     parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));

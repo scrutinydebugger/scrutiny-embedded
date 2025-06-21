@@ -32,7 +32,7 @@ namespace scrutiny
         inline AddressRange make_address_range(uintptr_t const start, uintptr_t const end)
         {
 #if SCRUTINY_HAS_CPP11
-            return {reinterpret_cast<void *>(start), reinterpret_cast<void *>(end)};
+            return { reinterpret_cast<void *>(start), reinterpret_cast<void *>(end) };
 #else
             AddressRange range;
             range.start = reinterpret_cast<void *>(start);
@@ -48,7 +48,7 @@ namespace scrutiny
         inline AddressRange make_address_range(void *const start, void *const end)
         {
 #if SCRUTINY_HAS_CPP11
-            return {start, end};
+            return { start, end };
 #else
             AddressRange range;
             range.start = start;
@@ -66,7 +66,7 @@ namespace scrutiny
             size = (size == 0) ? 1 : size;
             uintptr_t const end = reinterpret_cast<uintptr_t>(start) + size - 1;
 #if SCRUTINY_HAS_CPP11
-            return {start, reinterpret_cast<void *>(end)};
+            return { start, reinterpret_cast<void *>(end) };
 #else
             AddressRange range;
             range.start = start;

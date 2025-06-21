@@ -42,18 +42,9 @@ namespace scrutiny
           public:
             void init(Request const *const request);
             void next(MemoryBlock *const memblock);
-            inline bool finished(void) const
-            {
-                return m_finished;
-            };
-            inline bool is_valid(void) const
-            {
-                return !m_invalid;
-            };
-            inline uint16_t required_tx_buffer_size(void) const
-            {
-                return m_required_tx_buffer_size;
-            }
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            inline uint16_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
             void reset(void);
 
           protected:
@@ -71,10 +62,7 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             void write(MemoryBlock const *const memblock);
-            inline bool overflow(void) const
-            {
-                return m_overflow;
-            };
+            inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
           protected:
@@ -90,18 +78,9 @@ namespace scrutiny
           public:
             void init(Request const *const request, bool const masked_write);
             void next(MemoryBlock *const memblock);
-            inline bool finished(void) const
-            {
-                return m_finished;
-            };
-            inline bool is_valid(void) const
-            {
-                return !m_invalid;
-            };
-            inline uint32_t required_tx_buffer_size(void) const
-            {
-                return m_required_tx_buffer_size;
-            }
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            inline uint32_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
             void reset(void);
 
           protected:
@@ -121,10 +100,7 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             void write(MemoryBlock const *const memblock);
-            inline bool overflow(void) const
-            {
-                return m_overflow;
-            };
+            inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
           protected:
@@ -140,10 +116,7 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const
-            {
-                return m_overflow;
-            };
+            inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
           protected:
@@ -159,10 +132,7 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv, AnyType const v);
-            inline bool overflow(void) const
-            {
-                return m_overflow;
-            };
+            inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
           protected:
@@ -178,14 +148,8 @@ namespace scrutiny
           public:
             void init(Request const *const request);
             bool next(uint16_t *const id);
-            inline bool finished(void) const
-            {
-                return m_finished;
-            };
-            inline bool is_valid(void) const
-            {
-                return !m_invalid;
-            };
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
             void reset(void);
 
           protected:
@@ -203,10 +167,7 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const
-            {
-                return m_overflow;
-            };
+            inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
           protected:
@@ -222,14 +183,8 @@ namespace scrutiny
           public:
             void init(Request const *const request, MainHandler const *const main_handler);
             bool next(RuntimePublishedValue *const rpv, AnyType *const v);
-            inline bool finished(void) const
-            {
-                return m_finished;
-            };
-            inline bool is_valid(void) const
-            {
-                return !m_invalid;
-            };
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
             void reset(void);
 
           protected:

@@ -841,7 +841,8 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size + session_id_size;
 
             SCRUTINY_STATIC_ASSERT(
-                sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC), "Mismatch between codec definition and protocol constant.");
+                sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC),
+                "Mismatch between codec definition and protocol constant.");
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;

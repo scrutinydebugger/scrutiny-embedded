@@ -88,58 +88,31 @@ namespace scrutiny
             void disconnect(void);
 
             /// @brief Put the CommHandler in a state where the next request can be received.
-            inline void wait_next_request(void)
-            {
-                reset_rx();
-            }
+            inline void wait_next_request(void) { reset_rx(); }
 
             /// @brief Returns true if a request has been received. Will stay true until call to wait_next_request()
-            inline bool request_received(void) const
-            {
-                return m_request_received;
-            }
+            inline bool request_received(void) const { return m_request_received; }
 
             /// @brief Returns the request that has been received
-            inline Request const *get_request(void) const
-            {
-                return &m_active_request;
-            }
+            inline Request const *get_request(void) const { return &m_active_request; }
 
             /// @brief Gets the last error encountered in reception task
-            inline RxError::E get_rx_error(void) const
-            {
-                return m_rx_error;
-            }
+            inline RxError::E get_rx_error(void) const { return m_rx_error; }
 
             /// @brief Gets the last error encountered in transmission task
-            inline TxError::E get_tx_error(void) const
-            {
-                return m_tx_error;
-            }
+            inline TxError::E get_tx_error(void) const { return m_tx_error; }
 
             /// @brief Returns true if the CommHandler is presently transmitting. False otherwise
-            inline bool transmitting(void) const
-            {
-                return (m_state == State::Transmitting);
-            }
+            inline bool transmitting(void) const { return (m_state == State::Transmitting); }
 
             /// @brief Returns true if the CommHandler is presently receiving. False otherwise
-            inline bool receiving(void) const
-            {
-                return (m_state == State::Receiving);
-            }
+            inline bool receiving(void) const { return (m_state == State::Receiving); }
 
             /// @brief Returns true if the CommHandler is presently. Might be disabled if the configuration is invalid
-            inline bool is_enabled(void) const
-            {
-                return m_enabled;
-            }
+            inline bool is_enabled(void) const { return m_enabled; }
 
             /// @brief Enables the CommHandler
-            inline void enable(void)
-            {
-                m_enabled = true;
-            }
+            inline void enable(void) { m_enabled = true; }
 
             /// @brief Disables the CommHandler
             inline void disable(void)
@@ -149,28 +122,16 @@ namespace scrutiny
             }
 
             /// @brief Return true if a session is active with a server
-            inline bool is_connected(void) const
-            {
-                return m_session_active;
-            }
+            inline bool is_connected(void) const { return m_session_active; }
 
             /// @brief Returns the session ID given to the server upon connection
-            inline uint32_t get_session_id(void) const
-            {
-                return m_session_id;
-            }
+            inline uint32_t get_session_id(void) const { return m_session_id; }
 
             /// @brief Returns the size of the reception buffer
-            inline uint16_t rx_buffer_size(void) const
-            {
-                return m_rx_buffer_size;
-            }
+            inline uint16_t rx_buffer_size(void) const { return m_rx_buffer_size; }
 
             /// @brief Returns the size of the transmission buffer
-            inline uint16_t tx_buffer_size(void) const
-            {
-                return m_tx_buffer_size;
-            }
+            inline uint16_t tx_buffer_size(void) const { return m_tx_buffer_size; }
 
           protected:
             void process_active_request(void);

@@ -36,15 +36,9 @@ namespace scrutiny
             class BaseCondition
             {
               public:
-                virtual void reset(ConditionSharedData *const data)
-                {
-                    static_cast<void>(data);
-                };
+                virtual void reset(ConditionSharedData *const data) { static_cast<void>(data); };
                 virtual bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[]) = 0;
-                virtual unsigned int get_operand_count(void) const
-                {
-                    return 0;
-                };
+                virtual unsigned int get_operand_count(void) const { return 0; };
             };
 
             class EqualCondition : public BaseCondition
@@ -52,10 +46,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class NotEqualCondition : public BaseCondition
@@ -63,10 +54,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class GreaterThanCondition : public BaseCondition
@@ -74,10 +62,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class GreaterOrEqualThanCondition : public BaseCondition
@@ -85,10 +70,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class LessThanCondition : public BaseCondition
@@ -96,10 +78,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class LessOrEqualThanCondition : public BaseCondition
@@ -107,10 +86,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class ChangeMoreThanCondition : public BaseCondition
@@ -123,10 +99,7 @@ namespace scrutiny
                 };
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 2;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 2; }
             };
 
             class IsWithinCondition : public BaseCondition
@@ -134,10 +107,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 3;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 3; }
             };
 
             class AlwaysTrueCondition : public BaseCondition
@@ -145,10 +115,7 @@ namespace scrutiny
               public:
                 bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
                     SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE
-                {
-                    return 0;
-                }
+                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 0; }
             };
 
             // cppcheck-suppress[noConstructor]
@@ -165,10 +132,7 @@ namespace scrutiny
                 IsWithinCondition within;
                 AlwaysTrueCondition always_true;
 
-                inline ConditionSharedData *data()
-                {
-                    return &m_data;
-                };
+                inline ConditionSharedData *data() { return &m_data; };
 
               private:
                 ConditionSharedData m_data; // Data shared between each condition.

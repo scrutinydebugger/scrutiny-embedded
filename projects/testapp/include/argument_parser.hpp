@@ -45,26 +45,11 @@ class ArgumentParser
     void parse(int argc, char *argv[]);
     void next_memory_region(MemoryRegion *region);
     bool has_another_memory_region();
-    inline uint16_t udp_port()
-    {
-        return m_udp_port;
-    }
-    inline const SerialConfig &serial_config()
-    {
-        return m_serial_config;
-    }
-    inline TestAppCommand command()
-    {
-        return m_command;
-    }
-    inline bool is_valid()
-    {
-        return m_valid;
-    }
-    std::string error_message()
-    {
-        return m_last_error;
-    }
+    inline uint16_t udp_port() { return m_udp_port; }
+    inline const SerialConfig &serial_config() { return m_serial_config; }
+    inline TestAppCommand command() { return m_command; }
+    inline bool is_valid() { return m_valid; }
+    std::string error_message() { return m_last_error; }
 
   protected:
     bool m_valid;

@@ -379,7 +379,9 @@ namespace scrutiny
                 }
 
                 bool condition_result = m_trigger.active_condition->evaluate(
-                    m_trigger.conditions.data(), reinterpret_cast<VariableTypeCompare::E *>(optypes), reinterpret_cast<AnyTypeCompare *>(opvals));
+                    m_trigger.conditions.data(),
+                    reinterpret_cast<VariableTypeCompare::E *>(optypes),
+                    reinterpret_cast<AnyTypeCompare *>(opvals));
 
                 if (condition_result)
                 {

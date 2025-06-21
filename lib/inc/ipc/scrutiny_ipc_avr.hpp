@@ -31,10 +31,7 @@ namespace scrutiny
             m_written(false)
         {
         }
-        inline bool has_content(void) const
-        {
-            return m_written;
-        }
+        inline bool has_content(void) const { return m_written; }
 
         inline void commit(void)
         {

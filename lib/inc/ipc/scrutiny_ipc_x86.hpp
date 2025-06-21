@@ -31,20 +31,11 @@ namespace scrutiny
             m_written(false)
         {
         }
-        inline bool has_content(void) const
-        {
-            return m_written;
-        }
+        inline bool has_content(void) const { return m_written; }
 
-        inline void commit(void)
-        {
-            __asm__ __volatile__("movl $1, %0" : "=m"(m_written)::"memory");
-        }
+        inline void commit(void) { __asm__ __volatile__("movl $1, %0" : "=m"(m_written)::"memory"); }
 
-        inline void clear(void)
-        {
-            __asm__ __volatile__("movl $0, %0" : "=m"(m_written)::"memory");
-        }
+        inline void clear(void) { __asm__ __volatile__("movl $0, %0" : "=m"(m_written)::"memory"); }
 
         inline void send(T const &indata)
         {
