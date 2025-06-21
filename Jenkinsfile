@@ -39,7 +39,7 @@ pipeline {
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc_cxx11 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -67,7 +67,7 @@ pipeline {
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc_cxx98 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
