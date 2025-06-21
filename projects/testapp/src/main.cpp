@@ -403,7 +403,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
-            uint32_t time_since_start_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
+            uint32_t time_since_start_us =
+                static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
             uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
 
             if (len_received > 0)

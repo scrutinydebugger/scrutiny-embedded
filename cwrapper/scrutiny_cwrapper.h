@@ -191,7 +191,11 @@ extern "C"
     /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
     /// @param name The name of the loop
     /// @return A pointer to the `FixedFrequencyLoopHandler` object or NULL in case of failure.
-    scrutiny_c_loop_handler_ff_t *scrutiny_c_loop_handler_fixed_freq_construct(void *mem, size_t const size, uint32_t const timestep_100ns, char const *name);
+    scrutiny_c_loop_handler_ff_t *scrutiny_c_loop_handler_fixed_freq_construct(
+        void *mem,
+        size_t const size,
+        uint32_t const timestep_100ns,
+        char const *name);
 
     /// @brief Wrapper for `FixedFrequencyLoopHandler::process()`
     /// Process function be called at each iteration of the loop.

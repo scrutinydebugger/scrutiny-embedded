@@ -45,7 +45,10 @@ namespace scrutiny
         /// @param timestamp Timestamp to check against
         /// @param timeout_100ns Maximum time delta since the timestamp
         /// @return true if expired
-        inline bool has_expired(timestamp_t const timestamp, timediff_t const timeout_100ns) const { return (elapsed_since(timestamp) >= timeout_100ns); }
+        inline bool has_expired(timestamp_t const timestamp, timediff_t const timeout_100ns) const
+        {
+            return (elapsed_since(timestamp) >= timeout_100ns);
+        }
 
         /// @brief Put back the timebase at the given timestamp (default 0)
         /// @param val timestamp to use a actual value

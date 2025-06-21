@@ -389,7 +389,9 @@ namespace scrutiny
         class CodecV1_0
         {
           public:
-            ResponseCode::E encode_response_protocol_version(ResponseData::GetInfo::GetProtocolVersion const *const response_data, Response *const response);
+            ResponseCode::E encode_response_protocol_version(
+                ResponseData::GetInfo::GetProtocolVersion const *const response_data,
+                Response *const response);
             ResponseCode::E encode_response_software_id(Response *const response);
             ResponseCode::E encode_response_special_memory_region_count(
                 ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
@@ -402,18 +404,26 @@ namespace scrutiny
                 Response *const response);
             ResponseCode::E encode_response_get_rpv_count(ResponseData::GetInfo::GetRPVCount const *const response_data, Response *const response);
             ResponseCode::E encode_response_get_loop_count(ResponseData::GetInfo::GetLoopCount const *const response_data, Response *const response);
-            ResponseCode::E encode_response_get_loop_definition(ResponseData::GetInfo::GetLoopDefinition const *const response_data, Response *const response);
+            ResponseCode::E encode_response_get_loop_definition(
+                ResponseData::GetInfo::GetLoopDefinition const *const response_data,
+                Response *const response);
 
             ResponseCode::E encode_response_comm_discover(ResponseData::CommControl::Discover const *const response_data, Response *const response);
             ResponseCode::E encode_response_comm_heartbeat(ResponseData::CommControl::Heartbeat const *const response_data, Response *const response);
-            ResponseCode::E encode_response_comm_get_params(ResponseData::CommControl::GetParams const *const response_data, Response *const response);
+            ResponseCode::E encode_response_comm_get_params(
+                ResponseData::CommControl::GetParams const *const response_data,
+                Response *const response);
             ResponseCode::E encode_response_comm_connect(ResponseData::CommControl::Connect const *const response_data, Response *const response);
 
             ResponseCode::E decode_request_get_special_memory_region_location(
                 Request const *const request,
                 RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data);
-            ResponseCode::E decode_request_get_rpv_definition(Request const *const request, RequestData::GetInfo::GetRPVDefinition *const request_data);
-            ResponseCode::E decode_request_get_loop_definition(Request const *const request, RequestData::GetInfo::GetLoopDefinition *const request_data);
+            ResponseCode::E decode_request_get_rpv_definition(
+                Request const *const request,
+                RequestData::GetInfo::GetRPVDefinition *const request_data);
+            ResponseCode::E decode_request_get_loop_definition(
+                Request const *const request,
+                RequestData::GetInfo::GetLoopDefinition *const request_data);
 
             ResponseCode::E decode_request_comm_discover(Request const *const request, RequestData::CommControl::Discover *const request_data);
             ResponseCode::E decode_request_comm_heartbeat(Request const *const request, RequestData::CommControl::Heartbeat *const request_data);
@@ -434,8 +444,12 @@ namespace scrutiny
             WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode::E encode_response_datalogging_get_setup(ResponseData::DataLogControl::GetSetup const *const response_data, Response *const response);
-            ResponseCode::E encode_response_datalogging_status(ResponseData::DataLogControl::GetStatus const *const response_data, Response *const response);
+            ResponseCode::E encode_response_datalogging_get_setup(
+                ResponseData::DataLogControl::GetSetup const *const response_data,
+                Response *const response);
+            ResponseCode::E encode_response_datalogging_status(
+                ResponseData::DataLogControl::GetStatus const *const response_data,
+                Response *const response);
             ResponseCode::E encode_response_datalogging_get_acquisition_metadata(
                 ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
                 Response *const response);

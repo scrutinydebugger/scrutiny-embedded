@@ -26,8 +26,8 @@ namespace scrutiny
         /// @brief Converts a value stored as AnyType into AnyTypeCompare which is the same,
         /// but the value in the biggest integer format will be valid
         /// @param vtype The variable type. Will be modified by this function (may convert uint8 to uint32)
-        /// @param val The data to be modified. Will mostly writes 0 into uninitialized section so that when passing from uint8 to uint32, both values are
-        /// equals.
+        /// @param val The data to be modified. Will mostly writes 0 into uninitialized section so that when passing from uint8 to uint32, both values
+        /// are equals.
         void convert_to_compare_type(VariableType::E *const vtype, AnyType *const val);
 
         /// @brief Reads an operand used for log trigger
@@ -36,7 +36,11 @@ namespace scrutiny
         /// @param val Output value
         /// @param variable_type Output variable type
         /// @return true on success. false on failure
-        bool fetch_operand(MainHandler const *const main_handler, Operand const *const operand, AnyType *const val, VariableType::E *const variable_type);
+        bool fetch_operand(
+            MainHandler const *const main_handler,
+            Operand const *const operand,
+            AnyType *const val,
+            VariableType::E *const variable_type);
     } // namespace datalogging
 } // namespace scrutiny
 

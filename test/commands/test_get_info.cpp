@@ -122,7 +122,8 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1) };
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 
@@ -164,7 +165,8 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1) };
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 
@@ -231,7 +233,8 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end), scrutiny::tools::make_address_range(start + 1, end + 1) };
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 

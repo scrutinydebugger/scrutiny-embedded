@@ -59,8 +59,8 @@ void NixSerialPortBridge::start()
     tty.c_lflag &= ~ISIG;                                                        // Disable interpretation of INTR, QUIT and SUSP
     tty.c_iflag &= ~(IXON | IXOFF | IXANY);                                      // Turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable special char
-    tty.c_oflag &= ~OPOST;                                                       // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR;                                                       // Prevent conversion of newline to carriage return/line feed
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
 
     tty.c_cc[VTIME] = 0; // Non-blocking
     tty.c_cc[VMIN] = 0;

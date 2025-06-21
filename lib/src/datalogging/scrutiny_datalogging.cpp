@@ -96,7 +96,11 @@ namespace scrutiny
         /// @param val The output value
         /// @param variable_type The output value data type
         /// @return true on success, false on failure
-        bool fetch_operand(MainHandler const *const main_handler, Operand const *const operand, AnyType *const val, VariableType::E *const variable_type)
+        bool fetch_operand(
+            MainHandler const *const main_handler,
+            Operand const *const operand,
+            AnyType *const val,
+            VariableType::E *const variable_type)
         {
             bool success = true;
             if (operand->type == OperandType::LITERAL)

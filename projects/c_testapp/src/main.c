@@ -337,28 +337,31 @@ enum channel_type_e
     CHANNEL_TYPE_Serial
 };
 
-#define ERR_RETURN(msg)                                                                                                                                        \
-    {                                                                                                                                                          \
-        fprintf(stderr, "%s\n", msg);                                                                                                                          \
-        return;                                                                                                                                                \
+#define ERR_RETURN(msg)                                                                                                                              \
+    {                                                                                                                                                \
+        fprintf(stderr, "%s\n", msg);                                                                                                                \
+        return;                                                                                                                                      \
     }
-#define ERR_BREAK(msg)                                                                                                                                         \
-    {                                                                                                                                                          \
-        fprintf(stderr, "%s\n", msg);                                                                                                                          \
-        break;                                                                                                                                                 \
+#define ERR_BREAK(msg)                                                                                                                               \
+    {                                                                                                                                                \
+        fprintf(stderr, "%s\n", msg);                                                                                                                \
+        break;                                                                                                                                       \
     }
 
 void process_scrutiny_lib(comm_channel_interface_t *channel)
 {
 
     uint8_t buffer[1024];
-    scrutiny_c_main_handler_t *scrutiny_handler = scrutiny_c_main_handler_construct(malloc(SCRUTINY_C_MAIN_HANDLER_SIZE), SCRUTINY_C_MAIN_HANDLER_SIZE);
+    scrutiny_c_main_handler_t *scrutiny_handler =
+        scrutiny_c_main_handler_construct(malloc(SCRUTINY_C_MAIN_HANDLER_SIZE), SCRUTINY_C_MAIN_HANDLER_SIZE);
     scrutiny_c_config_t *config = scrutiny_c_config_construct(malloc(SCRUTINY_C_CONFIG_SIZE), SCRUTINY_C_CONFIG_SIZE);
 
     scrutiny_c_loop_handler_ff_t *ff_loop =
         scrutiny_c_loop_handler_fixed_freq_construct(malloc(SCRUTINY_C_LOOP_HANDLER_FF_SIZE), SCRUTINY_C_LOOP_HANDLER_FF_SIZE, 100000, "100Hz Loop");
-    scrutiny_c_loop_handler_vf_t *vf_loop =
-        scrutiny_c_loop_handler_variable_freq_construct(malloc(SCRUTINY_C_LOOP_HANDLER_VF_SIZE), SCRUTINY_C_LOOP_HANDLER_VF_SIZE, "Variable freq loop");
+    scrutiny_c_loop_handler_vf_t *vf_loop = scrutiny_c_loop_handler_variable_freq_construct(
+        malloc(SCRUTINY_C_LOOP_HANDLER_VF_SIZE),
+        SCRUTINY_C_LOOP_HANDLER_VF_SIZE,
+        "Variable freq loop");
 
     if (scrutiny_handler == NULL)
         ERR_RETURN("Failed to allocate scrutiny_handler");

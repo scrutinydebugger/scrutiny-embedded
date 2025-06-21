@@ -39,8 +39,13 @@ namespace scrutiny
         m_process_again_timestamp_taken = false;
         m_config = *config;
 
-        m_comm_handler
-            .init(m_config.m_rx_buffer, m_config.m_rx_buffer_size, m_config.m_tx_buffer, m_config.m_tx_buffer_size, &m_timebase, m_config.session_counter_seed);
+        m_comm_handler.init(
+            m_config.m_rx_buffer,
+            m_config.m_rx_buffer_size,
+            m_config.m_tx_buffer,
+            m_config.m_tx_buffer_size,
+            &m_timebase,
+            m_config.session_counter_seed);
 
         check_config();
         if (!m_enabled)
@@ -636,7 +641,8 @@ namespace scrutiny
         {
             stack.get_supported_features.response_data.memory_write = m_config.memory_write_enable;
 #if SCRUTINY_ENABLE_DATALOGGING
-            stack.get_supported_features.response_data.datalogging = m_config.is_datalogging_configured() && m_config.has_at_least_one_loop_with_datalogging();
+            stack.get_supported_features.response_data.datalogging =
+                m_config.is_datalogging_configured() && m_config.has_at_least_one_loop_with_datalogging();
 #else
             stack.get_supported_features.response_data.datalogging = false;
 #endif
@@ -752,7 +758,8 @@ namespace scrutiny
             }
 
             stack.get_prv_def.rpvs = m_config.get_rpvs_array();
-            for (int32_t i = stack.get_prv_def.request_data.start_index; i < stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count;
+            for (int32_t i = stack.get_prv_def.request_data.start_index;
+                 i < stack.get_prv_def.request_data.start_index + stack.get_prv_def.request_data.count;
                  i++)
             {
                 stack.get_prv_def.response_encoder->write(&stack.get_prv_def.rpvs[i]);
@@ -1543,7 +1550,8 @@ namespace scrutiny
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
             SCRUTINY_STATIC_ASSERT(
-                sizeof(stack.get_status.response_data.write_counter_since_trigger) >= sizeof(m_datalogging.threadsafe_data.write_counter_since_trigger),
+                sizeof(stack.get_status.response_data.write_counter_since_trigger) >=
+                    sizeof(m_datalogging.threadsafe_data.write_counter_since_trigger),
                 "Data cannot fit in protocol");
             SCRUTINY_STATIC_ASSERT(
                 sizeof(stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion) >=
@@ -1553,7 +1561,8 @@ namespace scrutiny
             stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
             stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion =
                 static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
-            stack.get_status.response_data.write_counter_since_trigger = static_cast<uint32_t>(m_datalogging.threadsafe_data.write_counter_since_trigger);
+            stack.get_status.response_data.write_counter_since_trigger =
+                static_cast<uint32_t>(m_datalogging.threadsafe_data.write_counter_since_trigger);
             code = m_codec.encode_response_datalogging_status(&stack.get_status.response_data, response);
             break;
         }
@@ -1562,7 +1571,9 @@ namespace scrutiny
             SCRUTINY_STATIC_ASSERT(
                 sizeof(stack.get_acq_metadata.response_data.number_of_points) >= sizeof(datalogging::buffer_size_t),
                 "Data won't fit in protocol");
-            SCRUTINY_STATIC_ASSERT(sizeof(stack.get_acq_metadata.response_data.data_size) >= sizeof(datalogging::buffer_size_t), "Data won't fit in protocol");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(stack.get_acq_metadata.response_data.data_size) >= sizeof(datalogging::buffer_size_t),
+                "Data won't fit in protocol");
             SCRUTINY_STATIC_ASSERT(
                 sizeof(stack.get_acq_metadata.response_data.points_after_trigger) >= sizeof(datalogging::buffer_size_t),
                 "Data won't fit in protocol");

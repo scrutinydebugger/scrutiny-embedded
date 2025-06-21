@@ -43,8 +43,8 @@
 #define SCRUTINY_BUILD_X64 0
 #define SCRUTINY_BUILD_X86 0
 
-#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) || defined(__WIN64__) ||   \
-    defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) ||               \
+    defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
 #undef SCRUTINY_BUILD_WINDOWS
 #define SCRUTINY_BUILD_WINDOWS 1
 #elif defined(__AVR_ARCH__)

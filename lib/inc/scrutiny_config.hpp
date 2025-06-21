@@ -199,8 +199,8 @@ namespace scrutiny
         /// @brief Maximum bitrate in bit/sec. This value is given to the server and enforced by the server only.
         uint32_t max_bitrate;
 
-        /// @brief A seed to initialize the session counter to avoid having collision in case multiple scrutiny enabled devices uses the same communication
-        /// channel
+        /// @brief A seed to initialize the session counter to avoid having collision in case multiple scrutiny enabled devices uses the same
+        /// communication channel
         uint32_t session_counter_seed;
 
         /// @brief The display name to be broadcasted during discovery phase. This value will be shown to the user.

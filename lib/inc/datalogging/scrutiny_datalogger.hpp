@@ -51,7 +51,8 @@ namespace scrutiny
             /// @param main_handler A pointer to the main handler to be used to access memory and RPVs
             /// @param buffer The logging buffer
             /// @param buffer_size Size of the logging buffer
-            /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread safety)
+            /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread
+            /// safety)
             void init(
                 MainHandler const *const main_handler,
                 uint8_t *const buffer,
@@ -136,12 +137,13 @@ namespace scrutiny
             uint16_t read_next_entry_size(buffer_size_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
-            MainHandler const *m_main_handler;     // A pointer to the main handler
-            buffer_size_t m_buffer_size;           // The datalogging buffer size
-            trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
+            MainHandler const *m_main_handler; // A pointer to the main handler
+            buffer_size_t m_buffer_size;       // The datalogging buffer size
+            trigger_callback_t
+                m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
-            Timebase const *m_timebase;              // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::E m_state;                        // Internal state
+            Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
+            State::E m_state;           // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 

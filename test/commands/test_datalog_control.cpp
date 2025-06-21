@@ -49,7 +49,12 @@ class TestDatalogControl : public ScrutinyTest
     RuntimePublishedValue rpvs[1];
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
+    uint16_t encode_datalogger_config(
+        uint8_t loop_id,
+        uint16_t config_id,
+        const datalogging::Configuration *dlconfig,
+        uint8_t *buffer,
+        uint16_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
     void test_configure(
         uint8_t loop_id,
@@ -616,7 +621,10 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
 }
 
-void TestDatalogControl::check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter)
+void TestDatalogControl::check_get_status(
+    datalogging::DataLogger::State::E expected_state,
+    uint32_t expected_remaining_bytes,
+    uint32_t expected_counter)
 {
     uint8_t tx_buffer[32] = { 0 };
     uint16_t n_to_read = 0;
@@ -912,7 +920,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
     for (uint8_t iteration = 0; iteration < 3; iteration++)
     {
         uint32_t read_cursor = 0;
-        // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or rearm)
+        // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or
+        // rearm)
         datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
         reader->reset();
         uint32_t const total_data_length = reader->read(reference_data, sizeof(reference_data));

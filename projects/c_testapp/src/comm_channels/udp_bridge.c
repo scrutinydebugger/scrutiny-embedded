@@ -11,17 +11,17 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define ERR_RETURN(msg)                                                                                                                                        \
-    {                                                                                                                                                          \
-        fprintf(stderr, "%s\n", msg);                                                                                                                          \
-        return COMM_CHANNEL_STATUS_error;                                                                                                                      \
+#define ERR_RETURN(msg)                                                                                                                              \
+    {                                                                                                                                                \
+        fprintf(stderr, "%s\n", msg);                                                                                                                \
+        return COMM_CHANNEL_STATUS_error;                                                                                                            \
     }
-#define RETURN_IF_NOT_SUCCESS(status)                                                                                                                          \
-    {                                                                                                                                                          \
-        if (status != COMM_CHANNEL_STATUS_success)                                                                                                             \
-        {                                                                                                                                                      \
-            return status;                                                                                                                                     \
-        }                                                                                                                                                      \
+#define RETURN_IF_NOT_SUCCESS(status)                                                                                                                \
+    {                                                                                                                                                \
+        if (status != COMM_CHANNEL_STATUS_success)                                                                                                   \
+        {                                                                                                                                            \
+            return status;                                                                                                                           \
+        }                                                                                                                                            \
     }
 
 #if SCRUTINY_BUILD_WINDOWS

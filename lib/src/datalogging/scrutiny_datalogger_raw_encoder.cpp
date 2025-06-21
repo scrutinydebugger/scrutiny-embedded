@@ -135,7 +135,10 @@ namespace scrutiny
             {
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
                 {
-                    m_main_handler->read_memory(&m_buffer[cursor], m_config->items_to_log[i].data.memory.address, m_config->items_to_log[i].data.memory.size);
+                    m_main_handler->read_memory(
+                        &m_buffer[cursor],
+                        m_config->items_to_log[i].data.memory.address,
+                        m_config->items_to_log[i].data.memory.size);
                     cursor += m_config->items_to_log[i].data.memory.size; // We verified that this is not 0 in init
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::RPV)

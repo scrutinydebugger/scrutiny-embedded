@@ -124,13 +124,19 @@ namespace scrutiny
                 return false;
             }
 
-            bool EqualCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool EqualCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::eq>(operand_types, operand_vals);
             }
 
-            bool NotEqualCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool NotEqualCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
@@ -154,7 +160,10 @@ namespace scrutiny
                 return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
             }
 
-            bool LessThanCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool LessThanCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
@@ -241,7 +250,10 @@ namespace scrutiny
                 return outval;
             }
 
-            bool IsWithinCondition::evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool IsWithinCondition::evaluate(
+                ConditionSharedData *const data,
+                VariableTypeCompare::E const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
                 float operands_vals_float[3];

@@ -33,8 +33,8 @@ namespace scrutiny
             /// @param tx_buffer Buffer for transmission
             /// @param tx_buffer_size Transmission buffer size
             /// @param timebase Pointer to a timebase object to keep track of time
-            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are connected to
-            /// the same channel
+            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are
+            /// connected to the same channel
             void init(
                 uint8_t *const rx_buffer,
                 uint16_t const rx_buffer_size,
@@ -74,7 +74,8 @@ namespace scrutiny
             void add_crc(Response *const response) const;
 
             /// @brief Trigger a heartbeat, resetting the watchdog timeout
-            /// @param challenge A challenge value to be used to compute a response. This value must change at each call otherwise the heartbeat will be ignored
+            /// @param challenge A challenge value to be used to compute a response. This value must change at each call otherwise the heartbeat will
+            /// be ignored
             /// @return True if the heartbeat was effective. False if it was ignored
             bool heartbeat(uint16_t const challenge);
 

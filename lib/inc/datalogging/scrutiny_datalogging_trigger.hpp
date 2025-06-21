@@ -37,7 +37,10 @@ namespace scrutiny
             {
               public:
                 virtual void reset(ConditionSharedData *const data) { static_cast<void>(data); };
-                virtual bool evaluate(ConditionSharedData *const data, VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[]) = 0;
+                virtual bool evaluate(
+                    ConditionSharedData *const data,
+                    VariableTypeCompare::E const operand_types[],
+                    AnyTypeCompare const operand_vals[]) = 0;
                 virtual unsigned int get_operand_count(void) const { return 0; };
             };
 

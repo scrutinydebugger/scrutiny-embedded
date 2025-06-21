@@ -22,17 +22,17 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define ERR_RETURN(msg)                                                                                                                                        \
-    {                                                                                                                                                          \
-        fprintf(stderr, "%s\n", msg);                                                                                                                          \
-        return COMM_CHANNEL_STATUS_error;                                                                                                                      \
+#define ERR_RETURN(msg)                                                                                                                              \
+    {                                                                                                                                                \
+        fprintf(stderr, "%s\n", msg);                                                                                                                \
+        return COMM_CHANNEL_STATUS_error;                                                                                                            \
     }
-#define RETURN_IF_NOT_SUCCESS(status)                                                                                                                          \
-    {                                                                                                                                                          \
-        if (status != COMM_CHANNEL_STATUS_success)                                                                                                             \
-        {                                                                                                                                                      \
-            return status;                                                                                                                                     \
-        }                                                                                                                                                      \
+#define RETURN_IF_NOT_SUCCESS(status)                                                                                                                \
+    {                                                                                                                                                \
+        if (status != COMM_CHANNEL_STATUS_success)                                                                                                   \
+        {                                                                                                                                            \
+            return status;                                                                                                                           \
+        }                                                                                                                                            \
     }
 
 comm_channel_status_e nix_serial_port_init(nix_serial_port_t *serial_port, char *const port_name, uint32_t const baudrate)
@@ -71,8 +71,8 @@ comm_channel_status_e nix_serial_port_start(nix_serial_port_t *serial_port)
     tty.c_lflag &= ~ISIG;                                                        // Disable interpretation of INTR, QUIT and SUSP
     tty.c_iflag &= ~(IXON | IXOFF | IXANY);                                      // Turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable special char
-    tty.c_oflag &= ~OPOST;                                                       // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR;                                                       // Prevent conversion of newline to carriage return/line feed
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
 
     tty.c_cc[VTIME] = 0; // Non-blocking
     tty.c_cc[VMIN] = 0;
