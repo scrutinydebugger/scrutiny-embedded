@@ -30,14 +30,19 @@ namespace scrutiny
         {
         public:
             /// @brief The internal state of the datalogger
-            enum class State : uint8_t
+
+            class State
             {
-                IDLE,
-                CONFIGURED,
-                ARMED,
-                TRIGGERED,
-                ACQUISITION_COMPLETED,
-                ERROR
+                public:
+                SCRUTINY_ENUM(uint_least8_t)
+                {
+                    IDLE,
+                    CONFIGURED,
+                    ARMED,
+                    TRIGGERED,
+                    ACQUISITION_COMPLETED,
+                    ERROR
+                };
             };
 
             /// @brief Initializes the datalogger
@@ -49,7 +54,7 @@ namespace scrutiny
                 MainHandler const *const main_handler,
                 uint8_t *const buffer,
                 buffer_size_t const buffer_size,
-                trigger_callback_t trigger_callback = nullptr);
+                trigger_callback_t trigger_callback = SCRUTINY_NULL);
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase The timebase used for time logging & trigger management
@@ -76,7 +81,7 @@ namespace scrutiny
             inline bool armed(void) const { return m_state == State::ARMED; }
 
             /// @brief Returns the Datalogger state
-            inline DataLogger::State get_state(void) const { return m_state; }
+            inline DataLogger::State::E get_state(void) const { return m_state; }
 
             /// @brief Arm the trigger so that the datalogger actively check for trigger condition to start acquisition
             void arm_trigger(void);
@@ -134,7 +139,7 @@ namespace scrutiny
             trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
             Timebase const *m_timebase;              // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State m_state;                           // Internal state
+            State::E m_state;                           // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 

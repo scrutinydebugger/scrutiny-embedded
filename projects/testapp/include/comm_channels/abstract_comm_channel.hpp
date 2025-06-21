@@ -10,7 +10,7 @@
 #ifndef ___ABSTRACT_COMM_CHANNEL_H___
 #define ___ABSTRACT_COMM_CHANNEL_H___
 
-#include <cstdint>
+#include <stdint.h>
 #include <cstdlib>
 
 class AbstractCommChannel

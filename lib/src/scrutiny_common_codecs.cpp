@@ -20,8 +20,8 @@ namespace scrutiny
     {
         uint8_t decode_address_big_endian(uint8_t const *const buf, uintptr_t *const addr)
         {
-            constexpr unsigned int addr_size = sizeof(void *);
-            static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
+            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
 
             uintptr_t computed_addr = 0;
             unsigned int i = 0;
@@ -62,8 +62,8 @@ namespace scrutiny
 
         uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *const buf)
         {
-            constexpr unsigned int addr_size = sizeof(void *);
-            static_assert(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
+            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
 
             unsigned int i = addr_size - 1;
 
@@ -94,7 +94,7 @@ namespace scrutiny
             return static_cast<uint8_t>(addr_size);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType const vartype, uint8_t *const buffer)
+        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType::E const vartype, uint8_t *const buffer)
         {
             uint8_t const typesize = tools::get_type_size(vartype);
             return encode_anytype_big_endian(val, typesize, buffer);

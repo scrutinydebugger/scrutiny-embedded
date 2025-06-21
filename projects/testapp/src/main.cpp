@@ -25,7 +25,7 @@ using SerialPortBridge = NixSerialPortBridge;
 
 #include <iostream>
 #include <iomanip>
-#include <cstdint>
+#include <stdint.h>
 #include <chrono>
 #include <thread>
 #include <algorithm>
@@ -376,7 +376,7 @@ void my_user_command(
 void process_scrutiny_lib(AbstractCommChannel *channel)
 {
     uint8_t buffer[1024];
-    static_assert(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
+    SCRUTINY_STATIC_ASSERT(sizeof(buffer) <= 0xFFFF, "Scrutiny expect a buffer smaller than 16 bits");
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
     scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq loop");
@@ -465,7 +465,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
 
 int main(int argc, char *argv[])
 {
-    static_assert(sizeof(char) == 1, "testapp doesn't support char bigger than 8 bits (yet)");
+    SCRUTINY_STATIC_ASSERT(sizeof(char) == 1, "testapp doesn't support char bigger than 8 bits (yet)");
 
     int errorcode = 0;
     static volatile int staticIntInMainFunc = 22222;

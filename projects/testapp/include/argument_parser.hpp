@@ -9,7 +9,7 @@
 #ifndef ___ARGUMENT_PARSER_H___
 #define ___ARGUMENT_PARSER_H___
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 
 enum class TestAppCommand
@@ -22,7 +22,7 @@ enum class TestAppCommand
 
 struct MemoryRegion
 {
-    std::uintptr_t start_address;
+    uintptr_t start_address;
     uint32_t length;
 };
 

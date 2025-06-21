@@ -26,11 +26,11 @@ protected:
     uint8_t _tx_buffer[128];
 
     TestCommControl() : ScrutinyTest(),
-                        tb{},
-                        scrutiny_handler{},
-                        config{},
-                        _rx_buffer{0},
-                        _tx_buffer{0}
+                        tb(),
+                        scrutiny_handler(),
+                        config(),
+                        _rx_buffer(),
+                        _tx_buffer()
     {
     }
 
@@ -98,9 +98,9 @@ TEST_F(TestCommControl, TestDiscoverWrongMagic)
 
 TEST_F(TestCommControl, TestDiscoverWrongMagicWhileConnected)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::CommControl;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::CommControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::CommControl::Subfunction::Discover);
-    const scrutiny::protocol::ResponseCode code = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::E code = scrutiny::protocol::ResponseCode::InvalidRequest;
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC), 4u);
 
     scrutiny_handler.comm()->connect();
@@ -171,9 +171,9 @@ TEST_F(TestCommControl, TestGetParams)
 {
     uint8_t tx_buffer[32];
     uint8_t request_data[8] = {2, 3, 0, 0};
-    constexpr uint8_t address_size = sizeof(std::uintptr_t);
+    SCRUTINY_CONSTEXPR uint8_t address_size = sizeof(uintptr_t);
     add_crc(request_data, sizeof(request_data) - 4);
-    constexpr uint16_t datalen = 2 + 2 + 4 + 4 + 4 + 1;
+    SCRUTINY_CONSTEXPR uint16_t datalen = 2 + 2 + 4 + 4 + 4 + 1;
 
     uint8_t expected_response[9 + datalen] = {0x82, 3, 0, 0, datalen};
     uint8_t i = 5;

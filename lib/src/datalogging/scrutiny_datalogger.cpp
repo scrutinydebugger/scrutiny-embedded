@@ -27,7 +27,7 @@ namespace scrutiny
             buffer_size_t const buffer_size,
             trigger_callback_t trigger_callback)
         {
-            m_timebase = nullptr;
+            m_timebase = SCRUTINY_NULL;
             m_main_handler = main_handler;
             m_buffer_size = buffer_size;
             m_trigger_callback = trigger_callback;
@@ -43,7 +43,7 @@ namespace scrutiny
             m_state = State::IDLE;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
-            m_trigger.active_condition = nullptr;
+            m_trigger.active_condition = SCRUTINY_NULL;
 
             m_trigger_cursor_location = 0;
             m_trigger_timestamp = 0;
@@ -251,7 +251,7 @@ namespace scrutiny
                     {
                         if (check_trigger())
                         {
-                            if (m_trigger_callback != nullptr)
+                            if (m_trigger_callback != SCRUTINY_NULL)
                             {
                                 m_trigger_callback();
                             }
@@ -341,7 +341,7 @@ namespace scrutiny
 
         bool DataLogger::check_trigger(void)
         {
-            static_assert(MAX_OPERANDS >= 2, "Expect at least 2 operands for relational comparison");
+            SCRUTINY_STATIC_ASSERT(MAX_OPERANDS >= 2, "Expect at least 2 operands for relational comparison");
             if (m_state != State::ARMED)
             {
                 return false;
@@ -349,7 +349,7 @@ namespace scrutiny
 
             bool outval = false;
             AnyType opvals[MAX_OPERANDS];
-            VariableType optypes[MAX_OPERANDS];
+            VariableType::E optypes[MAX_OPERANDS];
             const unsigned int nb_operand = m_trigger.active_condition->get_operand_count();
 
             if (nb_operand > MAX_OPERANDS)
@@ -377,7 +377,7 @@ namespace scrutiny
 
                 bool condition_result = m_trigger.active_condition->evaluate(
                     m_trigger.conditions.data(),
-                    reinterpret_cast<VariableTypeCompare *>(optypes),
+                    reinterpret_cast<VariableTypeCompare::E *>(optypes),
                     reinterpret_cast<AnyTypeCompare *>(opvals));
 
                 if (condition_result)

@@ -13,7 +13,6 @@
 
 #include <map>
 #include <vector>
-#include <tuple>
 
 class TestMemoryControlRPV : public ScrutinyTest
 {
@@ -26,11 +25,11 @@ protected:
     uint8_t _tx_buffer[128];
 
     TestMemoryControlRPV() : ScrutinyTest(),
-                             tb{},
-                             scrutiny_handler{},
-                             config{},
-                             _rx_buffer{0},
-                             _tx_buffer{0}
+                             tb(),
+                             scrutiny_handler(),
+                             config(),
+                             _rx_buffer(),
+                             _tx_buffer()
     {
     }
 
@@ -302,20 +301,21 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
         {0x9009, scrutiny::VariableType::float64},
 #endif
     };
-
-    std::map<uint16_t, std::vector<uint8_t>> expected_encoding;
-    expected_encoding.insert({0x9000, {0x99}});
-    expected_encoding.insert({0x9001, {0xA5, 0xA5}});
-    expected_encoding.insert({0x9002, {0x99, 0x88, 0x77, 0x66}});
-    expected_encoding.insert({0x9004, {0xC0}});                   // -64
-    expected_encoding.insert({0x9005, {0x8A, 0xD0}});             // -30000
-    expected_encoding.insert({0x9006, {0xC4, 0x65, 0x36, 0x00}}); // -1 000 000 000
-    expected_encoding.insert({0x9008, {0x3f, 0xb9, 0x99, 0x9a}}); // 1.45
+    typedef std::map<uint16_t, std::vector<uint8_t> > map_t;
+    typedef std::pair<uint16_t, std::vector<uint8_t> > map_value_t;
+    map_t expected_encoding;
+    expected_encoding.insert(map_value_t(0x9000, make_payload_1(0x99)));
+    expected_encoding.insert(map_value_t(0x9001, make_payload_2(0xA5, 0xA5)));
+    expected_encoding.insert(map_value_t(0x9002, make_payload_4(0x99, 0x88, 0x77, 0x66)));
+    expected_encoding.insert(map_value_t(0x9004, make_payload_1(0xC0)));                   // -64
+    expected_encoding.insert(map_value_t(0x9005, make_payload_2(0x8A, 0xD0)));             // -30000
+    expected_encoding.insert(map_value_t(0x9006, make_payload_4(0xC4, 0x65, 0x36, 0x00))); // -1 000 000 000
+    expected_encoding.insert(map_value_t(0x9008, make_payload_4(0x3f, 0xb9, 0x99, 0x9a))); // 1.45
 
 #if SCRUTINY_SUPPORT_64BITS
-    expected_encoding.insert({0x9003, {0xFF, 0xFF, 0x11, 0x11, 0x22, 0x22, 0x33, 0x33}});
-    expected_encoding.insert({0x9007, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // -90 000 000 000
-    expected_encoding.insert({0x9009, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // -5.123
+    expected_encoding.insert(map_value_t(0x9003, make_payload_8(0xFF, 0xFF, 0x11, 0x11, 0x22, 0x22, 0x33, 0x33)));
+    expected_encoding.insert(map_value_t(0x9007, make_payload_8(0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00))); // -90 000 000 000
+    expected_encoding.insert(map_value_t(0x9009, make_payload_8(0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb))); // -5.123
 #endif
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
@@ -330,7 +330,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     request_data[2] = ((nb_vals * 2) >> 8) & 0xFF; // length msb
     request_data[3] = ((nb_vals * 2) & 0xFF);      // length lsb
     unsigned int index = 4;
-    for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
+    for (map_t::iterator p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         uint16_t const id = p->first;
         request_data[index++] = (id >> 8) & 0xFF;
@@ -349,7 +349,7 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     EXPECT_EQ(nread, n_to_read);
 
     index = 5;
-    for (auto p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
+    for (map_t::iterator p = expected_encoding.begin(); p != expected_encoding.end(); ++p)
     {
         uint16_t const id = p->first;
         ASSERT_LE(index, static_cast<unsigned int>(nread - 2)); // safety check
@@ -372,9 +372,9 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
 
@@ -409,9 +409,9 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
 
@@ -446,9 +446,9 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
+    const scrutiny::protocol::ResponseCode::E overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
 
@@ -518,7 +518,7 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
 #endif
     };
 
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
@@ -567,7 +567,7 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 #endif
     };
 
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
@@ -598,6 +598,22 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 /*
     Try to write multiple RPV, on of each type. Validate that the data reach the destination intact
 */
+struct TestEntry
+{
+    static TestEntry make(uint16_t _id,  scrutiny::VariableType::E _type, std::vector<uint8_t> _data)
+    {
+        TestEntry o;
+        o.id = _id;
+        o.type = _type;
+        o.data = _data;
+        return o;
+    }
+    uint16_t id;
+    scrutiny::VariableType::E type;
+    std::vector<uint8_t> data;
+};
+
+
 TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 {
     dest_buffer_for_rpv_write.clear();
@@ -616,33 +632,25 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
         {0x1009, scrutiny::VariableType::float64}
 #endif
     };
-
-    struct TestEntry
-    {
-        uint16_t id;
-        scrutiny::VariableType type;
-        std::vector<uint8_t> data;
-    };
-
     std::vector<TestEntry> vals_and_payload;
 
-    vals_and_payload.push_back({0x1000, scrutiny::VariableType::uint8, {0x55}});                    // 4-6
-    vals_and_payload.push_back({0x1001, scrutiny::VariableType::uint16, {0xAB, 0xCD}});             // 7-10
-    vals_and_payload.push_back({0x1002, scrutiny::VariableType::uint32, {0x12, 0x34, 0x56, 0x78}}); // 11-16
+    vals_and_payload.push_back(TestEntry::make(0x1000, scrutiny::VariableType::uint8, make_payload_1(0x55)));                    // 4-6
+    vals_and_payload.push_back(TestEntry::make(0x1001, scrutiny::VariableType::uint16, make_payload_2(0xAB, 0xCD)));             // 7-10
+    vals_and_payload.push_back(TestEntry::make(0x1002, scrutiny::VariableType::uint32, make_payload_4(0x12, 0x34, 0x56, 0x78))); // 11-16
 #if SCRUTINY_SUPPORT_64BITS
-    vals_and_payload.push_back({0x1003, scrutiny::VariableType::uint64, {0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10}}); // 17-24
+    vals_and_payload.push_back(TestEntry::make(0x1003, scrutiny::VariableType::uint64, make_payload_8(0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10))); // 17-24
 #endif
-    vals_and_payload.push_back({0x1004, scrutiny::VariableType::sint8, {0xC0}});                    // 25-27
-    vals_and_payload.push_back({0x1005, scrutiny::VariableType::sint16, {0x8A, 0xD0}});             // 28 - 31
-    vals_and_payload.push_back({0x1006, scrutiny::VariableType::sint32, {0xC4, 0x65, 0x36, 0x00}}); // 32 - 37
+    vals_and_payload.push_back(TestEntry::make(0x1004, scrutiny::VariableType::sint8, make_payload_1(0xC0)));                    // 25-27
+    vals_and_payload.push_back(TestEntry::make(0x1005, scrutiny::VariableType::sint16, make_payload_2(0x8A, 0xD0)));             // 28 - 31
+    vals_and_payload.push_back(TestEntry::make(0x1006, scrutiny::VariableType::sint32, make_payload_4(0xC4, 0x65, 0x36, 0x00))); // 32 - 37
 #if SCRUTINY_SUPPORT_64BITS
-    vals_and_payload.push_back({0x1007, scrutiny::VariableType::sint64, {0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00}}); // 38 - 47
+    vals_and_payload.push_back(TestEntry::make(0x1007, scrutiny::VariableType::sint64, make_payload_8(0xff, 0xff, 0xff, 0xeb, 0x0b, 0x94, 0xfc, 0x00))); // 38 - 47
 #endif
-    vals_and_payload.push_back({0x1008, scrutiny::VariableType::sint32, {0x3f, 0xb9, 0x99, 0x9a}}); // 48 - 53
+    vals_and_payload.push_back(TestEntry::make(0x1008, scrutiny::VariableType::sint32, make_payload_4(0x3f, 0xb9, 0x99, 0x9a))); // 48 - 53
 #if SCRUTINY_SUPPORT_64BITS
-    vals_and_payload.push_back({0x1009, scrutiny::VariableType::sint64, {0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb}}); // 54 - 63
+    vals_and_payload.push_back(TestEntry::make(0x1009, scrutiny::VariableType::sint64, make_payload_8(0xc0, 0x14, 0x7d, 0xf3, 0xb6, 0x45, 0xa1, 0xcb))); // 54 - 63
 #endif
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
@@ -724,9 +732,9 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 
 TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
-    const scrutiny::protocol::ResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
 
@@ -745,7 +753,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 #endif
     };
 
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
@@ -782,19 +790,19 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 
 TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 {
-    constexpr scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
-    constexpr uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
-    constexpr scrutiny::protocol::ResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
+    SCRUTINY_CONSTEXPR scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    SCRUTINY_CONSTEXPR uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
+    SCRUTINY_CONSTEXPR scrutiny::protocol::ResponseCode::E overflow = scrutiny::protocol::ResponseCode::Overflow;
 
-    constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
-    constexpr uint16_t nb_write = buffersize_min_mod3 / 3 + 1; // 16bits ID + 16bits data
-    constexpr uint16_t rx_data_size = nb_write * 3;            // 16bits ID + 8bits data
-    constexpr uint16_t tx_data_size = (nb_write - 1) * 3;      // 16bits ID + 8bits length.  -1 to cause overflow
-    constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
+    SCRUTINY_CONSTEXPR uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
+    SCRUTINY_CONSTEXPR uint16_t nb_write = buffersize_min_mod3 / 3 + 1; // 16bits ID + 16bits data
+    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 3;            // 16bits ID + 8bits data
+    SCRUTINY_CONSTEXPR uint16_t tx_data_size = (nb_write - 1) * 3;      // 16bits ID + 8bits length.  -1 to cause overflow
+    SCRUTINY_CONSTEXPR uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
 
-    static_assert(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
-    static_assert(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
-    static_assert(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
+    SCRUTINY_STATIC_ASSERT(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    SCRUTINY_STATIC_ASSERT(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    SCRUTINY_STATIC_ASSERT(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
 
     uint8_t internal_rx_buffer[rx_data_size];
     uint8_t internal_tx_buffer[tx_data_size];
@@ -802,7 +810,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8}};
 
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
@@ -840,16 +848,16 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 */
 TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
 {
-    constexpr uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
-    constexpr uint16_t nb_write = buffersize_min_mod3 / 3; // 16bits ID + 16bits data
-    constexpr uint16_t rx_data_size = nb_write * 3;        // 16bits ID + 8bits data
-    constexpr uint16_t tx_data_size = nb_write * 3;        // 16bits ID + 8bits length.
-    constexpr uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
-    constexpr uint16_t response_size = tx_data_size + scrutiny::protocol::RESPONSE_OVERHEAD;
+    SCRUTINY_CONSTEXPR uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
+    SCRUTINY_CONSTEXPR uint16_t nb_write = buffersize_min_mod3 / 3; // 16bits ID + 16bits data
+    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 3;        // 16bits ID + 8bits data
+    SCRUTINY_CONSTEXPR uint16_t tx_data_size = nb_write * 3;        // 16bits ID + 8bits length.
+    SCRUTINY_CONSTEXPR uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
+    SCRUTINY_CONSTEXPR uint16_t response_size = tx_data_size + scrutiny::protocol::RESPONSE_OVERHEAD;
 
-    static_assert(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
-    static_assert(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
-    static_assert(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
+    SCRUTINY_STATIC_ASSERT(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    SCRUTINY_STATIC_ASSERT(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    SCRUTINY_STATIC_ASSERT(buffersize_min_mod3 % 3 == 0, "This should be a multiple of 3");
 
     uint8_t internal_rx_buffer[rx_data_size];
     uint8_t internal_tx_buffer[tx_data_size];
@@ -857,7 +865,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     scrutiny::RuntimePublishedValue rpvs[] = {
         {0x1000, scrutiny::VariableType::uint8}};
 
-    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), nullptr, rpv_write_callback);
+    config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();

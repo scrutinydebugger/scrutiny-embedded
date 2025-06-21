@@ -35,11 +35,11 @@ pipeline {
 
                     }
                 }
-                stage('GCC Full'){
+                stage('GCC Full C++11'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc_cxx11 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -63,11 +63,39 @@ pipeline {
                         }
                     }
                 }
-                stage('Clang Full'){
+                stage('GCC Full C++98'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc_cxx98 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                CMAKE_CXX_STANDARD=98   \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Clang Full C++11'){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-clang'
-                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-clang -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-clang_cxx11 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
                             reuseNode true
                         }
                     }
@@ -78,6 +106,34 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Clang Full C++98'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-clang'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-clang_cxx98 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                CMAKE_CXX_STANDARD=98 \
                                 scripts/build.sh
                                 '''
                             }

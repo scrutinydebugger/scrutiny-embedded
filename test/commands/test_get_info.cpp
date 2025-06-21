@@ -29,12 +29,12 @@ protected:
     scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
-    TestGetInfo() : ScrutinyTest(), tb{},
-                    scrutiny_handler{},
-                    config{},
-                    _rx_buffer{0},
-                    _tx_buffer{0},
-                    loops{nullptr, nullptr, nullptr},
+    TestGetInfo() : ScrutinyTest(), tb(),
+                    scrutiny_handler(),
+                    config(),
+                    _rx_buffer(),
+                    _tx_buffer(),
+                    loops(),
                     fixed_freq_loop(0x12345678, "Loop1"),
                     variable_freq_loop("Loop2"),
                     fixed_freq_loop_no_datalogging(100, "Loop3") {}
@@ -160,7 +160,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     uint8_t tx_buffer[32];
     uint8_t *buf[4];
 
-    constexpr uint32_t addr_size = sizeof(void *);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
     scrutiny::AddressRange readonly_ranges[] = {
@@ -181,7 +181,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     uint8_t region_index[] = {0, 1, 0};
     uint8_t region_type[] = {0, 0, 1};
     // Make expected response
-    constexpr uint16_t response_datalen = 2 + addr_size * 2;
+    SCRUTINY_CONSTEXPR uint16_t response_datalen = 2 + addr_size * 2;
     uint8_t expected_response[9 + response_datalen] = {
         0x81,
         5,
@@ -224,9 +224,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
 */
 TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::GetInfo;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::GetInfo;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetSpecialMemoryLocation);
-    const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
     uint8_t *buf[4];
@@ -364,9 +364,9 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
 
 TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
 {
-    const scrutiny::protocol::CommandId cmd = scrutiny::protocol::CommandId::GetInfo;
+    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::GetInfo;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
-    const scrutiny::protocol::ResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
 
@@ -410,7 +410,7 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
     {
 
         config.memory_write_enable = (i == 0) ? true : false;
-        config.set_user_command_callback((i == 0) ? nullptr : dummy_callback);
+        config.set_user_command_callback((i == 0) ? SCRUTINY_NULL : dummy_callback);
 #if SCRUTINY_ENABLE_DATALOGGING
         uint8_t dl_buffer[128];
         config.set_datalogging_buffers(dl_buffer, sizeof(dl_buffer));

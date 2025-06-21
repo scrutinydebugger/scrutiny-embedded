@@ -33,15 +33,15 @@ protected:
     uint8_t buffer_canary_2[512];
 
     TestRawEncoder() : ScrutinyTest(),
-                       scrutiny_handler{},
-                       config{},
-                       dlconfig{},
-                       encoder{},
-                       _rx_buffer{},
-                       _tx_buffer{},
-                       buffer_canary_1{},
-                       dlbuffer{},
-                       buffer_canary_2{}
+                       scrutiny_handler(),
+                       config(),
+                       dlconfig(),
+                       encoder(),
+                       _rx_buffer(),
+                       _tx_buffer(),
+                       buffer_canary_1(),
+                       dlbuffer(),
+                       buffer_canary_2()
     {
     }
 

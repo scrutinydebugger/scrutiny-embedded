@@ -96,12 +96,14 @@
         "xstring": "c",
         "xtr1common": "c",
         "xtree": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "codecvt": "cpp",
+        "source_location": "cpp"
     },
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },
     "[cpp]": {
-        "editor.formatOnSave": true,
+       // "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-vscode.cpptools",
     },
     "cSpell.words": [

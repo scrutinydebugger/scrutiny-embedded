@@ -18,22 +18,28 @@
 #error "Not enabled"
 #endif
 
-static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
 
 namespace scrutiny
 {
     namespace datalogging
     {
-        constexpr unsigned int MAX_OPERANDS = 4;
+        static SCRUTINY_CONSTEXPR unsigned int MAX_OPERANDS = 4;
+        #if SCRUTINY_HAS_CPP11
+        static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
         static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
+        #endif
 
         typedef ctypes::scrutiny_c_datalogging_buffer_size_t buffer_size_t;
 
-        enum class EncodingType : uint8_t
+        class EncodingType
         {
-            RAW
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                RAW
+            };
         };
-
+            
         union AnyTypeCompare
         {
             uint_biggest_t _uint;
@@ -41,19 +47,27 @@ namespace scrutiny
             float _float;
         };
 
-        enum class VariableTypeCompare : uint8_t
+        class VariableTypeCompare
         {
-            _float = static_cast<int>(scrutiny::VariableType::float32),
-            _uint = static_cast<int>(scrutiny::BiggestUint),
-            _sint = static_cast<int>(scrutiny::BiggestSint)
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                _float = static_cast<int>(scrutiny::VariableType::float32),
+                _uint = static_cast<int>(scrutiny::BiggestUint),
+                _sint = static_cast<int>(scrutiny::BiggestSint)
+            };
         };
 
-        enum class OperandType : uint8_t
+        class OperandType
         {
-            LITERAL = 0,
-            VAR = 1,
-            VARBIT = 2,
-            RPV = 3
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                LITERAL = 0,
+                VAR = 1,
+                VARBIT = 2,
+                RPV = 3
+            };
         };
 
         union OperandData
@@ -65,12 +79,12 @@ namespace scrutiny
             struct
             {
                 void *addr;
-                VariableType datatype;
+                VariableType::E datatype;
             } var;
             struct
             {
                 void *addr;
-                VariableType datatype;
+                VariableType::E datatype;
                 uint8_t bitoffset;
                 uint8_t bitsize;
             } varbit;
@@ -82,21 +96,25 @@ namespace scrutiny
 
         struct Operand
         {
-            OperandType type;
+            OperandType::E type;
             OperandData data;
         };
 
-        enum class SupportedTriggerConditions : uint8_t
+        class SupportedTriggerConditions
         {
-            AlwaysTrue = 0,         // Always true
-            Equal = 1,              // Operand1 == Operand2
-            NotEqual = 2,           // Operand1 != Operand2
-            LessThan = 3,           // Operand1 < Operand2
-            LessOrEqualThan = 4,    // Operand1 <= Operand2
-            GreaterThan = 5,        // Operand1 > Operand2
-            GreaterOrEqualThan = 6, // Operand1 >= Operand2
-            ChangeMoreThan = 7,     // |Operand1[n] - Operand1[n-1]| > |Operand2| && sign(Operand1[n] - Operand1[n-1]) == sign(Operand2)
-            IsWithin = 8            // |Operand1 - Operand2| < |Operand3|
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                AlwaysTrue = 0,         // Always true
+                Equal = 1,              // Operand1 == Operand2
+                NotEqual = 2,           // Operand1 != Operand2
+                LessThan = 3,           // Operand1 < Operand2
+                LessOrEqualThan = 4,    // Operand1 <= Operand2
+                GreaterThan = 5,        // Operand1 > Operand2
+                GreaterOrEqualThan = 6, // Operand1 >= Operand2
+                ChangeMoreThan = 7,     // |Operand1[n] - Operand1[n-1]| > |Operand2| && sign(Operand1[n] - Operand1[n-1]) == sign(Operand2)
+                IsWithin = 8            // |Operand1 - Operand2| < |Operand3|
+            };
         };
 
         struct TriggerConfig
@@ -115,21 +133,25 @@ namespace scrutiny
                 hold_time_100ns = other->hold_time_100ns;
             }
 
-            SupportedTriggerConditions condition; // Selected condition
+            SupportedTriggerConditions::E condition; // Selected condition
             uint8_t operand_count;                // Number of given operands
             uint32_t hold_time_100ns;             // Amount of time that the condition must be true for trigger to trig
             Operand operands[MAX_OPERANDS];       // The operand definitions
         };
 
-        enum class LoggableType : uint8_t
+        class LoggableType
         {
-            MEMORY = 0,
-            RPV = 1,
-            TIME = 2
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+                MEMORY = 0,
+                RPV = 1,
+                TIME = 2
+            };
         };
         struct LoggableItem
         {
-            LoggableType type;
+            LoggableType::E type;
             union
             {
                 struct

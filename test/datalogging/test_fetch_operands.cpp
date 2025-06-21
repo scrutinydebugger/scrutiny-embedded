@@ -45,29 +45,31 @@ protected:
     uint8_t readonly_buffer[128];
     uint8_t readonly_buffer2[128];
 
-    scrutiny::AddressRange readonly_ranges[2] = {
-        scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
-        scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2))};
-
-    scrutiny::AddressRange forbidden_ranges[2] = {
-        scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer)),
-        scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2))};
-
-    scrutiny::RuntimePublishedValue rpvs[2] = {
-        {0x1234, scrutiny::VariableType::uint32},
-        {0x5678, scrutiny::VariableType::float32}};
+    scrutiny::AddressRange readonly_ranges[2];
+    scrutiny::AddressRange forbidden_ranges[2];
+    scrutiny::RuntimePublishedValue rpvs[2];
 
     TestFetchOperands() : ScrutinyTest(),
-                          tb{},
-                          scrutiny_handler{},
-                          config{},
-                          _rx_buffer{0},
-                          _tx_buffer{0},
-                          forbidden_buffer{0},
-                          forbidden_buffer2{0},
-                          readonly_buffer{0},
-                          readonly_buffer2{0}
+                          tb(),
+                          scrutiny_handler(),
+                          config(),
+                          _rx_buffer(),
+                          _tx_buffer(),
+                          forbidden_buffer(),
+                          forbidden_buffer2(),
+                          readonly_buffer(),
+                          readonly_buffer2()
     {
+        readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
+        readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
+
+        forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
+        forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer2));
+        
+        rpvs[0].id = 0x1234;
+        rpvs[0].type = scrutiny::VariableType::uint32;
+        rpvs[1].id = 0x5678;
+        rpvs[1].type = scrutiny::VariableType::float32;
     }
 
     virtual void SetUp()
@@ -87,10 +89,10 @@ using namespace scrutiny::datalogging;
 
 TEST_F(TestFetchOperands, TestFetchLiteral)
 {
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::LITERAL;
     operand.data.literal.val = 0.1234f;
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
@@ -103,10 +105,10 @@ TEST_F(TestFetchOperands, TestFetchVar)
 {
     float my_var = 3.1415926f;
 
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::VAR;
     operand.data.var.addr = &my_var;
     operand.data.var.datatype = scrutiny::VariableType::float32;
@@ -120,10 +122,10 @@ TEST_F(TestFetchOperands, TestFetchVar)
 
 TEST_F(TestFetchOperands, TestFetchRPV)
 {
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::RPV;
 
     operand.data.rpv.id = 0x1234;
@@ -152,10 +154,10 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
 
     my_struct.val = -1000;
 
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::VARBIT;
 
     operand.data.varbit.addr = &my_struct;
@@ -171,11 +173,11 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
 
 TEST_F(TestFetchOperands, TestBadOperandType)
 {
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
-    operand.type = static_cast<OperandType>(0xff);
+    Operand operand;
+    operand.type = static_cast<OperandType::E>(0xff);
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
     EXPECT_FALSE(success);
@@ -183,10 +185,10 @@ TEST_F(TestFetchOperands, TestBadOperandType)
 
 TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
 {
-    scrutiny::AnyType val{};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::VAR;
     operand.data.var.addr = forbidden_buffer;
     operand.data.var.datatype = scrutiny::VariableType::uint8;
@@ -197,10 +199,10 @@ TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
 
 TEST_F(TestFetchOperands, TestFetchInexistandRPV)
 {
-    scrutiny::AnyType val{0};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
 
-    Operand operand{};
+    Operand operand;
     operand.type = OperandType::RPV;
     operand.data.rpv.id = 0xAAAA;
 
@@ -217,14 +219,19 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
         int32_t b;
         int32_t c;
         int32_t d;
-    } my_struct{0, 0, 0, 0};
+    } my_struct;
 #pragma pack(pop)
 
-    scrutiny::AnyType val{0};
-    scrutiny::VariableType vartype{scrutiny::VariableType::unknown};
-    bool success{false};
+    my_struct.a=0;
+    my_struct.b=0;
+    my_struct.c=0;
+    my_struct.d=0;
 
-    Operand operand{};
+    scrutiny::AnyType val;
+    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    bool success= false;
+
+    Operand operand;
     operand.type = OperandType::VARBIT;
     operand.data.varbit.addr = &my_struct;
     operand.data.varbit.datatype = scrutiny::VariableType::sint8;

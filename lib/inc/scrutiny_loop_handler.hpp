@@ -24,10 +24,14 @@ namespace scrutiny
 {
     class MainHandler;
 
-    enum class LoopType : uint8_t
+    class LoopType
     {
-        FIXED_FREQ,
-        VARIABLE_FREQ
+        public:
+        SCRUTINY_ENUM(uint_least8_t)
+        {
+            FIXED_FREQ,
+            VARIABLE_FREQ
+        };
     };
 
     class LoopHandler
@@ -35,40 +39,48 @@ namespace scrutiny
         friend class scrutiny::MainHandler;
 
     public:
-        enum class Main2LoopMessageID : uint8_t
+        class Main2LoopMessageID
         {
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
 #if SCRUTINY_ENABLE_DATALOGGING
-            RELEASE_DATALOGGER_OWNERSHIP,
-            TAKE_DATALOGGER_OWNERSHIP,
-            DATALOGGER_ARM_TRIGGER,
-            DATALOGGER_DISARM_TRIGGER
+                RELEASE_DATALOGGER_OWNERSHIP,
+                TAKE_DATALOGGER_OWNERSHIP,
+                DATALOGGER_ARM_TRIGGER,
+                DATALOGGER_DISARM_TRIGGER
 #endif
+            };
         };
 
-        enum class Loop2MainMessageID : uint8_t
+        class Loop2MainMessageID
         {
-#if SCRUTINY_ENABLE_DATALOGGING
-            DATALOGGER_OWNERSHIP_TAKEN,
-            DATALOGGER_OWNERSHIP_RELEASED,
-            DATALOGGER_DATA_ACQUIRED,
-            DATALOGGER_STATUS_UPDATE
-#endif
+            public:
+            SCRUTINY_ENUM(uint_least8_t)
+            {
+    #if SCRUTINY_ENABLE_DATALOGGING
+                DATALOGGER_OWNERSHIP_TAKEN,
+                DATALOGGER_OWNERSHIP_RELEASED,
+                DATALOGGER_DATA_ACQUIRED,
+                DATALOGGER_STATUS_UPDATE
+    #endif
+            };
         };
 
         struct Main2LoopMessage
         {
-            Main2LoopMessageID message_id;
+            Main2LoopMessageID::E message_id;
         };
 
         struct Loop2MainMessage
         {
-            Loop2MainMessageID message_id;
+            Loop2MainMessageID::E message_id;
             union
             {
 #if SCRUTINY_ENABLE_DATALOGGING
                 struct
                 {
-                    datalogging::DataLogger::State state;
+                    datalogging::DataLogger::State::E state;
                     datalogging::buffer_size_t bytes_to_acquire_from_trigger_to_completion;
                     datalogging::buffer_size_t write_counter_since_trigger;
                 } datalogger_status_update;
@@ -76,12 +88,20 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(char const *name = "") : m_name(name)
+        LoopHandler(char const *name = "") : 
+            m_name(name)
+#if SCRUTINY_ENABLE_DATALOGGING
+            ,
+            m_datalogger(SCRUTINY_NULL),
+            m_owns_datalogger(false),
+            m_datalogger_data_acquired(false),
+            m_support_datalogging(true)
+#endif
         {
         }
 
         /// @brief Returns the loop type: Fixed frequency or variable frequency
-        virtual LoopType loop_type(void) const = 0;
+        virtual LoopType::E loop_type(void) const = 0;
 
         virtual uint32_t get_timestep_100ns(void) const = 0;
 
@@ -134,13 +154,13 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
-        datalogging::DataLogger *m_datalogger = nullptr;
+        datalogging::DataLogger *m_datalogger;
         /// @brief Tells wether this loop is the owner of the datalogger
-        bool m_owns_datalogger = false;
+        bool m_owns_datalogger;
         /// @brief Indicates if data has been acquired and ready to be downloaded or saved
-        bool m_datalogger_data_acquired = false;
+        bool m_datalogger_data_acquired;
         /// @brief Indicates if this loop can do datalogging
-        bool m_support_datalogging = true;
+        bool m_support_datalogging;
 #endif
     };
 
@@ -165,10 +185,10 @@ namespace scrutiny
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType loop_type(void) const override { return LoopType::FIXED_FREQ; }
+        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE { return LoopType::FIXED_FREQ; }
 
         /// @brief Returns the time delta assigned to the loop (in multiple of 100ns)
-        virtual uint32_t get_timestep_100ns(void) const override { return m_timestep_100ns; }
+        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE { return m_timestep_100ns; }
 
     protected:
         uint32_t const m_timestep_100ns;
@@ -186,14 +206,14 @@ namespace scrutiny
         }
 
         /// @brief Stubbed implementation that always return 0
-        virtual uint32_t get_timestep_100ns(void) const override { return 0; }
+        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE { return 0; }
 
         /// @brief Process function be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType loop_type(void) const override { return LoopType::VARIABLE_FREQ; }
+        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE { return LoopType::VARIABLE_FREQ; }
     };
 }
 

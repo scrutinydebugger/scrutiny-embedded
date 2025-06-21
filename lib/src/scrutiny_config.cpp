@@ -21,30 +21,30 @@ namespace scrutiny
 
     void Config::clear()
     {
-        m_tx_buffer = nullptr;
-        m_rx_buffer = nullptr;
+        m_tx_buffer = SCRUTINY_NULL;
+        m_rx_buffer = SCRUTINY_NULL;
         m_rx_buffer_size = 0;
         m_tx_buffer_size = 0;
-        m_forbidden_address_ranges = nullptr;
+        m_forbidden_address_ranges = SCRUTINY_NULL;
         m_forbidden_range_count = 0;
-        m_readonly_address_ranges = nullptr;
+        m_readonly_address_ranges = SCRUTINY_NULL;
         m_readonly_range_count = 0;
-        m_rpvs = nullptr;
+        m_rpvs = SCRUTINY_NULL;
         m_rpv_count = 0;
-        m_rpv_read_callback = nullptr;
-        m_rpv_write_callback = nullptr;
+        m_rpv_read_callback = SCRUTINY_NULL;
+        m_rpv_write_callback = SCRUTINY_NULL;
         display_name = "";
         max_bitrate = 0;
-        m_user_command_callback = nullptr;
+        m_user_command_callback = SCRUTINY_NULL;
         session_counter_seed = 0;
         memory_write_enable = true;
-        m_loops = nullptr;
+        m_loops = SCRUTINY_NULL;
         m_loop_count = 0;
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        m_datalogger_buffer = nullptr;
+        m_datalogger_buffer = SCRUTINY_NULL;
         m_datalogger_buffer_size = 0;
-        m_datalogger_trigger_callback = nullptr;
+        m_datalogger_trigger_callback = SCRUTINY_NULL;
 #endif
     }
 

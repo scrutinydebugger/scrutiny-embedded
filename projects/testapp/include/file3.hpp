@@ -6,7 +6,7 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <cstdint>
+#include <stdint.h>
 
 union File3Union
 {

@@ -4,17 +4,28 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+set(INSTALL_GMOCK OFF CACHE STRING "")
+set(INSTALL_GTEST OFF CACHE STRING "")
+
+set(GTEST_RELEASE release-1.12.1)       # Last one to support C++11
+if (CMAKE_CXX_STANDARD EQUAL 98)
+    set(GTEST_RELEASE release-1.8.1)    # Last one to support C++98
+    set(PATCH_CMD git apply ${CMAKE_CURRENT_SOURCE_DIR}/patches/scrutiny_gtest-1.8.1.patch)
+    set(BUILD_GMOCK  OFF CACHE STRING "")   # GMock 1.8.1 is broken on gcc 11+
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.12.1
+  GIT_TAG ${GTEST_RELEASE}
+  PATCH_COMMAND ${PATCH_CMD}
+  UPDATE_DISCONNECTED  ON
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-set(INSTALL_GMOCK OFF)
-set(INSTALL_GTEST OFF)
+
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
@@ -38,7 +49,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_datalog_control.cpp
     )
-    
+
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp

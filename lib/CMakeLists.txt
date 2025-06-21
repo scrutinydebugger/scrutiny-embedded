@@ -27,8 +27,6 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     )
 endif()
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
-
 if (${SCRUTINY_ENABLE_DATALOGGING})
     message(STATUS "Scrutiny datalogging is ENABLED")
 else()
@@ -81,5 +79,3 @@ install(
     TARGETS ${PROJECT_NAME} 
     ARCHIVE DESTINATION ${INSTALL_FOLDER} 
 )
-
-

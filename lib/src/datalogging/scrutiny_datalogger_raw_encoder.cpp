@@ -16,6 +16,14 @@ namespace scrutiny
 {
     namespace datalogging
     {
+        RawFormatReader::RawFormatReader(RawFormatEncoder const *const encoder) : 
+            m_encoder(encoder),
+            m_read_cursor(0),
+            m_finished(false),
+            m_read_started(false)
+        {
+        }
+
         /// @brief Reads a chunk of data from the datalogger buffer and copy it to the output buffer
         /// @param buffer Output buffer
         /// @param max_size Maximum size to copy
@@ -85,6 +93,25 @@ namespace scrutiny
             m_read_started = false;
             m_finished = false;
             m_read_cursor = m_encoder->get_read_cursor();
+        }
+
+        RawFormatEncoder::RawFormatEncoder() : 
+            m_buffer(SCRUTINY_NULL),
+            m_buffer_size(0),
+            m_config(SCRUTINY_NULL),
+            m_reader(this),
+            m_main_handler(SCRUTINY_NULL),
+            m_timebase(SCRUTINY_NULL),
+            m_max_entries(0),
+            m_next_entry_write_index(0),
+            m_first_valid_entry_index(0),
+            m_entry_write_counter(0),
+            m_entry_size(0),
+            m_entries_count(0),
+            m_full(false),
+            m_error(false)
+        {
+            
         }
 
         /// @brief Takes a snapshot of the data to log and write it into the datalogger buffer
@@ -173,7 +200,7 @@ namespace scrutiny
             m_full = false;
             m_max_entries = 0;
 
-            if (m_buffer == nullptr || m_buffer_size == 0)
+            if (m_buffer == SCRUTINY_NULL || m_buffer_size == 0)
             {
                 m_error = true;
             }

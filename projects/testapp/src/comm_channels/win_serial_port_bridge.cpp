@@ -15,7 +15,7 @@
 
 #include "win_serial_port_bridge.hpp"
 #include <cstdlib>
-#include <cstdint>
+#include <stdint.h>
 
 #include <windows.h>
 #include <winbase.h>
