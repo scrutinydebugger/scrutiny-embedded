@@ -41,7 +41,8 @@ namespace scrutiny
             // clang-format on
         };
 
-        union AnyTypeCompare {
+        union AnyTypeCompare
+        {
             uint_biggest_t _uint;
             int_biggest_t _sint;
             float _float;
@@ -74,7 +75,8 @@ namespace scrutiny
             // clang-format on
         };
 
-        union OperandData {
+        union OperandData
+        {
             struct
             {
                 float val;
@@ -159,7 +161,8 @@ namespace scrutiny
         struct LoggableItem
         {
             LoggableType::E type;
-            union {
+            union
+            {
                 struct
                 {
                     void *address;

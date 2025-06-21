@@ -243,7 +243,8 @@ namespace scrutiny
                     uint8_t loop_id;
                     uint8_t loop_type;
                     bool support_datalogging;
-                    union {
+                    union
+                    {
                         struct
                         {
                             uint32_t timestep_100ns;
@@ -464,14 +465,16 @@ namespace scrutiny
 #endif
 
           protected:
-            union {
+            union
+            {
                 ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
                 WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
                 ReadRPVRequestParser m_memory_control_read_rpv_parser;
                 WriteRPVRequestParser m_memory_control_write_rpv_parser;
             } parsers;
 
-            union {
+            union
+            {
                 ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
                 WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
                 GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;

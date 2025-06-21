@@ -570,7 +570,8 @@ namespace scrutiny
     // ============= [GetInfo] ============
     protocol::ResponseCode::E MainHandler::process_get_info(protocol::Request const *const request, protocol::Response *const response)
     {
-        union {
+        union
+        {
             struct
             {
                 protocol::ResponseData::GetInfo::GetProtocolVersion response_data;
@@ -826,7 +827,8 @@ namespace scrutiny
     // ============= [CommControl] ============
     protocol::ResponseCode::E MainHandler::process_comm_control(protocol::Request const *const request, protocol::Response *const response)
     {
-        union {
+        union
+        {
             struct
             {
                 protocol::RequestData::CommControl::Discover request_data;
@@ -983,7 +985,8 @@ namespace scrutiny
         protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
 
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
-        union {
+        union
+        {
             struct
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
@@ -1359,7 +1362,8 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
     protocol::ResponseCode::E MainHandler::process_datalog_control(protocol::Request const *const request, protocol::Response *const response)
     {
-        union {
+        union
+        {
             struct
             {
                 protocol::ResponseData::DataLogControl::GetSetup response_data;

@@ -190,7 +190,8 @@ namespace scrutiny
             RxFSMState::E m_rx_state;  // Reception Finite State Machine state
             RxError::E m_rx_error;     // Last reception error code
             bool m_request_received;   // Flag indicating if a full request has been received
-            union {
+            union
+            {
                 uint8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
                 uint8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
                 uint16_t data_bytes_received;  // Number of bytes part of the data payload received up to now

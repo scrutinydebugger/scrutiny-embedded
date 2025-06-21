@@ -181,14 +181,14 @@ namespace scrutiny
         bool touches_readonly_region(void const *const addr_start, size_t const length) const;
         void check_config(void);
 
-        Timebase m_timebase;                  // Timebase to keep track of time
-        protocol::CommHandler m_comm_handler; // The communication handler that parses the request and manages the buffers
-        bool m_processing_request;            // True when a request is being processed
-        bool m_disconnect_pending;            // INdicates that a disconnect request has been received and must be processed right away
-        Config m_config;                      // The configuration
-        bool m_enabled;                       // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
-        bool m_process_again_timestamp_taken; // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
-                                              // should not be updated on subsequent ProcessAgain code
+        Timebase m_timebase;                   // Timebase to keep track of time
+        protocol::CommHandler m_comm_handler;  // The communication handler that parses the request and manages the buffers
+        bool m_processing_request;             // True when a request is being processed
+        bool m_disconnect_pending;             // INdicates that a disconnect request has been received and must be processed right away
+        Config m_config;                       // The configuration
+        bool m_enabled;                        // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
+        bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
+                                               // should not be updated on subsequent ProcessAgain code
         timestamp_t m_process_again_timestamp; // Timestamp at which the first ProcessAgain code has been returned to ensure timeout
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec; // Communication protocol Codec
