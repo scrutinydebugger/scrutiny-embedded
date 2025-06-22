@@ -55,7 +55,7 @@ namespace scrutiny
             /// safety)
             void init(
                 MainHandler const *const main_handler,
-                uint8_t *const buffer,
+                unsigned char *const buffer,
                 buffer_size_t const buffer_size,
                 trigger_callback_t trigger_callback = SCRUTINY_NULL);
 
@@ -135,7 +135,6 @@ namespace scrutiny
             bool acquisition_completed(void);
             void write_uncompressed_entry(void);
             uint16_t read_next_entry_size(buffer_size_t *cursor);
-            void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
             MainHandler const *m_main_handler; // A pointer to the main handler
             buffer_size_t m_buffer_size;       // The datalogging buffer size

@@ -27,15 +27,15 @@ namespace scrutiny
 
     namespace protocol
     {
-        SCRUTINY_CONSTEXPR unsigned int REQUEST_OVERHEAD = 8;         // Number of bytes in a request that are not part of the payload
-        SCRUTINY_CONSTEXPR unsigned int RESPONSE_OVERHEAD = 9;        // Number of bytes in a response that are not part of the payload
-        SCRUTINY_CONSTEXPR unsigned int MAX_DISPLAY_NAME_LENGTH = 64; // Maximum length of a display name given on discover
-        SCRUTINY_CONSTEXPR unsigned int MAX_LOOP_NAME_LENGTH = 32;    // Maximum length given to a loop
-        SCRUTINY_CONSTEXPR unsigned int MINIMUM_RX_BUFFER_SIZE = 32;  // Minimum size of the reception buffer
-        SCRUTINY_CONSTEXPR unsigned int MINIMUM_TX_BUFFER_SIZE = 32;  // Minimum size of the transmit buffer
-        SCRUTINY_CONSTEXPR uint16_t BUFFER_OVERFLOW_MARGIN = 16;      // This margin let us detect overflow in CommHandler with very few calculations.
-        SCRUTINY_CONSTEXPR unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum reception buffer size in bytes
-        SCRUTINY_CONSTEXPR unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum transmission buffer size in bytes
+        static SCRUTINY_CONSTEXPR unsigned int REQUEST_OVERHEAD = 8;         // Number of bytes in a request that are not part of the payload
+        static SCRUTINY_CONSTEXPR unsigned int RESPONSE_OVERHEAD = 9;        // Number of bytes in a response that are not part of the payload
+        static SCRUTINY_CONSTEXPR unsigned int MAX_DISPLAY_NAME_LENGTH = 64; // Maximum length of a display name given on discover
+        static SCRUTINY_CONSTEXPR unsigned int MAX_LOOP_NAME_LENGTH = 32;    // Maximum length given to a loop
+        static SCRUTINY_CONSTEXPR unsigned int MINIMUM_RX_BUFFER_SIZE = 32;  // Minimum size of the reception buffer
+        static SCRUTINY_CONSTEXPR unsigned int MINIMUM_TX_BUFFER_SIZE = 32;  // Minimum size of the transmit buffer
+        static SCRUTINY_CONSTEXPR uint16_t BUFFER_OVERFLOW_MARGIN = 16;      // This margin let us detect overflow in CommHandler with very few calculations.
+        static SCRUTINY_CONSTEXPR unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum reception buffer size in bytes
+        static SCRUTINY_CONSTEXPR unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum transmission buffer size in bytes
 
         class ReadMemoryBlocksRequestParser
         {
@@ -49,7 +49,7 @@ namespace scrutiny
 
           protected:
             void validate();
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_datasize;
             uint16_t m_required_tx_buffer_size;
@@ -66,7 +66,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
             uint16_t m_size_limit;
@@ -86,7 +86,7 @@ namespace scrutiny
           protected:
             void validate(void);
 
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_size_limit;
             uint16_t m_required_tx_buffer_size;
@@ -104,7 +104,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
             uint16_t m_size_limit;
@@ -120,7 +120,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
             uint16_t m_size_limit;
@@ -136,7 +136,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
             uint16_t m_size_limit;
@@ -155,7 +155,7 @@ namespace scrutiny
           protected:
             void validate(void);
 
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
             bool m_finished;
@@ -171,7 +171,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             Response *m_response;
             uint16_t m_cursor;
             uint16_t m_size_limit;
@@ -188,7 +188,7 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
             bool m_finished;
@@ -202,8 +202,8 @@ namespace scrutiny
             {
                 struct GetProtocolVersion
                 {
-                    uint8_t major;
-                    uint8_t minor;
+                    uint_least8_t major;
+                    uint_least8_t minor;
                 };
 
                 struct GetSupportedFeatures
@@ -216,14 +216,14 @@ namespace scrutiny
 
                 struct GetSpecialMemoryRegionCount
                 {
-                    uint8_t nbr_readonly_region;
-                    uint8_t nbr_forbidden_region;
+                    uint_least8_t nbr_readonly_region;
+                    uint_least8_t nbr_forbidden_region;
                 };
 
                 struct GetSpecialMemoryRegionLocation
                 {
-                    uint8_t region_type;
-                    uint8_t region_index;
+                    uint_least8_t region_type;
+                    uint_least8_t region_index;
                     uintptr_t start;
                     uintptr_t end;
                 };
@@ -235,13 +235,13 @@ namespace scrutiny
 
                 struct GetLoopCount
                 {
-                    uint8_t count;
+                    uint_least8_t count;
                 };
 
                 struct GetLoopDefinition
                 {
-                    uint8_t loop_id;
-                    uint8_t loop_type;
+                    uint_least8_t loop_id;
+                    uint_least8_t loop_type;
                     bool support_datalogging;
                     union
                     {
@@ -251,7 +251,7 @@ namespace scrutiny
                         } fixed_freq;
                     } loop_type_specific;
 
-                    uint8_t loop_name_length;
+                    uint_least8_t loop_name_length;
                     char const *loop_name;
                 };
             } // namespace GetInfo
@@ -260,7 +260,7 @@ namespace scrutiny
             {
                 struct Discover
                 {
-                    uint8_t display_name_length;
+                    uint_least8_t display_name_length;
                     char const *display_name;
                 };
                 struct Heartbeat
@@ -275,11 +275,11 @@ namespace scrutiny
                     uint32_t max_bitrate;
                     uint32_t comm_rx_timeout;
                     uint32_t heartbeat_timeout;
-                    uint8_t address_size;
+                    uint_least8_t address_size;
                 };
                 struct Connect
                 {
-                    uint8_t magic[sizeof(protocol::CommControl::CONNECT_MAGIC)];
+                    unsigned char magic[sizeof(protocol::CommControl::CONNECT_MAGIC)];
                     uint32_t session_id;
                 };
             } // namespace CommControl
@@ -290,13 +290,13 @@ namespace scrutiny
                 struct GetSetup
                 {
                     uint32_t buffer_size;
-                    uint8_t data_encoding;
-                    uint8_t max_signal_count;
+                    uint_least8_t data_encoding;
+                    uint_least8_t max_signal_count;
                 };
 
                 struct GetStatus
                 {
-                    uint8_t state;
+                    uint_least8_t state;
                     uint32_t bytes_to_acquire_from_trigger_to_completion;
                     uint32_t write_counter_since_trigger;
                 };
@@ -313,7 +313,7 @@ namespace scrutiny
                 struct ReadAcquisition
                 {
                     uint16_t acquisition_id;
-                    uint8_t rolling_counter;
+                    uint_least8_t rolling_counter;
                     datalogging::DataReader *reader;
                     uint32_t *crc;
                 };
@@ -328,8 +328,8 @@ namespace scrutiny
             {
                 struct GetSpecialMemoryRegionLocation
                 {
-                    uint8_t region_type;
-                    uint8_t region_index;
+                    uint_least8_t region_type;
+                    uint_least8_t region_index;
                 };
 
                 struct GetRPVDefinition
@@ -340,12 +340,12 @@ namespace scrutiny
 
                 struct GetLoopCount
                 {
-                    uint8_t loop_count;
+                    uint_least8_t loop_count;
                 };
 
                 struct GetLoopDefinition
                 {
-                    uint8_t loop_id;
+                    uint_least8_t loop_id;
                 };
             } // namespace GetInfo
 
@@ -353,7 +353,7 @@ namespace scrutiny
             {
                 struct Discover
                 {
-                    uint8_t magic[sizeof(protocol::CommControl::DISCOVER_MAGIC)];
+                    unsigned char magic[sizeof(protocol::CommControl::DISCOVER_MAGIC)];
                 };
 
                 struct Heartbeat
@@ -364,7 +364,7 @@ namespace scrutiny
 
                 struct Connect
                 {
-                    uint8_t magic[sizeof(protocol::CommControl::CONNECT_MAGIC)];
+                    unsigned char magic[sizeof(protocol::CommControl::CONNECT_MAGIC)];
                 };
 
                 struct Disconnect
@@ -379,7 +379,7 @@ namespace scrutiny
             {
                 struct Configure
                 {
-                    uint8_t loop_id;
+                    uint_least8_t loop_id;
                     uint16_t config_id;
                     // Rest is directly written to datalogger config. So not in this struct.
                 };

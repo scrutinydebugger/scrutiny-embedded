@@ -33,21 +33,21 @@ namespace scrutiny
         /// @param rx_buffer_size Reception buffer size
         /// @param tx_buffer Transmission buffer
         /// @param tx_buffer_size Transmission buffer size
-        void set_buffers(uint8_t *rx_buffer, uint16_t const rx_buffer_size, uint8_t *tx_buffer, uint16_t const tx_buffer_size);
+        void set_buffers(unsigned char * const rx_buffer, uint16_t const rx_buffer_size, unsigned char * const tx_buffer, uint16_t const tx_buffer_size);
 
         /// @brief Define some memory section that are to be left untouched
         /// @param range Array of ranges represented by the `AddressRange` object.
         /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
         /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
         /// @param count Number of ranges in the given array
-        void set_forbidden_address_range(AddressRange const *range, uint8_t const count);
+        void set_forbidden_address_range(AddressRange const *range, uint_least8_t const count);
 
         /// @brief Defines some memory sections that are read-only.
         /// @param ranges Array of ranges represented by the `scrutiny::AddressRange` object.
         /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
         /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
         /// @param count Number of ranges in the given array
-        void set_readonly_address_range(AddressRange const *ranges, uint8_t const count);
+        void set_readonly_address_range(AddressRange const *ranges, uint_least8_t const count);
 
         /// @brief Configures the Runtime Published Values
         /// @param array Array of `scrutiny::RuntimePublishedValues` that contains the definition of each RPV.
@@ -67,7 +67,7 @@ namespace scrutiny
         /// This array must be allocated outside of Scrutiny and stay
         /// allocated forever as no copy will be made
         /// @param loop_count Number of `scrutiny::LoopHandlers`
-        void set_loops(LoopHandler **loops, uint8_t loop_count);
+        void set_loops(LoopHandler **loops, uint_least8_t loop_count);
 
         /// @brief Sets a callback to be called by Scrutiny after a request to the UserCommand function.
         /// This generic feature allows the integrator to pass down some custom request/data to the application by leveraging the already
@@ -84,7 +84,7 @@ namespace scrutiny
         /// @brief Sets the buffer used to store data when doing a datalogging acquisition
         /// @param buffer The datalogging buffer
         /// @param buffer_size The datalogging buffer size
-        void set_datalogging_buffers(uint8_t *buffer, datalogging::buffer_size_t const buffer_size);
+        void set_datalogging_buffers(unsigned char *buffer, datalogging::buffer_size_t const buffer_size);
 
         /// @brief Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
         /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
@@ -155,7 +155,7 @@ namespace scrutiny
         }
 
         /// @brief Returns the number of forbidden ranges configured
-        inline uint8_t forbidden_ranges_count(void) const
+        inline uint_least8_t forbidden_ranges_count(void) const
         {
             return m_forbidden_range_count;
         }
@@ -167,7 +167,7 @@ namespace scrutiny
         }
 
         /// @brief Returns the number of read-only ranges configured
-        inline uint8_t readonly_ranges_count(void) const
+        inline uint_least8_t readonly_ranges_count(void) const
         {
             return m_readonly_range_count;
         }
@@ -210,26 +210,26 @@ namespace scrutiny
         bool memory_write_enable;
 
       private:
-        uint8_t *m_rx_buffer;                           // The comm Rx buffer
+        unsigned char *m_rx_buffer;                           // The comm Rx buffer
         uint16_t m_rx_buffer_size;                      // The comm Rx buffer size
-        uint8_t *m_tx_buffer;                           // The comm Tx buffer
+        unsigned char *m_tx_buffer;                           // The comm Tx buffer
         uint16_t m_tx_buffer_size;                      // The comm Tx buffer size
         AddressRange const *m_forbidden_address_ranges; // The forbidden address range array pointer. nullptr if unset
-        uint8_t m_forbidden_range_count;                // The forbidden address range count
+        uint_least8_t m_forbidden_range_count;                // The forbidden address range count
         AddressRange const *m_readonly_address_ranges;  // The read-only address range array pointer. nullptr if unset
-        uint8_t m_readonly_range_count;                 // The read-only address range count
+        uint_least8_t m_readonly_range_count;                 // The read-only address range count
         RuntimePublishedValue const *m_rpvs;            // The array of Runtime Published Values. nullptr if unset
         uint16_t m_rpv_count;                           // The number of Runtime Published Values in the RPV array
         RpvReadCallback m_rpv_read_callback;            // The callback to perform read operation on a Runtime Published Value (RPV)
         RpvWriteCallback m_rpv_write_callback;          // The callback to perform write operation on a Runtime Published Value (RPV)
         LoopHandler **m_loops;                          // The array of Loop Handler pointers
-        uint8_t m_loop_count;                           // Number of Loop Handler in the array
+        uint_least8_t m_loop_count;                           // Number of Loop Handler in the array
 
         /// @brief Callback to be called on a User Command request.
         user_command_callback_t m_user_command_callback; // Callback to call when a User Command service call is requested by the server
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        uint8_t *m_datalogger_buffer;                                  // Buffer that stores the datalogging data
+        unsigned char *m_datalogger_buffer;                                  // Buffer that stores the datalogging data
         datalogging::buffer_size_t m_datalogger_buffer_size;           // size of the datalogging buffer
         datalogging::trigger_callback_t m_datalogger_trigger_callback; // Callback to call upon datalogging acquisition triggers
 #endif

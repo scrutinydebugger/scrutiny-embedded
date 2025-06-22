@@ -26,11 +26,11 @@ namespace scrutiny
                 data_length = 0;
             }
 
-            uint8_t command_id;
-            uint8_t subfunction_id;
+            uint_least8_t command_id;
+            uint_least8_t subfunction_id;
             uint16_t data_length;
             uint16_t data_max_length;
-            uint8_t *data;
+            unsigned char *data;
             uint32_t crc;
         };
 
@@ -44,12 +44,12 @@ namespace scrutiny
                 data_length = 0;
             }
 
-            uint8_t command_id;
-            uint8_t subfunction_id;
-            uint8_t response_code;
+            uint_least8_t command_id;
+            uint_least8_t subfunction_id;
+            uint_least8_t response_code;
             uint16_t data_length;
             uint16_t data_max_length;
-            uint8_t *data;
+            unsigned char *data;
             uint32_t crc;
         };
 
@@ -117,8 +117,8 @@ namespace scrutiny
 
         struct Version
         {
-            uint8_t major;
-            uint8_t minor;
+            uint_least8_t major;
+            uint_least8_t minor;
         };
 
         namespace GetInfo
@@ -157,8 +157,8 @@ namespace scrutiny
 
         namespace CommControl
         {
-            extern uint8_t const DISCOVER_MAGIC[4];
-            extern uint8_t const CONNECT_MAGIC[4];
+            extern unsigned char const DISCOVER_MAGIC[4];
+            extern unsigned char const CONNECT_MAGIC[4];
 
             class Subfunction
             {

@@ -34,7 +34,7 @@ namespace scrutiny
         {
           public:
             explicit RawFormatReader(RawFormatEncoder const *const encoder);
-            datalogging::buffer_size_t read(uint8_t *const buffer, datalogging::buffer_size_t const max_size);
+            datalogging::buffer_size_t read(unsigned char *const buffer, datalogging::buffer_size_t const max_size);
             inline bool finished(void) const { return m_finished; }
             void reset(void);
             inline bool error(void) const;
@@ -60,7 +60,7 @@ namespace scrutiny
             void init(
                 MainHandler const *const main_handler,
                 datalogging::Configuration const *const config,
-                uint8_t *const buffer,
+                unsigned char *const buffer,
                 datalogging::buffer_size_t const buffer_size);
             void encode_next_entry(void);
             void reset(void);
@@ -80,7 +80,7 @@ namespace scrutiny
             RawFormatReader *get_reader(void) { return &m_reader; };
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             datalogging::buffer_size_t m_buffer_size;
             datalogging::Configuration const *m_config;
             RawFormatReader m_reader;

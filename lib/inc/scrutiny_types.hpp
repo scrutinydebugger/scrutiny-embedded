@@ -151,10 +151,10 @@ namespace scrutiny
     /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
     struct MemoryBlock
     {
-        uint8_t *start_address;
+        unsigned char *start_address;
         uint16_t length;
-        uint8_t *source_data;
-        uint8_t *mask;
+        unsigned char *source_data;
+        unsigned char *mask;
     };
 } // namespace scrutiny
 

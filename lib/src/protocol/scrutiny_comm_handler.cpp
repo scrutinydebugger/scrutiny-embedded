@@ -21,9 +21,9 @@ namespace scrutiny
         uint32_t CommHandler::s_session_counter = 0;
 
         void CommHandler::init(
-            uint8_t *const rx_buffer,
+            unsigned char *const rx_buffer,
             uint16_t const rx_buffer_size,
-            uint8_t *const tx_buffer,
+            unsigned char *const tx_buffer,
             uint16_t const tx_buffer_size,
             Timebase const *const timebase,
             uint32_t const session_counter_seed)
@@ -53,7 +53,7 @@ namespace scrutiny
             reset();
         }
 
-        void CommHandler::receive_data(uint8_t const *const data, uint16_t const len)
+        void CommHandler::receive_data(unsigned char const *const data, uint16_t const len)
         {
             uint16_t i = 0;
 
@@ -293,7 +293,7 @@ namespace scrutiny
             return true;
         }
 
-        uint16_t CommHandler::pop_data(uint8_t *const buffer, uint16_t len)
+        uint16_t CommHandler::pop_data(unsigned char *const buffer, uint16_t len)
         {
             SCRUTINY_STATIC_ASSERT(protocol::MAXIMUM_TX_BUFFER_SIZE <= 0xFFFF - 9, "Cannot parse successfully with 16bits counters");
 
@@ -326,11 +326,11 @@ namespace scrutiny
                 }
                 else if (m_nbytes_sent == 3u)
                 {
-                    buffer[i] = static_cast<uint8_t>((m_active_response.data_length >> 8) & 0xFFu);
+                    buffer[i] = static_cast<unsigned char>((m_active_response.data_length >> 8) & 0xFFu);
                 }
                 else if (m_nbytes_sent == 4u) // cppcheck-suppress[knownConditionTrueFalse]
                 {
-                    buffer[i] = static_cast<uint8_t>(m_active_response.data_length & 0xFFu);
+                    buffer[i] = static_cast<unsigned char>(m_active_response.data_length & 0xFFu);
                 }
 
                 i++;
@@ -393,12 +393,12 @@ namespace scrutiny
         // Check if the last request received is a valid "Comm Discover request".
         bool CommHandler::received_discover_request(void)
         {
-            if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
+            if (m_active_request.command_id != static_cast<uint_least8_t>(CommandId::CommControl))
             {
                 return false;
             }
 
-            if (m_active_request.subfunction_id != static_cast<uint8_t>(CommControl::Subfunction::Discover))
+            if (m_active_request.subfunction_id != static_cast<uint_least8_t>(CommControl::Subfunction::Discover))
             {
                 return false;
             }
@@ -419,12 +419,12 @@ namespace scrutiny
         // Check if the last request received is a valid "Comm Discover request".
         bool CommHandler::received_connect_request(void)
         {
-            if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
+            if (m_active_request.command_id != static_cast<uint_least8_t>(CommandId::CommControl))
             {
                 return false;
             }
 
-            if (m_active_request.subfunction_id != static_cast<uint8_t>(CommControl::Subfunction::Connect))
+            if (m_active_request.subfunction_id != static_cast<uint_least8_t>(CommControl::Subfunction::Connect))
             {
                 return false;
             }
@@ -474,10 +474,10 @@ namespace scrutiny
         bool CommHandler::check_crc(Request const *const req) const
         {
             uint32_t crc = 0;
-            uint8_t header_data[4];
-            header_data[0] = req->command_id;
-            header_data[1] = req->subfunction_id;
-            header_data[2] = (req->data_length >> 8) & 0xFF;
+            unsigned char header_data[4];
+            header_data[0] = req->command_id & 0xFF;            // CHAR_BIT might be 16
+            header_data[1] = req->subfunction_id & 0xFF;        // CHAR_BIT might be 16
+            header_data[2] = (req->data_length >> 8) & 0xFF;    // CHAR_BIT might be 16
             header_data[3] = req->data_length & 0xFF;
             crc = tools::crc32(header_data, sizeof(header_data));
             crc = tools::crc32(req->data, req->data_length, crc);
@@ -489,10 +489,10 @@ namespace scrutiny
             if (response->data_length > m_tx_buffer_size)
                 return;
 
-            uint8_t header[5];
-            header[0] = response->command_id;
-            header[1] = response->subfunction_id;
-            header[2] = response->response_code;
+            unsigned char header[5];
+            header[0] = response->command_id & 0xFF;        // CHAR_BIT might be 16
+            header[1] = response->subfunction_id & 0xFF;    // CHAR_BIT might be 16
+            header[2] = response->response_code & 0xFF;     // CHAR_BIT might be 16
             header[3] = (response->data_length >> 8) & 0xFF;
             header[4] = response->data_length & 0xFF;
 

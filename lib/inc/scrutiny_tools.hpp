@@ -15,10 +15,11 @@
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 
-#if !SCRUTINY_BUILD_AVR_GCC
+#if !SCRUTINY_BUILD_AVR_GCC && !SCRUTINY_BUILD_TI_C28x
 #include <cmath>
 #else
 #include <string.h>
+#include <limits.h>
 #endif
 
 namespace scrutiny
@@ -78,7 +79,7 @@ namespace scrutiny
         /// @brief Returns the size of a given type in bytes
         /// @param vt The VariableType object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableType::E const vt)
+        inline uint_least8_t get_type_size(VariableType::E const vt)
         {
             if (vt == VariableType::unknown)
             {
@@ -91,7 +92,7 @@ namespace scrutiny
         /// @brief Returns the size of a given TypeSize in bytes
         /// @param ts The VariableTypeSize object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableTypeSize::E const ts)
+        inline uint_least8_t get_type_size(VariableTypeSize::E const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -259,8 +260,8 @@ namespace scrutiny
         /// @return true if finite value
         inline bool is_float_finite(float const val)
         {
-#if SCRUTINY_BUILD_AVR_GCC
-            SCRUTINY_STATIC_ASSERT(sizeof(float) == 4, "Expect float to be 32 bits");
+#if SCRUTINY_BUILD_AVR_GCC || SCRUTINY_BUILD_TI_C28x
+            SCRUTINY_STATIC_ASSERT(sizeof(float)*CHAR_BIT/8 == 4, "Expect float to be 32 bits");
             uint32_t uv;
             memcpy(&uv, &val, 4);
             uint16_t exponent = (uv >> 23) & 0xFF;
@@ -283,7 +284,7 @@ namespace scrutiny
         /// @param size Size of data in bytes
         /// @param start_value Start value of CRC. This value can be used to chain CRC calculation.
         /// @return The CRC32 value of the data
-        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value = 0);
+        uint32_t crc32(unsigned char const *data, uint32_t const size, uint32_t const start_value = 0);
     } // namespace tools
 
 } // namespace scrutiny

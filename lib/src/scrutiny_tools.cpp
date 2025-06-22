@@ -50,7 +50,7 @@ namespace scrutiny
         bool is_supported_type(VariableType::E const vt)
         {
             VariableTypeType::E tt = get_var_type_type(vt);
-            uint8_t ts = get_type_size(vt);
+            uint_least8_t ts = get_type_size(vt);
 
             if (ts == 0)
             {
@@ -88,14 +88,14 @@ namespace scrutiny
             }
         }
 
-        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value)
+        uint32_t crc32(unsigned char const *data, uint32_t const size, uint32_t const start_value)
         {
             uint32_t crc = ~start_value;
 
             for (uint32_t i = 0; i < size; i++)
             {
-                uint8_t byte = data[i];
-                for (unsigned int j = 0; j < 8; j++)
+                unsigned char byte = data[i];
+                for (uint_fast8_t j = 0; j < 8; j++)
                 {
                     const unsigned int lsb = (byte ^ crc) & 1;
                     crc >>= 1;

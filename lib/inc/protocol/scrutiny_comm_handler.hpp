@@ -36,9 +36,9 @@ namespace scrutiny
             /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are
             /// connected to the same channel
             void init(
-                uint8_t *const rx_buffer,
+                unsigned char *const rx_buffer,
                 uint16_t const rx_buffer_size,
-                uint8_t *const tx_buffer,
+                unsigned char *const tx_buffer,
                 uint16_t const tx_buffer_size,
                 Timebase const *const timebase,
                 uint32_t const session_counter_seed = 0);
@@ -46,7 +46,7 @@ namespace scrutiny
             /// @brief Move data from the outside world (received by the server) to the scrutiny lib
             /// @param data Buffer containing the received data
             /// @param len Number of bytes to read
-            void receive_data(uint8_t const *const data, uint16_t const len);
+            void receive_data(unsigned char const *const data, uint16_t const len);
 
             /// @brief Send a response to the server
             /// @param response The response object
@@ -60,7 +60,7 @@ namespace scrutiny
             Response *prepare_response(void);
 
             // Reads data from the scrutiny lib so that it can be sent to the outside world (to the server)
-            uint16_t pop_data(uint8_t *const buffer, uint16_t len);
+            uint16_t pop_data(unsigned char *const buffer, uint16_t len);
 
             /// @brief Returns the number of bytes pending to be sent.
             uint16_t data_to_send(void) const;
@@ -182,9 +182,9 @@ namespace scrutiny
             bool m_first_heartbeat_received;     // Flag indicating if the first heartbeat has been received.
 
             // Reception
-            uint8_t *m_rx_buffer;      // The reception buffer
+            unsigned char *m_rx_buffer;      // The reception buffer
             uint16_t m_rx_buffer_size; // The reception buffer size
-            uint8_t *m_tx_buffer;      // The transmission buffer
+            unsigned char *m_tx_buffer;      // The transmission buffer
             uint16_t m_tx_buffer_size; // The transmission buffer size
             Request m_active_request;  // The request presently being received
             RxFSMState::E m_rx_state;  // Reception Finite State Machine state
@@ -192,8 +192,8 @@ namespace scrutiny
             bool m_request_received;   // Flag indicating if a full request has been received
             union
             {
-                uint8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
-                uint8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
+                uint_least8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
+                uint_least8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
                 uint16_t data_bytes_received;  // Number of bytes part of the data payload received up to now
             } m_per_state_data;
             timestamp_t m_last_rx_timestamp; // Timestamp at which the last chunk of data was received

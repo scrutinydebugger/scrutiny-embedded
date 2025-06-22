@@ -12,5 +12,5 @@
 
 namespace scrutiny
 {
-    extern uint8_t const software_id[SCRUTINY_SOFTWARE_ID_LENGTH] = SCRUTINY_SOFTWARE_ID_PLACEHOLDER;
+    unsigned char const software_id[SCRUTINY_SOFTWARE_ID_LENGTH] = SCRUTINY_SOFTWARE_ID_PLACEHOLDER;
 }

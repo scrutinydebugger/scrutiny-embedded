@@ -14,6 +14,8 @@
 #include "ipc/scrutiny_ipc_std_atomic.hpp"
 #elif SCRUTINY_BUILD_X64 || SCRUTINY_BUILD_X86
 #include "ipc/scrutiny_ipc_x86.hpp"
+#elif SCRUTINY_BUILD_TI_C28x
+#include "ipc/scrutiny_ipc_ti_c28x.hpp"
 #else
 #error "No IPC capabilities"
 #endif

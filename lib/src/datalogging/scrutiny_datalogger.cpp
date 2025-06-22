@@ -23,7 +23,7 @@ namespace scrutiny
     {
         void DataLogger::init(
             MainHandler const *const main_handler,
-            uint8_t *const buffer,
+            unsigned char *const buffer,
             buffer_size_t const buffer_size,
             trigger_callback_t trigger_callback)
         {
@@ -115,7 +115,7 @@ namespace scrutiny
             // Size are consistent so far, we can read the operand and items definition without crashing anything
             if (m_config_valid)
             {
-                for (uint8_t i = 0; i < m_config.trigger.operand_count; i++)
+                for (uint_fast8_t i = 0; i < m_config.trigger.operand_count; i++)
                 {
                     if (m_config.trigger.operands[i].type == OperandType::LITERAL)
                     {
@@ -169,7 +169,7 @@ namespace scrutiny
                     }
                 }
 
-                for (uint8_t i = 0; i < m_config.items_count; i++)
+                for (uint_fast8_t i = 0; i < m_config.items_count; i++)
                 {
                     if (m_config.items_to_log[i].type == LoggableType::RPV)
                     {

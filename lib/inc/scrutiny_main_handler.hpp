@@ -56,13 +56,13 @@ namespace scrutiny
         /// @brief Pass data received from the server to the scrutiny-embedded lib input stream.
         /// @param data Pointer to the data buffer
         /// @param len Length of the data
-        inline void receive_data(uint8_t const *const data, uint16_t const len) { m_comm_handler.receive_data(data, len); }
+        inline void receive_data(unsigned char const *const data, uint16_t const len) { m_comm_handler.receive_data(data, len); }
 
         /// @brief Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
         /// @param buffer Buffer to write the data into
         /// @param len Maximum length of the data to read
         /// @return Number of bytes actually read
-        inline uint16_t pop_data(uint8_t *const buffer, uint16_t const len)
+        inline uint16_t pop_data(unsigned char *const buffer, uint16_t const len)
         {
             uint16_t const size = m_comm_handler.pop_data(buffer, len);
             check_finished_sending();
@@ -231,7 +231,7 @@ namespace scrutiny
             bool request_disarm_trigger;              // Flag indicating that a request has been made to darm the trigger
             bool pending_ownership_release;           // Flag indicating that a request for ownership release is presently being processed
             bool reading_in_progress;                 // Flag indicating that the datalogging data is presently being read by the user.
-            uint8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
+            uint_least8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
             uint32_t read_acquisition_crc;            // CRC of the datalogging buffer content
         } m_datalogging;                              // All data related to the datalogging feature
 #endif
