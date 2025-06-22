@@ -44,7 +44,7 @@ void RawFormatParser::parse(uint32_t entry_count)
         }
         else if (m_config->items_to_log[i].type == scrutiny::datalogging::LoggableType::RPV)
         {
-            elem_size = scrutiny::tools::get_type_size(m_main_handler->get_rpv_type(m_config->items_to_log[i].data.rpv.id));
+            elem_size = scrutiny::tools::get_type_size_char(m_main_handler->get_rpv_type(m_config->items_to_log[i].data.rpv.id));
         }
         else if (m_config->items_to_log[i].type == scrutiny::datalogging::LoggableType::TIME)
         {
@@ -81,7 +81,7 @@ void RawFormatParser::parse(uint32_t entry_count)
             }
             else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::RPV)
             {
-                elem_size = scrutiny::tools::get_type_size(m_main_handler->get_rpv_type(m_config->items_to_log[j].data.rpv.id));
+                elem_size = scrutiny::tools::get_type_size_char(m_main_handler->get_rpv_type(m_config->items_to_log[j].data.rpv.id));
             }
             else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::TIME)
             {
