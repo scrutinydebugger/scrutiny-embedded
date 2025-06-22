@@ -23,7 +23,6 @@ namespaceAFile2::classBFile2 file2ClassBInstance;
 int file2GlobalArray1Int5[5];
 float file2GlobalArray2x2Float[2][2];
 
-
 static char file2StaticChar;
 static int file2StaticInt;
 static short file2StaticShort;
@@ -49,7 +48,7 @@ namespace NamespaceInFile2
 
     EnumA instance_enumA;
     static EnumA staticInstance_enumA;
-}
+} // namespace NamespaceInFile2
 
 NamespaceInFile2::EnumA instance2_enumA;
 static NamespaceInFile2::EnumA staticInstance2_enumA;
@@ -57,16 +56,16 @@ static NamespaceInFile2::EnumA staticInstance2_enumA;
 void file2SetValues()
 {
     file2GlobalChar = 20;
-    file2GlobalInt =  2000;
-    file2GlobalShort =  998;
-    file2GlobalLong =  555555;
-    file2GlobalUnsignedChar =  254u;
-    file2GlobalUnsignedInt =  123456u;
-    file2GlobalUnsignedShort =  12345u;
-    file2GlobalUnsignedLong =  1234567u;
-    file2GlobalFloat =  0.1f;
-    file2GlobalDouble =  0.11111111111111;
-    file2GlobalBool =  false;
+    file2GlobalInt = 2000;
+    file2GlobalShort = 998;
+    file2GlobalLong = 555555;
+    file2GlobalUnsignedChar = 254u;
+    file2GlobalUnsignedInt = 123456u;
+    file2GlobalUnsignedShort = 12345u;
+    file2GlobalUnsignedLong = 1234567u;
+    file2GlobalFloat = 0.1f;
+    file2GlobalDouble = 0.11111111111111;
+    file2GlobalBool = false;
 
     file2StaticChar = -66;
     file2StaticInt = -8745;
@@ -84,7 +83,7 @@ void file2SetValues()
     NamespaceInFile2::staticInstance_enumA = NamespaceInFile2::eVal3;
     instance2_enumA = NamespaceInFile2::eVal4;
     staticInstance2_enumA = NamespaceInFile2::eVal1;
-    
+
     file2GlobalArray1Int5[0] = 1111;
     file2GlobalArray1Int5[1] = 2222;
     file2GlobalArray1Int5[2] = 3333;
@@ -99,7 +98,7 @@ void file2SetValues()
     file2ClassBInstance.intInClassB = -11111;
     file2ClassBInstance.nestedClassInstance.intInClassBA = -22222;
     file2ClassBInstance.nestedClassInstance.classAInstance.intInClassA = -33333;
-    
+
     file2ClassBStaticInstance.intInClassB = -44444;
     file2ClassBStaticInstance.nestedClassInstance.intInClassBA = -55555;
     file2ClassBStaticInstance.nestedClassInstance.classAInstance.intInClassA = -66666;
@@ -117,7 +116,3 @@ void file2func1(int x)
     static double file2func1Var = 963258741.123;
     (void)file2func1Var;
 }
-
-
-
-

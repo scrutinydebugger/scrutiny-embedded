@@ -30,7 +30,7 @@ namespace FileNamespace
 {
     class File3TestClass
     {
-    public:
+      public:
         enum class File3EnumInClass : uint32_t
         {
             AAA,
@@ -68,6 +68,6 @@ namespace FileNamespace
             } field3;
         } m_file3_complex_struct;
     };
-}
+} // namespace FileNamespace
 
 void file3SetValues();

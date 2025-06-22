@@ -103,8 +103,8 @@
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },
     "[cpp]": {
-       // "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "xaver.clang-format",
     },
     "cSpell.words": [
         "bitoffset",

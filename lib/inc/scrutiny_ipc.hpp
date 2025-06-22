@@ -13,7 +13,7 @@
 #elif SCRUTINY_HAS_CPP11
 #include "ipc/scrutiny_ipc_std_atomic.hpp"
 #elif SCRUTINY_BUILD_X64 || SCRUTINY_BUILD_X86
-#include "ipc/scrutiny_ipc_x86.hpp"    
+#include "ipc/scrutiny_ipc_x86.hpp"
 #else
 #error "No IPC capabilities"
-#endif 
+#endif

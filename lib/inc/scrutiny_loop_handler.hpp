@@ -11,10 +11,10 @@
 #ifndef ___SCRUTINY_LOOP_HANDLER_H___
 #define ___SCRUTINY_LOOP_HANDLER_H___
 
-#include <stdint.h>
+#include "scrutiny_ipc.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
-#include "scrutiny_ipc.hpp"
+#include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging.hpp"
@@ -26,44 +26,49 @@ namespace scrutiny
 
     class LoopType
     {
-        public:
+      public:
+        // clang-format off
         SCRUTINY_ENUM(uint_least8_t)
         {
             FIXED_FREQ,
             VARIABLE_FREQ
         };
+        // clang-format on
     };
 
     class LoopHandler
     {
         friend class scrutiny::MainHandler;
 
-    public:
+      public:
         class Main2LoopMessageID
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
 #if SCRUTINY_ENABLE_DATALOGGING
-                RELEASE_DATALOGGER_OWNERSHIP,
-                TAKE_DATALOGGER_OWNERSHIP,
-                DATALOGGER_ARM_TRIGGER,
+                RELEASE_DATALOGGER_OWNERSHIP, 
+                TAKE_DATALOGGER_OWNERSHIP, 
+                DATALOGGER_ARM_TRIGGER, 
                 DATALOGGER_DISARM_TRIGGER
 #endif
             };
+            // clang-format on
         };
 
         class Loop2MainMessageID
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
-    #if SCRUTINY_ENABLE_DATALOGGING
-                DATALOGGER_OWNERSHIP_TAKEN,
+#if SCRUTINY_ENABLE_DATALOGGING
+                DATALOGGER_OWNERSHIP_TAKEN, 
                 DATALOGGER_OWNERSHIP_RELEASED,
-                DATALOGGER_DATA_ACQUIRED,
+                DATALOGGER_DATA_ACQUIRED, 
                 DATALOGGER_STATUS_UPDATE
-    #endif
+#endif
             };
         };
 
@@ -75,8 +80,7 @@ namespace scrutiny
         struct Loop2MainMessage
         {
             Loop2MainMessageID::E message_id;
-            union
-            {
+            union {
 #if SCRUTINY_ENABLE_DATALOGGING
                 struct
                 {
@@ -88,14 +92,11 @@ namespace scrutiny
             } data;
         };
 
-        LoopHandler(char const *name = "") : 
+        LoopHandler(char const *name = "") :
             m_name(name)
 #if SCRUTINY_ENABLE_DATALOGGING
             ,
-            m_datalogger(SCRUTINY_NULL),
-            m_owns_datalogger(false),
-            m_datalogger_data_acquired(false),
-            m_support_datalogging(true)
+            m_datalogger(SCRUTINY_NULL), m_owns_datalogger(false), m_datalogger_data_acquired(false), m_support_datalogging(true)
 #endif
         {
         }
@@ -106,19 +107,34 @@ namespace scrutiny
         virtual uint32_t get_timestep_100ns(void) const = 0;
 
         /// @brief Return the timebase used by the Loop Handler
-        inline Timebase *get_timebase(void) { return &m_timebase; }
+        inline Timebase *get_timebase(void)
+        {
+            return &m_timebase;
+        }
 
         /// @brief Return the a readonly pointer to the timebase used by the Loop Handler
-        inline Timebase *get_timebase_ro(void) { return &m_timebase; }
+        inline Timebase *get_timebase_ro(void)
+        {
+            return &m_timebase;
+        }
 
         /// @brief Returns the IPC object to send a message to the Loop Handler
-        inline scrutiny::IPCMessage<Main2LoopMessage> *ipc_main2loop(void) { return &m_main2loop_msg; }
+        inline scrutiny::IPCMessage<Main2LoopMessage> *ipc_main2loop(void)
+        {
+            return &m_main2loop_msg;
+        }
 
         /// @brief Returns the IPC object to receive a message from the Loop Handler
-        inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void) { return &m_loop2main_msg; }
+        inline scrutiny::IPCMessage<Loop2MainMessage> *ipc_loop2main(void)
+        {
+            return &m_loop2main_msg;
+        }
 
         /// @brief Returns the name of the loop. May be nullptr if not set.
-        inline char const *get_name(void) const { return m_name; }
+        inline char const *get_name(void) const
+        {
+            return m_name;
+        }
 #if SCRUTINY_ENABLE_DATALOGGING
 
         inline void allow_datalogging(bool const val)
@@ -137,7 +153,7 @@ namespace scrutiny
         }
 #endif
 
-    protected:
+      protected:
         /// @brief Initialize the Loop Handler
         void init(MainHandler *const main_handler);
 
@@ -168,12 +184,11 @@ namespace scrutiny
     /// This act as a probe to execute some code in tasks that are not synchronized with the Main Handler task
     class FixedFrequencyLoopHandler : public LoopHandler
     {
-    public:
+      public:
         /// @brief Constructor
         /// @param timestep_100ns Time delta between each call to process() in multiple of 100ns
         /// @param name The name of the loop
-        explicit FixedFrequencyLoopHandler(timediff_t const timestep_100ns, char const *name = "") : LoopHandler(name),
-                                                                                                     m_timestep_100ns(timestep_100ns)
+        explicit FixedFrequencyLoopHandler(timediff_t const timestep_100ns, char const *name = "") : LoopHandler(name), m_timestep_100ns(timestep_100ns)
         {
         }
 
@@ -185,12 +200,18 @@ namespace scrutiny
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE { return LoopType::FIXED_FREQ; }
+        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE
+        {
+            return LoopType::FIXED_FREQ;
+        }
 
         /// @brief Returns the time delta assigned to the loop (in multiple of 100ns)
-        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE { return m_timestep_100ns; }
+        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE
+        {
+            return m_timestep_100ns;
+        }
 
-    protected:
+      protected:
         uint32_t const m_timestep_100ns;
     };
 
@@ -198,7 +219,7 @@ namespace scrutiny
     /// This act as a probe to execute some code in tasks that are not synchronized with the Main Handler task
     class VariableFrequencyLoopHandler : public LoopHandler
     {
-    public:
+      public:
         /// @brief Constructor
         /// @param name The name of the loop
         explicit VariableFrequencyLoopHandler(char const *name = "") : LoopHandler(name)
@@ -206,15 +227,21 @@ namespace scrutiny
         }
 
         /// @brief Stubbed implementation that always return 0
-        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE { return 0; }
+        virtual uint32_t get_timestep_100ns(void) const SCRUTINY_OVERRIDE
+        {
+            return 0;
+        }
 
         /// @brief Process function be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE { return LoopType::VARIABLE_FREQ; }
+        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE
+        {
+            return LoopType::VARIABLE_FREQ;
+        }
     };
-}
+} // namespace scrutiny
 
 #endif //___SCRUTINY_LOOP_HANDLER_H___

@@ -7,8 +7,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <stdint.h>
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 typedef void (*scrutiny_c_user_command_callback_t)(
     uint8_t const subfunction,

@@ -15,13 +15,13 @@
 
 #include "abstract_comm_channel.hpp"
 
-#include <windows.h>
-#include <string>
 #include <stdint.h>
+#include <string>
+#include <windows.h>
 
 class WinSerialPortBridge : public AbstractCommChannel
 {
-public:
+  public:
     WinSerialPortBridge(const std::string &port_name, uint32_t baudrate);
 
     virtual void stop();
@@ -31,7 +31,7 @@ public:
 
     static void throw_system_error(const std::string &msg);
 
-private:
+  private:
     std::string m_port_name;
     uint32_t m_baudrate;
     HANDLE m_serial_handle;

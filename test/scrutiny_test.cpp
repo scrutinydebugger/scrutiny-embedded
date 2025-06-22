@@ -8,10 +8,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutiny_test.hpp"
+#include "scrutiny.hpp"
 #include <stdint.h>
 #include <string>
-#include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
 
 void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
 {
@@ -49,8 +49,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     {
         if (expected[i] != candidate[i])
         {
-            return ::testing::AssertionFailure() << "candidate[" << i
-                                                 << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
+            return ::testing::AssertionFailure() << "candidate[" << i << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
                                                  << "] (" << static_cast<uint32_t>(expected[i]) << ")";
         }
     }
@@ -64,30 +63,36 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     {
         if (buffer[i] != val)
         {
-            return ::testing::AssertionFailure() << "buffer[" << i
-                                                 << "] (" << static_cast<uint32_t>(buffer[i]) << ") != expected[" << i
-                                                 << "] (" << static_cast<uint32_t>(val) << ")";
+            return ::testing::AssertionFailure() << "buffer[" << i << "] (" << static_cast<uint32_t>(buffer[i]) << ") != expected[" << i << "] ("
+                                                 << static_cast<uint32_t>(val) << ")";
         }
     }
 
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(uint8_t *buffer, scrutiny::protocol::CommandId::E cmd, uint8_t subfunction, scrutiny::protocol::ResponseCode::E code)
+::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(
+    uint8_t *buffer,
+    scrutiny::protocol::CommandId::E cmd,
+    uint8_t subfunction,
+    scrutiny::protocol::ResponseCode::E code)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
-        return ::testing::AssertionFailure() << "Wrong command ID. Got " << static_cast<uint32_t>(buffer[0]) << " but expected " << static_cast<uint32_t>(cmd);
+        return ::testing::AssertionFailure() << "Wrong command ID. Got " << static_cast<uint32_t>(buffer[0]) << " but expected "
+                                             << static_cast<uint32_t>(cmd);
     }
 
     if (buffer[1] != subfunction)
     {
-        return ::testing::AssertionFailure() << "Wrong Subfunction. Got " << static_cast<uint32_t>(buffer[1]) << " but expected " << static_cast<uint32_t>(subfunction);
+        return ::testing::AssertionFailure() << "Wrong Subfunction. Got " << static_cast<uint32_t>(buffer[1]) << " but expected "
+                                             << static_cast<uint32_t>(subfunction);
     }
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2]) << " but expected " << code;
+        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2])
+                                             << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
@@ -183,8 +188,8 @@ namespace scrutiny
 
             return out << " (" << static_cast<uint32_t>(val) << ")";
         }
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 namespace scrutiny
@@ -216,6 +221,6 @@ namespace scrutiny
 
             return out << " (" << static_cast<uint32_t>(val) << ")";
         }
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny
 #endif

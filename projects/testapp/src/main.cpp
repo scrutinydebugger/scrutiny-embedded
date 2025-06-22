@@ -6,12 +6,12 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "abstract_comm_channel.hpp"
+#include "argument_parser.hpp"
 #include "file1.hpp"
 #include "file2.hpp"
 #include "file3.hpp"
-#include "argument_parser.hpp"
 #include "scrutiny.hpp"
-#include "abstract_comm_channel.hpp"
 #include "udp_bridge.hpp"
 
 #if SCRUTINY_BUILD_WINDOWS
@@ -23,12 +23,12 @@ using SerialPortBridge = WinSerialPortBridge;
 using SerialPortBridge = NixSerialPortBridge;
 #endif
 
-#include <iostream>
-#include <iomanip>
-#include <stdint.h>
-#include <chrono>
-#include <thread>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <stdint.h>
+#include <thread>
 
 using namespace std;
 
@@ -70,24 +70,16 @@ static uint8_t scrutiny_rx_buffer[128];
 static uint8_t scrutiny_tx_buffer[256];
 
 scrutiny::RuntimePublishedValue rpvs[] = {
-    {0x1000, scrutiny::VariableType::sint8},
-    {0x1001, scrutiny::VariableType::sint16},
-    {0x1002, scrutiny::VariableType::sint32},
+    { 0x1000, scrutiny::VariableType::sint8 },   { 0x1001, scrutiny::VariableType::sint16 },  { 0x1002, scrutiny::VariableType::sint32 },
 
-    {0x2000, scrutiny::VariableType::uint8},
-    {0x2001, scrutiny::VariableType::uint16},
-    {0x2002, scrutiny::VariableType::uint32},
+    { 0x2000, scrutiny::VariableType::uint8 },   { 0x2001, scrutiny::VariableType::uint16 },  { 0x2002, scrutiny::VariableType::uint32 },
 
-    {0x3000, scrutiny::VariableType::float32},
-    {0x4000, scrutiny::VariableType::boolean},
+    { 0x3000, scrutiny::VariableType::float32 }, { 0x4000, scrutiny::VariableType::boolean },
 
-    {0x5000, scrutiny::VariableType::boolean},
-    {0x5001, scrutiny::VariableType::uint16},
+    { 0x5000, scrutiny::VariableType::boolean }, { 0x5001, scrutiny::VariableType::uint16 },
 
 #if SCRUTINY_SUPPORT_64BITS
-    {0x1003, scrutiny::VariableType::sint64},
-    {0x2003, scrutiny::VariableType::uint64},
-    {0x3001, scrutiny::VariableType::float64},
+    { 0x1003, scrutiny::VariableType::sint64 },  { 0x2003, scrutiny::VariableType::uint64 },  { 0x3001, scrutiny::VariableType::float64 },
 #endif
 
 };
@@ -316,8 +308,7 @@ void my_user_command(
     uint16_t *response_data_length,
     uint16_t const response_max_data_length)
 {
-    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction)
-              << " with " << request_data_length << " data bytes: ";
+    std::cout << "User command: Subfunction #" << static_cast<unsigned int>(subfunction) << " with " << request_data_length << " data bytes: ";
     for (uint32_t i = 0; i < request_data_length; i++)
     {
         std::cout << hex << setw(2) << setfill('0') << static_cast<uint32_t>(request_data[i]);
@@ -381,7 +372,7 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
     scrutiny::Config config;
     scrutiny::VariableFrequencyLoopHandler vf_loop("Variable freq loop");
     scrutiny::FixedFrequencyLoopHandler ff_loop(100000, "100Hz Loop");
-    scrutiny::LoopHandler *loops[] = {&ff_loop, &vf_loop};
+    scrutiny::LoopHandler *loops[] = { &ff_loop, &vf_loop };
     config.set_buffers(scrutiny_rx_buffer, sizeof(scrutiny_rx_buffer), scrutiny_tx_buffer, sizeof(scrutiny_tx_buffer));
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(scrutiny::RuntimePublishedValue), TestAppRPVReadCallback, TestAppRPVWriteCallback);
     config.set_loops(loops, sizeof(loops) / sizeof(loops[0]));
@@ -412,7 +403,8 @@ void process_scrutiny_lib(AbstractCommChannel *channel)
             process_interactive_data();
             len_received = channel->receive(buffer, sizeof(buffer)); // Non-blocking. Can return 0
             now_timestamp = chrono::steady_clock::now();
-            uint32_t time_since_start_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
+            uint32_t time_since_start_us =
+                static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - start_timestamp).count());
             uint32_t timestep_us = static_cast<uint32_t>(chrono::duration_cast<chrono::microseconds>(now_timestamp - last_timestamp).count());
 
             if (len_received > 0)
@@ -477,8 +469,7 @@ int main(int argc, char *argv[])
 
     if (!parser.is_valid())
     {
-        cerr << "Invalid usage" << endl
-             << parser.error_message() << endl;
+        cerr << "Invalid usage" << endl << parser.error_message() << endl;
         errorcode = -1;
     }
     else

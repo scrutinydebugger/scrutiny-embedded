@@ -13,7 +13,7 @@
 
 class TestRxParsing : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
 
@@ -30,7 +30,7 @@ protected:
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_ZeroLen_AllInOne)
 {
-    uint8_t data[8] = {1, 2, 0, 0};
+    uint8_t data[8] = { 1, 2, 0, 0 };
     add_crc(data, 4);
     comm.receive_data(data, sizeof(data));
 
@@ -46,7 +46,7 @@ TEST_F(TestRxParsing, TestRx_ZeroLen_AllInOne)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_ZeroLen_BytePerByte)
 {
-    uint8_t data[8] = {1, 2, 0, 0};
+    uint8_t data[8] = { 1, 2, 0, 0 };
     add_crc(data, 4);
 
     for (unsigned int i = 0; i < sizeof(data); i++)
@@ -66,7 +66,7 @@ TEST_F(TestRxParsing, TestRx_ZeroLen_BytePerByte)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_NonZeroLen_AllInOne)
 {
-    uint8_t data[11] = {1, 2, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t data[11] = { 1, 2, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(data, 7);
     comm.receive_data(data, sizeof(data));
 
@@ -85,7 +85,7 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_AllInOne)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
 {
-    uint8_t data[11] = {1, 2, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t data[11] = { 1, 2, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(data, 7);
 
     for (unsigned int i = 0; i < sizeof(data); i++)
@@ -108,7 +108,7 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_Discover_2_parts)
 {
-    uint8_t data[12] = {1, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68};
+    uint8_t data[12] = { 1, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68 };
     add_crc(data, 8);
 
     for (uint16_t i = 0; i < sizeof(data); i++)
@@ -139,7 +139,7 @@ TEST_F(TestRxParsing, TestRx_UseAllBuffer)
 
     uint16_t datalen = sizeof(_rx_buffer);
 
-    uint8_t data[sizeof(_rx_buffer) + 8] = {1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF)};
+    uint8_t data[sizeof(_rx_buffer) + 8] = { 1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF) };
     add_crc(data, sizeof(_rx_buffer) + 4);
 
     comm.receive_data(data, sizeof(data));
@@ -154,7 +154,7 @@ TEST_F(TestRxParsing, TestRx_Overflow)
 
     uint16_t datalen = sizeof(_rx_buffer) + 1;
 
-    uint8_t data[sizeof(_rx_buffer) + 8] = {1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF)};
+    uint8_t data[sizeof(_rx_buffer) + 8] = { 1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF) };
     add_crc(data, sizeof(_rx_buffer) + 4);
 
     comm.receive_data(data, sizeof(data));
@@ -170,7 +170,7 @@ TEST_F(TestRxParsing, TestRx_OverflowRestoreAfterDelay)
 
     uint16_t datalen = sizeof(_rx_buffer) + 1;
 
-    uint8_t data[sizeof(_rx_buffer) + 8] = {1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF)};
+    uint8_t data[sizeof(_rx_buffer) + 8] = { 1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF) };
     add_crc(data, sizeof(_rx_buffer) + 4);
 
     comm.receive_data(data, sizeof(data));
@@ -181,7 +181,7 @@ TEST_F(TestRxParsing, TestRx_OverflowRestoreAfterDelay)
     tb.step(SCRUTINY_COMM_RX_TIMEOUT_US * 10); // Increase the timesbase from enough time for comm to restart
 
     datalen = sizeof(_rx_buffer);
-    uint8_t data2[sizeof(_rx_buffer) + 8] = {1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF)};
+    uint8_t data2[sizeof(_rx_buffer) + 8] = { 1, 2, static_cast<uint8_t>((datalen >> 8) & 0xFF), static_cast<uint8_t>(datalen & 0xFF) };
     add_crc(data2, sizeof(_rx_buffer) + 4);
 
     comm.receive_data(data2, sizeof(data2));
@@ -192,7 +192,7 @@ TEST_F(TestRxParsing, TestRx_OverflowRestoreAfterDelay)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_Timeout)
 {
-    uint8_t data[11] = {1, 2, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t data[11] = { 1, 2, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(data, 7);
 
     for (uint8_t i = 1; i < sizeof(data) - 1; i++)
@@ -209,7 +209,7 @@ TEST_F(TestRxParsing, TestRx_Timeout)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_BadCRC)
 {
-    uint8_t data[11] = {1, 2, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t data[11] = { 1, 2, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(data, 7);
     data[10] = ~data[10]; // Force bad CRC
     comm.receive_data(data, sizeof(data));
@@ -220,7 +220,7 @@ TEST_F(TestRxParsing, TestRx_BadCRC)
 //=============================================================================
 TEST_F(TestRxParsing, TestRx_ReceiveResponseBit_Ignore)
 {
-    uint8_t data[12] = {0x81, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68};
+    uint8_t data[12] = { 0x81, 2, 0, 4, 0x7e, 0x18, 0xfc, 0x68 };
     add_crc(data, sizeof(data) - 4);
     EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::None);
     comm.receive_data(data, sizeof(data));

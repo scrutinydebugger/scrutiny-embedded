@@ -14,8 +14,8 @@
 #if SCRUTINY_BUILD_WINDOWS
 #include <winsock2.h>
 #else
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #endif
 
@@ -37,7 +37,7 @@ typedef sockaddr SOCKADDR;
 
 class UdpBridge : public AbstractCommChannel
 {
-public:
+  public:
     UdpBridge(uint16_t port);
 
     static void global_init();
@@ -54,7 +54,7 @@ public:
     void set_nonblocking();
     static void throw_system_error(char const *msg);
 
-private:
+  private:
     uint16_t m_port;
     SOCKET m_sock;               // SOCKET = int for linux, SOCKET for windows
     SOCKADDR m_last_packet_addr; // SOCKADDR = sockaddr for linux, SOCKADDR for windows

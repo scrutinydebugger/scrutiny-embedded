@@ -9,8 +9,8 @@
 #ifndef ___SCRUTINY_TYPES_H___
 #define ___SCRUTINY_TYPES_H___
 
-#include <stdint.h>
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 namespace scrutiny
 {
@@ -22,12 +22,14 @@ namespace scrutiny
     /// @brief Represents an storage endianness
     class Endianness
     {
-        public:
+      public:
+        // clang-format off
         SCRUTINY_ENUM(uint_least8_t)
         {
             LITTLE = ctypes::SCRUTINY_C_ENDIANNESS_LITTLE,
             BIG = ctypes::SCRUTINY_C_ENDIANNESS_BIG
         };
+        // clang-format on
     };
 
     /// @brief Represents an address range with a start an a end.
@@ -39,7 +41,8 @@ namespace scrutiny
     /// @brief Represent a type type, meaning a type without its size. uint8, uin16, int32 all have type type uint.
     class VariableTypeType
     {
-        public:
+      public:
+        // clang-format off
         SCRUTINY_ENUM(uint_least8_t)
         {
             _sint = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_sint,
@@ -49,12 +52,14 @@ namespace scrutiny
             _cfloat = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat,
             _undef = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_undef
         };
+        // clang-format on
     };
 
     /// @brief Represent a type size
     class VariableTypeSize
     {
-        public:
+      public:
+        // clang-format off
         SCRUTINY_ENUM(uint_least8_t)
         {
             _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
@@ -65,12 +70,14 @@ namespace scrutiny
             _256 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_256,
             _undef = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_undef
         };
+        // clang-format on
     };
 
     /// @brief  Represent a datatype. Must match the python core module enum
     class VariableType
-    {   
-        public:
+    {
+      public:
+        // clang-format off
         SCRUTINY_ENUM(uint_least8_t)
         {
             sint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint8,
@@ -95,6 +102,7 @@ namespace scrutiny
 #endif
             unknown = ctypes::SCRUTINY_C_VARIABLE_TYPE_unknown
         };
+        // clang-format on
     };
 
     /// @brief Union structure to pass any type of data to a function.
@@ -108,18 +116,18 @@ namespace scrutiny
     typedef int64_t int_biggest_t;
     typedef double float_biggest_t;
 
-    #define BiggestUint  VariableType::uint64
-    #define BiggestSint  VariableType::sint64
-    #define BiggestFloat  VariableType::float64
+#define BiggestUint VariableType::uint64
+#define BiggestSint VariableType::sint64
+#define BiggestFloat VariableType::float64
 
 #else
     typedef uint32_t uint_biggest_t;
     typedef int32_t int_biggest_t;
     typedef float float_biggest_t;
 
-    #define BiggestUint  VariableType::uint32
-    #define BiggestSint  VariableType::sint32
-    #define BiggestFloat  VariableType::float32
+#define BiggestUint VariableType::uint32
+#define BiggestSint VariableType::sint32
+#define BiggestFloat VariableType::float32
 #endif
 
     /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and a ID that can be read/written by the server
@@ -148,6 +156,6 @@ namespace scrutiny
         uint8_t *source_data;
         uint8_t *mask;
     };
-}
+} // namespace scrutiny
 
 #endif //  ___SCRUTINY_TYPES_H___

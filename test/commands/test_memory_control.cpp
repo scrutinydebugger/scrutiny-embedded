@@ -6,14 +6,14 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 #include <cstring>
+#include <gtest/gtest.h>
 
 class TestMemoryControl : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -21,12 +21,13 @@ protected:
     uint8_t _rx_buffer[128];
     uint8_t _tx_buffer[128];
 
-    TestMemoryControl() : ScrutinyTest(),
-                          tb(),
-                          scrutiny_handler(),
-                          config(),
-                          _rx_buffer(),
-                          _tx_buffer()
+    TestMemoryControl() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer()
     {
     }
 
@@ -45,10 +46,10 @@ protected:
 TEST_F(TestMemoryControl, TestReadSingleAddress)
 {
     // Building request
-    uint8_t data_buf[] = {0x11, 0x22, 0x33};
+    uint8_t data_buf[] = { 0x11, 0x22, 0x33 };
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = sizeof(data_buf);
-    uint8_t request_data[8 + addr_size + 2] = {3, 1, 0, addr_size + 2};
+    uint8_t request_data[8 + addr_size + 2] = { 3, 1, 0, addr_size + 2 };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], data_buf);
     request_data[index++] = (data_size >> 8) & 0xFF;
@@ -58,7 +59,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     // Building expected response
     uint8_t tx_buffer[32];
     SCRUTINY_CONSTEXPR uint16_t datalen = addr_size + 2 + data_size;
-    uint8_t expected_response[9 + datalen] = {0x83, 1, 0, 0, datalen};
+    uint8_t expected_response[9 + datalen] = { 0x83, 1, 0, 0, datalen };
     index = 5;
     index += encode_addr(&expected_response[index], data_buf);
     expected_response[index++] = (data_size >> 8) & 0xFF;
@@ -86,9 +87,9 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
 */
 TEST_F(TestMemoryControl, TestReadMultipleAddress)
 {
-    uint8_t data_buf1[] = {0x11, 0x22, 0x33};
-    uint8_t data_buf2[] = {0x44, 0x55, 0x66, 0x77};
-    uint8_t data_buf3[] = {0x88, 0x99};
+    uint8_t data_buf1[] = { 0x11, 0x22, 0x33 };
+    uint8_t data_buf2[] = { 0x44, 0x55, 0x66, 0x77 };
+    uint8_t data_buf3[] = { 0x88, 0x99 };
     uint8_t tx_buffer[64];
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size1 = sizeof(data_buf1);
@@ -97,7 +98,7 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 3;
 
     // Building request
-    uint8_t request_data[8 + datalen_req] = {3, 1, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 1, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], data_buf1);
     request_data[index++] = (data_size1 >> 8) & 0xFF;
@@ -112,7 +113,7 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
 
     // Building expected_response
     SCRUTINY_CONSTEXPR uint16_t datalen_resp = (addr_size + 2) * 3 + data_size1 + data_size2 + data_size3;
-    uint8_t expected_response[9 + datalen_resp] = {0x83, 1, 0, 0, datalen_resp};
+    uint8_t expected_response[9 + datalen_resp] = { 0x83, 1, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], data_buf1);
     expected_response[index++] = (data_size1 >> 8) & 0xFF;
@@ -159,7 +160,7 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
     uint8_t tx_buffer[64];
 
     // Building request
-    uint8_t request_data[64] = {static_cast<uint8_t>(cmd), subfn};
+    uint8_t request_data[64] = { static_cast<uint8_t>(cmd), subfn };
     uint16_t length_to_receive;
     for (unsigned int i = 0; i < 32; i++)
     {
@@ -203,11 +204,11 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
     const scrutiny::protocol::ResponseCode::E ok = scrutiny::protocol::ResponseCode::OK;
 
     uint8_t tx_buffer[sizeof(_rx_buffer) * 2];
-    uint8_t some_buffer[sizeof(_rx_buffer)] = {0};
+    uint8_t some_buffer[sizeof(_rx_buffer)] = { 0 };
     uint16_t buf1_size = sizeof(_rx_buffer) - (addr_size + 2) * 2 - 1; // We fill all the buffer minus 1 byte.
 
     // Building request
-    uint8_t request_data[64] = {static_cast<uint8_t>(cmd), subfn, 0, (addr_size + 2) * 2};
+    uint8_t request_data[64] = { static_cast<uint8_t>(cmd), subfn, 0, (addr_size + 2) * 2 };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], &some_buffer);
     request_data[index++] = static_cast<uint8_t>(buf1_size >> 8);
@@ -259,19 +260,18 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     const scrutiny::protocol::ResponseCode::E ok = scrutiny::protocol::ResponseCode::OK;
 
     uint8_t tx_buffer[32];
-    uint8_t buf[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     SCRUTINY_CONSTEXPR uint8_t datalen = sizeof(void *) + 2;
-    uint8_t request_data[8 + datalen] = {3, 1, 0, datalen};
+    uint8_t request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
@@ -312,20 +312,19 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     const scrutiny::protocol::ResponseCode::E ok = scrutiny::protocol::ResponseCode::OK;
 
     uint8_t tx_buffer[32];
-    uint8_t buf[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 
     // indices [6,7,8,9] are readonly
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_range[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange readonly_range[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_readonly_address_range(readonly_range, sizeof(readonly_range) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     SCRUTINY_CONSTEXPR uint8_t datalen = sizeof(void *) + 2;
-    uint8_t request_data[8 + datalen] = {3, 1, 0, datalen};
+    uint8_t request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
@@ -358,14 +357,14 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
 TEST_F(TestMemoryControl, TestWriteSingleAddress)
 {
 
-    uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
-    uint8_t data_to_write[] = {0x11, 0x22, 0x33, 0x44};
-    uint8_t expected_output_buffer[] = {0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+    uint8_t buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+    uint8_t data_to_write[] = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write);
-    uint8_t request_data[8 + datalen_req] = {3, 2, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
@@ -376,7 +375,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     // Building expected response
     uint8_t tx_buffer[32];
     SCRUTINY_CONSTEXPR uint16_t datalen_resp = addr_size + 2;
-    uint8_t expected_response[9 + datalen_resp] = {0x83, 2, 0, 0, datalen_resp};
+    uint8_t expected_response[9 + datalen_resp] = { 0x83, 2, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
     expected_response[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
@@ -405,15 +404,15 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
 TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 {
 
-    uint8_t buffer[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-    uint8_t data_to_write[] = {0xFF, 0xFF, 0x00, 0x00};
-    uint8_t write_mask[] = {0xF0, 0xAA, 0xF0, 0xAA};
-    uint8_t expected_output_buffer[] = {0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+    uint8_t buffer[] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
+    uint8_t data_to_write[] = { 0xFF, 0xFF, 0x00, 0x00 };
+    uint8_t write_mask[] = { 0xF0, 0xAA, 0xF0, 0xAA };
+    uint8_t expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write) * 2;
-    uint8_t request_data[8 + datalen_req] = {3, 3, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
@@ -426,7 +425,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     // Building expected response
     uint8_t tx_buffer[32];
     SCRUTINY_CONSTEXPR uint16_t datalen_resp = addr_size + 2;
-    uint8_t expected_response[9 + datalen_resp] = {0x83, 3, 0, 0, datalen_resp};
+    uint8_t expected_response[9 + datalen_resp] = { 0x83, 3, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
     expected_response[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
@@ -455,15 +454,15 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 {
 
-    uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
-    uint8_t data_to_write1[] = {0x11, 0x22, 0x33, 0x44};
-    uint8_t data_to_write2[] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE};
-    uint8_t expected_output_buffer[] = {0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x09, 0x0a};
+    uint8_t buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+    uint8_t data_to_write1[] = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t data_to_write2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
+    uint8_t expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x09, 0x0a };
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 2 + sizeof(data_to_write1) + sizeof(data_to_write2);
-    uint8_t request_data[8 + datalen_req] = {3, 2, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = (sizeof(data_to_write1) >> 8) & 0xFF;
@@ -480,7 +479,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     // Building expected response
     uint8_t tx_buffer[32];
     SCRUTINY_CONSTEXPR uint16_t datalen_resp = (addr_size + 2) * 2;
-    uint8_t expected_response[9 + datalen_resp] = {0x83, 2, 0, 0, datalen_resp};
+    uint8_t expected_response[9 + datalen_resp] = { 0x83, 2, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
     expected_response[index++] = (sizeof(data_to_write1) >> 8) & 0xFF;
@@ -512,17 +511,17 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
 {
 
-    uint8_t buffer[] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x99};
-    uint8_t data_to_write1[] = {0x11, 0x22, 0x33, 0x44};
-    uint8_t write_mask1[] = {0xFF, 0x00, 0xF0, 0x0F};
-    uint8_t data_to_write2[] = {0xAA, 0xAA, 0x55, 0x55, 0x0F};
-    uint8_t write_mask2[] = {0x0F, 0xAA, 0xAA, 0x55, 0xF0};
-    uint8_t expected_output_buffer[] = {0x11, 0x55, 0x35, 0x54, 0x5A, 0xFF, 0x55, 0x55, 0x05, 0x99};
+    uint8_t buffer[] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x99 };
+    uint8_t data_to_write1[] = { 0x11, 0x22, 0x33, 0x44 };
+    uint8_t write_mask1[] = { 0xFF, 0x00, 0xF0, 0x0F };
+    uint8_t data_to_write2[] = { 0xAA, 0xAA, 0x55, 0x55, 0x0F };
+    uint8_t write_mask2[] = { 0x0F, 0xAA, 0xAA, 0x55, 0xF0 };
+    uint8_t expected_output_buffer[] = { 0x11, 0x55, 0x35, 0x54, 0x5A, 0xFF, 0x55, 0x55, 0x05, 0x99 };
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 2 + sizeof(data_to_write1) * 2 + sizeof(data_to_write2) * 2;
-    uint8_t request_data[8 + datalen_req] = {3, 3, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = (sizeof(data_to_write1) >> 8) & 0xFF;
@@ -544,7 +543,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     // Building expected response
     uint8_t tx_buffer[32];
     SCRUTINY_CONSTEXPR uint16_t datalen_resp = (addr_size + 2) * 2;
-    uint8_t expected_response[9 + datalen_resp] = {0x83, 3, 0, 0, datalen_resp};
+    uint8_t expected_response[9 + datalen_resp] = { 0x83, 3, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
     expected_response[index++] = (sizeof(data_to_write1) >> 8) & 0xFF;
@@ -576,14 +575,14 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::Write);
     const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
-    uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+    uint8_t buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
     uint8_t tx_buffer[32];
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = 10;
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + data_size;
-    uint8_t request_data[8 + datalen_req] = {3, 2, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = ((data_size + 1) >> 8) & 0xFF;
@@ -610,14 +609,14 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteMasked);
     const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
-    uint8_t buffer[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+    uint8_t buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
     uint8_t tx_buffer[32];
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = 10;
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + data_size;
-    uint8_t request_data[8 + datalen_req] = {3, 3, 0, datalen_req};
+    uint8_t request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
     request_data[index++] = ((data_size + 1) >> 8) & 0xFF;
@@ -650,12 +649,11 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     const scrutiny::protocol::ResponseCode::E ok = scrutiny::protocol::ResponseCode::OK;
 
     uint8_t tx_buffer[32];
-    uint8_t buf[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
@@ -663,7 +661,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
 
     SCRUTINY_CONSTEXPR uint16_t window_size = 4;
     SCRUTINY_CONSTEXPR uint8_t datalen = sizeof(void *) + 2 + window_size;
-    uint8_t request_data[8 + datalen] = {3, 2, 0, datalen};
+    uint8_t request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
     {
@@ -706,12 +704,11 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     const scrutiny::protocol::ResponseCode::E ok = scrutiny::protocol::ResponseCode::OK;
 
     uint8_t tx_buffer[32];
-    uint8_t buf[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start, end)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
@@ -719,7 +716,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
 
     SCRUTINY_CONSTEXPR uint16_t window_size = 4;
     SCRUTINY_CONSTEXPR uint8_t datalen = sizeof(void *) + 2 + window_size;
-    uint8_t request_data[8 + datalen] = {3, 2, 0, datalen};
+    uint8_t request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
     {
@@ -766,9 +763,9 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
     SCRUTINY_CONSTEXPR uint32_t datalen = (addr_size + 2 + data_to_write_length) * 2;
     uint8_t tx_buffer[64];
 
-    uint8_t some_data[] = {1, 2, 3, 4};
+    uint8_t some_data[] = { 1, 2, 3, 4 };
 
-    uint8_t request_data[8 + datalen + 64] = {3, 2, 0, 0}; // Add 64 bytes because we will put more data.
+    uint8_t request_data[8 + datalen + 64] = { 3, 2, 0, 0 }; // Add 64 bytes because we will put more data.
 
     for (uint16_t i = 0; i < datalen + 10; i++)
     {

@@ -12,10 +12,10 @@
 
 #include <stdint.h>
 
-#include "scrutiny_setup.hpp"
-#include "scrutiny_timebase.hpp"
 #include "scrutiny_protocol.hpp"
 #include "scrutiny_protocol_definitions.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_timebase.hpp"
 #include "scrutiny_tools.hpp"
 
 namespace scrutiny
@@ -26,14 +26,15 @@ namespace scrutiny
         /// Communication is half-duplex and works by polling with a request/response scheme.
         class CommHandler
         {
-        public:
+          public:
             /// @brief Initialize the CommHandler
             /// @param rx_buffer     Buffer for reception
             /// @param rx_buffer_size Reception buffer size
             /// @param tx_buffer Buffer for transmission
             /// @param tx_buffer_size Transmission buffer size
             /// @param timebase Pointer to a timebase object to keep track of time
-            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are connected to the same channel
+            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are
+            /// connected to the same channel
             void init(
                 uint8_t *const rx_buffer,
                 uint16_t const rx_buffer_size,
@@ -73,7 +74,8 @@ namespace scrutiny
             void add_crc(Response *const response) const;
 
             /// @brief Trigger a heartbeat, resetting the watchdog timeout
-            /// @param challenge A challenge value to be used to compute a response. This value must change at each call otherwise the heartbeat will be ignored
+            /// @param challenge A challenge value to be used to compute a response. This value must change at each call otherwise the heartbeat will
+            /// be ignored
             /// @return True if the heartbeat was effective. False if it was ignored
             bool heartbeat(uint16_t const challenge);
 
@@ -132,14 +134,15 @@ namespace scrutiny
             /// @brief Returns the size of the transmission buffer
             inline uint16_t tx_buffer_size(void) const { return m_tx_buffer_size; }
 
-        protected:
+          protected:
             void process_active_request(void);
             bool received_discover_request(void);
             bool received_connect_request(void);
 
             class RxFSMState
-            { 
-                public:
+            {
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     WaitForCommand,
@@ -150,17 +153,20 @@ namespace scrutiny
                     WaitForProcess,
                     Error
                 };
+                // clang-format on
             };
 
             class State
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     Idle,
                     Receiving,
                     Transmitting
                 };
+                // clang-format on
             };
 
             void reset_rx();
@@ -181,8 +187,8 @@ namespace scrutiny
             uint8_t *m_tx_buffer;      // The transmission buffer
             uint16_t m_tx_buffer_size; // The transmission buffer size
             Request m_active_request;  // The request presently being received
-            RxFSMState::E m_rx_state;     // Reception Finite State Machine state
-            RxError::E m_rx_error;        // Last reception error code
+            RxFSMState::E m_rx_state;  // Reception Finite State Machine state
+            RxError::E m_rx_error;     // Last reception error code
             bool m_request_received;   // Flag indicating if a full request has been received
             union
             {
@@ -198,11 +204,10 @@ namespace scrutiny
             uint16_t m_nbytes_sent;     // Number of bytes sent up to now. Includes headers and CRC
             TxError::E m_tx_error;      // Last Transmission error code
 
-        private:
+          private:
             static uint32_t s_session_counter; // A counter to generate session ID
         };
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny
 
 #endif //___SCRUTINY_COMM_HANDLER_H___
-

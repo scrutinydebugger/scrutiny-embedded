@@ -9,10 +9,10 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
-#include "scrutiny_setup.hpp"
-#include "datalogging/scrutiny_datalogging_types.hpp"
-#include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
+#include "datalogging/scrutiny_datalogging_trigger.hpp"
+#include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -28,28 +28,31 @@ namespace scrutiny
 
         class DataLogger
         {
-        public:
+          public:
             /// @brief The internal state of the datalogger
 
             class State
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
-                    IDLE,
-                    CONFIGURED,
-                    ARMED,
-                    TRIGGERED,
-                    ACQUISITION_COMPLETED,
+                    IDLE, 
+                    CONFIGURED, 
+                    ARMED, 
+                    TRIGGERED, 
+                    ACQUISITION_COMPLETED, 
                     ERROR
                 };
+                // clang-format on
             };
 
             /// @brief Initializes the datalogger
             /// @param main_handler A pointer to the main handler to be used to access memory and RPVs
             /// @param buffer The logging buffer
             /// @param buffer_size Size of the logging buffer
-            /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread safety)
+            /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread
+            /// safety)
             void init(
                 MainHandler const *const main_handler,
                 uint8_t *const buffer,
@@ -126,7 +129,7 @@ namespace scrutiny
                 }
             }
 
-        protected:
+          protected:
             void process_acquisition(void);
             void stamp_trigger_point(void);
             bool acquisition_completed(void);
@@ -134,17 +137,19 @@ namespace scrutiny
             uint16_t read_next_entry_size(buffer_size_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);
 
-            MainHandler const *m_main_handler;     // A pointer to the main handler
-            buffer_size_t m_buffer_size;           // The datalogging buffer size
-            trigger_callback_t m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
+            MainHandler const *m_main_handler; // A pointer to the main handler
+            buffer_size_t m_buffer_size;       // The datalogging buffer size
+            trigger_callback_t
+                m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
-            Timebase const *m_timebase;              // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::E m_state;                           // Internal state
+            Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
+            State::E m_state;           // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 
-            buffer_size_t m_remaining_data_to_write; // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
-            bool m_manual_trigger;                   // Indicates if a manual trigger have been requested
+            // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
+            buffer_size_t m_remaining_data_to_write;
+            bool m_manual_trigger; // Indicates if a manual trigger have been requested
 
             Configuration m_config;                   // The datalogger configuration object
             bool m_config_valid;                      // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
@@ -162,6 +167,6 @@ namespace scrutiny
                 trigger::BaseCondition *active_condition; // A pointer to the active condition object.
             } m_trigger;                                  // Data related to the graph trigger
         };
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny
 #endif // ___SCRUTINY_DATALOGGER_H___

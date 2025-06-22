@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "scrutiny_config.hpp"
-#include "scrutiny_tools.hpp"
 #include "scrutiny_loop_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_tools.hpp"
 #include <string.h>
 
 namespace scrutiny
@@ -68,7 +68,11 @@ namespace scrutiny
         m_readonly_range_count = count;
     }
 
-    void Config::set_published_values(RuntimePublishedValue const *const array, uint16_t const nbr, RpvReadCallback const rd_cb, RpvWriteCallback const wr_cb)
+    void Config::set_published_values(
+        RuntimePublishedValue const *const array,
+        uint16_t const nbr,
+        RpvReadCallback const rd_cb,
+        RpvWriteCallback const wr_cb)
     {
         m_rpvs = array;
         m_rpv_count = nbr;
@@ -101,4 +105,4 @@ namespace scrutiny
         return false;
     }
 #endif
-}
+} // namespace scrutiny

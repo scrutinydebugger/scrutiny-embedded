@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <stdint.h>
+#include "scrutiny_tools.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
-#include "scrutiny_tools.hpp"
+#include <stdint.h>
 
 namespace scrutiny
 {
@@ -109,5 +109,5 @@ namespace scrutiny
 
             return ~crc;
         }
-    }
-}
+    } // namespace tools
+} // namespace scrutiny

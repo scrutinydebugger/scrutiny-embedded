@@ -11,6 +11,7 @@
 #define ___SCRUTINY_PROTOCOL_DEFINITION_H___
 
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 namespace scrutiny
 {
@@ -54,7 +55,8 @@ namespace scrutiny
 
         class CommandId
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 GetInfo = 0x01,
@@ -63,11 +65,13 @@ namespace scrutiny
                 UserCommand = 0x04,
                 DataLogControl = 0x05
             };
+            // clang-format on
         };
 
         class ResponseCode
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 OK = 0,
@@ -80,11 +84,13 @@ namespace scrutiny
                 NoResponseToSend = 0xFE,
                 ProcessAgain = 0xFF
             };
+            // clang-format on
         };
 
         class RxError
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 None,
@@ -92,11 +98,13 @@ namespace scrutiny
                 Disabled,
                 InvalidCommand
             };
+            // clang-format on
         };
 
         class TxError
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 None,
@@ -104,6 +112,7 @@ namespace scrutiny
                 Busy,
                 Disabled
             };
+            // clang-format on
         };
 
         struct Version
@@ -116,7 +125,8 @@ namespace scrutiny
         {
             class Subfunction
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     GetprotocolVersion = 1,
@@ -129,18 +139,21 @@ namespace scrutiny
                     GetLoopCount = 8,
                     GetLoopDefinition = 9
                 };
+                // clang-format on
             };
 
             class MemoryRegionType
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     ReadOnly = 0,
                     Forbidden = 1
                 };
+                // clang-format on
             };
-        }
+        } // namespace GetInfo
 
         namespace CommControl
         {
@@ -149,7 +162,8 @@ namespace scrutiny
 
             class Subfunction
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     Discover = 1,
@@ -158,14 +172,16 @@ namespace scrutiny
                     Connect = 4,
                     Disconnect = 5
                 };
+                // clang-format on
             };
-        }
+        } // namespace CommControl
 
         namespace MemoryControl
         {
             class Subfunction
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     Read = 1,
@@ -174,14 +190,16 @@ namespace scrutiny
                     ReadRPV = 4,
                     WriteRPV = 5
                 };
+                // clang-format on
             };
-        }
+        } // namespace MemoryControl
 
         namespace DataLogControl
         {
             class Subfunction
             {
-                public:
+              public:
+                // clang-format off
                 SCRUTINY_ENUM(uint_least8_t)
                 {
                     GetSetup = 1,
@@ -193,10 +211,11 @@ namespace scrutiny
                     ReadAcquisition = 7,
                     ResetDatalogger = 8
                 };
+                // clang-format on
             };
-        }
+        } // namespace DataLogControl
 
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_PROTOCOL_DEFINITION_H___

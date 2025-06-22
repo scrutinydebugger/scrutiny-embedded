@@ -34,7 +34,7 @@ struct SerialConfig
 
 class ArgumentParser
 {
-public:
+  public:
     enum class Error
     {
         WrongCommand,
@@ -51,7 +51,7 @@ public:
     inline bool is_valid() { return m_valid; }
     std::string error_message() { return m_last_error; }
 
-protected:
+  protected:
     bool m_valid;
     TestAppCommand m_command;
     unsigned int m_region_index;

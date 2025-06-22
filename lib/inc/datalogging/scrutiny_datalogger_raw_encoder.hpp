@@ -10,10 +10,10 @@
 #ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 #define ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 
-#include <stdint.h>
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -32,7 +32,7 @@ namespace scrutiny
 
         class RawFormatReader
         {
-        public:
+          public:
             explicit RawFormatReader(RawFormatEncoder const *const encoder);
             datalogging::buffer_size_t read(uint8_t *const buffer, datalogging::buffer_size_t const max_size);
             inline bool finished(void) const { return m_finished; }
@@ -42,7 +42,7 @@ namespace scrutiny
             datalogging::buffer_size_t get_total_size(void) const;
             inline datalogging::EncodingType::E get_encoding(void) const;
 
-        protected:
+          protected:
             RawFormatEncoder const *const m_encoder;
             datalogging::buffer_size_t m_read_cursor;
             bool m_finished;
@@ -53,7 +53,7 @@ namespace scrutiny
         {
             friend class RawFormatReader;
 
-        public:
+          public:
             static SCRUTINY_CONSTEXPR EncodingType::E ENCODING = EncodingType::RAW;
             RawFormatEncoder();
 
@@ -77,12 +77,9 @@ namespace scrutiny
             inline bool buffer_full(void) const { return m_full; }
             datalogging::buffer_size_t remaining_bytes_to_full() const;
 
-            RawFormatReader *get_reader(void)
-            {
-                return &m_reader;
-            };
+            RawFormatReader *get_reader(void) { return &m_reader; };
 
-        protected:
+          protected:
             uint8_t *m_buffer;
             datalogging::buffer_size_t m_buffer_size;
             datalogging::Configuration const *m_config;
@@ -100,10 +97,19 @@ namespace scrutiny
             bool m_error;
         };
 
-        datalogging::buffer_size_t RawFormatReader::get_entry_count(void) const { return m_encoder->get_entry_count(); }
-        inline datalogging::EncodingType::E RawFormatReader::get_encoding(void) const { return m_encoder->get_encoding(); }
-        inline bool RawFormatReader::error(void) const { return m_encoder->error(); }
-    }
-}
+        datalogging::buffer_size_t RawFormatReader::get_entry_count(void) const
+        {
+            return m_encoder->get_entry_count();
+        }
+        inline datalogging::EncodingType::E RawFormatReader::get_encoding(void) const
+        {
+            return m_encoder->get_encoding();
+        }
+        inline bool RawFormatReader::error(void) const
+        {
+            return m_encoder->error();
+        }
+    } // namespace datalogging
+} // namespace scrutiny
 
 #endif // ___SCRUTINY_DATALOGGER_RAW_ENCODER___

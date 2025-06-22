@@ -1,9 +1,9 @@
-#include <SSD1306AsciiSpi.h>
 #include "Console.hpp"
+#include <SSD1306AsciiSpi.h>
 
 extern SSD1306AsciiSpi display;
 
-static FILE uartout = {0};
+static FILE uartout = { 0 };
 static int console_putchar(char c, FILE *stream)
 {
     return display.write(c);

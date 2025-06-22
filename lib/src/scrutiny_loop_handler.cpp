@@ -8,10 +8,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "scrutiny_loop_handler.hpp"
-#include "scrutiny_timebase.hpp"
 #include "scrutiny_main_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_timebase.hpp"
 
 namespace scrutiny
 {
@@ -93,7 +93,8 @@ namespace scrutiny
                     if (msg_out.data.datalogger_status_update.state == datalogging::DataLogger::State::TRIGGERED)
                     {
                         // write counter gets reset on trigger
-                        msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion = m_datalogger->get_bytes_to_acquire_from_trigger_to_completion();
+                        msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion =
+                            m_datalogger->get_bytes_to_acquire_from_trigger_to_completion();
                         msg_out.data.datalogger_status_update.write_counter_since_trigger = m_datalogger->data_counter_since_trigger();
                     }
                     else
@@ -123,4 +124,4 @@ namespace scrutiny
     {
         process_common(timestep_100ns);
     }
-}
+} // namespace scrutiny

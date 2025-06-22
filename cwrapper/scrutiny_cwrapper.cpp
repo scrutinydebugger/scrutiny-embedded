@@ -1,11 +1,15 @@
-#include "scrutiny.hpp"
 #include "scrutiny_cwrapper.h"
+#include "scrutiny.hpp"
 #include <new>
 #include <stddef.h>
 
 SCRUTINY_STATIC_ASSERT(sizeof(scrutiny_c_runtime_published_value_t) == sizeof(scrutiny::RuntimePublishedValue), "C/C++ RPV type mismatch");
-SCRUTINY_STATIC_ASSERT(offsetof(scrutiny_c_runtime_published_value_t, id) == offsetof(scrutiny::RuntimePublishedValue, id), "C/C++ RPV type mismatch");
-SCRUTINY_STATIC_ASSERT(offsetof(scrutiny_c_runtime_published_value_t, type) == offsetof(scrutiny::RuntimePublishedValue, type), "C/C++ RPV type mismatch");
+SCRUTINY_STATIC_ASSERT(
+    offsetof(scrutiny_c_runtime_published_value_t, id) == offsetof(scrutiny::RuntimePublishedValue, id),
+    "C/C++ RPV type mismatch");
+SCRUTINY_STATIC_ASSERT(
+    offsetof(scrutiny_c_runtime_published_value_t, type) == offsetof(scrutiny::RuntimePublishedValue, type),
+    "C/C++ RPV type mismatch");
 
 static inline scrutiny::Config *get_config(scrutiny_c_config_t *config)
 {
@@ -153,7 +157,11 @@ extern "C"
         return get_main_handler(mh)->data_to_send();
     }
 
-    scrutiny_c_loop_handler_ff_t *scrutiny_c_loop_handler_fixed_freq_construct(void *mem, size_t const size, uint32_t const timestep_100ns, char const *name)
+    scrutiny_c_loop_handler_ff_t *scrutiny_c_loop_handler_fixed_freq_construct(
+        void *mem,
+        size_t const size,
+        uint32_t const timestep_100ns,
+        char const *name)
     {
         if (size < SCRUTINY_C_LOOP_HANDLER_FF_SIZE || mem == SCRUTINY_NULL)
         {

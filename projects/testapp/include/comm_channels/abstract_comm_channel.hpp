@@ -10,12 +10,12 @@
 #ifndef ___ABSTRACT_COMM_CHANNEL_H___
 #define ___ABSTRACT_COMM_CHANNEL_H___
 
-#include <stdint.h>
 #include <cstdlib>
+#include <stdint.h>
 
 class AbstractCommChannel
 {
-public:
+  public:
     virtual void start() = 0;
     virtual void stop() = 0;
     virtual void send(uint8_t const *buffer, int len) = 0;

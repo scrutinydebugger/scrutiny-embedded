@@ -17,14 +17,14 @@
 
 #include "abstract_comm_channel.hpp"
 
-#include <string>
-#include <stdint.h>
-#include <cstdlib>
 #include "abstract_comm_channel.hpp"
+#include <cstdlib>
+#include <stdint.h>
+#include <string>
 
 class NixSerialPortBridge : public AbstractCommChannel
 {
-public:
+  public:
     NixSerialPortBridge(const std::string &port_name, uint32_t baudrate);
 
     virtual void stop();
@@ -34,7 +34,7 @@ public:
 
     static void throw_system_error(const std::string &msg);
 
-private:
+  private:
     std::string m_port_name;
     uint32_t m_baudrate;
     int m_fd;

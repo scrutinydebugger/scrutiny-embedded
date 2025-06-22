@@ -52,7 +52,9 @@ typedef enum
 
 void c_testapp_argument_parser_init(c_testapp_argument_parser_t *parser);
 void c_testapp_argument_parser_parse(c_testapp_argument_parser_t *parser, int argc, char *argv[]);
-c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(c_testapp_argument_parser_t *parser, c_testapp_memory_region_t *region);
+c_testapp_argument_parser_error_e c_testapp_argument_parser_next_memory_region(
+    c_testapp_argument_parser_t *parser,
+    c_testapp_memory_region_t *region);
 int c_testapp_argument_parser_has_another_memory_region(c_testapp_argument_parser_t *parser);
 
 #endif // ___ARGUMENT_PARSER_H___

@@ -9,8 +9,8 @@
 
 #include <string.h>
 
-#include "scrutiny_setup.hpp"
 #include "protocol/scrutiny_comm_handler.hpp"
+#include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 
 namespace scrutiny
@@ -344,7 +344,9 @@ namespace scrutiny
                 {
                     uint16_t const remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent - 5);
                     uint16_t const user_request_remaining = (len - i);
-                    uint16_t const data_bytes_to_copy = (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes; // Don't read more than available.
+                    // Don't read more than available.
+                    uint16_t const data_bytes_to_copy =
+                        (user_request_remaining < remaining_data_bytes) ? user_request_remaining : remaining_data_bytes;
                     memcpy(&buffer[i], &m_active_response.data[m_active_response.data_length - remaining_data_bytes], data_bytes_to_copy);
 
                     i += data_bytes_to_copy;

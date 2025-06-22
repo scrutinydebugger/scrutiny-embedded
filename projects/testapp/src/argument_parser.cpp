@@ -6,18 +6,19 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include <algorithm>
 #include <cstdlib>
 #include <string>
-#include <algorithm>
 
 #include "argument_parser.hpp"
 
-ArgumentParser::ArgumentParser() : m_valid(false),
-                                   m_command(TestAppCommand::None),
-                                   m_region_index(0),
-                                   m_argc(0),
-                                   m_argv(nullptr),
-                                   m_last_error()
+ArgumentParser::ArgumentParser() :
+    m_valid(false),
+    m_command(TestAppCommand::None),
+    m_region_index(0),
+    m_argc(0),
+    m_argv(nullptr),
+    m_last_error()
 {
 }
 
@@ -33,8 +34,7 @@ void ArgumentParser::parse(int argc, char *argv[])
     }
 
     std::string cmd(argv[1]);
-    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c)
-                   { return static_cast<unsigned char>(std::tolower(c)); });
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return static_cast<unsigned char>(std::tolower(c)); });
 
     if (cmd == "memdump")
     {

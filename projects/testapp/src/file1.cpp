@@ -45,8 +45,8 @@ namespace NamespaceInFile1
     {
         unsigned long file1GlobalNestedVar1;
         static unsigned long file1StaticNestedVar1;
-    }
-}
+    } // namespace NamespaceInFile1Nested1
+} // namespace NamespaceInFile1
 
 void file1SetValues()
 {

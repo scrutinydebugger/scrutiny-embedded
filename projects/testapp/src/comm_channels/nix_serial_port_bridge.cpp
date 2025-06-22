@@ -13,21 +13,21 @@
 #endif
 
 #include "nix_serial_port_bridge.hpp"
-#include <stdint.h>
 #include <cstdlib>
-#include <string>
 #include <cstring>
+#include <stdint.h>
+#include <string>
 #include <system_error>
 
 #include <errno.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <termios.h>
 #include <unistd.h>
 
-NixSerialPortBridge::NixSerialPortBridge(const std::string &port_name, uint32_t baudrate) : m_port_name(port_name),
-                                                                                            m_baudrate(baudrate),
-                                                                                            m_fd(-1)
+NixSerialPortBridge::NixSerialPortBridge(const std::string &port_name, uint32_t baudrate) :
+    m_port_name(port_name),
+    m_baudrate(baudrate),
+    m_fd(-1)
 {
 }
 
@@ -59,8 +59,8 @@ void NixSerialPortBridge::start()
     tty.c_lflag &= ~ISIG;                                                        // Disable interpretation of INTR, QUIT and SUSP
     tty.c_iflag &= ~(IXON | IXOFF | IXANY);                                      // Turn off s/w flow ctrl
     tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable special char
-    tty.c_oflag &= ~OPOST;                                                       // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR;                                                       // Prevent conversion of newline to carriage return/line feed
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
 
     tty.c_cc[VTIME] = 0; // Non-blocking
     tty.c_cc[VMIN] = 0;

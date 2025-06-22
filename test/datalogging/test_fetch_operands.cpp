@@ -6,11 +6,11 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
-#include "scrutiny_test.hpp"
 #include "scrutiny.hpp"
+#include "scrutiny_test.hpp"
 
 static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
 {
@@ -32,7 +32,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
 
 class TestFetchOperands : public ScrutinyTest
 {
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -49,23 +49,24 @@ protected:
     scrutiny::AddressRange forbidden_ranges[2];
     scrutiny::RuntimePublishedValue rpvs[2];
 
-    TestFetchOperands() : ScrutinyTest(),
-                          tb(),
-                          scrutiny_handler(),
-                          config(),
-                          _rx_buffer(),
-                          _tx_buffer(),
-                          forbidden_buffer(),
-                          forbidden_buffer2(),
-                          readonly_buffer(),
-                          readonly_buffer2()
+    TestFetchOperands() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer(),
+        forbidden_buffer(),
+        forbidden_buffer2(),
+        readonly_buffer(),
+        readonly_buffer2()
     {
         readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
         readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
 
         forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
         forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer2));
-        
+
         rpvs[0].id = 0x1234;
         rpvs[0].type = scrutiny::VariableType::uint32;
         rpvs[1].id = 0x5678;
@@ -222,14 +223,14 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     } my_struct;
 #pragma pack(pop)
 
-    my_struct.a=0;
-    my_struct.b=0;
-    my_struct.c=0;
-    my_struct.d=0;
+    my_struct.a = 0;
+    my_struct.b = 0;
+    my_struct.c = 0;
+    my_struct.d = 0;
 
     scrutiny::AnyType val;
     scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
-    bool success= false;
+    bool success = false;
 
     Operand operand;
     operand.type = OperandType::VARBIT;

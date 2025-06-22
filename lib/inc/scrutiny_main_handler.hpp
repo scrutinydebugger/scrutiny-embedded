@@ -11,11 +11,11 @@
 
 #include <stdint.h>
 
-#include "scrutiny_setup.hpp"
-#include "scrutiny_loop_handler.hpp"
-#include "scrutiny_timebase.hpp"
 #include "protocol/scrutiny_protocol.hpp"
 #include "scrutiny_config.hpp"
+#include "scrutiny_loop_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_timebase.hpp"
 
 #if SCRUTINY_ENABLE_DATALOGGING
 #include "datalogging/scrutiny_datalogging.hpp"
@@ -26,7 +26,7 @@ namespace scrutiny
     // cppcheck-suppress[noConstructor]
     class MainHandler
     {
-    public:
+      public:
         MainHandler(void);
 
         /// @brief Initialize the scrutiny Main Handler
@@ -56,10 +56,7 @@ namespace scrutiny
         /// @brief Pass data received from the server to the scrutiny-embedded lib input stream.
         /// @param data Pointer to the data buffer
         /// @param len Length of the data
-        inline void receive_data(uint8_t const *const data, uint16_t const len)
-        {
-            m_comm_handler.receive_data(data, len);
-        }
+        inline void receive_data(uint8_t const *const data, uint16_t const len) { m_comm_handler.receive_data(data, len); }
 
         /// @brief Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
         /// @param buffer Buffer to write the data into
@@ -74,10 +71,7 @@ namespace scrutiny
 
         /// @brief Tells how much data is available in the scrutiny-embedded lib output stream
         /// @return Number of bytes available
-        inline uint16_t data_to_send(void) const
-        {
-            return m_comm_handler.data_to_send();
-        }
+        inline uint16_t data_to_send(void) const { return m_comm_handler.data_to_send(); }
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief Returns the state of the datalogger. Thread safe
@@ -95,11 +89,15 @@ namespace scrutiny
         /// @brief Returns true if the datalogger is in an error state. Thread safe
         inline bool datalogging_error(void) const
         {
-            return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ERROR) || m_datalogging.error != DataloggingError::NoError;
+            return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ERROR) ||
+                   m_datalogging.error != DataloggingError::NoError;
         }
 
         /// @brief Returns true if the datalogger is presently owned by a loop
-        bool datalogging_ownership_taken(void) const { return m_datalogging.owner != SCRUTINY_NULL; }
+        bool datalogging_ownership_taken(void) const
+        {
+            return m_datalogging.owner != SCRUTINY_NULL;
+        }
 
         /// @brief Reads a section of memory like a memcpy does, but enforce the respect of forbidden regions
         /// @param dst Destination buffer
@@ -118,8 +116,10 @@ namespace scrutiny
         /// @brief Reads a bitfield variable from a memory location. Ensure the respect of forbidden regions and will not make unaligned memory access
         /// @param addr Address at which the variable is stored
         /// @param var_tt Type type of the variable to read (uint, int, float. See scrutiny::VariableTypeType)
-        /// @param bitoffset Offset from the address to read from. This value should normally comes from the debug symbols since it is compiler dependent
-        /// @param bitsize Size in bits of the variable to read. This value should normally comes from the debug symbols since it is compiler dependent
+        /// @param bitoffset Offset from the address to read from. This value should normally comes from the debug symbols since it is compiler
+        /// dependent
+        /// @param bitsize Size in bits of the variable to read. This value should normally comes from the debug symbols since it is compiler
+        /// dependent
         /// @param val The output value
         /// @param output_type The output variable type deduced from the VariableTypeType and the size
         /// @return true on success, false on failure
@@ -132,7 +132,10 @@ namespace scrutiny
             VariableType::E *const output_type) const;
 
         /// @brief Returns a pointer to the datalogger object
-        inline datalogging::DataLogger *datalogger(void) { return &m_datalogging.datalogger; }
+        inline datalogging::DataLogger *datalogger(void)
+        {
+            return &m_datalogging.datalogger;
+        }
 #endif
         /// @brief Return the Runtime Published Value (RPV) read callback
         inline RpvReadCallback get_rpv_read_callback(void) const
@@ -141,15 +144,24 @@ namespace scrutiny
         }
 
         /// @brief Returns a pointer to the communication handler
-        inline protocol::CommHandler *comm(void) { return &m_comm_handler; }
+        inline protocol::CommHandler *comm(void)
+        {
+            return &m_comm_handler;
+        }
 
         /// @brief Returns a pointer the the given configuration
-        inline Config *get_config(void) { return &m_config; }
+        inline Config *get_config(void)
+        {
+            return &m_config;
+        }
 
         /// @brief Returns a pointer the the given configuration in read-only
-        inline Config const *get_config_ro(void) const { return &m_config; }
+        inline Config const *get_config_ro(void) const
+        {
+            return &m_config;
+        }
 
-    private:
+      private:
         void process_loops(void);
         void check_finished_sending(void);
         void process_request(protocol::Request const *const request, protocol::Response *const response);
@@ -175,7 +187,8 @@ namespace scrutiny
         bool m_disconnect_pending;             // INdicates that a disconnect request has been received and must be processed right away
         Config m_config;                       // The configuration
         bool m_enabled;                        // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
-        bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp should not be updated on subsequent ProcessAgain code
+        bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
+                                               // should not be updated on subsequent ProcessAgain code
         timestamp_t m_process_again_timestamp; // Timestamp at which the first ProcessAgain code has been returned to ensure timeout
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec; // Communication protocol Codec
@@ -184,18 +197,20 @@ namespace scrutiny
 #endif
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        
+
         class DataloggingError
         {
-            public:
+          public:
+            // clang-format off
             SCRUTINY_ENUM(uint_least8_t)
             {
                 NoError,
                 UnexpectedRelease,
                 UnexpectedClaim
             };
+            // clang-format on
         };
-            
+
         struct ThreadSafeData
         {
             datalogging::DataLogger::State::E datalogger_state;
@@ -221,6 +236,6 @@ namespace scrutiny
         } m_datalogging;                              // All data related to the datalogging feature
 #endif
     };
-}
+} // namespace scrutiny
 
 #endif

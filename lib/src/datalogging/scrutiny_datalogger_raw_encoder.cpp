@@ -7,16 +7,16 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogger_raw_encoder.hpp"
-#include "scrutiny_main_handler.hpp"
 #include "scrutiny_common_codecs.hpp"
+#include "scrutiny_main_handler.hpp"
+#include "scrutiny_setup.hpp"
 
 namespace scrutiny
 {
     namespace datalogging
     {
-        RawFormatReader::RawFormatReader(RawFormatEncoder const *const encoder) : 
+        RawFormatReader::RawFormatReader(RawFormatEncoder const *const encoder) :
             m_encoder(encoder),
             m_read_cursor(0),
             m_finished(false),
@@ -95,7 +95,7 @@ namespace scrutiny
             m_read_cursor = m_encoder->get_read_cursor();
         }
 
-        RawFormatEncoder::RawFormatEncoder() : 
+        RawFormatEncoder::RawFormatEncoder() :
             m_buffer(SCRUTINY_NULL),
             m_buffer_size(0),
             m_config(SCRUTINY_NULL),
@@ -111,7 +111,6 @@ namespace scrutiny
             m_full(false),
             m_error(false)
         {
-            
         }
 
         /// @brief Takes a snapshot of the data to log and write it into the datalogger buffer
@@ -136,7 +135,10 @@ namespace scrutiny
             {
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
                 {
-                    m_main_handler->read_memory(&m_buffer[cursor], m_config->items_to_log[i].data.memory.address, m_config->items_to_log[i].data.memory.size);
+                    m_main_handler->read_memory(
+                        &m_buffer[cursor],
+                        m_config->items_to_log[i].data.memory.address,
+                        m_config->items_to_log[i].data.memory.size);
                     cursor += m_config->items_to_log[i].data.memory.size; // We verified that this is not 0 in init
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::RPV)
@@ -264,5 +266,5 @@ namespace scrutiny
 
             return get_buffer_effective_size() - get_write_cursor();
         }
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny

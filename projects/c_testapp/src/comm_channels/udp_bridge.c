@@ -6,13 +6,23 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_cwrapper.h"
 #include "udp_bridge.h"
-#include "stdlib.h"
+#include "scrutiny_cwrapper.h"
 #include "stdio.h"
+#include "stdlib.h"
 
-#define ERR_RETURN(msg) {fprintf(stderr, "%s\n", msg); return COMM_CHANNEL_STATUS_error;}
-#define RETURN_IF_NOT_SUCCESS(status) {if (status != COMM_CHANNEL_STATUS_success){return status;}}
+#define ERR_RETURN(msg)                                                                                                                              \
+    {                                                                                                                                                \
+        fprintf(stderr, "%s\n", msg);                                                                                                                \
+        return COMM_CHANNEL_STATUS_error;                                                                                                            \
+    }
+#define RETURN_IF_NOT_SUCCESS(status)                                                                                                                \
+    {                                                                                                                                                \
+        if (status != COMM_CHANNEL_STATUS_success)                                                                                                   \
+        {                                                                                                                                            \
+            return status;                                                                                                                           \
+        }                                                                                                                                            \
+    }
 
 #if SCRUTINY_BUILD_WINDOWS
 #include <windows.h>
@@ -38,17 +48,16 @@ comm_channel_status_e udp_bridge_global_close()
 #if SCRUTINY_BUILD_WINDOWS
     WSACleanup();
 #endif
-return COMM_CHANNEL_STATUS_success;
+    return COMM_CHANNEL_STATUS_success;
 }
 
-
-void udp_bridge_init(udp_bridge_t* bridge, uint16_t port)
+void udp_bridge_init(udp_bridge_t *bridge, uint16_t port)
 {
-    bridge->m_port=port;
-    bridge->m_sock=INVALID_SOCKET;
+    bridge->m_port = port;
+    bridge->m_sock = INVALID_SOCKET;
 }
 
-comm_channel_status_e udp_bridge_start(udp_bridge_t* bridge)
+comm_channel_status_e udp_bridge_start(udp_bridge_t *bridge)
 {
     int ret;
     comm_channel_status_e status;
@@ -67,7 +76,7 @@ comm_channel_status_e udp_bridge_start(udp_bridge_t* bridge)
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(bridge->m_port);
 
-    ret = bind(bridge->m_sock, (SOCKADDR*)&addr, sizeof(addr)); // SOCKADDR = sockaddr for linux
+    ret = bind(bridge->m_sock, (SOCKADDR *)&addr, sizeof(addr)); // SOCKADDR = sockaddr for linux
 
     if (ret < 0)
     {
@@ -77,7 +86,7 @@ comm_channel_status_e udp_bridge_start(udp_bridge_t* bridge)
     return COMM_CHANNEL_STATUS_success;
 }
 
-comm_channel_status_e udp_bridge_set_nonblocking(udp_bridge_t* bridge)
+comm_channel_status_e udp_bridge_set_nonblocking(udp_bridge_t *bridge)
 {
 #if SCRUTINY_BUILD_WINDOWS
     unsigned long mode = 1;
@@ -101,7 +110,7 @@ comm_channel_status_e udp_bridge_set_nonblocking(udp_bridge_t* bridge)
     return COMM_CHANNEL_STATUS_success;
 }
 
-comm_channel_status_e udp_bridge_stop(udp_bridge_t* bridge)
+comm_channel_status_e udp_bridge_stop(udp_bridge_t *bridge)
 {
     if (ISVALIDSOCKET(bridge->m_sock))
     {
@@ -110,7 +119,7 @@ comm_channel_status_e udp_bridge_stop(udp_bridge_t* bridge)
     return COMM_CHANNEL_STATUS_success;
 }
 
-comm_channel_status_e _udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer, int len, int flags, int *ret)
+comm_channel_status_e _udp_bridge_receive(udp_bridge_t *bridge, uint8_t *buffer, int len, int flags, int *ret)
 {
 #if SCRUTINY_BUILD_WINDOWS
     int size = sizeof(bridge->m_last_packet_addr);
@@ -139,8 +148,7 @@ comm_channel_status_e _udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer,
     return COMM_CHANNEL_STATUS_success;
 }
 
-
-comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len, int flags)
+comm_channel_status_e _udp_bridge_send(udp_bridge_t *bridge, uint8_t const *buffer, int len, int flags)
 {
     int ret = sendto(bridge->m_sock, (char const *)buffer, len, flags, &bridge->m_last_packet_addr, sizeof(bridge->m_last_packet_addr));
 
@@ -151,12 +159,12 @@ comm_channel_status_e _udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buf
     return COMM_CHANNEL_STATUS_success;
 }
 
-comm_channel_status_e udp_bridge_send(udp_bridge_t* bridge, uint8_t const  *buffer, int len) 
-{ 
-    return _udp_bridge_send(bridge, buffer, len, 0); 
+comm_channel_status_e udp_bridge_send(udp_bridge_t *bridge, uint8_t const *buffer, int len)
+{
+    return _udp_bridge_send(bridge, buffer, len, 0);
 }
 
-comm_channel_status_e udp_bridge_receive(udp_bridge_t* bridge, uint8_t *buffer, int len, int* ret) 
-{ 
-    return _udp_bridge_receive(bridge, buffer, len, 0, ret); 
+comm_channel_status_e udp_bridge_receive(udp_bridge_t *bridge, uint8_t *buffer, int len, int *ret)
+{
+    return _udp_bridge_receive(bridge, buffer, len, 0, ret);
 }

@@ -6,10 +6,10 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_setup.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"
-#include "scrutiny_tools.hpp"
 #include "scrutiny_main_handler.hpp"
+#include "scrutiny_setup.hpp"
+#include "scrutiny_tools.hpp"
 #include <string.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -143,5 +143,5 @@ namespace scrutiny
 
             return success;
         }
-    }
-}
+    } // namespace datalogging
+} // namespace scrutiny

@@ -13,17 +13,18 @@
 
 class TestTxParsing : public ScrutinyTest
 {
-public:
-    TestTxParsing() : ScrutinyTest(),
-                      comm(),
-                      response_buffer(),
-                      response(),
-                      _rx_buffer(),
-                      _tx_buffer()
+  public:
+    TestTxParsing() :
+        ScrutinyTest(),
+        comm(),
+        response_buffer(),
+        response(),
+        _rx_buffer(),
+        _tx_buffer()
     {
     }
 
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
     uint8_t response_buffer[256];
@@ -55,7 +56,7 @@ TEST_F(TestTxParsing, TestReadAllData)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -84,7 +85,7 @@ TEST_F(TestTxParsing, TestReadBytePerByte)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -117,11 +118,11 @@ TEST_F(TestTxParsing, TestReadByChunk)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
-    uint8_t chunks[3] = {3, 6, 3};
+    uint8_t chunks[3] = { 3, 6, 3 };
     ASSERT_EQ(n_to_read, 12u);
 
     uint16_t nread;
@@ -151,7 +152,7 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = {0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33};
+    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();

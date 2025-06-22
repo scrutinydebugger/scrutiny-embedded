@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -15,7 +15,7 @@
 class TestGetInfo : public ScrutinyTest
 {
 
-protected:
+  protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
@@ -29,15 +29,19 @@ protected:
     scrutiny::VariableFrequencyLoopHandler variable_freq_loop;
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
-    TestGetInfo() : ScrutinyTest(), tb(),
-                    scrutiny_handler(),
-                    config(),
-                    _rx_buffer(),
-                    _tx_buffer(),
-                    loops(),
-                    fixed_freq_loop(0x12345678, "Loop1"),
-                    variable_freq_loop("Loop2"),
-                    fixed_freq_loop_no_datalogging(100, "Loop3") {}
+    TestGetInfo() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        _rx_buffer(),
+        _tx_buffer(),
+        loops(),
+        fixed_freq_loop(0x12345678, "Loop1"),
+        variable_freq_loop("Loop2"),
+        fixed_freq_loop_no_datalogging(100, "Loop3")
+    {
+    }
 
     virtual void SetUp()
     {
@@ -59,9 +63,9 @@ protected:
 
 TEST_F(TestGetInfo, TestReadprotocolVersion)
 {
-    uint8_t request_data[8] = {1, 1, 0, 0};
+    uint8_t request_data[8] = { 1, 1, 0, 0 };
     uint8_t tx_buffer[32];
-    uint8_t expected_response[11] = {0x81, 1, 0, 0, 2, 1, 0}; // Version 1.0
+    uint8_t expected_response[11] = { 0x81, 1, 0, 0, 2, 1, 0 }; // Version 1.0
     add_crc(request_data, sizeof(request_data) - 4);
     add_crc(expected_response, sizeof(expected_response) - 4);
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -82,14 +86,14 @@ TEST_F(TestGetInfo, TestReadSoftwareId)
     uint8_t tx_buffer[SCRUTINY_SOFTWARE_ID_LENGTH + 32];
 
     // Make request
-    uint8_t request_data[8 + SCRUTINY_SOFTWARE_ID_LENGTH] = {1, 2, 0, 0};
+    uint8_t request_data[8 + SCRUTINY_SOFTWARE_ID_LENGTH] = { 1, 2, 0, 0 };
     request_data[2] = (SCRUTINY_SOFTWARE_ID_LENGTH >> 8) & 0xFF;
     request_data[3] = SCRUTINY_SOFTWARE_ID_LENGTH & 0xFF;
     std::memcpy(&request_data[4], scrutiny::software_id, SCRUTINY_SOFTWARE_ID_LENGTH);
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + SCRUTINY_SOFTWARE_ID_LENGTH] = {0x81, 2, 0};
+    uint8_t expected_response[9 + SCRUTINY_SOFTWARE_ID_LENGTH] = { 0x81, 2, 0 };
     expected_response[3] = (SCRUTINY_SOFTWARE_ID_LENGTH >> 8) & 0xFF;
     expected_response[4] = SCRUTINY_SOFTWARE_ID_LENGTH & 0xFF;
     std::memcpy(&expected_response[5], scrutiny::software_id, SCRUTINY_SOFTWARE_ID_LENGTH);
@@ -118,12 +122,10 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -132,11 +134,11 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8] = {1, 4, 0, 0};
+    uint8_t request_data[8] = { 1, 4, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 2] = {0x81, 4, 0, 0, 2, 2, 1};
+    uint8_t expected_response[9 + 2] = { 0x81, 4, 0, 0, 2, 2, 1 };
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -163,12 +165,10 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -177,9 +177,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 2] = {1, 5, 0, 2};
-    uint8_t region_index[] = {0, 1, 0};
-    uint8_t region_type[] = {0, 0, 1};
+    uint8_t request_data[8 + 2] = { 1, 5, 0, 2 };
+    uint8_t region_index[] = { 0, 1, 0 };
+    uint8_t region_type[] = { 0, 0, 1 };
     // Make expected response
     SCRUTINY_CONSTEXPR uint16_t response_datalen = 2 + addr_size * 2;
     uint8_t expected_response[9 + response_datalen] = {
@@ -233,12 +233,10 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
-    scrutiny::AddressRange readonly_ranges[] = {
-        scrutiny::tools::make_address_range(start, end),
-        scrutiny::tools::make_address_range(start + 1, end + 1)};
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
+                                                 scrutiny::tools::make_address_range(start + 1, end + 1) };
 
-    scrutiny::AddressRange forbidden_ranges[] = {
-        scrutiny::tools::make_address_range(start + 2, end + 2)};
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start + 2, end + 2) };
 
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
@@ -246,7 +244,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 2] = {1, 5, 0, 2, 0, 2}; // Oops, index 2 doesn't exist
+    uint8_t request_data[8 + 2] = { 1, 5, 0, 2, 0, 2 }; // Oops, index 2 doesn't exist
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -283,21 +281,20 @@ TEST_F(TestGetInfo, TestGetRPVCount)
 {
     uint8_t tx_buffer[32];
 
-    scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+    scrutiny::RuntimePublishedValue rpvs[3] = { { 0x1122, scrutiny::VariableType::uint32 },
+                                                { 0x3344, scrutiny::VariableType::float32 },
+                                                { 0x5566, scrutiny::VariableType::uint16 } };
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8] = {1, 6, 0, 0};
+    uint8_t request_data[8] = { 1, 6, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 2] = {0x81, 6, 0, 0, 2, 0, 3};
+    uint8_t expected_response[9 + 2] = { 0x81, 6, 0, 0, 2, 0, 3 };
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -320,21 +317,20 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
 {
     uint8_t tx_buffer[64];
 
-    scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+    scrutiny::RuntimePublishedValue rpvs[3] = { { 0x1122, scrutiny::VariableType::uint32 },
+                                                { 0x3344, scrutiny::VariableType::float32 },
+                                                { 0x5566, scrutiny::VariableType::uint16 } };
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 4] = {1, 7, 0, 4, 0, 1, 0, 2}; // start=1, count =2
+    uint8_t request_data[8 + 4] = { 1, 7, 0, 4, 0, 1, 0, 2 }; // start=1, count =2
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 3 * 2] = {0x81, 7, 0, 0, 3 * 2};
+    uint8_t expected_response[9 + 3 * 2] = { 0x81, 7, 0, 0, 3 * 2 };
     unsigned int index = 5;
     expected_response[index++] = 0x33;
     expected_response[index++] = 0x44;
@@ -370,17 +366,16 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
 
     uint8_t tx_buffer[32];
 
-    scrutiny::RuntimePublishedValue rpvs[3] = {
-        {0x1122, scrutiny::VariableType::uint32},
-        {0x3344, scrutiny::VariableType::float32},
-        {0x5566, scrutiny::VariableType::uint16}};
+    scrutiny::RuntimePublishedValue rpvs[3] = { { 0x1122, scrutiny::VariableType::uint32 },
+                                                { 0x3344, scrutiny::VariableType::float32 },
+                                                { 0x5566, scrutiny::VariableType::uint16 } };
 
     config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    uint8_t request_data[8 + 4] = {1, 7, 0, 4, 0, 1, 0, 3}; // start=1, count =3.  Will overflow
+    uint8_t request_data[8 + 4] = { 1, 7, 0, 4, 0, 1, 0, 3 }; // start=1, count =3.  Will overflow
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -393,7 +388,13 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
 }
 
-void dummy_callback(uint8_t const subfunction, uint8_t const *request_data, uint16_t const request_data_length, uint8_t *response_data, uint16_t *response_data_length, uint16_t const response_max_data_length)
+void dummy_callback(
+    uint8_t const subfunction,
+    uint8_t const *request_data,
+    uint16_t const request_data_length,
+    uint8_t *response_data,
+    uint16_t *response_data_length,
+    uint16_t const response_max_data_length)
 {
     static_cast<void>(subfunction);
     static_cast<void>(request_data);
@@ -422,11 +423,11 @@ TEST_F(TestGetInfo, TestSupportedFeatures)
         uint8_t tx_buffer[32];
 
         // Make request
-        uint8_t request_data[8] = {1, 3, 0, 0};
+        uint8_t request_data[8] = { 1, 3, 0, 0 };
         add_crc(request_data, sizeof(request_data) - 4);
 
         // Make expected response
-        uint8_t expected_response[9 + 1] = {0x81, 3, 0, 0, 1};
+        uint8_t expected_response[9 + 1] = { 0x81, 3, 0, 0, 1 };
         expected_response[5] = 0;
 
         if (config.memory_write_enable)
@@ -466,11 +467,11 @@ TEST_F(TestGetInfo, TestGetLoopCount)
 {
     uint8_t tx_buffer[32];
 
-    uint8_t request_data[8] = {1, 8, 0, 0};
+    uint8_t request_data[8] = { 1, 8, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 1] = {0x81, 8, 0, 0, 1};
+    uint8_t expected_response[9 + 1] = { 0x81, 8, 0, 0, 1 };
     expected_response[5] = 3; // 3 loops
     add_crc(expected_response, sizeof(expected_response) - 4);
 
@@ -494,11 +495,11 @@ TEST_F(TestGetInfo, TestGetLoopCountNoLoopSet)
 
     uint8_t tx_buffer[32];
 
-    uint8_t request_data[8] = {1, 8, 0, 0};
+    uint8_t request_data[8] = { 1, 8, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 1] = {0x81, 8, 0, 0, 1};
+    uint8_t expected_response[9 + 1] = { 0x81, 8, 0, 0, 1 };
     expected_response[5] = 0; // 2 loops
     add_crc(expected_response, sizeof(expected_response) - 4);
 
@@ -518,7 +519,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
     std::string loop_name = "Loop1";
     uint8_t tx_buffer[32];
 
-    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 0};
+    uint8_t request_data[8 + 1] = { 1, 9, 0, 1, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     /*
@@ -531,7 +532,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
     */
 
     // Make expected response
-    uint8_t expected_response[9 + 13] = {0x81, 9, 0, 0, 13};
+    uint8_t expected_response[9 + 13] = { 0x81, 9, 0, 0, 13 };
     expected_response[5] = 0; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -560,7 +561,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
     std::string loop_name = "Loop3";
     uint8_t tx_buffer[64];
 
-    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 2}; // Read loop 2
+    uint8_t request_data[8 + 1] = { 1, 9, 0, 1, 2 }; // Read loop 2
     add_crc(request_data, sizeof(request_data) - 4);
 
     /*
@@ -573,7 +574,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
     */
 
     // Make expected response
-    uint8_t expected_response[9 + 13] = {0x81, 9, 0, 0, 13};
+    uint8_t expected_response[9 + 13] = { 0x81, 9, 0, 0, 13 };
     expected_response[5] = 2; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::FIXED_FREQ);
     expected_response[7] = 0;
@@ -598,7 +599,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
     std::string loop_name = "Loop2";
     uint8_t tx_buffer[32];
 
-    uint8_t request_data[8 + 1] = {1, 9, 0, 1, 1};
+    uint8_t request_data[8 + 1] = { 1, 9, 0, 1, 1 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     /*
@@ -610,7 +611,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
     */
 
     // Make expected response
-    uint8_t expected_response[9 + 9] = {0x81, 9, 0, 0, 9};
+    uint8_t expected_response[9 + 9] = { 0x81, 9, 0, 0, 9 };
     expected_response[5] = 1; // loop ID
     expected_response[6] = static_cast<uint8_t>(scrutiny::LoopType::VARIABLE_FREQ);
 #if SCRUTINY_ENABLE_DATALOGGING

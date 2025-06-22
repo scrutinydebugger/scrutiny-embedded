@@ -6,16 +6,16 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
+#include "protocol/scrutiny_codec_v1_0.hpp"
+#include "scrutiny_common_codecs.hpp"
+#include "scrutiny_main_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
 #include "scrutiny_tools.hpp"
 #include "scrutiny_types.hpp"
-#include "scrutiny_main_handler.hpp"
-#include "protocol/scrutiny_codec_v1_0.hpp"
-#include "scrutiny_common_codecs.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
@@ -419,7 +419,7 @@ namespace scrutiny
                 m_finished = true;
             }
 
-            return !m_invalid; 
+            return !m_invalid;
         }
 
         void ReadRPVRequestParser::reset(void)
@@ -519,7 +519,9 @@ namespace scrutiny
         //==============================================================
 
         // ===== Encoding =====
-        ResponseCode::E CodecV1_0::encode_response_protocol_version(ResponseData::GetInfo::GetProtocolVersion const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_protocol_version(
+            ResponseData::GetInfo::GetProtocolVersion const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t datalen = 2;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
@@ -548,7 +550,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_special_memory_region_count(ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_special_memory_region_count(
+            ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = sizeof(response_data->nbr_readonly_region);
             SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = sizeof(response_data->nbr_forbidden_region);
@@ -563,7 +567,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_special_memory_region_location(ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data, Response *response)
+        ResponseCode::E CodecV1_0::encode_response_special_memory_region_location(
+            ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data,
+            Response *response)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
             SCRUTINY_CONSTEXPR uint16_t region_type_size = sizeof(response_data->region_type);
@@ -584,7 +590,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_supported_features(ResponseData::GetInfo::GetSupportedFeatures const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_supported_features(
+            ResponseData::GetInfo::GetSupportedFeatures const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t datalen = 1;
 
@@ -610,14 +618,18 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_special_memory_region_location(Request const *const request, RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data)
+        ResponseCode::E CodecV1_0::decode_request_get_special_memory_region_location(
+            Request const *const request,
+            RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data)
         {
             request_data->region_type = request->data[0];
             request_data->region_index = request->data[1];
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_rpv_definition(Request const *const request, RequestData::GetInfo::GetRPVDefinition *const request_data)
+        ResponseCode::E CodecV1_0::decode_request_get_rpv_definition(
+            Request const *const request,
+            RequestData::GetInfo::GetRPVDefinition *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t start_index_pos = 0;
             SCRUTINY_CONSTEXPR uint16_t start_index_size = sizeof(request_data->start_index);
@@ -636,7 +648,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_loop_definition(Request const *const request, RequestData::GetInfo::GetLoopDefinition *const request_data)
+        ResponseCode::E CodecV1_0::decode_request_get_loop_definition(
+            Request const *const request,
+            RequestData::GetInfo::GetLoopDefinition *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t loop_id_len = sizeof(request_data->loop_id);
             SCRUTINY_CONSTEXPR uint16_t datalen = loop_id_len;
@@ -650,7 +664,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_loop_definition(ResponseData::GetInfo::GetLoopDefinition const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_get_loop_definition(
+            ResponseData::GetInfo::GetLoopDefinition const *const response_data,
+            Response *const response)
         {
             SCRUTINY_STATIC_ASSERT(sizeof(timediff_t) == 4, "Unsupported timediff size");
             SCRUTINY_CONSTEXPR uint16_t loop_id_size = sizeof(response_data->loop_id);
@@ -707,7 +723,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_rpv_count(ResponseData::GetInfo::GetRPVCount const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_get_rpv_count(
+            ResponseData::GetInfo::GetRPVCount const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
@@ -721,7 +739,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_loop_count(ResponseData::GetInfo::GetLoopCount const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_get_loop_count(
+            ResponseData::GetInfo::GetLoopCount const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
@@ -737,7 +757,9 @@ namespace scrutiny
 
         // ============================ CommunicationControl ============================
 
-        ResponseCode::E CodecV1_0::encode_response_comm_discover(ResponseData::CommControl::Discover const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_comm_discover(
+            ResponseData::CommControl::Discover const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t software_id_size = sizeof(scrutiny::software_id);
             SCRUTINY_CONSTEXPR uint16_t display_name_length_size = sizeof(response_data->display_name_length);
@@ -769,7 +791,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_heartbeat(ResponseData::CommControl::Heartbeat const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_comm_heartbeat(
+            ResponseData::CommControl::Heartbeat const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(response_data->session_id);
             SCRUTINY_CONSTEXPR uint16_t challenge_response_size = sizeof(response_data->challenge_response);
@@ -787,7 +811,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_get_params(ResponseData::CommControl::GetParams const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_comm_get_params(
+            ResponseData::CommControl::GetParams const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t rx_buffer_size_len = sizeof(response_data->data_rx_buffer_size);
             SCRUTINY_CONSTEXPR uint16_t tx_buffer_size_len = sizeof(response_data->data_tx_buffer_size);
@@ -795,7 +821,8 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_size = sizeof(response_data->heartbeat_timeout);
             SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_size = sizeof(response_data->comm_rx_timeout);
             SCRUTINY_CONSTEXPR uint16_t address_size_size = sizeof(response_data->address_size);
-            SCRUTINY_CONSTEXPR uint16_t datalen = rx_buffer_size_len + tx_buffer_size_len + max_bitrate_size + heartbeat_timeout_size + comm_rx_timeout_size + address_size_size;
+            SCRUTINY_CONSTEXPR uint16_t datalen =
+                rx_buffer_size_len + tx_buffer_size_len + max_bitrate_size + heartbeat_timeout_size + comm_rx_timeout_size + address_size_size;
 
             SCRUTINY_CONSTEXPR uint16_t rx_buffer_size_pos = 0;
             SCRUTINY_CONSTEXPR uint16_t tx_buffer_size_pos = rx_buffer_size_pos + rx_buffer_size_len;
@@ -821,13 +848,17 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_connect(ResponseData::CommControl::Connect const *const response_data, Response *const response)
+        ResponseCode::E CodecV1_0::encode_response_comm_connect(
+            ResponseData::CommControl::Connect const *const response_data,
+            Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(response_data->magic);
             SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(response_data->session_id);
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size + session_id_size;
 
-            SCRUTINY_STATIC_ASSERT(sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC), "Mismatch between codec definition and protocol constant.");
+            SCRUTINY_STATIC_ASSERT(
+                sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC),
+                "Mismatch between codec definition and protocol constant.");
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
@@ -860,7 +891,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_heartbeat(Request const *const request, RequestData::CommControl::Heartbeat *const request_data)
+        ResponseCode::E CodecV1_0::decode_request_comm_heartbeat(
+            Request const *const request,
+            RequestData::CommControl::Heartbeat *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(request_data->session_id);
             SCRUTINY_CONSTEXPR uint16_t challenge_size = sizeof(request_data->challenge);
@@ -892,7 +925,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_disconnect(Request const *const request, RequestData::CommControl::Disconnect *const request_data)
+        ResponseCode::E CodecV1_0::decode_request_comm_disconnect(
+            Request const *const request,
+            RequestData::CommControl::Disconnect *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(request_data->session_id);
             SCRUTINY_CONSTEXPR uint16_t datalen = session_id_size;
@@ -972,7 +1007,8 @@ namespace scrutiny
             ResponseData::DataLogControl::GetSetup const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding) + sizeof(response_data->max_signal_count);
+            SCRUTINY_CONSTEXPR uint16_t datalen =
+                sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding) + sizeof(response_data->max_signal_count);
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
@@ -1021,7 +1057,8 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t data_size_size = sizeof(response_data->data_size);
             SCRUTINY_CONSTEXPR uint16_t points_after_trigger_size = sizeof(response_data->points_after_trigger);
 
-            SCRUTINY_CONSTEXPR uint16_t datalen = acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
+            SCRUTINY_CONSTEXPR uint16_t datalen =
+                acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -1136,7 +1173,9 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType::E>(request->data[cursor++]);
-                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
+                    cursor += codecs::decode_address_big_endian(
+                        &request->data[cursor],
+                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
                     break;
                 }
                 case datalogging::OperandType::VARBIT:
@@ -1147,7 +1186,9 @@ namespace scrutiny
                     }
 
                     config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType::E>(request->data[cursor++]);
-                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
+                    cursor += codecs::decode_address_big_endian(
+                        &request->data[cursor],
+                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
                     config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++];
                     config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++];
                     break;
@@ -1188,7 +1229,9 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    cursor += codecs::decode_address_big_endian(&request->data[cursor], reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
+                    cursor += codecs::decode_address_big_endian(
+                        &request->data[cursor],
+                        reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
                     config->items_to_log[i].data.memory.size = request->data[cursor++];
                     break;
                 }
@@ -1222,5 +1265,5 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 #endif
-    }
-}
+    } // namespace protocol
+} // namespace scrutiny

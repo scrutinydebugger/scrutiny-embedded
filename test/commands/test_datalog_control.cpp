@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 #include <string>
 
 #include "scrutiny.hpp"
@@ -31,7 +31,7 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
 
 class TestDatalogControl : public ScrutinyTest
 {
-protected:
+  protected:
     static SCRUTINY_CONSTEXPR uint32_t FIXED_FREQ_LOOP_TIMESTEP_US = 100u;
     Timebase tb;
     MainHandler scrutiny_handler;
@@ -48,24 +48,35 @@ protected:
 
     RuntimePublishedValue rpvs[1];
 
-
 #if SCRUTINY_ENABLE_DATALOGGING
-    uint16_t encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size);
+    uint16_t encode_datalogger_config(
+        uint8_t loop_id,
+        uint16_t config_id,
+        const datalogging::Configuration *dlconfig,
+        uint8_t *buffer,
+        uint16_t max_size);
     datalogging::Configuration get_valid_reference_configuration();
-    void test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode::E expected_code, bool check_response = true, std::string error_msg = "");
+    void test_configure(
+        uint8_t loop_id,
+        uint16_t config_id,
+        datalogging::Configuration refconfig,
+        protocol::ResponseCode::E expected_code,
+        bool check_response = true,
+        std::string error_msg = "");
     void check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
     float m_some_var_logged1;
 #endif
 
-    TestDatalogControl() : ScrutinyTest(),
-                           tb(),
-                           scrutiny_handler(),
-                           config(),
-                           fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
-                           variable_freq_loop("Loop2"),
-                           fixed_freq_loop_no_datalogging(100)
+    TestDatalogControl() :
+        ScrutinyTest(),
+        tb(),
+        scrutiny_handler(),
+        config(),
+        fixed_freq_loop(FIXED_FREQ_LOOP_TIMESTEP_US, "Loop1"),
+        variable_freq_loop("Loop2"),
+        fixed_freq_loop_no_datalogging(100)
     {
         rpvs[0].id = 0x8888;
         rpvs[0].type = VariableType::float32;
@@ -110,7 +121,7 @@ TEST_F(TestDatalogControl, TestUnsupported)
     for (uint16_t i = 0; i <= 255u; i++)
     {
         uint8_t const subfn = static_cast<uint8_t>(i);
-        uint8_t request_data[8] = {5, subfn, 0, 0};
+        uint8_t request_data[8] = { 5, subfn, 0, 0 };
         add_crc(request_data, sizeof(request_data) - 4);
 
         scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -134,7 +145,12 @@ TEST_F(TestDatalogControl, TestUnsupported)
 /// @param buffer The destination buffer
 /// @param max_size The buffer max size.
 /// @return  Number of bytes written. Will be 0 in case of overflow
-uint16_t TestDatalogControl::encode_datalogger_config(uint8_t loop_id, uint16_t config_id, const datalogging::Configuration *dlconfig, uint8_t *buffer, uint16_t max_size)
+uint16_t TestDatalogControl::encode_datalogger_config(
+    uint8_t loop_id,
+    uint16_t config_id,
+    const datalogging::Configuration *dlconfig,
+    uint8_t *buffer,
+    uint16_t max_size)
 {
     uint16_t cursor = 0;
     if (max_size < 1 + 2 + 2 + 1 + 4 + 1 + 4 + 1)
@@ -270,9 +286,15 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
 /// @param expected_code Expected response code returned through CommHandler
 /// @param check_response When true, make sure the respons eis valid.
 /// @param error_msg Error message to log in case of failure
-void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, datalogging::Configuration refconfig, protocol::ResponseCode::E expected_code, bool check_response, std::string error_msg)
+void TestDatalogControl::test_configure(
+    uint8_t loop_id,
+    uint16_t config_id,
+    datalogging::Configuration refconfig,
+    protocol::ResponseCode::E expected_code,
+    bool check_response,
+    std::string error_msg)
 {
-    uint8_t request_data[1024] = {5, 2};
+    uint8_t request_data[1024] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
     ASSERT_GT(sizeof(request_data), payload_size + 8) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
@@ -283,7 +305,7 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
     scrutiny_handler.receive_data(request_data, payload_size + 8);
     scrutiny_handler.process(0);
 
-    uint8_t tx_buffer[32] = {0};
+    uint8_t tx_buffer[32] = { 0 };
     uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
@@ -308,14 +330,14 @@ void TestDatalogControl::test_configure(uint8_t loop_id, uint16_t config_id, dat
 
 TEST_F(TestDatalogControl, TestGetSetup)
 {
-    uint8_t tx_buffer[32] = {0};
+    uint8_t tx_buffer[32] = { 0 };
     uint32_t buffer_size = sizeof(dlbuffer);
 
-    uint8_t request_data[8] = {5, 1, 0, 0};
+    uint8_t request_data[8] = { 5, 1, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    uint8_t expected_response[9 + 4 + 1 + 1] = {0x85, 1, 0, 0, 6};
+    uint8_t expected_response[9 + 4 + 1 + 1] = { 0x85, 1, 0, 0, 6 };
     codecs::encode_32_bits_big_endian(buffer_size, &expected_response[5]);
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
     expected_response[9] = static_cast<uint8_t>(datalogging::EncodingType::RAW);
@@ -409,11 +431,10 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
 {
-    float bad_values[] = {
-        std::numeric_limits<float>::infinity(),
-        -std::numeric_limits<float>::infinity(),
-        std::numeric_limits<float>::quiet_NaN(),
-        std::numeric_limits<float>::signaling_NaN()};
+    float bad_values[] = { std::numeric_limits<float>::infinity(),
+                           -std::numeric_limits<float>::infinity(),
+                           std::numeric_limits<float>::quiet_NaN(),
+                           std::numeric_limits<float>::signaling_NaN() };
 
     SCRUTINY_CONSTEXPR uint8_t loop_id = 1;
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
@@ -530,7 +551,7 @@ TEST_F(TestDatalogControl, TestArmTriggerNotConfigured)
 {
     uint8_t tx_buffer[32];
 
-    uint8_t request_data[8] = {5, 3, 0, 0};
+    uint8_t request_data[8] = { 5, 3, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -558,10 +579,10 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     scrutiny_handler.process(0);
 
     // Arm trigger
-    uint8_t arm_request_data[8] = {5, 3, 0, 0};
+    uint8_t arm_request_data[8] = { 5, 3, 0, 0 };
     add_crc(arm_request_data, sizeof(arm_request_data) - 4);
 
-    uint8_t arm_expected_response[9] = {0x85, 3, 0, 0, 0};
+    uint8_t arm_expected_response[9] = { 0x85, 3, 0, 0, 0 };
     add_crc(arm_expected_response, sizeof(arm_expected_response) - 4);
 
     scrutiny_handler.receive_data(arm_request_data, sizeof(arm_request_data));
@@ -579,10 +600,10 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     EXPECT_TRUE(scrutiny_handler.datalogger()->armed());
 
     // Disarm trigger
-    uint8_t disarm_request_data[8] = {5, 4, 0, 0};
+    uint8_t disarm_request_data[8] = { 5, 4, 0, 0 };
     add_crc(disarm_request_data, sizeof(disarm_request_data) - 4);
 
-    uint8_t diarm_expected_response[9] = {0x85, 4, 0, 0, 0};
+    uint8_t diarm_expected_response[9] = { 0x85, 4, 0, 0, 0 };
     add_crc(diarm_expected_response, sizeof(diarm_expected_response) - 4);
 
     scrutiny_handler.receive_data(disarm_request_data, sizeof(disarm_request_data));
@@ -600,14 +621,17 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
 }
 
-void TestDatalogControl::check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter)
+void TestDatalogControl::check_get_status(
+    datalogging::DataLogger::State::E expected_state,
+    uint32_t expected_remaining_bytes,
+    uint32_t expected_counter)
 {
-    uint8_t tx_buffer[32] = {0};
-    uint16_t n_to_read= 0;
+    uint8_t tx_buffer[32] = { 0 };
+    uint16_t n_to_read = 0;
 
-    uint8_t request_data[8] = {5, 5, 0, 0};
+    uint8_t request_data[8] = { 5, 5, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
-    uint8_t expected_response[9 + 1 + 4 + 4] = {0x85, 5, 0, 0, 1 + 4 + 4};
+    uint8_t expected_response[9 + 1 + 4 + 4] = { 0x85, 5, 0, 0, 1 + 4 + 4 };
     uint16_t cursor = 5;
     cursor += codecs::encode_8_bits(static_cast<uint8_t>(expected_state), &expected_response[cursor]);
     cursor += codecs::encode_32_bits_big_endian(expected_remaining_bytes, &expected_response[cursor]);
@@ -664,7 +688,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0);
 
     // Empty transmit buffer
-    uint8_t dummy_buffer[32] = {0};
+    uint8_t dummy_buffer[32] = { 0 };
     scrutiny_handler.pop_data(dummy_buffer, sizeof(dummy_buffer));
     EXPECT_TRUE(IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow));
     scrutiny_handler.process(0);
@@ -703,7 +727,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
 
 TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
 {
-    uint8_t tx_buffer[32] = {0};
+    uint8_t tx_buffer[32] = { 0 };
     uint16_t n_to_read = 0;
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
@@ -713,7 +737,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     scrutiny_handler.process(0);
 
     // Send a request and expect a FailureToProceed because no acquisition is ready.
-    uint8_t request_data_before[8] = {5, 6, 0, 0};
+    uint8_t request_data_before[8] = { 5, 6, 0, 0 };
     add_crc(request_data_before, sizeof(request_data_before) - 4);
 
     scrutiny_handler.receive_data(request_data_before, sizeof(request_data_before));
@@ -745,7 +769,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     scrutiny_handler.process(1);
 
     // Send a 2nd request. Expect a OK response because data is available now.
-    uint8_t request_data_after[8] = {5, 6, 0, 0};
+    uint8_t request_data_after[8] = { 5, 6, 0, 0 };
     add_crc(request_data_after, sizeof(request_data_after) - 4);
 
     scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
@@ -759,7 +783,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
     reader->reset();
 
-    uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 4] = {0x85, 6, 0, 0, 16};
+    uint8_t expected_response[9 + 2 + 2 + 4 + 4 + 4] = { 0x85, 6, 0, 0, 16 };
     uint16_t cursor = 5;
     cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
     cursor += codecs::encode_16_bits_big_endian((uint16_t)0xabcd, &expected_response[cursor]);
@@ -773,11 +797,11 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 {
-    uint8_t tx_buffer[32] = {0};
+    uint8_t tx_buffer[32] = { 0 };
     uint16_t n_to_read = 0;
 
     // Send a request and expect a FailureToProceed because no acquisition is ready.
-    uint8_t request_data_before[8] = {5, 7, 0, 0};
+    uint8_t request_data_before[8] = { 5, 7, 0, 0 };
     add_crc(request_data_before, sizeof(request_data_before) - 4);
 
     scrutiny_handler.receive_data(request_data_before, sizeof(request_data_before));
@@ -793,7 +817,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    uint8_t tx_buffer[1024] = {0};
+    uint8_t tx_buffer[1024] = { 0 };
     uint16_t n_to_read;
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
@@ -820,7 +844,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
 
-    uint8_t request_data_after[8] = {5, 7, 0, 0};
+    uint8_t request_data_after[8] = { 5, 7, 0, 0 };
     add_crc(request_data_after, sizeof(request_data_after) - 4);
 
     scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
@@ -855,8 +879,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
 {
-    uint8_t small_tx_buffer[32] = {0};
-    uint8_t big_dlbuffer[10000] = {0};
+    uint8_t small_tx_buffer[32] = { 0 };
+    uint8_t big_dlbuffer[10000] = { 0 };
 
     config.set_buffers(_rx_buffer, sizeof(_rx_buffer), small_tx_buffer, sizeof(small_tx_buffer));
     config.set_datalogging_buffers(big_dlbuffer, sizeof(big_dlbuffer));
@@ -896,7 +920,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
     for (uint8_t iteration = 0; iteration < 3; iteration++)
     {
         uint32_t read_cursor = 0;
-        // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or rearm)
+        // We can loop as many time as we want.  The datalogger keeps the data for as long as there is no command to change its state (reconfigure or
+        // rearm)
         datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
         reader->reset();
         uint32_t const total_data_length = reader->read(reference_data, sizeof(reference_data));
@@ -910,7 +935,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             std::string error_msg = std::string("iteration=") + NumberToString(iteration) + std::string(", i=") + NumberToString(i);
             uint8_t validation_txbuffer[128];
 
-            uint8_t request_data_after[8] = {5, 7, 0, 0};
+            uint8_t request_data_after[8] = { 5, 7, 0, 0 };
             add_crc(request_data_after, sizeof(request_data_after) - 4);
 
             scrutiny_handler.receive_data(request_data_after, sizeof(request_data_after));
@@ -951,7 +976,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
 
 TEST_F(TestDatalogControl, TestResetDatalogger)
 {
-    uint8_t tx_buffer[32] = {0};
+    uint8_t tx_buffer[32] = { 0 };
     // Get Status
     check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
 
@@ -967,7 +992,7 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
     check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
     EXPECT_TRUE(scrutiny_handler.datalogging_ownership_taken());
 
-    uint8_t request_data[8] = {5, 8, 0, 0};
+    uint8_t request_data[8] = { 5, 8, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
