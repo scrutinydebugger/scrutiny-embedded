@@ -94,14 +94,14 @@ namespace scrutiny
 
         uint_least8_t encode_anytype_big_endian(AnyType const *const val, VariableType::E const vartype, unsigned char *const buffer)
         {
-            uint_least8_t const typesize = tools::get_type_size(vartype);
-            return encode_anytype_big_endian(val, typesize, buffer);
+            uint_least8_t const typesize_u8 = tools::get_type_size_u8(vartype);
+            return encode_anytype_big_endian(val, typesize_u8, buffer);
         }
 
-        uint_least8_t encode_anytype_big_endian(AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer)
+        uint_least8_t encode_anytype_big_endian(AnyType const *const val, uint_least8_t const typesize_u8, unsigned char *const buffer)
         {
 
-            switch (typesize)
+            switch (typesize_u8)
             {
             case 1:
                 codecs::encode_8_bits(val->uint8, buffer);
@@ -120,7 +120,7 @@ namespace scrutiny
             default:
                 return 0;
             }
-            return typesize;
+            return typesize_u8;
         }
     } // namespace codecs
 } // namespace scrutiny

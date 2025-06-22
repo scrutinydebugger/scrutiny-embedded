@@ -33,6 +33,7 @@ namespace scrutiny
             while (true)
             {
                 uint16_t length;
+                // Doesn't have at least one memory block
                 if (ADDR_SIZE_U8 + 2 > static_cast<uint16_t>(m_request_datasize - cursor))
                 {
                     m_invalid = true;
@@ -45,8 +46,13 @@ namespace scrutiny
 
                 m_required_tx_buffer_size += ADDR_SIZE_U8 + 2 + length;
 
-                if (cursor == m_request_datasize)
+                if (cursor == m_request_datasize)   // Last block
                 {
+                    break;
+                }
+                else if (cursor > m_request_datasize) // Bad size
+                {   
+                    m_invalid = true;
                     break;
                 }
             }
@@ -312,22 +318,22 @@ namespace scrutiny
 
         void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
         {
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize_u8 = tools::get_type_size_u8(rpv->type);
             // id (2) + type (1)
-            if (2u + typesize > static_cast<uint16_t>(m_size_limit - m_cursor))
+            if (2u + typesize_u8 > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
                 m_overflow = true;
                 return;
             }
 
-            if (typesize == 1u || typesize == 2u || typesize == 4u
+            if (typesize_u8 == 1u || typesize_u8 == 2u || typesize_u8 == 4u
 #if SCRUTINY_SUPPORT_64BITS
-                || typesize == 8u
+                || typesize_u8 == 8u
 #endif
             )
             {
                 m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-                m_cursor += codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_anytype_big_endian(&v, typesize_u8, &m_buffer[m_cursor]);
                 m_response->data_length = m_cursor;
             }
         }
@@ -350,7 +356,7 @@ namespace scrutiny
 
         void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
         {
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize_u8 = tools::get_type_size_u8(rpv->type);
             // id (2) + datalen (1)
             if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -359,7 +365,7 @@ namespace scrutiny
             }
 
             m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits(typesize, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(typesize_u8, &m_buffer[m_cursor]);
 
             m_response->data_length = m_cursor;
         }
@@ -458,16 +464,16 @@ namespace scrutiny
                 return false;
             }
 
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize_u8 = tools::get_type_size_u8(rpv->type);
 
-            if (typesize > static_cast<uint16_t>(m_request_len - m_bytes_read))
+            if (typesize_u8 > static_cast<uint16_t>(m_request_len - m_bytes_read))
             {
                 m_invalid = true;
                 return false;
             }
 
             ok_to_process = true;
-            switch (typesize)
+            switch (typesize_u8)
             {
             case 1:
                 v->uint8 = codecs::decode_8_bits(&m_buffer[m_bytes_read]);
@@ -489,7 +495,7 @@ namespace scrutiny
             }
 
             // We don't flag error on unsupported types. We skip them
-            m_bytes_read += typesize;
+            m_bytes_read += typesize_u8;
 
             if (m_bytes_read == m_request_len)
             {

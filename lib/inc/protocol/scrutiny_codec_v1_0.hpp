@@ -216,6 +216,8 @@ namespace scrutiny
 
                 struct GetSpecialMemoryRegionCount
                 {
+                    static SCRUTINY_CONSTEXPR uint_least8_t NBR_READONLY_REGION_SIZE_U8 = 1;
+                    static SCRUTINY_CONSTEXPR uint_least8_t NBR_FORBIDDEN_REGION_SIZE_U8 = 1;
                     uint_least8_t nbr_readonly_region;
                     uint_least8_t nbr_forbidden_region;
                 };

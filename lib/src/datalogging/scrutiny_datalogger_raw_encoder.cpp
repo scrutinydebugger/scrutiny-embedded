@@ -147,17 +147,15 @@ namespace scrutiny
                     AnyType outval;
                     uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    uint_least8_t const typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
+                    uint_least8_t const typesize = tools::get_type_size_u8(rpv.type); // Should be supported. We rely on datalogger::configure
                     m_main_handler->get_rpv_read_callback()(rpv, &outval);   // We assume that this is not nullptr. We rely on datalogger::configure
-                    codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
-                    cursor += typesize;
+                    cursor += codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
-                    cursor += sizeof(scrutiny::timestamp_t);
+                    cursor += codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
                 }
             }
 
@@ -190,7 +188,7 @@ namespace scrutiny
 
             reset();
         }
-
+        
         void RawFormatEncoder::reset(void)
         {
             reset_write_counter();
@@ -228,7 +226,7 @@ namespace scrutiny
                     }
                     else
                     {
-                        elem_size = tools::get_type_size(rpv.type);
+                        elem_size = tools::get_type_size_char(rpv.type);
                     }
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)

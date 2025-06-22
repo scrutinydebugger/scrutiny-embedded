@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
@@ -76,31 +77,57 @@ namespace scrutiny
 #endif
         }
 
-        /// @brief Returns the size of a given type in bytes
+        /// @brief Returns the size of a given type in multiple of 8bits
         /// @param vt The VariableType object
         /// @return Size in bytes
-        inline uint_least8_t get_type_size(VariableType::E const vt)
+        inline uint_least8_t get_type_size_u8(VariableType::E const vt)
         {
             if (vt == VariableType::unknown)
             {
                 return 0;
             }
 
-            return 1 << (static_cast<unsigned int>(vt) & 0xF);
+            return (1 << (static_cast<unsigned int>(vt) & 0xF)) ;
+        }
+
+        /// @brief Returns the size of a given type in multiple of CHAR_BIT. Assume CHAR_BIT is a multiple of CHAR_BIT. 
+        /// @param vt The VariableType object
+        /// @return Size in multiple of CHAR_BIT
+        inline uint_least8_t get_type_size_char(VariableType::E const vt)
+        {
+            uint_least8_t const typesize_u8 = get_type_size_u8(vt);
+            if (typesize_u8 < CHAR_BIT/8)
+            {
+                return CHAR_BIT/8;
+            }
+            return typesize_u8 / (CHAR_BIT/8);
         }
 
         /// @brief Returns the size of a given TypeSize in bytes
         /// @param ts The VariableTypeSize object
         /// @return Size in bytes
-        inline uint_least8_t get_type_size(VariableTypeSize::E const ts)
+        inline uint_least8_t get_type_size_u8(VariableTypeSize::E const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
                 return 0;
             }
 
-            return 1 << (static_cast<unsigned int>(ts) & 0xF);
+            return (1 << (static_cast<unsigned int>(ts) & 0xF)) ;
         }
+
+        /// @brief Returns the size of a given TypeSize in multiple of CHAR_BIT
+        /// @param ts The VariableTypeSize object
+        /// @return Size in multiple of CHAR_BIT
+        inline uint_least8_t get_type_size_char(VariableTypeSize::E const ts)
+        {
+            uint_least8_t const typesize_u8 = get_type_size_u8(ts);
+            if (typesize_u8 < CHAR_BIT/8)
+            {
+                return CHAR_BIT/8;
+            }
+            return typesize_u8 / (CHAR_BIT/8);
+        }        
 
         /// @brief Returns the Type Type of a given data type.
         /// @param vt The VariableTypeSize object

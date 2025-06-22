@@ -130,7 +130,7 @@ namespace scrutiny
             /// @param other The configuration to copy
             void copy_from(TriggerConfig *other)
             {
-                for (unsigned int i = 0; i < MAX_OPERANDS; i++)
+                for (uint_fast8_t i = 0; i < MAX_OPERANDS; i++)
                 {
                     memcpy(&operands[i], &other->operands[i], sizeof(Operand));
                 }
@@ -180,22 +180,30 @@ namespace scrutiny
 
         struct Configuration
         {
+            static SCRUTINY_CONSTEXPR uint_least8_t PROBE_LOCATION_BITS = 8;
+            static SCRUTINY_CONSTEXPR uint32_t PROBE_LOCATION_MAX = (1 << PROBE_LOCATION_BITS)-1;
+            
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
             void copy_from(Configuration *other)
             {
                 items_count = other->items_count;
                 decimation = other->decimation;
-                probe_location = other->probe_location;
+                set_probe_location(other->probe_location);
                 timeout_100ns = other->timeout_100ns;
                 trigger.copy_from(&other->trigger);
                 if (items_count <= SCRUTINY_DATALOGGING_MAX_SIGNAL)
                 {
-                    for (unsigned int i = 0; i < items_count; i++)
+                    for (uint_fast8_t i = 0; i < items_count; i++)
                     {
                         memcpy(&items_to_log[i], &other->items_to_log[i], sizeof(LoggableItem));
                     }
                 }
+            }
+
+            inline void set_probe_location(uint_least8_t const val)
+            {
+                probe_location = SCRUTINY_MAX(SCRUTINY_MIN(PROBE_LOCATION_MAX, val), 0);
             }
 
             LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log

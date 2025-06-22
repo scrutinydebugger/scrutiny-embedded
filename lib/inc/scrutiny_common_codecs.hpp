@@ -30,6 +30,7 @@ namespace scrutiny
     {
 
 #if SCRUTINY_HAS_CPP11
+        // C++ Standard does not requires IEEE-754
         static_assert(sizeof(float)*CHAR_BIT/8 == FLOAT_SIZE_U8, "Expect float to be 32bits");
 #endif
 
@@ -170,7 +171,6 @@ namespace scrutiny
 
         inline float decode_float_big_endian(unsigned char const *const buff)
         {
-            SCRUTINY_STATIC_ASSERT(sizeof(float)*CHAR_BIT/8 == 4, "Expect float to be 32 bits");
             uint32_t const temp = decode_32_bits_big_endian(buff);
             float v;
             memcpy(&v, &temp, sizeof(float));

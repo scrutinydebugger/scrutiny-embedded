@@ -50,7 +50,7 @@ namespace scrutiny
         bool is_supported_type(VariableType::E const vt)
         {
             VariableTypeType::E tt = get_var_type_type(vt);
-            uint_least8_t ts = get_type_size(vt);
+            uint_least8_t ts = get_type_size_u8(vt);
 
             if (ts == 0)
             {

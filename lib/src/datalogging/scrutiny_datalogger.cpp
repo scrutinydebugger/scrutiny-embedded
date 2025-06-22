@@ -146,8 +146,8 @@ namespace scrutiny
                     else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
                     {
                         // Works with and without 64bits support
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) ||
-                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * 8)
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * CHAR_BIT - 1) ||
+                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT)
                         {
                             m_config_valid = false;
                         }
@@ -158,7 +158,7 @@ namespace scrutiny
                         }
 
                         if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize >
-                            tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
+                            tools::get_type_size_char(m_config.trigger.operands[i].data.varbit.datatype) * CHAR_BIT)
                         {
                             m_config_valid = false;
                         }
@@ -282,9 +282,9 @@ namespace scrutiny
             m_trigger_timestamp = m_timebase->get_timestamp();
             m_encoder.reset_write_counter(); // Completion logic uses that counter directly without processing
 
-            uint64_t const multiplier = static_cast<uint64_t>((1 << (sizeof(m_config.probe_location) * 8)) - 1 - m_config.probe_location);
-            m_remaining_data_to_write =
-                static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> (sizeof(m_config.probe_location) * 8));
+            // We do a fixed point scaling where the probe_location is a value between 0 and 1 represented in PROBE_LOCATION_BITS (8bits). 
+            uint64_t const multiplier = static_cast<uint64_t>(m_config.PROBE_LOCATION_MAX - m_config.probe_location);   // fixpt multiplier
+            m_remaining_data_to_write = static_cast<buffer_size_t>((static_cast<uint64_t>(m_buffer_size) * multiplier) >> m_config.PROBE_LOCATION_BITS);
             if (!m_encoder.buffer_full())
             {
                 m_remaining_data_to_write = SCRUTINY_MAX(m_remaining_data_to_write, m_encoder.remaining_bytes_to_full());
