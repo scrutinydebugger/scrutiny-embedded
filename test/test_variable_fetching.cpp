@@ -8,8 +8,8 @@
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstddef>
-#include <gtest/gtest.h>
 
 class TestVariableFetching : public ScrutinyTest
 {

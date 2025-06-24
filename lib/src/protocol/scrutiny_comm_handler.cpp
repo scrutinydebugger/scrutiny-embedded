@@ -503,14 +503,17 @@ namespace scrutiny
         void CommHandler::reset(void)
         {
             m_state = State::Idle;
-            m_heartbeat_timestamp = m_timebase->get_timestamp();
             m_last_heartbeat_challenge = 0;
             m_first_heartbeat_received = false;
             m_session_id = 0;
             m_session_active = false;
+            if (m_enabled)
+            {
+                m_heartbeat_timestamp = m_timebase->get_timestamp();
 
-            reset_rx();
-            reset_tx();
+                reset_rx();
+                reset_tx();
+            }
         }
 
         void CommHandler::reset_rx(void)

@@ -8,18 +8,24 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstdlib>
-#include <gtest/gtest.h>
+#include <ostream>
 #include <stdint.h>
 
 #include "scrutiny.hpp"
 
-#define ASSERT_BUF_EQ(candidate, expected, size) ASSERT_TRUE(COMPARE_BUF(candidate, expected, size))
-#define EXPECT_BUF_EQ(candidate, expected, size) EXPECT_TRUE(COMPARE_BUF(candidate, expected, size))
-#define ASSERT_BUF_SET(buffer, val, size) ASSERT_TRUE(CHECK_SET(buffer, val, size))
-#define EXPECT_BUF_SET(buffer, val, size) EXPECT_TRUE(CHECK_SET(buffer, val, size))
+#define EXPECT_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code)                                                                                  \
+    SCRUTINYTEST_EXPECT_WITH_DETAILS(                                                                                                                \
+        TEST_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code),                                                                                   \
+        "EXPECT_IS_PROTOCOL_RESPONSE(" #buffer "," #cmd "," #subfunction "," #code ")")
 
-class ScrutinyTest : public ::testing::Test
+#define ASSERT_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code)                                                                                  \
+    SCRUTINYTEST_ASSERT_WITH_DETAILS(                                                                                                                \
+        TEST_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code),                                                                                   \
+        "ASSERT_IS_PROTOCOL_RESPONSE(" #buffer "," #cmd "," #subfunction "," #code ")")
+
+class ScrutinyTest : public scrutinytest::TestCase
 {
   protected:
     inline std::vector<uint8_t> make_payload_1(uint8_t v0)
@@ -83,9 +89,7 @@ class ScrutinyTest : public ::testing::Test
     void fill_buffer_incremental(uint8_t *buffer, uint32_t length);
     unsigned int encode_addr(uint8_t *buffer, void *addr);
 
-    ::testing::AssertionResult COMPARE_BUF(uint8_t const *candidate, uint8_t const *expected, uint32_t const size);
-    ::testing::AssertionResult CHECK_SET(uint8_t const *buffer, uint8_t const val, uint32_t const size);
-    ::testing::AssertionResult IS_PROTOCOL_RESPONSE(
+    bool TEST_IS_PROTOCOL_RESPONSE(
         uint8_t *buffer,
         scrutiny::protocol::CommandId::E cmd,
         uint8_t subfunction,

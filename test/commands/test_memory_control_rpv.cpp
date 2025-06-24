@@ -8,8 +8,8 @@
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 #include <map>
 #include <vector>
@@ -397,7 +397,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
 
     scrutiny_handler.process(0);
 }
@@ -433,7 +433,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
 
     scrutiny_handler.process(0);
 }
@@ -483,7 +483,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow);
 
     scrutiny_handler.process(0);
 }
@@ -777,7 +777,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
         scrutiny_handler.process(0);
 
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << " i=" << i;
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid) << " i=" << i;
         delete[] request_data;
     }
 }
@@ -837,7 +837,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow);
 }
 
 /*
