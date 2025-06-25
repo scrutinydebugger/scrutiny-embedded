@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -254,7 +254,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
 }
 
 /*
@@ -385,7 +385,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
 }
 
 void dummy_callback(

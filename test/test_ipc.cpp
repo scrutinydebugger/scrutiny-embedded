@@ -7,7 +7,7 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_ipc.hpp"
-#include <gtest/gtest.h>
+#include "scrutinytest/scrutinytest.hpp"
 #include <stdint.h>
 #include <stdlib.h>
 

@@ -6,13 +6,22 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
 #define TX_BUFFER_SIZE 128
+
+struct CallbackData
+{
+
+    uint16_t subfunction;
+    unsigned char request_data[16];
+    uint16_t request_data_length;
+    uint16_t response_max_data_length;
+};
 
 class TestUserCommand : public ScrutinyTest
 {
@@ -37,21 +46,23 @@ class TestUserCommand : public ScrutinyTest
     virtual void SetUp() { config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer)); }
 };
 
+static CallbackData callback1_data;
 void my_callback1(
-    uint8_t const subfunction,
-    uint8_t const *request_data,
+    uint_least8_t const subfunction,
+    unsigned char const *request_data,
     uint16_t const request_data_length,
-    uint8_t *response_data,
+    unsigned char *response_data,
     uint16_t *response_data_length,
     uint16_t const response_max_data_length)
 {
-    EXPECT_EQ(subfunction, 0xAA);
-    EXPECT_EQ(request_data_length, 0x3);
-    EXPECT_EQ(request_data[0], 0x12);
-    EXPECT_EQ(request_data[1], 0x34);
-    EXPECT_EQ(request_data[2], 0x56);
 
-    EXPECT_EQ(response_max_data_length, TX_BUFFER_SIZE);
+    callback1_data.subfunction = subfunction;
+    callback1_data.request_data_length = request_data_length;
+    if (request_data_length <= sizeof(callback1_data.request_data))
+    {
+        std::memcpy(callback1_data.request_data, request_data, request_data_length);
+    }
+    callback1_data.response_max_data_length = response_max_data_length;
 
     response_data[0] = 0x11;
     response_data[1] = 0x22;
@@ -92,11 +103,19 @@ TEST_F(TestUserCommand, TestCommandCalled)
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
 
+    EXPECT_EQ(callback1_data.subfunction, 0xAA);
+    EXPECT_EQ(callback1_data.request_data_length, 0x3);
+    EXPECT_EQ(callback1_data.request_data[0], 0x12);
+    EXPECT_EQ(callback1_data.request_data[1], 0x34);
+    EXPECT_EQ(callback1_data.request_data[2], 0x56);
+
+    EXPECT_EQ(callback1_data.response_max_data_length, TX_BUFFER_SIZE);
+
     uint16_t n_to_read = scrutiny_handler.data_to_send();
     ASSERT_EQ(n_to_read, sizeof(expected_response));
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
-    COMPARE_BUF(tx_buffer, expected_response, sizeof(expected_response));
+    EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
 
 TEST_F(TestUserCommand, TestResponseOverflow)
@@ -118,7 +137,7 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     uint16_t n_to_read = scrutiny_handler.data_to_send();
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code);
 }
 
 TEST_F(TestUserCommand, TestNoCallback)
@@ -140,5 +159,5 @@ TEST_F(TestUserCommand, TestNoCallback)
     uint16_t n_to_read = scrutiny_handler.data_to_send();
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, 0, code);
 }

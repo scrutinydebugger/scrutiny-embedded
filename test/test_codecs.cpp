@@ -8,7 +8,7 @@
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
-#include <gtest/gtest.h>
+#include "scrutinytest/scrutinytest.hpp"
 
 class TestCodecs : public ScrutinyTest
 {

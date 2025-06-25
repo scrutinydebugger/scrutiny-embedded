@@ -8,8 +8,8 @@
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 class TestMemoryControl : public ScrutinyTest
 {
@@ -184,7 +184,7 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
         ASSERT_LT(n_to_read, sizeof(tx_buffer)) << "[i=" << static_cast<uint32_t>(i) << "]";
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
         // Now we expect an InvalidRequest response
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code)) << "[i=" << static_cast<uint32_t>(i) << "]";
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code) << "[i=" << static_cast<uint32_t>(i) << "]";
         scrutiny_handler.process(0);
     }
 }
@@ -235,11 +235,11 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
 
         if (length < 2) // Below 2, we don't overflow the tx buffer
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[length=" << static_cast<uint32_t>(length) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[length=" << static_cast<uint32_t>(length) << "]";
         }
         else // We should have overflown the tx buffer here.
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow)) << "[length=" << static_cast<uint32_t>(length) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow) << "[length=" << static_cast<uint32_t>(length) << "]";
         }
         scrutiny_handler.process(0);
     }
@@ -292,11 +292,11 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
 
         if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         else // We expect to be refused access to buffer
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         scrutiny_handler.process(0);
     }
@@ -343,7 +343,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[i=" << static_cast<uint32_t>(i) << "]";
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
 
         scrutiny_handler.process(0);
     }
@@ -600,7 +600,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
     uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
 }
 
 TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
@@ -634,7 +634,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
 }
 
 /*
@@ -682,11 +682,11 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
 
         if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         else // We expect to be refused access to buffer
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         scrutiny_handler.process(0);
     }
@@ -737,11 +737,11 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
 
         if (i < 2 || i > 10) // Sliding window is completely out of readonly region
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         else // We expect to be refused access to buffer
         {
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden)) << "[i=" << static_cast<uint32_t>(i) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
         scrutiny_handler.process(0);
     }
@@ -798,7 +798,7 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid)) << "[i=" << static_cast<uint32_t>(i) << "]";
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid) << "[i=" << static_cast<uint32_t>(i) << "]";
 
         scrutiny_handler.process(0);
     }

@@ -6,8 +6,9 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
+#include <limits>
 #include <string>
 
 #include "scrutiny.hpp"
@@ -132,7 +133,7 @@ TEST_F(TestDatalogControl, TestUnsupported)
         ASSERT_GT(n_to_read, 0);
 
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
-        ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
         scrutiny_handler.process(0);
     }
 }
@@ -296,7 +297,7 @@ void TestDatalogControl::test_configure(
 {
     uint8_t request_data[1024] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
-    ASSERT_GT(sizeof(request_data), payload_size + 8) << error_msg;
+    ASSERT_GT(sizeof(request_data), (size_t)payload_size + 8) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
     request_data[2] = (payload_size >> 8) & 0xFF;
     request_data[3] = payload_size & 0xFF;
@@ -315,7 +316,7 @@ void TestDatalogControl::test_configure(
         ASSERT_EQ(n_to_read, 9) << error_msg;
 
         scrutiny_handler.process(0);
-        EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 2, expected_code)) << error_msg;
+        EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 2, expected_code) << error_msg;
 
         if (expected_code == protocol::ResponseCode::OK)
         {
@@ -431,6 +432,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
 {
+
     float bad_values[] = { std::numeric_limits<float>::infinity(),
                            -std::numeric_limits<float>::infinity(),
                            std::numeric_limits<float>::quiet_NaN(),
@@ -563,7 +565,7 @@ TEST_F(TestDatalogControl, TestArmTriggerNotConfigured)
 
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 3, protocol::ResponseCode::FailureToProceed));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 3, protocol::ResponseCode::FailureToProceed);
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
     fixed_freq_loop.process();
     EXPECT_FALSE(scrutiny_handler.datalogger()->armed());
@@ -645,12 +647,11 @@ void TestDatalogControl::check_get_status(
     ASSERT_GT(n_to_read, 0);
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
-    EXPECT_TRUE( // More verbose than raw data check in case of failure
-        IS_PROTOCOL_RESPONSE(
-            tx_buffer,
-            protocol::CommandId::DataLogControl,
-            static_cast<uint8_t>(protocol::DataLogControl::Subfunction::GetStatus),
-            protocol::ResponseCode::OK));
+    EXPECT_IS_PROTOCOL_RESPONSE(
+        tx_buffer,
+        protocol::CommandId::DataLogControl,
+        static_cast<uint8_t>(protocol::DataLogControl::Subfunction::GetStatus),
+        protocol::ResponseCode::OK);
 
     datalogging::DataLogger::State::E gotten_state = static_cast<datalogging::DataLogger::State::E>(tx_buffer[5]);
     uint32_t gotten_remaining_bytes = codecs::decode_32_bits_big_endian(&tx_buffer[6]);
@@ -690,7 +691,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     // Empty transmit buffer
     uint8_t dummy_buffer[32] = { 0 };
     scrutiny_handler.pop_data(dummy_buffer, sizeof(dummy_buffer));
-    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow));
+    EXPECT_IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow);
     scrutiny_handler.process(0);
 
     check_get_status(datalogging::DataLogger::State::IDLE, 0, 0); // Gets reset if in error.
@@ -748,7 +749,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     // Expect a failure because there is no daa available.
-    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::FailureToProceed));
+    EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::FailureToProceed);
 
     // Force an acquisition to happen
     scrutiny_handler.datalogger()->arm_trigger();
@@ -779,7 +780,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::OK));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::OK);
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
     reader->reset();
 
@@ -812,7 +813,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
     // Expect a failure because there is no daa available.
-    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::FailureToProceed));
+    EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::FailureToProceed);
 }
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
@@ -854,7 +855,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK);
 
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
     EXPECT_EQ(tx_buffer[5], 1); // finished
@@ -946,7 +947,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             scrutiny_handler.pop_data(validation_txbuffer, n_to_read);
             scrutiny_handler.process(0);
 
-            ASSERT_TRUE(IS_PROTOCOL_RESPONSE(validation_txbuffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK)) << error_msg;
+            ASSERT_IS_PROTOCOL_RESPONSE(validation_txbuffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK) << error_msg;
             finished = static_cast<bool>(validation_txbuffer[5]);
             EXPECT_EQ(validation_txbuffer[6], i % 0x100) << error_msg; // Rolling counter;
             EXPECT_EQ(codecs::decode_16_bits_big_endian(&validation_txbuffer[7]), expected_acquisition_id) << error_msg;
@@ -1005,7 +1006,7 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
     ASSERT_LE(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
-    EXPECT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 8, protocol::ResponseCode::OK));
+    EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 8, protocol::ResponseCode::OK);
     EXPECT_FALSE(scrutiny_handler.datalogging_ownership_taken());
     // Acquisition complete. Process for IPC message to be transferred from loop to main
     check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);

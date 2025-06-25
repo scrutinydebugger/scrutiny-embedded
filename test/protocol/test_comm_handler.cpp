@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"

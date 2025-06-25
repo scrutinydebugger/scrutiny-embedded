@@ -98,7 +98,9 @@
         "xtree": "c",
         "xutility": "c",
         "codecvt": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp"
     },
     "cmake.configureOnOpen": false,
     "cmake.configureSettings": { "gtest_build_samples": "ON" },

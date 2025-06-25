@@ -7,7 +7,7 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny.hpp"
-#include <gtest/gtest.h>
+#include "scrutinytest/scrutinytest.hpp"
 
 TEST(TestTypes, TestSize)
 {

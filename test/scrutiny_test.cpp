@@ -43,35 +43,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     }
 }
 
-::testing::AssertionResult ScrutinyTest::COMPARE_BUF(uint8_t const *candidate, uint8_t const *expected, uint32_t const size)
-{
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        if (expected[i] != candidate[i])
-        {
-            return ::testing::AssertionFailure() << "candidate[" << i << "] (" << static_cast<uint32_t>(candidate[i]) << ") != expected[" << i
-                                                 << "] (" << static_cast<uint32_t>(expected[i]) << ")";
-        }
-    }
-
-    return ::testing::AssertionSuccess();
-}
-
-::testing::AssertionResult ScrutinyTest::CHECK_SET(uint8_t const *buffer, uint8_t const val, uint32_t const size)
-{
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        if (buffer[i] != val)
-        {
-            return ::testing::AssertionFailure() << "buffer[" << i << "] (" << static_cast<uint32_t>(buffer[i]) << ") != expected[" << i << "] ("
-                                                 << static_cast<uint32_t>(val) << ")";
-        }
-    }
-
-    return ::testing::AssertionSuccess();
-}
-
-::testing::AssertionResult ScrutinyTest::IS_PROTOCOL_RESPONSE(
+bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
     uint8_t *buffer,
     scrutiny::protocol::CommandId::E cmd,
     uint8_t subfunction,
@@ -79,28 +51,24 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
-        return ::testing::AssertionFailure() << "Wrong command ID. Got " << static_cast<uint32_t>(buffer[0]) << " but expected "
-                                             << static_cast<uint32_t>(cmd);
+        SCRUTINYTEST_FAIL << "Wrong command ID. Got " << static_cast<uint32_t>(buffer[0]) << " but expected " << static_cast<uint32_t>(cmd);
     }
 
     if (buffer[1] != subfunction)
     {
-        return ::testing::AssertionFailure() << "Wrong Subfunction. Got " << static_cast<uint32_t>(buffer[1]) << " but expected "
-                                             << static_cast<uint32_t>(subfunction);
+        SCRUTINYTEST_FAIL << "Wrong Subfunction. Got " << static_cast<uint32_t>(buffer[1]) << " but expected " << static_cast<uint32_t>(subfunction);
     }
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        return ::testing::AssertionFailure() << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2])
-                                             << " but expected " << code;
+        SCRUTINYTEST_FAIL << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2]) << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
     {
-        return ::testing::AssertionFailure() << "Wrong command length. Got " << static_cast<uint32_t>(length) << " but expected 0";
+        SCRUTINYTEST_FAIL << "Wrong command length. Got " << static_cast<uint32_t>(length) << " but expected 0";
     }
-
-    return ::testing::AssertionSuccess();
+    SCRUTINYTEST_PASS;
 }
 
 #if defined(_MSC_VER)

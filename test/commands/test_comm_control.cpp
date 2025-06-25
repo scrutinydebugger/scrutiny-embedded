@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
+#include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <gtest/gtest.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
@@ -47,7 +47,6 @@ class TestCommControl : public ScrutinyTest
 
 TEST_F(TestCommControl, TestDiscover)
 {
-
     ASSERT_FALSE(scrutiny_handler.comm()->is_connected()); // We should get a Discover response even when not connected.
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC), 4u);
     uint8_t request_data[8 + 4] = { 2, 1, 0, 4 };
@@ -125,7 +124,7 @@ TEST_F(TestCommControl, TestDiscoverWrongMagicWhileConnected)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     // Now we expect an InvalidRequest response
-    ASSERT_TRUE(IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code);
     scrutiny_handler.process(0);
 }
 
