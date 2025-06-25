@@ -133,7 +133,7 @@ TEST_F(TestDatalogControl, TestUnsupported)
         ASSERT_GT(n_to_read, 0);
 
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
-        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure));
+        ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
         scrutiny_handler.process(0);
     }
 }
