@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
   scrutinytest
   GIT_REPOSITORY https://github.com/scrutinydebugger/scrutiny-test-framework
-  GIT_TAG be7f18cf3e6b9fb0355bbd646e92f8736a3e67e8
+  GIT_TAG 007864969b6d47f7171e2181920e5e48dab02a3f
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
