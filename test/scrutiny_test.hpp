@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <ostream>
 #include <stdint.h>
+#include <vector>
 
 #include "scrutiny.hpp"
 
