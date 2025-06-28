@@ -10,7 +10,7 @@
 #include <cstring>
 
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 
 static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
 {

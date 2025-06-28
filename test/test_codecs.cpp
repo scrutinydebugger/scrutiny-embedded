@@ -7,7 +7,7 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
 
 class TestCodecs : public ScrutinyBaseTest

@@ -7,12 +7,12 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutinytest/scrutinytest.hpp"
-#include <cstring>
+#include "stdlib.h"
+#include "string.h"
 #include <limits>
-#include <string>
 
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 
 using namespace scrutiny;
 
@@ -63,7 +63,7 @@ class TestDatalogControl : public ScrutinyBaseTest
         datalogging::Configuration refconfig,
         protocol::ResponseCode::E expected_code,
         bool check_response = true,
-        std::string error_msg = "");
+        char const *error_msg = "");
     void check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
@@ -293,7 +293,7 @@ void TestDatalogControl::test_configure(
     datalogging::Configuration refconfig,
     protocol::ResponseCode::E expected_code,
     bool check_response,
-    std::string error_msg)
+    char const *error_msg)
 {
     uint8_t request_data[1024] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
@@ -433,7 +433,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
 {
 
-    float bad_values[] = { std::numeric_limits<float>::infinity(),
+    float bad_values[] = { 1.3,
                            -std::numeric_limits<float>::infinity(),
                            std::numeric_limits<float>::quiet_NaN(),
                            std::numeric_limits<float>::signaling_NaN() };
@@ -441,7 +441,8 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
     SCRUTINY_CONSTEXPR uint8_t loop_id = 1;
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
     {
-        std::string error_msg = std::string("i=") + NumberToString(i);
+        char error_msg[16];
+        sprintf(error_msg, "i=%d", i);
         datalogging::Configuration refconfig = get_valid_reference_configuration();
         refconfig.trigger.operands[0].type = datalogging::OperandType::LITERAL;
         refconfig.trigger.operands[0].data.literal.val = bad_values[i];
@@ -966,7 +967,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             {
                 qty_to_read = payload_length - 4;
             }
-            std::memcpy(&read_data[read_cursor], &validation_txbuffer[9], qty_to_read);
+            memcpy(&read_data[read_cursor], &validation_txbuffer[9], qty_to_read);
             read_cursor += qty_to_read;
         }
         EXPECT_TRUE(finished);

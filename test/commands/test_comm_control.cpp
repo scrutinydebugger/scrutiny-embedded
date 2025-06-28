@@ -7,10 +7,10 @@
 //   Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutinytest/scrutinytest.hpp"
-#include <cstring>
+#include <string.h>
 
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 
 #define DISPLAY_NAME "helloworld"
 #define DISPLAY_NAME_LENGTH 10
@@ -50,7 +50,7 @@ TEST_F(TestCommControl, TestDiscover)
     ASSERT_FALSE(scrutiny_handler.comm()->is_connected()); // We should get a Discover response even when not connected.
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC), 4u);
     uint8_t request_data[8 + 4] = { 2, 1, 0, 4 };
-    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
+    memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
     std::string display_name = std::string(DISPLAY_NAME);
 
     uint8_t tx_buffer[64];
@@ -65,10 +65,10 @@ TEST_F(TestCommControl, TestDiscover)
     uint16_t index = 5;
     expected_response[index++] = 1;
     expected_response[index++] = 0;
-    std::memcpy(&expected_response[index], scrutiny::software_id, sizeof(scrutiny::software_id));
+    memcpy(&expected_response[index], scrutiny::software_id, sizeof(scrutiny::software_id));
     index += sizeof(scrutiny::software_id);
     expected_response[index++] = static_cast<uint8_t>(display_name.length());
-    std::memcpy(&expected_response[index], display_name.c_str(), display_name.length());
+    memcpy(&expected_response[index], display_name.c_str(), display_name.length());
 
     add_crc(request_data, sizeof(request_data) - 4);
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -90,7 +90,7 @@ TEST_F(TestCommControl, TestDiscoverWrongMagic)
 {
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC), 4u);
     uint8_t request_data[8 + 4] = { 2, 1, 0, 4 };
-    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
+    memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
     request_data[4] = ~request_data[4];
     add_crc(request_data, sizeof(request_data) - 4);
 
@@ -110,7 +110,7 @@ TEST_F(TestCommControl, TestDiscoverWrongMagicWhileConnected)
 
     scrutiny_handler.comm()->connect();
     uint8_t request_data[8 + 4] = { 2, 1, 0, 4 };
-    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
+    memcpy(&request_data[4], scrutiny::protocol::CommControl::DISCOVER_MAGIC, sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC));
     request_data[4] = ~request_data[4];
     add_crc(request_data, sizeof(request_data) - 4);
 
@@ -219,11 +219,11 @@ TEST_F(TestCommControl, TestConnect)
 {
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC), 4u);
     uint8_t request_data[8 + 4] = { 2, 4, 0, 4 };
-    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
+    memcpy(&request_data[4], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
 
     uint8_t tx_buffer[32];
     uint8_t expected_response[9 + 4 + 4] = { 0x82, 4, 0, 0, 8 }; // Version 1.0
-    std::memcpy(&expected_response[5], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
+    memcpy(&expected_response[5], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
 
     add_crc(request_data, sizeof(request_data) - 4);
 

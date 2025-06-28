@@ -8,10 +8,9 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 #include "scrutiny.hpp"
 #include <stdint.h>
-#include <string>
 
 void ScrutinyBaseTest::add_crc(uint8_t *data, uint16_t data_len)
 {
@@ -164,7 +163,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State::E val)
+        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, DataLogger::State::E val)
         {
             switch (val)
             {

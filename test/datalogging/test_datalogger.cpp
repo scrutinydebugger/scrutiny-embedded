@@ -12,7 +12,7 @@
 
 #include "raw_format_parser.hpp"
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 #include <algorithm>
 #include <cmath>
 #include <sstream>

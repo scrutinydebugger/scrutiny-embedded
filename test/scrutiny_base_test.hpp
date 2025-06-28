@@ -1,4 +1,4 @@
-//    scrutiny_test.hpp
+//    scrutiny_base_test.hpp
 //        Base class for CPP unit tests.
 //        All test should inherit this class.
 //         Includes bunch of helper for easy testing.
@@ -101,7 +101,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        std::ostream &operator<<(std::ostream &out, ResponseCode val);
+        std::ostream &operator<<(std::ostream &out, ResponseCode::E val);
     }
 } // namespace scrutiny
 
@@ -110,7 +110,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State val);
+        std::ostream &operator<<(std::ostream &out, DataLogger::State::E val);
     }
 } // namespace scrutiny
 

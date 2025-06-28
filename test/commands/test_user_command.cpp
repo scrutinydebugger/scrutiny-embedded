@@ -10,7 +10,7 @@
 #include <cstring>
 
 #include "scrutiny.hpp"
-#include "scrutiny_test.hpp"
+#include "scrutiny_base_test.hpp"
 
 #define TX_BUFFER_SIZE 128
 
