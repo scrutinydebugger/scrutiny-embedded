@@ -10,6 +10,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include <limits>
+#include <stdio.h>
 
 #include "scrutiny.hpp"
 #include "scrutiny_base_test.hpp"
