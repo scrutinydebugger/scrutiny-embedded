@@ -433,7 +433,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
 {
 
-    float bad_values[] = { 1.3,
+    float bad_values[] = { std::numeric_limits<float>::infinity(),
                            -std::numeric_limits<float>::infinity(),
                            std::numeric_limits<float>::quiet_NaN(),
                            std::numeric_limits<float>::signaling_NaN() };
