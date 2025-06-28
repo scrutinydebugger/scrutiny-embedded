@@ -11,7 +11,7 @@
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
 
-class TestMemoryControl : public ScrutinyTest
+class TestMemoryControl : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -22,7 +22,7 @@ class TestMemoryControl : public ScrutinyTest
     uint8_t _tx_buffer[128];
 
     TestMemoryControl() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

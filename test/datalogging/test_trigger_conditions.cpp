@@ -30,7 +30,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
-class TestTriggerConditions : public ScrutinyTest
+class TestTriggerConditions : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -50,7 +50,7 @@ class TestTriggerConditions : public ScrutinyTest
     scrutiny::RuntimePublishedValue rpvs[2];
 
     TestTriggerConditions() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

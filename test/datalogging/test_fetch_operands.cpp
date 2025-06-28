@@ -30,7 +30,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
-class TestFetchOperands : public ScrutinyTest
+class TestFetchOperands : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -50,7 +50,7 @@ class TestFetchOperands : public ScrutinyTest
     scrutiny::RuntimePublishedValue rpvs[2];
 
     TestFetchOperands() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

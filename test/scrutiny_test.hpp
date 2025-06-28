@@ -26,7 +26,7 @@
         TEST_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code),                                                                                   \
         "ASSERT_IS_PROTOCOL_RESPONSE(" #buffer "," #cmd "," #subfunction "," #code ")")
 
-class ScrutinyTest : public scrutinytest::TestCase
+class ScrutinyBaseTest : public scrutinytest::TestCase
 {
   protected:
     inline std::vector<uint8_t> make_payload_1(uint8_t v0)

@@ -15,7 +15,7 @@
 
 using namespace scrutiny;
 
-class TestRawEncoder : public ScrutinyTest
+class TestRawEncoder : public ScrutinyBaseTest
 {
   protected:
     void check_canaries();
@@ -33,7 +33,7 @@ class TestRawEncoder : public ScrutinyTest
     uint8_t buffer_canary_2[512];
 
     TestRawEncoder() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         scrutiny_handler(),
         config(),
         dlconfig(),

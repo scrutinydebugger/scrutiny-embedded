@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string>
 
-void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
+void ScrutinyBaseTest::add_crc(uint8_t *data, uint16_t data_len)
 {
     uint32_t crc = scrutiny::tools::crc32(data, data_len);
     data[data_len] = (crc >> 24) & 0xFF;
@@ -22,7 +22,7 @@ void ScrutinyTest::add_crc(uint8_t *data, uint16_t data_len)
     data[data_len + 3] = (crc >> 0) & 0xFF;
 }
 
-void ScrutinyTest::add_crc(scrutiny::protocol::Response *response)
+void ScrutinyBaseTest::add_crc(scrutiny::protocol::Response *response)
 {
     uint8_t header[5];
     header[0] = response->command_id;
@@ -35,7 +35,7 @@ void ScrutinyTest::add_crc(scrutiny::protocol::Response *response)
     response->crc = scrutiny::tools::crc32(response->data, response->data_length, crc);
 }
 
-void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
+void ScrutinyBaseTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 {
     for (uint32_t i = 0; i < length; i++)
     {
@@ -43,7 +43,7 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
     }
 }
 
-bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
+bool ScrutinyBaseTest::TEST_IS_PROTOCOL_RESPONSE(
     uint8_t *buffer,
     scrutiny::protocol::CommandId::E cmd,
     uint8_t subfunction,
@@ -76,7 +76,7 @@ bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
 #pragma warning(disable : 4127) // Get rid of SCRUTINY_CONSTEXPR always true condition warning.
 #endif
 
-unsigned int ScrutinyTest::encode_addr(uint8_t *buffer, void *addr)
+unsigned int ScrutinyBaseTest::encode_addr(uint8_t *buffer, void *addr)
 {
     uintptr_t ptr = reinterpret_cast<uintptr_t>(addr);
     SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(ptr);

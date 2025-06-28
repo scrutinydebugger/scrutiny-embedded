@@ -12,7 +12,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-class TestCommHandler : public ScrutinyTest
+class TestCommHandler : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;

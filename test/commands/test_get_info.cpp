@@ -12,7 +12,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-class TestGetInfo : public ScrutinyTest
+class TestGetInfo : public ScrutinyBaseTest
 {
 
   protected:
@@ -30,7 +30,7 @@ class TestGetInfo : public ScrutinyTest
     scrutiny::FixedFrequencyLoopHandler fixed_freq_loop_no_datalogging;
 
     TestGetInfo() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

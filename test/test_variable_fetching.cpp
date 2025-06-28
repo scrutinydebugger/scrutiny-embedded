@@ -11,7 +11,7 @@
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstddef>
 
-class TestVariableFetching : public ScrutinyTest
+class TestVariableFetching : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -30,7 +30,7 @@ class TestVariableFetching : public ScrutinyTest
     scrutiny::AddressRange forbidden_ranges[2];
 
     TestVariableFetching() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

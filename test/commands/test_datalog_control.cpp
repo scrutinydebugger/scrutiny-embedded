@@ -30,7 +30,7 @@ static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
     return true;
 }
 
-class TestDatalogControl : public ScrutinyTest
+class TestDatalogControl : public ScrutinyBaseTest
 {
   protected:
     static SCRUTINY_CONSTEXPR uint32_t FIXED_FREQ_LOOP_TIMESTEP_US = 100u;
@@ -71,7 +71,7 @@ class TestDatalogControl : public ScrutinyTest
 #endif
 
     TestDatalogControl() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

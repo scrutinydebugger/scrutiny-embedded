@@ -51,7 +51,7 @@ static void trigger_callback(void)
     g_trigger_callback_count++;
 }
 
-class TestDatalogger : public ScrutinyTest
+class TestDatalogger : public ScrutinyBaseTest
 {
   protected:
     void check_canaries();
@@ -77,7 +77,7 @@ class TestDatalogger : public ScrutinyTest
     uint8_t buffer_canary_2[512];
 
     TestDatalogger() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

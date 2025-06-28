@@ -14,7 +14,7 @@
 #include <map>
 #include <vector>
 
-class TestMemoryControlRPV : public ScrutinyTest
+class TestMemoryControlRPV : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -25,7 +25,7 @@ class TestMemoryControlRPV : public ScrutinyTest
     uint8_t _tx_buffer[128];
 
     TestMemoryControlRPV() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

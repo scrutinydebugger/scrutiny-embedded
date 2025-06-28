@@ -10,7 +10,7 @@
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
 
-class TestCodecs : public ScrutinyTest
+class TestCodecs : public ScrutinyBaseTest
 {
 };
 

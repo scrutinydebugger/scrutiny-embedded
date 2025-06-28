@@ -23,7 +23,7 @@ struct CallbackData
     uint16_t response_max_data_length;
 };
 
-class TestUserCommand : public ScrutinyTest
+class TestUserCommand : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -34,7 +34,7 @@ class TestUserCommand : public ScrutinyTest
     uint8_t _tx_buffer[TX_BUFFER_SIZE];
 
     TestUserCommand() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

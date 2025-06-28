@@ -15,7 +15,7 @@
 #define DISPLAY_NAME "helloworld"
 #define DISPLAY_NAME_LENGTH 10
 
-class TestCommControl : public ScrutinyTest
+class TestCommControl : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
@@ -26,7 +26,7 @@ class TestCommControl : public ScrutinyTest
     uint8_t _tx_buffer[128];
 
     TestCommControl() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         tb(),
         scrutiny_handler(),
         config(),

@@ -11,11 +11,11 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-class TestTxParsing : public ScrutinyTest
+class TestTxParsing : public ScrutinyBaseTest
 {
   public:
     TestTxParsing() :
-        ScrutinyTest(),
+        ScrutinyBaseTest(),
         comm(),
         response_buffer(),
         response(),

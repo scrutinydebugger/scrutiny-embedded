@@ -11,7 +11,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-class TestRxParsing : public ScrutinyTest
+class TestRxParsing : public ScrutinyBaseTest
 {
   protected:
     scrutiny::Timebase tb;
