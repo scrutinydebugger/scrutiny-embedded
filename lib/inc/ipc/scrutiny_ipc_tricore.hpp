@@ -41,14 +41,10 @@ namespace scrutiny
         inline bool has_content(void) const { return m_written != 0; }
 
         /// @brief Mark the message as ready to be read using an atomic operation
-        inline void commit(void)
-        {
-            // maybe use an atomic _asm_ instruction?
-            m_written = 1;
-        }
+        inline void commit(void) { _scrutiny_ldmst(&m_written, 1, 1); }
 
         /// @brief  Deletes the message content and leave rooms for the next one.
-        inline void clear(void) { m_written = 0; }
+        inline void clear(void) { _scrutiny_ldmst(&m_written, 1, 0); }
 
         /// @brief Sends a message to the receiver. Meant to be used by the producer
         /// @param indata Data to be sent
