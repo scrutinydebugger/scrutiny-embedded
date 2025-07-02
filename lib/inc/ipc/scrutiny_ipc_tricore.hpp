@@ -38,7 +38,7 @@ namespace scrutiny
         IPCMessage() { clear(); }
 
         /// @brief Tells if the message content is valid and can be read.
-        inline bool has_content(void) const { return m_written != 0 }
+        inline bool has_content(void) const { return m_written != 0; }
 
         /// @brief Mark the message as ready to be read using an atomic operation
         inline void commit(void)
