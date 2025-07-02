@@ -10,6 +10,7 @@
 #define ___SCRUTINY_IPC_STD_ATOMIC_H___
 
 #include "scrutiny_setup.hpp"
+#include <stdint.h>
 
 #if !SCRUTINY_BUILD_TRICORE
 #error "Only works for tricore architecture"
