@@ -16,7 +16,7 @@
 #error "Only works for tricore architecture"
 #endif
 
-static inline void _scrutiny_ldmst(volatile void *address, uint32 mask, uint32 value)
+static inline void _scrutiny_ldmst(volatile void *address, uint32_t mask, uint32_t value)
 {
     __asm__ volatile(
         "mov %H2,%1 \n\
