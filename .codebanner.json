@@ -317,6 +317,9 @@
         },
         "projects/c_testapp/src/tools.c": {
             "docstring": "Miscelaneous tools for C TestApp"
+        },
+        "lib/inc/ipc/scrutiny_ipc_tricore.hpp": {
+            "docstring": "An implementation of the Scrutiny IPC based on Tricore intrinsics to store atomically"
         }
     }
 }

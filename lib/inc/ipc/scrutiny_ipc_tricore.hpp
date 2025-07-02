@@ -1,5 +1,5 @@
-//    scrutiny_ipc_std_atomic.hpp
-//        An implementation of the Scrutiny IPC based on C++11 std::atomic.
+//    scrutiny_ipc_tricore.hpp
+//        An implementation of the Scrutiny IPC based on Tricore intrinsics to store atomically
 //
 //   - License : MIT - See LICENSE file.
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
