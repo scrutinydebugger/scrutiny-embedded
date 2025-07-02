@@ -42,6 +42,7 @@
 #define SCRUTINY_BUILD_AVR_GCC 0
 #define SCRUTINY_BUILD_X64 0
 #define SCRUTINY_BUILD_X86 0
+#define SCRUTINY_BUILD_TRICORE 0
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) ||               \
     defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
@@ -56,6 +57,9 @@
 #elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
 #undef SCRUTINY_BUILD_X86
 #define SCRUTINY_BUILD_X86 1
+#elif defined(__tricore__) || defined(__tricore) || defined(tricore)
+#undef SCRUTINY_BUILD_TRICORE
+#define SCRUTINY_BUILD_TRICORE 1
 #endif
 
 #endif //___SCRUTINY_COMPILER_HPP___
