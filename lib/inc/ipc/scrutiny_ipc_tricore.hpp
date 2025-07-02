@@ -22,7 +22,8 @@ static inline void _scrutiny_ldmst(volatile void *address, uint32_t mask, uint32
         "mov %H2,%1 \n\
                   ldmst [%0]0,%A2" ::"a"(address),
         "d"(mask),
-        "d"((long long)value));
+        "d"((long long)value)
+        : "memory");
 }
 
 namespace scrutiny
