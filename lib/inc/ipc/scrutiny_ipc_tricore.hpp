@@ -6,8 +6,8 @@
 //
 //   Copyright (c) 2021 Scrutiny Debugger
 
-#ifndef ___SCRUTINY_IPC_STD_ATOMIC_H___
-#define ___SCRUTINY_IPC_STD_ATOMIC_H___
+#ifndef ___SCRUTINY_IPC_TRICORE_H___
+#define ___SCRUTINY_IPC_TRICORE_H___
 
 #include "scrutiny_setup.hpp"
 #include <stdint.h>
@@ -69,4 +69,4 @@ namespace scrutiny
     };
 } // namespace scrutiny
 
-#endif // ___SCRUTINY_IPC_STD_ATOMIC_H___
+#endif // ___SCRUTINY_IPC_TRICORE_H___
