@@ -24,3 +24,5 @@ add_subdirectory(projects)
 if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
+
+include(cmake/scrutiny.cmake)    # Make available for project importing us
