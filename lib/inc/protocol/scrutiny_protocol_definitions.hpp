@@ -57,7 +57,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eCommandId, uint_least8_t)
             {
                 GetInfo = 0x01,
                 CommControl = 0x02,
@@ -72,7 +72,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eResponseCode, uint_least8_t)
             {
                 OK = 0,
                 InvalidRequest = 1,
@@ -91,7 +91,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eRxError, uint_least8_t)
             {
                 None,
                 Overflow,
@@ -105,7 +105,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eTxError, uint_least8_t)
             {
                 None,
                 Overflow,
@@ -127,7 +127,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eSubfunction, uint_least8_t)
                 {
                     GetprotocolVersion = 1,
                     GetSoftwareId = 2,
@@ -146,7 +146,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eMemoryRegionType, uint_least8_t)
                 {
                     ReadOnly = 0,
                     Forbidden = 1
@@ -164,7 +164,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eSubfunction, uint_least8_t)
                 {
                     Discover = 1,
                     Heartbeat = 2,
@@ -182,7 +182,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eSubfunction, uint_least8_t)
                 {
                     Read = 1,
                     Write = 2,
@@ -200,7 +200,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eSubfunction, uint_least8_t)
                 {
                     GetSetup = 1,
                     ConfigureDatalog = 2,

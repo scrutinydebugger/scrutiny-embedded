@@ -65,7 +65,7 @@ namespace scrutiny
             } // namespace relational_operators
 
             template <template <class, class> class OPERATOR>
-            bool RelationalCompare(VariableTypeCompare::E const operand_types[], AnyTypeCompare const operand_vals[])
+            bool RelationalCompare(VariableTypeCompare::eVariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
             {
                 SCRUTINY_CONSTEXPR uint_biggest_t UINT_2_INT_MAX = static_cast<uint_biggest_t>(-1) >> 1;
 
@@ -126,7 +126,7 @@ namespace scrutiny
 
             bool EqualCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -135,7 +135,7 @@ namespace scrutiny
 
             bool NotEqualCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -144,7 +144,7 @@ namespace scrutiny
 
             bool GreaterThanCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -153,7 +153,7 @@ namespace scrutiny
 
             bool GreaterOrEqualThanCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -162,7 +162,7 @@ namespace scrutiny
 
             bool LessThanCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -171,7 +171,7 @@ namespace scrutiny
 
             bool LessOrEqualThanCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -180,7 +180,7 @@ namespace scrutiny
 
             bool ChangeMoreThanCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 // We can reasonably make the assumption that the delta will be a human-sized value.
@@ -252,7 +252,7 @@ namespace scrutiny
 
             bool IsWithinCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
@@ -284,7 +284,7 @@ namespace scrutiny
 
             bool AlwaysTrueCondition::evaluate(
                 ConditionSharedData *const data,
-                VariableTypeCompare::E const operand_types[],
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);

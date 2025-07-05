@@ -92,9 +92,9 @@ class ScrutinyTest : public scrutinytest::TestCase
 
     bool TEST_IS_PROTOCOL_RESPONSE(
         uint8_t *buffer,
-        scrutiny::protocol::CommandId::E cmd,
+        scrutiny::protocol::CommandId::eCommandId cmd,
         uint8_t subfunction,
-        scrutiny::protocol::ResponseCode::E code);
+        scrutiny::protocol::ResponseCode::eResponseCode code);
 };
 
 namespace scrutiny

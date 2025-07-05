@@ -34,7 +34,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eEncodingType, uint_least8_t)
             {
                 RAW
             };
@@ -52,7 +52,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eVariableTypeCompare, uint_least8_t)
             {
                 _float = static_cast<int>(scrutiny::VariableType::float32),
                 _uint = static_cast<int>(scrutiny::BiggestUint),
@@ -65,7 +65,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eOperandType, uint_least8_t)
             {
                 LITERAL = 0,
                 VAR = 1,
@@ -84,12 +84,12 @@ namespace scrutiny
             struct
             {
                 void *addr;
-                VariableType::E datatype;
+                VariableType::eVariableType datatype;
             } var;
             struct
             {
                 void *addr;
-                VariableType::E datatype;
+                VariableType::eVariableType datatype;
                 uint8_t bitoffset;
                 uint8_t bitsize;
             } varbit;
@@ -101,7 +101,7 @@ namespace scrutiny
 
         struct Operand
         {
-            OperandType::E type;
+            OperandType::eOperandType type;
             OperandData data;
         };
 
@@ -109,7 +109,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eSupportedTriggerConditions, uint_least8_t)
             {
                 AlwaysTrue = 0,         // Always true
                 Equal = 1,              // Operand1 == Operand2
@@ -140,17 +140,17 @@ namespace scrutiny
                 hold_time_100ns = other->hold_time_100ns;
             }
 
-            SupportedTriggerConditions::E condition; // Selected condition
-            uint8_t operand_count;                   // Number of given operands
-            uint32_t hold_time_100ns;                // Amount of time that the condition must be true for trigger to trig
-            Operand operands[MAX_OPERANDS];          // The operand definitions
+            SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
+            uint8_t operand_count;                                             // Number of given operands
+            uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
+            Operand operands[MAX_OPERANDS];                                    // The operand definitions
         };
 
         class LoggableType
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eLoggableType, uint_least8_t)
             {
                 MEMORY = 0,
                 RPV = 1,
@@ -160,7 +160,7 @@ namespace scrutiny
         };
         struct LoggableItem
         {
-            LoggableType::E type;
+            LoggableType::eLoggableType type;
             union
             {
                 struct

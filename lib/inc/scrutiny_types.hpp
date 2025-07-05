@@ -24,7 +24,7 @@ namespace scrutiny
     {
       public:
         // clang-format off
-        SCRUTINY_ENUM(uint_least8_t)
+        SCRUTINY_ENUM(eEndianness, uint_least8_t)
         {
             LITTLE = ctypes::SCRUTINY_C_ENDIANNESS_LITTLE,
             BIG = ctypes::SCRUTINY_C_ENDIANNESS_BIG
@@ -43,7 +43,7 @@ namespace scrutiny
     {
       public:
         // clang-format off
-        SCRUTINY_ENUM(uint_least8_t)
+        SCRUTINY_ENUM(eVariableTypeType, uint_least8_t)
         {
             _sint = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_sint,
             _uint = ctypes::SCRUTINY_C_VARIABLE_TYPE_TYPE_uint,
@@ -60,7 +60,7 @@ namespace scrutiny
     {
       public:
         // clang-format off
-        SCRUTINY_ENUM(uint_least8_t)
+        SCRUTINY_ENUM(eVariableTypeSize, uint_least8_t)
         {
             _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
             _16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_16,
@@ -78,7 +78,7 @@ namespace scrutiny
     {
       public:
         // clang-format off
-        SCRUTINY_ENUM(uint_least8_t)
+        SCRUTINY_ENUM(eVariableType, uint_least8_t)
         {
             sint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint8,
             sint16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint16,
@@ -140,7 +140,7 @@ namespace scrutiny
         }
 
         uint16_t id;
-        VariableType::E type;
+        VariableType::eVariableType type;
     };
 
     /// @brief Callback called on Runtime Published Value read

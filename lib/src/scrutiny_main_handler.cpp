@@ -119,7 +119,7 @@ namespace scrutiny
         return true;
     }
 
-    bool MainHandler::fetch_variable(void const *const addr, VariableType::E const variable_type, AnyType *const val) const
+    bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
         uint8_t typesize = tools::get_type_size(variable_type);
         if (typesize == 0 || typesize > sizeof(AnyType))
@@ -137,19 +137,19 @@ namespace scrutiny
 
     bool MainHandler::fetch_variable_bitfield(
         void const *const addr,
-        VariableTypeType::E const var_tt,
+        VariableTypeType::eVariableTypeType const var_tt,
         uint_fast8_t const bitoffset,
         uint_fast8_t const bitsize,
         AnyType *const val,
-        VariableType::E *const output_type) const
+        VariableType::eVariableType *const output_type) const
     {
         bool success = true;
         uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
         uint_fast8_t const output_required_size = ((bitsize - 1) >> 3) + 1;
-        VariableTypeSize::E const fetch_type_size = tools::get_required_type_size(fetch_required_size);
-        VariableTypeSize::E const output_type_size = tools::get_required_type_size(output_required_size);
-        VariableType::E const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
-        VariableType::E const output_variable_type = tools::make_type(var_tt, output_type_size);
+        VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size(fetch_required_size);
+        VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
+        VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
+        VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
 
         if (touches_forbidden_region(addr, tools::get_type_size(fetch_type_size)))
         {
@@ -417,7 +417,7 @@ namespace scrutiny
             protocol::Response *response = m_comm_handler.prepare_response();
             process_request(m_comm_handler.get_request(), response);
 
-            if (static_cast<protocol::ResponseCode::E>(response->response_code) == protocol::ResponseCode::ProcessAgain)
+            if (static_cast<protocol::ResponseCode::eResponseCode>(response->response_code) == protocol::ResponseCode::ProcessAgain)
             {
                 m_processing_request = false;
                 if (!m_process_again_timestamp_taken)
@@ -437,7 +437,7 @@ namespace scrutiny
                 }
                 // comm handler will stay in standby until we process the request. Data in rx buffer is guaranteed to stay valid until then
             }
-            else if (static_cast<protocol::ResponseCode::E>(response->response_code) == protocol::ResponseCode::NoResponseToSend)
+            else if (static_cast<protocol::ResponseCode::eResponseCode>(response->response_code) == protocol::ResponseCode::NoResponseToSend)
             {
                 m_processing_request = true;
                 // Will not be transmitting, therefore automatically wait for next request below
@@ -510,7 +510,7 @@ namespace scrutiny
         return found;
     }
 
-    VariableType::E MainHandler::get_rpv_type(uint16_t const id) const
+    VariableType::eVariableType MainHandler::get_rpv_type(uint16_t const id) const
     {
         RuntimePublishedValue rpv;
         bool const found = get_rpv(id, &rpv);
@@ -519,13 +519,13 @@ namespace scrutiny
 
     void MainHandler::process_request(protocol::Request const *const request, protocol::Response *const response)
     {
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
         response->reset();
 
         response->command_id = request->command_id;
         response->subfunction_id = request->subfunction_id;
 
-        switch (static_cast<protocol::CommandId::E>(request->command_id))
+        switch (static_cast<protocol::CommandId::eCommandId>(request->command_id))
         {
             // ============= [GetInfo] ============
         case protocol::CommandId::GetInfo:
@@ -568,7 +568,7 @@ namespace scrutiny
     }
 
     // ============= [GetInfo] ============
-    protocol::ResponseCode::E MainHandler::process_get_info(protocol::Request const *const request, protocol::Response *const response)
+    protocol::ResponseCode::eResponseCode MainHandler::process_get_info(protocol::Request const *const request, protocol::Response *const response)
     {
         union
         {
@@ -618,9 +618,9 @@ namespace scrutiny
 
         } stack;
 
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
-        switch (static_cast<protocol::GetInfo::Subfunction::E>(request->subfunction_id))
+        switch (static_cast<protocol::GetInfo::Subfunction::eSubfunction>(request->subfunction_id))
         {
             // =========== [GetprotocolVersion] ==========
         case protocol::GetInfo::Subfunction::GetprotocolVersion:
@@ -675,8 +675,8 @@ namespace scrutiny
                 break;
             }
 
-            if (static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) ==
-                protocol::GetInfo::MemoryRegionType::ReadOnly)
+            if (static_cast<protocol::GetInfo::MemoryRegionType::eMemoryRegionType>(
+                    stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::ReadOnly)
             {
                 if (!m_config.is_readonly_address_range_set())
                 {
@@ -695,8 +695,8 @@ namespace scrutiny
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
             else if (
-                static_cast<protocol::GetInfo::MemoryRegionType::E>(stack.get_special_memory_region_location.request_data.region_type) ==
-                protocol::GetInfo::MemoryRegionType::Forbidden)
+                static_cast<protocol::GetInfo::MemoryRegionType::eMemoryRegionType>(
+                    stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
             {
                 if (!m_config.is_forbidden_address_range_set())
                 {
@@ -792,7 +792,7 @@ namespace scrutiny
                 break;
             }
 
-            const LoopType::E loop_type = m_config.m_loops[loop_id]->loop_type();
+            const LoopType::eLoopType loop_type = m_config.m_loops[loop_id]->loop_type();
             stack.get_loop_def.response_data.loop_id = loop_id;
             stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -825,7 +825,9 @@ namespace scrutiny
     }
 
     // ============= [CommControl] ============
-    protocol::ResponseCode::E MainHandler::process_comm_control(protocol::Request const *const request, protocol::Response *const response)
+    protocol::ResponseCode::eResponseCode MainHandler::process_comm_control(
+        protocol::Request const *const request,
+        protocol::Response *const response)
     {
         union
         {
@@ -858,9 +860,9 @@ namespace scrutiny
             } disconnect;
         } stack;
 
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
-        switch (static_cast<protocol::CommControl::Subfunction::E>(request->subfunction_id))
+        switch (static_cast<protocol::CommControl::Subfunction::eSubfunction>(request->subfunction_id))
         {
             // =========== [Discover] ==========
         case protocol::CommControl::Subfunction::Discover:
@@ -980,9 +982,11 @@ namespace scrutiny
         return code;
     }
 
-    protocol::ResponseCode::E MainHandler::process_memory_control(protocol::Request const *const request, protocol::Response *const response)
+    protocol::ResponseCode::eResponseCode MainHandler::process_memory_control(
+        protocol::Request const *const request,
+        protocol::Response *const response)
     {
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
         union
@@ -1021,7 +1025,7 @@ namespace scrutiny
 
         } stack;
 
-        switch (static_cast<protocol::MemoryControl::Subfunction::E>(request->subfunction_id))
+        switch (static_cast<protocol::MemoryControl::Subfunction::eSubfunction>(request->subfunction_id))
         {
             // =========== [Read] ==========
         case protocol::MemoryControl::Subfunction::Read:
@@ -1075,8 +1079,8 @@ namespace scrutiny
         case protocol::MemoryControl::Subfunction::Write: // fall through
         case protocol::MemoryControl::Subfunction::WriteMasked:
         {
-            bool const masked =
-                static_cast<protocol::MemoryControl::Subfunction::E>(request->subfunction_id) == protocol::MemoryControl::Subfunction::WriteMasked;
+            bool const masked = static_cast<protocol::MemoryControl::Subfunction::eSubfunction>(request->subfunction_id) ==
+                                protocol::MemoryControl::Subfunction::WriteMasked;
             code = protocol::ResponseCode::OK;
 
             if (m_config.memory_write_enable == false)
@@ -1326,9 +1330,11 @@ namespace scrutiny
         return false;
     }
 
-    protocol::ResponseCode::E MainHandler::process_user_command(protocol::Request const *const request, protocol::Response *const response)
+    protocol::ResponseCode::eResponseCode MainHandler::process_user_command(
+        protocol::Request const *const request,
+        protocol::Response *const response)
     {
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         if (m_config.is_user_command_callback_set())
         {
@@ -1360,7 +1366,9 @@ namespace scrutiny
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-    protocol::ResponseCode::E MainHandler::process_datalog_control(protocol::Request const *const request, protocol::Response *const response)
+    protocol::ResponseCode::eResponseCode MainHandler::process_datalog_control(
+        protocol::Request const *const request,
+        protocol::Response *const response)
     {
         union
         {
@@ -1396,8 +1404,8 @@ namespace scrutiny
             return protocol::ResponseCode::UnsupportedFeature;
         }
 
-        protocol::ResponseCode::E code = protocol::ResponseCode::FailureToProceed;
-        switch (static_cast<protocol::DataLogControl::Subfunction::E>(request->subfunction_id))
+        protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
+        switch (static_cast<protocol::DataLogControl::Subfunction::eSubfunction>(request->subfunction_id))
         {
 
         case protocol::DataLogControl::Subfunction::GetSetup:
@@ -1670,7 +1678,8 @@ namespace scrutiny
         }
         }
 
-        if (static_cast<protocol::DataLogControl::Subfunction::E>(request->subfunction_id) == protocol::DataLogControl::Subfunction::ConfigureDatalog)
+        if (static_cast<protocol::DataLogControl::Subfunction::eSubfunction>(request->subfunction_id) ==
+            protocol::DataLogControl::Subfunction::ConfigureDatalog)
         {
             if (code != protocol::ResponseCode::OK && code != protocol::ResponseCode::ProcessAgain)
             {

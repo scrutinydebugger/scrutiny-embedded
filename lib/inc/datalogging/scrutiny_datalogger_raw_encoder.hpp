@@ -40,7 +40,7 @@ namespace scrutiny
             inline bool error(void) const;
             inline datalogging::buffer_size_t get_entry_count(void) const;
             datalogging::buffer_size_t get_total_size(void) const;
-            inline datalogging::EncodingType::E get_encoding(void) const;
+            inline datalogging::EncodingType::eEncodingType get_encoding(void) const;
 
           protected:
             RawFormatEncoder const *const m_encoder;
@@ -54,7 +54,7 @@ namespace scrutiny
             friend class RawFormatReader;
 
           public:
-            static SCRUTINY_CONSTEXPR EncodingType::E ENCODING = EncodingType::RAW;
+            static SCRUTINY_CONSTEXPR EncodingType::eEncodingType ENCODING = EncodingType::RAW;
             RawFormatEncoder();
 
             void init(
@@ -68,7 +68,7 @@ namespace scrutiny
             inline void set_timebase(Timebase const *const timebase) { m_timebase = timebase; }
             inline datalogging::buffer_size_t get_entry_write_counter(void) const { return m_entry_write_counter; }
             inline datalogging::buffer_size_t get_data_write_counter(void) const { return m_entry_write_counter * m_entry_size; }
-            inline datalogging::EncodingType::E get_encoding(void) const { return ENCODING; }
+            inline datalogging::EncodingType::eEncodingType get_encoding(void) const { return ENCODING; }
             inline datalogging::buffer_size_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
             inline datalogging::buffer_size_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
             inline bool error(void) const { return m_error; }
@@ -101,7 +101,7 @@ namespace scrutiny
         {
             return m_encoder->get_entry_count();
         }
-        inline datalogging::EncodingType::E RawFormatReader::get_encoding(void) const
+        inline datalogging::EncodingType::eEncodingType RawFormatReader::get_encoding(void) const
         {
             return m_encoder->get_encoding();
         }

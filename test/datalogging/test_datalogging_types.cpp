@@ -32,7 +32,7 @@ TEST(TestDataLoggingTypes, AnyTypeCompareCast)
 
 TEST(TestDataLoggingTypes, ConvertToCompareType)
 {
-    scrutiny::VariableType::E vtype;
+    scrutiny::VariableType::eVariableType vtype;
     scrutiny::AnyType v;
 
     vtype = scrutiny::VariableType::sint8;

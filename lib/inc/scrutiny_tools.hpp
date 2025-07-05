@@ -78,7 +78,7 @@ namespace scrutiny
         /// @brief Returns the size of a given type in bytes
         /// @param vt The VariableType object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableType::E const vt)
+        inline uint8_t get_type_size(VariableType::eVariableType const vt)
         {
             if (vt == VariableType::unknown)
             {
@@ -91,7 +91,7 @@ namespace scrutiny
         /// @brief Returns the size of a given TypeSize in bytes
         /// @param ts The VariableTypeSize object
         /// @return Size in bytes
-        inline uint8_t get_type_size(VariableTypeSize::E const ts)
+        inline uint8_t get_type_size(VariableTypeSize::eVariableTypeSize const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -104,16 +104,16 @@ namespace scrutiny
         /// @brief Returns the Type Type of a given data type.
         /// @param vt The VariableTypeSize object
         /// @return The VariableTypeType enum object
-        inline VariableTypeType::E get_var_type_type(VariableType::E const vt)
+        inline VariableTypeType::eVariableTypeType get_var_type_type(VariableType::eVariableType const vt)
         {
-            return static_cast<VariableTypeType::E>(static_cast<unsigned int>(vt) & 0xF0);
+            return static_cast<VariableTypeType::eVariableTypeType>(static_cast<unsigned int>(vt) & 0xF0);
         }
 
         /// @brief Creates a VariableType from a TypeType and a size.
         /// @param tt The type type (uint, int, float, etc)
         /// @param ts The type size (8,16, 32)
         /// @return The VariableType enum object
-        inline VariableType::E make_type(VariableTypeType::E const tt, VariableTypeSize::E const ts)
+        inline VariableType::eVariableType make_type(VariableTypeType::eVariableTypeType const tt, VariableTypeSize::eVariableTypeSize const ts)
         {
             if (tt == VariableTypeType::_boolean)
             {
@@ -124,23 +124,23 @@ namespace scrutiny
                 return VariableType::unknown;
             }
 
-            return static_cast<VariableType::E>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
+            return static_cast<VariableType::eVariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 
         /// @brief Returns true if given Variable Type is a floating point type, regardless of its size
-        inline bool is_float_type(VariableType::E const vt)
+        inline bool is_float_type(VariableType::eVariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_float;
         }
 
         /// @brief Returns true if given Variable Type is a unsigned int type, regardless of its size
-        inline bool is_uint_type(VariableType::E const vt)
+        inline bool is_uint_type(VariableType::eVariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_uint;
         }
 
         /// @brief Returns true if given Variable Type is a signed int type, regardless of its size
-        inline bool is_sint_type(VariableType::E const vt)
+        inline bool is_sint_type(VariableType::eVariableType const vt)
         {
             return get_var_type_type(vt) == VariableTypeType::_sint;
         }
@@ -271,12 +271,12 @@ namespace scrutiny
         }
 
         /// @brief Returns true if the type is supported by scrutiny
-        bool is_supported_type(VariableType::E const vt);
+        bool is_supported_type(VariableType::eVariableType const vt);
 
         /// @brief Returns which variable type to use to store a given size
         /// @param size Given size in bytes
         /// @return The size to use.
-        VariableTypeSize::E get_required_type_size(uint_fast8_t const size);
+        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size);
 
         /// @brief Computes a standard CRC32
         /// @param data Input data

@@ -519,7 +519,7 @@ namespace scrutiny
         //==============================================================
 
         // ===== Encoding =====
-        ResponseCode::E CodecV1_0::encode_response_protocol_version(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_protocol_version(
             ResponseData::GetInfo::GetProtocolVersion const *const response_data,
             Response *const response)
         {
@@ -536,7 +536,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_software_id(Response *const response)
+        ResponseCode::eResponseCode CodecV1_0::encode_response_software_id(Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(scrutiny::software_id);
 
@@ -550,7 +550,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_special_memory_region_count(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_special_memory_region_count(
             ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
             Response *const response)
         {
@@ -567,7 +567,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_special_memory_region_location(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_special_memory_region_location(
             ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data,
             Response *response)
         {
@@ -590,7 +590,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_supported_features(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_supported_features(
             ResponseData::GetInfo::GetSupportedFeatures const *const response_data,
             Response *const response)
         {
@@ -618,7 +618,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_special_memory_region_location(
+        ResponseCode::eResponseCode CodecV1_0::decode_request_get_special_memory_region_location(
             Request const *const request,
             RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data)
         {
@@ -627,7 +627,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_rpv_definition(
+        ResponseCode::eResponseCode CodecV1_0::decode_request_get_rpv_definition(
             Request const *const request,
             RequestData::GetInfo::GetRPVDefinition *const request_data)
         {
@@ -648,7 +648,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_get_loop_definition(
+        ResponseCode::eResponseCode CodecV1_0::decode_request_get_loop_definition(
             Request const *const request,
             RequestData::GetInfo::GetLoopDefinition *const request_data)
         {
@@ -664,7 +664,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_loop_definition(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_get_loop_definition(
             ResponseData::GetInfo::GetLoopDefinition const *const response_data,
             Response *const response)
         {
@@ -692,7 +692,7 @@ namespace scrutiny
             }
 
             uint16_t cursor = 3;
-            switch (static_cast<scrutiny::LoopType::E>(response_data->loop_type))
+            switch (static_cast<scrutiny::LoopType::eLoopType>(response_data->loop_type))
             {
             case scrutiny::LoopType::FIXED_FREQ:
                 if (cursor + timestep_100ns_size > response->data_max_length)
@@ -723,7 +723,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_rpv_count(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_get_rpv_count(
             ResponseData::GetInfo::GetRPVCount const *const response_data,
             Response *const response)
         {
@@ -739,7 +739,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_get_loop_count(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_get_loop_count(
             ResponseData::GetInfo::GetLoopCount const *const response_data,
             Response *const response)
         {
@@ -757,7 +757,7 @@ namespace scrutiny
 
         // ============================ CommunicationControl ============================
 
-        ResponseCode::E CodecV1_0::encode_response_comm_discover(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_comm_discover(
             ResponseData::CommControl::Discover const *const response_data,
             Response *const response)
         {
@@ -791,7 +791,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_heartbeat(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_comm_heartbeat(
             ResponseData::CommControl::Heartbeat const *const response_data,
             Response *const response)
         {
@@ -811,7 +811,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_get_params(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_comm_get_params(
             ResponseData::CommControl::GetParams const *const response_data,
             Response *const response)
         {
@@ -848,7 +848,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_comm_connect(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_comm_connect(
             ResponseData::CommControl::Connect const *const response_data,
             Response *const response)
         {
@@ -871,7 +871,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_discover(Request const *const request, RequestData::CommControl::Discover *const request_data)
+        ResponseCode::eResponseCode CodecV1_0::decode_request_comm_discover(
+            Request const *const request,
+            RequestData::CommControl::Discover *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(CommControl::DISCOVER_MAGIC);
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size;
@@ -891,7 +893,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_heartbeat(
+        ResponseCode::eResponseCode CodecV1_0::decode_request_comm_heartbeat(
             Request const *const request,
             RequestData::CommControl::Heartbeat *const request_data)
         {
@@ -910,7 +912,9 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_connect(Request const *const request, RequestData::CommControl::Connect *const request_data)
+        ResponseCode::eResponseCode CodecV1_0::decode_request_comm_connect(
+            Request const *const request,
+            RequestData::CommControl::Connect *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(CommControl::DISCOVER_MAGIC);
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size;
@@ -925,7 +929,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_request_comm_disconnect(
+        ResponseCode::eResponseCode CodecV1_0::decode_request_comm_disconnect(
             Request const *const request,
             RequestData::CommControl::Disconnect *const request_data)
         {
@@ -1003,7 +1007,7 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        ResponseCode::E CodecV1_0::encode_response_datalogging_get_setup(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_datalogging_get_setup(
             ResponseData::DataLogControl::GetSetup const *const response_data,
             Response *const response)
         {
@@ -1022,7 +1026,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_datalogging_status(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_datalogging_status(
             ResponseData::DataLogControl::GetStatus const *const response_data,
             Response *const response)
         {
@@ -1047,7 +1051,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_datalogging_get_acquisition_metadata(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_datalogging_get_acquisition_metadata(
             ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
             Response *const response)
         {
@@ -1076,7 +1080,7 @@ namespace scrutiny
             return ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::encode_response_datalogging_read_acquisition(
+        ResponseCode::eResponseCode CodecV1_0::encode_response_datalogging_read_acquisition(
             ResponseData::DataLogControl::ReadAcquisition const *const response_data,
             Response *const response,
             bool *const finished)
@@ -1107,7 +1111,7 @@ namespace scrutiny
             return protocol::ResponseCode::OK;
         }
 
-        ResponseCode::E CodecV1_0::decode_datalogging_configure_request(
+        ResponseCode::eResponseCode CodecV1_0::decode_datalogging_configure_request(
             Request const *const request,
             RequestData::DataLogControl::Configure *const request_data,
             datalogging::Configuration *const config)
@@ -1123,7 +1127,7 @@ namespace scrutiny
             config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
             config->probe_location = request->data[5];
             config->timeout_100ns = codecs::decode_32_bits_big_endian(&request->data[6]);
-            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::E>(request->data[10]);
+            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(request->data[10]);
             config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian(&request->data[11]);
             config->trigger.operand_count = request->data[15];
 
@@ -1140,7 +1144,7 @@ namespace scrutiny
                     return ResponseCode::InvalidRequest;
                 }
 
-                const datalogging::OperandType::E optype = static_cast<datalogging::OperandType::E>(request->data[cursor]);
+                const datalogging::OperandType::eOperandType optype = static_cast<datalogging::OperandType::eOperandType>(request->data[cursor]);
                 config->trigger.operands[i].type = optype;
                 cursor++;
 
@@ -1172,7 +1176,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType::E>(request->data[cursor++]);
+                    config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
                     cursor += codecs::decode_address_big_endian(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
@@ -1185,7 +1189,7 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
 
-                    config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType::E>(request->data[cursor++]);
+                    config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
                     cursor += codecs::decode_address_big_endian(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
@@ -1219,7 +1223,7 @@ namespace scrutiny
                     return ResponseCode::InvalidRequest;
                 }
 
-                config->items_to_log[i].type = static_cast<datalogging::LoggableType::E>(request->data[cursor++]);
+                config->items_to_log[i].type = static_cast<datalogging::LoggableType::eLoggableType>(request->data[cursor++]);
 
                 switch (config->items_to_log[i].type)
                 {

@@ -204,7 +204,7 @@ TEST_F(TestVariableFetching, Bitfield)
 #endif
 
     scrutiny::AnyType outval;
-    scrutiny::VariableType::E outtype;
+    scrutiny::VariableType::eVariableType outtype;
     bool success;
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[0], scrutiny::VariableTypeType::_uint, 2, 3, &outval, &outtype);
     EXPECT_TRUE(success);

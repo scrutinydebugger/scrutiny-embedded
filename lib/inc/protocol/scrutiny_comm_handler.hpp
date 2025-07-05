@@ -98,10 +98,10 @@ namespace scrutiny
             inline Request const *get_request(void) const { return &m_active_request; }
 
             /// @brief Gets the last error encountered in reception task
-            inline RxError::E get_rx_error(void) const { return m_rx_error; }
+            inline RxError::eRxError get_rx_error(void) const { return m_rx_error; }
 
             /// @brief Gets the last error encountered in transmission task
-            inline TxError::E get_tx_error(void) const { return m_tx_error; }
+            inline TxError::eTxError get_tx_error(void) const { return m_tx_error; }
 
             /// @brief Returns true if the CommHandler is presently transmitting. False otherwise
             inline bool transmitting(void) const { return (m_state == State::Transmitting); }
@@ -143,7 +143,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eRxFSMState, uint_least8_t)
                 {
                     WaitForCommand,
                     WaitForSubfunction,
@@ -160,7 +160,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eState, uint_least8_t)
                 {
                     Idle,
                     Receiving,
@@ -173,7 +173,7 @@ namespace scrutiny
             void reset_tx();
 
             Timebase const *m_timebase;          // Pointer to the timebase given by the MainHandler
-            State::E m_state;                    // Internal state, idle, receiving, transmitting
+            State::eState m_state;               // Internal state, idle, receiving, transmitting
             bool m_enabled;                      // Enable flag
             uint32_t m_session_id;               // Actual session ID
             bool m_session_active;               // Flag indicating if a session is active with the server
@@ -182,14 +182,14 @@ namespace scrutiny
             bool m_first_heartbeat_received;     // Flag indicating if the first heartbeat has been received.
 
             // Reception
-            uint8_t *m_rx_buffer;      // The reception buffer
-            uint16_t m_rx_buffer_size; // The reception buffer size
-            uint8_t *m_tx_buffer;      // The transmission buffer
-            uint16_t m_tx_buffer_size; // The transmission buffer size
-            Request m_active_request;  // The request presently being received
-            RxFSMState::E m_rx_state;  // Reception Finite State Machine state
-            RxError::E m_rx_error;     // Last reception error code
-            bool m_request_received;   // Flag indicating if a full request has been received
+            uint8_t *m_rx_buffer;               // The reception buffer
+            uint16_t m_rx_buffer_size;          // The reception buffer size
+            uint8_t *m_tx_buffer;               // The transmission buffer
+            uint16_t m_tx_buffer_size;          // The transmission buffer size
+            Request m_active_request;           // The request presently being received
+            RxFSMState::eRxFSMState m_rx_state; // Reception Finite State Machine state
+            RxError::eRxError m_rx_error;       // Last reception error code
+            bool m_request_received;            // Flag indicating if a full request has been received
             union
             {
                 uint8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
@@ -199,10 +199,10 @@ namespace scrutiny
             timestamp_t m_last_rx_timestamp; // Timestamp at which the last chunk of data was received
 
             // Transmission
-            Response m_active_response; // The response being transmitted
-            uint16_t m_nbytes_to_send;  // Number of bytes to send in this response
-            uint16_t m_nbytes_sent;     // Number of bytes sent up to now. Includes headers and CRC
-            TxError::E m_tx_error;      // Last Transmission error code
+            Response m_active_response;   // The response being transmitted
+            uint16_t m_nbytes_to_send;    // Number of bytes to send in this response
+            uint16_t m_nbytes_sent;       // Number of bytes sent up to now. Includes headers and CRC
+            TxError::eTxError m_tx_error; // Last Transmission error code
 
           private:
             static uint32_t s_session_counter; // A counter to generate session ID

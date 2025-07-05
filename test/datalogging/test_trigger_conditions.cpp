@@ -96,7 +96,7 @@ TEST_F(TestTriggerConditions, OperatorEQ)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -111,7 +111,7 @@ TEST_F(TestTriggerConditions, OperatorNEQ)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.5f;
     vals[1]._float = 0.5f;
@@ -126,7 +126,7 @@ TEST_F(TestTriggerConditions, OperatorGT)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -143,7 +143,7 @@ TEST_F(TestTriggerConditions, OperatorGET)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -160,7 +160,7 @@ TEST_F(TestTriggerConditions, OperatorLT)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -177,7 +177,7 @@ TEST_F(TestTriggerConditions, OperatorLET)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -194,7 +194,7 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     for (int i = 0; i < 2; i++)
     {
@@ -261,7 +261,7 @@ TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
     for (int i = 0; i < 2; i++)
     {
         const int op0 = (i == 0) ? 0 : 1;
@@ -301,7 +301,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
     cond.cmt.reset(cond.data());
 
     // Test positive change
@@ -352,7 +352,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[2];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[2];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
     // ===== Float - Sint
     cond.cmt.reset(cond.data());
@@ -581,7 +581,7 @@ TEST_F(TestTriggerConditions, IsWithin)
 {
     scrutiny::datalogging::trigger::ConditionSet cond;
     scrutiny::datalogging::AnyTypeCompare vals[3];
-    scrutiny::datalogging::VariableTypeCompare::E valtypes[3];
+    scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[3];
 
     cond.within.reset(cond.data());
     // Test positive change

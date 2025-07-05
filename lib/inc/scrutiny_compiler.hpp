@@ -20,7 +20,7 @@
 // =========== Compiler features =========
 #if SCRUTINY_HAS_CPP11
 #define SCRUTINY_CONSTEXPR constexpr
-#define SCRUTINY_ENUM(type) enum E : type
+#define SCRUTINY_ENUM(name, type) enum name : type
 #define SCRUTINY_STATIC_ASSERT(x, y) static_assert(x, y)
 #define SCRUTINY_NULL nullptr
 #define SCRUTINY_OVERRIDE override
@@ -28,7 +28,7 @@
 #define SCRUTINY_EXPLICIT explicit
 #else
 #define SCRUTINY_CONSTEXPR const
-#define SCRUTINY_ENUM(type) enum E
+#define SCRUTINY_ENUM(name, type) enum name
 #define SCRUTINY_STATIC_ASSERT(x, y)
 #define SCRUTINY_NULL NULL
 #define SCRUTINY_OVERRIDE
