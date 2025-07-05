@@ -11,11 +11,11 @@ option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" ON)
 option(SCRUTINY_BUILD_CWRAPPER "Build a C99 wrapper" ON)
 option(INSTALL_FOLDER "Install folder" ${CMAKE_CURRENT_BINARY_DIR}/install )
 
-
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(lib)
+include(lib/cmake/scrutiny.cmake)    # Make available for project importing us with FetchContent
+
 if (SCRUTINY_BUILD_CWRAPPER)
     add_subdirectory(cwrapper)
 endif()
