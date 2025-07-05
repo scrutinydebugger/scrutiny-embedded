@@ -61,13 +61,21 @@ endif()
 
 
 # ----- INSTALL -----
-install(DIRECTORY inc 
+install(
+    DIRECTORY inc 
     DESTINATION ${INSTALL_FOLDER}
     PATTERN "*.hpp.in" EXCLUDE
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
-    DESTINATION ${INSTALL_FOLDER}/inc)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
+    DESTINATION ${INSTALL_FOLDER}/inc
+    )
+
+install(
+    FILES ${CMAKE_CURRENT_LIST_DIR}/cmake/scrutiny.cmake
+    DESTINATION ${INSTALL_FOLDER}
+    )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc/>
@@ -79,3 +87,4 @@ install(
     TARGETS ${PROJECT_NAME} 
     ARCHIVE DESTINATION ${INSTALL_FOLDER} 
 )
+

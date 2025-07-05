@@ -1,3 +1,11 @@
+//    main.cpp
+//        The default main for launching the test framework
+//
+//   - License : MIT - See LICENSE file.
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//   Copyright (c) 2021 Scrutiny Debugger
+
 #include "scrutinytest/scrutinytest.hpp"
 
 #include <iostream>

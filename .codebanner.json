@@ -8,7 +8,8 @@
         "*.cpp",
         "*.hpp",
         "*.h",
-        "*.c"
+        "*.c",
+        "*.cmake"
     ],
     "exclude_patterns": [
         "projects/platformio/*",
@@ -320,6 +321,12 @@
         },
         "lib/inc/ipc/scrutiny_ipc_tricore.hpp": {
             "docstring": "An implementation of the Scrutiny IPC based on Tricore intrinsics to store atomically"
+        },
+        "lib/cmake/scrutiny.cmake": {
+            "docstring": "Scrutiny CMake tools"
+        },
+        "test/main.cpp": {
+            "docstring": "The default main for launching the test framework"
         }
     }
 }

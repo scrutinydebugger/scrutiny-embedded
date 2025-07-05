@@ -14,6 +14,8 @@ option(INSTALL_FOLDER "Install folder" ${CMAKE_CURRENT_BINARY_DIR}/install )
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(lib)
+include(lib/cmake/scrutiny.cmake)    # Make available for project importing us with FetchContent
+
 if (SCRUTINY_BUILD_CWRAPPER)
     add_subdirectory(cwrapper)
 endif()
@@ -22,5 +24,3 @@ add_subdirectory(projects)
 if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
 endif()
-
-include(cmake/scrutiny.cmake)    # Make available for project importing us with FetchContent
