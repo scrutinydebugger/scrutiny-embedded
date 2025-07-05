@@ -103,9 +103,9 @@ TEST_F(TestCommControl, TestDiscoverWrongMagic)
 
 TEST_F(TestCommControl, TestDiscoverWrongMagicWhileConnected)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::CommControl;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::CommControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::CommControl::Subfunction::Discover);
-    const scrutiny::protocol::ResponseCode::E code = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::eResponseCode code = scrutiny::protocol::ResponseCode::InvalidRequest;
     ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::DISCOVER_MAGIC), 4u);
 
     scrutiny_handler.comm()->connect();

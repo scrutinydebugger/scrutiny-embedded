@@ -91,7 +91,7 @@ using namespace scrutiny::datalogging;
 TEST_F(TestFetchOperands, TestFetchLiteral)
 {
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::LITERAL;
@@ -107,7 +107,7 @@ TEST_F(TestFetchOperands, TestFetchVar)
     float my_var = 3.1415926f;
 
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::VAR;
@@ -124,7 +124,7 @@ TEST_F(TestFetchOperands, TestFetchVar)
 TEST_F(TestFetchOperands, TestFetchRPV)
 {
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::RPV;
@@ -156,7 +156,7 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
     my_struct.val = -1000;
 
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::VARBIT;
@@ -175,10 +175,10 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
 TEST_F(TestFetchOperands, TestBadOperandType)
 {
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = static_cast<OperandType::E>(0xff);
+    operand.type = static_cast<OperandType::eOperandType>(0xff);
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype);
     EXPECT_FALSE(success);
@@ -187,7 +187,7 @@ TEST_F(TestFetchOperands, TestBadOperandType)
 TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
 {
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::VAR;
@@ -201,7 +201,7 @@ TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
 TEST_F(TestFetchOperands, TestFetchInexistandRPV)
 {
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
     operand.type = OperandType::RPV;
@@ -229,7 +229,7 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     my_struct.d = 0;
 
     scrutiny::AnyType val;
-    scrutiny::VariableType::E vartype = scrutiny::VariableType::unknown;
+    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
     bool success = false;
 
     Operand operand;

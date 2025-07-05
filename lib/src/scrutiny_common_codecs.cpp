@@ -94,7 +94,7 @@ namespace scrutiny
             return static_cast<uint8_t>(addr_size);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType::E const vartype, uint8_t *const buffer)
+        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType::eVariableType const vartype, uint8_t *const buffer)
         {
             uint8_t const typesize = tools::get_type_size(vartype);
             return encode_anytype_big_endian(val, typesize, buffer);

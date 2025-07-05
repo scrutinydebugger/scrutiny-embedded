@@ -28,7 +28,7 @@ namespace scrutiny
         /// @param vtype The variable type. Will be modified by this function (may convert uint8 to uint32)
         /// @param val The data to be modified. Will mostly writes 0 into uninitialized section so that when passing from uint8 to uint32, both values
         /// are equals.
-        void convert_to_compare_type(VariableType::E *const vtype, AnyType *const val);
+        void convert_to_compare_type(VariableType::eVariableType *const vtype, AnyType *const val);
 
         /// @brief Reads an operand used for log trigger
         /// @param main_handler A pointer to the main handler used to fetch the memory and respect forbidden regions
@@ -40,7 +40,7 @@ namespace scrutiny
             MainHandler const *const main_handler,
             Operand const *const operand,
             AnyType *const val,
-            VariableType::E *const variable_type);
+            VariableType::eVariableType *const variable_type);
     } // namespace datalogging
 } // namespace scrutiny
 

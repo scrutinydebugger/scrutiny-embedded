@@ -352,7 +352,7 @@ namespace scrutiny
 
             bool outval = false;
             AnyType opvals[MAX_OPERANDS];
-            VariableType::E optypes[MAX_OPERANDS];
+            VariableType::eVariableType optypes[MAX_OPERANDS];
             const unsigned int nb_operand = m_trigger.active_condition->get_operand_count();
 
             if (nb_operand > MAX_OPERANDS)
@@ -380,7 +380,7 @@ namespace scrutiny
 
                 bool condition_result = m_trigger.active_condition->evaluate(
                     m_trigger.conditions.data(),
-                    reinterpret_cast<VariableTypeCompare::E *>(optypes),
+                    reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(optypes),
                     reinterpret_cast<AnyTypeCompare *>(opvals));
 
                 if (condition_result)

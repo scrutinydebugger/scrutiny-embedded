@@ -372,9 +372,9 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
 
@@ -408,9 +408,9 @@ TEST_F(TestMemoryControlRPV, TestReadRPVBadRequest)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
 
@@ -444,9 +444,9 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 
 TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::ReadRPV);
-    const scrutiny::protocol::ResponseCode::E overflow = scrutiny::protocol::ResponseCode::Overflow;
+    const scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     uint8_t tx_buffer[32];
 
@@ -597,7 +597,7 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 */
 struct TestEntry
 {
-    static TestEntry make(uint16_t _id, scrutiny::VariableType::E _type, std::vector<uint8_t> _data)
+    static TestEntry make(uint16_t _id, scrutiny::VariableType::eVariableType _type, std::vector<uint8_t> _data)
     {
         TestEntry o;
         o.id = _id;
@@ -606,7 +606,7 @@ struct TestEntry
         return o;
     }
     uint16_t id;
-    scrutiny::VariableType::E type;
+    scrutiny::VariableType::eVariableType type;
     std::vector<uint8_t> data;
 };
 
@@ -731,9 +731,9 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 
 TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
-    const scrutiny::protocol::ResponseCode::E invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     uint8_t tx_buffer[32];
 
@@ -789,9 +789,9 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
 
 TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 {
-    SCRUTINY_CONSTEXPR scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::MemoryControl;
+    SCRUTINY_CONSTEXPR scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     SCRUTINY_CONSTEXPR uint8_t subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::WriteRPV);
-    SCRUTINY_CONSTEXPR scrutiny::protocol::ResponseCode::E overflow = scrutiny::protocol::ResponseCode::Overflow;
+    SCRUTINY_CONSTEXPR scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     SCRUTINY_CONSTEXPR uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
     SCRUTINY_CONSTEXPR uint16_t nb_write = buffersize_min_mod3 / 3 + 1; // 16bits ID + 16bits data

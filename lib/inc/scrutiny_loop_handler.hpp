@@ -28,7 +28,7 @@ namespace scrutiny
     {
       public:
         // clang-format off
-        SCRUTINY_ENUM(uint_least8_t)
+        SCRUTINY_ENUM(eLoopType, uint_least8_t)
         {
             FIXED_FREQ,
             VARIABLE_FREQ
@@ -45,7 +45,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eMain2LoopMessageID, uint_least8_t)
             {
 #if SCRUTINY_ENABLE_DATALOGGING
                 RELEASE_DATALOGGER_OWNERSHIP, 
@@ -61,7 +61,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eLoop2MainMessageID, uint_least8_t)
             {
 #if SCRUTINY_ENABLE_DATALOGGING
                 DATALOGGER_OWNERSHIP_TAKEN, 
@@ -74,17 +74,17 @@ namespace scrutiny
 
         struct Main2LoopMessage
         {
-            Main2LoopMessageID::E message_id;
+            Main2LoopMessageID::eMain2LoopMessageID message_id;
         };
 
         struct Loop2MainMessage
         {
-            Loop2MainMessageID::E message_id;
+            Loop2MainMessageID::eLoop2MainMessageID message_id;
             union {
 #if SCRUTINY_ENABLE_DATALOGGING
                 struct
                 {
-                    datalogging::DataLogger::State::E state;
+                    datalogging::DataLogger::State::eState state;
                     datalogging::buffer_size_t bytes_to_acquire_from_trigger_to_completion;
                     datalogging::buffer_size_t write_counter_since_trigger;
                 } datalogger_status_update;
@@ -102,7 +102,7 @@ namespace scrutiny
         }
 
         /// @brief Returns the loop type: Fixed frequency or variable frequency
-        virtual LoopType::E loop_type(void) const = 0;
+        virtual LoopType::eLoopType loop_type(void) const = 0;
 
         virtual uint32_t get_timestep_100ns(void) const = 0;
 
@@ -200,7 +200,7 @@ namespace scrutiny
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE
+        virtual LoopType::eLoopType loop_type(void) const SCRUTINY_OVERRIDE
         {
             return LoopType::FIXED_FREQ;
         }
@@ -237,7 +237,7 @@ namespace scrutiny
         void process(timediff_t const timestep_100ns);
 
         /// @brief Return the type of loop handler
-        virtual LoopType::E loop_type(void) const SCRUTINY_OVERRIDE
+        virtual LoopType::eLoopType loop_type(void) const SCRUTINY_OVERRIDE
         {
             return LoopType::VARIABLE_FREQ;
         }

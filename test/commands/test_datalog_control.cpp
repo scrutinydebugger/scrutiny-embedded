@@ -61,10 +61,10 @@ class TestDatalogControl : public ScrutinyTest
         uint8_t loop_id,
         uint16_t config_id,
         datalogging::Configuration refconfig,
-        protocol::ResponseCode::E expected_code,
+        protocol::ResponseCode::eResponseCode expected_code,
         bool check_response = true,
         std::string error_msg = "");
-    void check_get_status(datalogging::DataLogger::State::E expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
+    void check_get_status(datalogging::DataLogger::State::eState expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
     float m_some_var_logged1;
@@ -114,8 +114,8 @@ class TestDatalogControl : public ScrutinyTest
 // Expect all subfunctions to return Unsupported feature if not supported
 TEST_F(TestDatalogControl, TestUnsupported)
 {
-    const protocol::CommandId::E cmd = protocol::CommandId::DataLogControl;
-    const protocol::ResponseCode::E failure = protocol::ResponseCode::UnsupportedFeature;
+    const protocol::CommandId::eCommandId cmd = protocol::CommandId::DataLogControl;
+    const protocol::ResponseCode::eResponseCode failure = protocol::ResponseCode::UnsupportedFeature;
 
     uint8_t tx_buffer[32];
 
@@ -291,7 +291,7 @@ void TestDatalogControl::test_configure(
     uint8_t loop_id,
     uint16_t config_id,
     datalogging::Configuration refconfig,
-    protocol::ResponseCode::E expected_code,
+    protocol::ResponseCode::eResponseCode expected_code,
     bool check_response,
     std::string error_msg)
 {
@@ -463,7 +463,7 @@ TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {
     SCRUTINY_CONSTEXPR uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.condition = static_cast<datalogging::SupportedTriggerConditions::E>(0xAA);
+    refconfig.trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(0xAA);
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
 }
@@ -624,7 +624,7 @@ TEST_F(TestDatalogControl, TestArmDisarmTriggerOK)
 }
 
 void TestDatalogControl::check_get_status(
-    datalogging::DataLogger::State::E expected_state,
+    datalogging::DataLogger::State::eState expected_state,
     uint32_t expected_remaining_bytes,
     uint32_t expected_counter)
 {
@@ -653,7 +653,7 @@ void TestDatalogControl::check_get_status(
         static_cast<uint8_t>(protocol::DataLogControl::Subfunction::GetStatus),
         protocol::ResponseCode::OK);
 
-    datalogging::DataLogger::State::E gotten_state = static_cast<datalogging::DataLogger::State::E>(tx_buffer[5]);
+    datalogging::DataLogger::State::eState gotten_state = static_cast<datalogging::DataLogger::State::eState>(tx_buffer[5]);
     uint32_t gotten_remaining_bytes = codecs::decode_32_bits_big_endian(&tx_buffer[6]);
     uint32_t gotten_byte_counter = codecs::decode_32_bits_big_endian(&tx_buffer[10]);
     EXPECT_EQ(gotten_state, expected_state);

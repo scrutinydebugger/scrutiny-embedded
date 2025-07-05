@@ -35,7 +35,7 @@ namespace scrutiny
             {
               public:
                 // clang-format off
-                SCRUTINY_ENUM(uint_least8_t)
+                SCRUTINY_ENUM(eState, uint_least8_t)
                 {
                     IDLE, 
                     CONFIGURED, 
@@ -84,7 +84,7 @@ namespace scrutiny
             inline bool armed(void) const { return m_state == State::ARMED; }
 
             /// @brief Returns the Datalogger state
-            inline DataLogger::State::E get_state(void) const { return m_state; }
+            inline DataLogger::State::eState get_state(void) const { return m_state; }
 
             /// @brief Arm the trigger so that the datalogger actively check for trigger condition to start acquisition
             void arm_trigger(void);
@@ -143,7 +143,7 @@ namespace scrutiny
                 m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
             Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::E m_state;           // Internal state
+            State::eState m_state;       // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 

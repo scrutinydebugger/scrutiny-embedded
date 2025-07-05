@@ -224,9 +224,9 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
 */
 TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::GetInfo;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::GetInfo;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetSpecialMemoryLocation);
-    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
     uint8_t *buf[4];
@@ -360,9 +360,9 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
 
 TEST_F(TestGetInfo, TestGetRPVDefinitionOverflow)
 {
-    const scrutiny::protocol::CommandId::E cmd = scrutiny::protocol::CommandId::GetInfo;
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::GetInfo;
     uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::GetInfo::Subfunction::GetRuntimePublishedValuesDefinition);
-    const scrutiny::protocol::ResponseCode::E failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+    const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     uint8_t tx_buffer[32];
 

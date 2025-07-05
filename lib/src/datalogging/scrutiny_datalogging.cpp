@@ -23,7 +23,7 @@ namespace scrutiny
         /// will have a valid value with zeros in the MSBs
         /// @param vtype Variable type of the input data
         /// @param val Input data
-        void convert_to_compare_type(VariableType::E *const vtype, AnyType *const val)
+        void convert_to_compare_type(VariableType::eVariableType *const vtype, AnyType *const val)
         {
             switch (*vtype)
             {
@@ -100,7 +100,7 @@ namespace scrutiny
             MainHandler const *const main_handler,
             Operand const *const operand,
             AnyType *const val,
-            VariableType::E *const variable_type)
+            VariableType::eVariableType *const variable_type)
         {
             bool success = true;
             if (operand->type == OperandType::LITERAL)

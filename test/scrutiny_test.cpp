@@ -45,9 +45,9 @@ void ScrutinyTest::fill_buffer_incremental(uint8_t *buffer, uint32_t length)
 
 bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
     uint8_t *buffer,
-    scrutiny::protocol::CommandId::E cmd,
+    scrutiny::protocol::CommandId::eCommandId cmd,
     uint8_t subfunction,
-    scrutiny::protocol::ResponseCode::E code)
+    scrutiny::protocol::ResponseCode::eResponseCode code)
 {
     if (buffer[0] != (static_cast<uint8_t>(cmd) | 0x80))
     {
@@ -61,7 +61,8 @@ bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
 
     if (buffer[2] != static_cast<uint8_t>(code))
     {
-        SCRUTINYTEST_FAIL << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::E>(buffer[2]) << " but expected " << code;
+        SCRUTINYTEST_FAIL << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::eResponseCode>(buffer[2])
+                          << " but expected " << code;
     }
     uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | static_cast<uint16_t>(buffer[4]);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
@@ -118,7 +119,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode::E val)
+        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode::eResponseCode val)
         {
             switch (val)
             {
@@ -164,7 +165,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State::E val)
+        std::ostream &operator<<(std::ostream &out, DataLogger::State::eState val)
         {
             switch (val)
             {

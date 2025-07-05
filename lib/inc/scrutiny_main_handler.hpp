@@ -47,7 +47,7 @@ namespace scrutiny
         /// @brief Returns the type of a Runtime Published Value identified by its ID
         /// @param id The RPV ID
         /// @return The VariableType object of the RPV.  VariableType::Unknown if the given ID is not set in the configuration.
-        VariableType::E get_rpv_type(uint16_t const id) const;
+        VariableType::eVariableType get_rpv_type(uint16_t const id) const;
 
         /// @brief Periodic process loop to be called as fast as possible
         /// @param timestep_100ns The time elapsed since last call to this function, in multiple of 100ns.
@@ -75,7 +75,7 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief Returns the state of the datalogger. Thread safe
-        inline datalogging::DataLogger::State::E get_datalogger_state(void) const
+        inline datalogging::DataLogger::State::eState get_datalogger_state(void) const
         {
             return m_datalogging.threadsafe_data.datalogger_state;
         }
@@ -111,7 +111,7 @@ namespace scrutiny
         /// @param variable_type Type of variable to read
         /// @param val The output value
         /// @return true on success, false on failure
-        bool fetch_variable(void const *const addr, VariableType::E const variable_type, AnyType *const val) const;
+        bool fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const;
 
         /// @brief Reads a bitfield variable from a memory location. Ensure the respect of forbidden regions and will not make unaligned memory access
         /// @param addr Address at which the variable is stored
@@ -125,11 +125,11 @@ namespace scrutiny
         /// @return true on success, false on failure
         bool fetch_variable_bitfield(
             void const *const addr,
-            VariableTypeType::E const var_tt,
+            VariableTypeType::eVariableTypeType const var_tt,
             uint_fast8_t const bitoffset,
             uint_fast8_t const bitsize,
             AnyType *const val,
-            VariableType::E *const output_type) const;
+            VariableType::eVariableType *const output_type) const;
 
         /// @brief Returns a pointer to the datalogger object
         inline datalogging::DataLogger *datalogger(void)
@@ -165,13 +165,13 @@ namespace scrutiny
         void process_loops(void);
         void check_finished_sending(void);
         void process_request(protocol::Request const *const request, protocol::Response *const response);
-        protocol::ResponseCode::E process_get_info(protocol::Request const *const request, protocol::Response *const response);
-        protocol::ResponseCode::E process_comm_control(protocol::Request const *const request, protocol::Response *const response);
-        protocol::ResponseCode::E process_memory_control(protocol::Request const *const request, protocol::Response *const response);
-        protocol::ResponseCode::E process_user_command(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode::eResponseCode process_get_info(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode::eResponseCode process_comm_control(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode::eResponseCode process_memory_control(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode::eResponseCode process_user_command(protocol::Request const *const request, protocol::Response *const response);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        protocol::ResponseCode::E process_datalog_control(protocol::Request const *const request, protocol::Response *const response);
+        protocol::ResponseCode::eResponseCode process_datalog_control(protocol::Request const *const request, protocol::Response *const response);
         void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
@@ -202,7 +202,7 @@ namespace scrutiny
         {
           public:
             // clang-format off
-            SCRUTINY_ENUM(uint_least8_t)
+            SCRUTINY_ENUM(eDataloggingError, uint_least8_t)
             {
                 NoError,
                 UnexpectedRelease,
@@ -213,7 +213,7 @@ namespace scrutiny
 
         struct ThreadSafeData
         {
-            datalogging::DataLogger::State::E datalogger_state;
+            datalogging::DataLogger::State::eState datalogger_state;
             datalogging::buffer_size_t bytes_to_acquire_from_trigger_to_completion;
             datalogging::buffer_size_t write_counter_since_trigger;
         };
@@ -225,7 +225,7 @@ namespace scrutiny
 
             LoopHandler *owner;                       // LoopHandler that presently own the Datalogger
             LoopHandler *new_owner;                   // LoopHandler that is requested to take ownership of the  Datalogger
-            DataloggingError::E error;                // Error related to datalogging mechanism
+            DataloggingError::eDataloggingError error; // Error related to datalogging mechanism
             bool request_arm_trigger;                 // Flag indicating that a request has been made to arm the trigger
             bool request_ownership_release;           // Flag indicating that a request has been made to release ownership of the datalogger
             bool request_disarm_trigger;              // Flag indicating that a request has been made to darm the trigger

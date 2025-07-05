@@ -217,7 +217,7 @@ namespace scrutiny
         uint8_t encode_address_big_endian(void const *const addr, uint8_t *const buf);
         uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *const buf);
 
-        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, VariableType::E const vartype, uint8_t *const buffer);
+        uint8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, VariableType::eVariableType const vartype, uint8_t *const buffer);
         uint8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, uint8_t const typesize, uint8_t *const buffer);
     } // namespace codecs
 } // namespace scrutiny
