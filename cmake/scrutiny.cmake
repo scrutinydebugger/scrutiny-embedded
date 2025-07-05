@@ -23,7 +23,9 @@ function (scrutiny_postbuild TARGET)
         METADATA_VERSION        # OPTIONAL: The version of the project, embedded in the .sfd file
     )
     set(multiValueArgs 
-        ALIAS_FILES   # OPTIONAL: List of file containing an alias definition. Will eb embedded in the .sfd
+        ALIAS_FILES             # OPTIONAL: List of file containing an alias definition. Will eb embedded in the .sfd
+        CU_IGNORE_PATTERNS      # OPTIONAL: A list of compile unit to ignore. It can be the file basename or a file path with a glob pattern
+        PATH_IGNORE_PATTERNS    # OPTIONAL: A list of variable path to ignore. Specified as a glob pattern
     )
     cmake_parse_arguments(PARSE_ARGV 0 arg "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
@@ -127,7 +129,12 @@ function (scrutiny_postbuild TARGET)
         COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description"
         COMMAND ${CMAKE_COMMAND} -E rm -rf ${arg_WORKDIR}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${arg_WORKDIR}
-        COMMAND ${arg_SCRUTINY_CMD} elf2varmap $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} --loglevel error
+        COMMAND ${arg_SCRUTINY_CMD} 
+            elf2varmap $<TARGET_FILE:${TARGET}> 
+            --output ${arg_WORKDIR} 
+            --loglevel error 
+            --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
+            --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
         COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
