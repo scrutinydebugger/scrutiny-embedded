@@ -94,10 +94,10 @@ extern "C"
         scrutiny_c_rpv_write_callback_t const wr_cb)
     {
         get_config(config)->set_published_values(
-            reinterpret_cast<scrutiny::RuntimePublishedValue const *const>(array), // should match as per static_assert above
+            reinterpret_cast<scrutiny::RuntimePublishedValue const *>(array), // should match as per static_assert above
             nbr,
-            reinterpret_cast<scrutiny::RpvReadCallback>(rd_cb),   // Expect signature to match
-            reinterpret_cast<scrutiny::RpvWriteCallback>(wr_cb)); // Expect signature to match
+            reinterpret_cast<scrutiny::RpvReadCallback>(reinterpret_cast<void *>(rd_cb)),   // Expect signature to match
+            reinterpret_cast<scrutiny::RpvWriteCallback>(reinterpret_cast<void *>(wr_cb))); // Expect signature to match
     }
 
     void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint8_t const loop_count)
