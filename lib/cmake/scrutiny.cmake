@@ -121,7 +121,7 @@ function (scrutiny_postbuild TARGET)
 
     # Convert alias file path to absolute path relative to source
     set(ALIAS_LIST_ABS "")
-    foreach(ALIAS_FILE ${ALIAS_FILES})
+    foreach(ALIAS_FILE ${arg_ALIAS_FILES})
         if (NOT IS_ABSOLUTE ${ALIAS_FILE})
             set(ALIAS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${ALIAS_FILE})
         endif()
