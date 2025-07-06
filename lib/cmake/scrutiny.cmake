@@ -28,6 +28,8 @@ function (scrutiny_postbuild TARGET)
         METADATA_PROJECT_NAME   # OPTIONAL: The name of the project, embedded in the .sfd file
         METADATA_AUTHOR         # OPTIONAL: The name of the project author, embedded in the .sfd file
         METADATA_VERSION        # OPTIONAL: The version of the project, embedded in the .sfd file
+        
+        CPPFILT                 # OPTIONAL: The binary to use for demangling. Default to "c++filt" if not provided
     )
     set(multiValueArgs 
         ALIAS_FILES             # OPTIONAL: List of file containing an alias definition. Will eb embedded in the .sfd
@@ -39,10 +41,16 @@ function (scrutiny_postbuild TARGET)
     # Find scrutiny
     if (NOT arg_SCRUTINY_CMD)
         find_program(arg_SCRUTINY_CMD "scrutiny" REQUIRED)
-    elseif(NOT EXISTS ${arg_SCRUTINY_CMD})
-        message(SEND_ERROR "scrutiny executable does not exists: ${arg_SCRUTINY_CMD} ")
+    else()
+        # Do nothing. Trust the user. He could apss "python -m scuritny"
     endif()
     message(STATUS "Using scrutiny at ${arg_SCRUTINY_CMD}")
+
+    if (NOT arg_CPPFILT)
+        find_program(arg_CPPFILT "c++filt" REQUIRED)
+    else()
+        find_program(arg_CPPFILT "c++filt" REQUIRED HINTS ${arg_CPPFILT})
+    endif()
     
     # Validate work folder
     if (NOT arg_WORKDIR)
@@ -131,6 +139,7 @@ function (scrutiny_postbuild TARGET)
     list(LENGTH ALIAS_LIST_ABS ALIAS_COUNT)     # Count the alias file to skip that step if 0
 
     # --- Make the SFD ---
+    
     add_custom_command(OUTPUT ${arg_SFD_FILENAME}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
         COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description"
@@ -142,6 +151,7 @@ function (scrutiny_postbuild TARGET)
             --loglevel error 
             --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
             --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
+            --cppfilt ${arg_CPPFILT}
         COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
