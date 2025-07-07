@@ -95,15 +95,15 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     var1 = 1.0f;
     var2 = 0x1111u;
-    encoder.encode_next_entry();
+    encoder.encode_next_entry(SCRUTINY_NULL);
     timebase.step(100);
     var1 = 2.0f;
     var2 = 0x2222u;
-    encoder.encode_next_entry();
+    encoder.encode_next_entry(SCRUTINY_NULL);
     timebase.step(100);
     var1 = 3.0f;
     var2 = 0x3333u;
-    encoder.encode_next_entry();
+    encoder.encode_next_entry(SCRUTINY_NULL);
 
     datalogging::RawFormatReader *reader = encoder.get_reader();
     reader->reset();

@@ -26,6 +26,8 @@
 namespace scrutiny
 {
     class MainHandler;
+    class LoopHandler;
+
     namespace datalogging
     {
         class RawFormatEncoder;
@@ -62,7 +64,7 @@ namespace scrutiny
                 datalogging::Configuration const *const config,
                 uint8_t *const buffer,
                 datalogging::buffer_size_t const buffer_size);
-            void encode_next_entry(void);
+            void encode_next_entry(LoopHandler *const caller);
             void reset(void);
             inline void reset_write_counter(void) { m_entry_write_counter = 0; }
             inline void set_timebase(Timebase const *const timebase) { m_timebase = timebase; }

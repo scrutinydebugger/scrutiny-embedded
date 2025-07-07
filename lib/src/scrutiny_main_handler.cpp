@@ -332,14 +332,15 @@ namespace scrutiny
             // No owner, can read directly. Otherwise will be updated by an IPC message
             m_datalogging.threadsafe_data.datalogger_state = m_datalogging.datalogger.get_state();
 
-            if (m_datalogging.new_owner != SCRUTINY_NULL)
+            if (m_datalogging.new_owner != SCRUTINY_NULL) // We need to give ownership to someone else
             {
-                if (!m_datalogging.new_owner->ipc_main2loop()->has_content())
+                if (!m_datalogging.new_owner->ipc_main2loop()->has_content()) // If there is room to send a msg
                 {
+                    // Ask the wanted new owner to take ownership
                     LoopHandler::Main2LoopMessage msg;
                     msg.message_id = LoopHandler::Main2LoopMessageID::TAKE_DATALOGGER_OWNERSHIP;
                     m_datalogging.new_owner->ipc_main2loop()->send(msg);
-                    m_datalogging.new_owner = SCRUTINY_NULL;
+                    m_datalogging.new_owner = SCRUTINY_NULL; //
                 }
             }
 
@@ -349,7 +350,7 @@ namespace scrutiny
         }
         else
         {
-            if (!m_datalogging.owner->ipc_main2loop()->has_content())
+            if (!m_datalogging.owner->ipc_main2loop()->has_content()) // If there is room to send a msg
             {
                 LoopHandler::Main2LoopMessage msg;
                 if (m_datalogging.request_ownership_release)
@@ -370,6 +371,10 @@ namespace scrutiny
                     msg.message_id = LoopHandler::Main2LoopMessageID::DATALOGGER_DISARM_TRIGGER;
                     m_datalogging.owner->ipc_main2loop()->send(msg);
                     m_datalogging.request_disarm_trigger = false;
+                }
+                else
+                {
+                    // No message to send, do nothing
                 }
             }
         }
@@ -1185,7 +1190,7 @@ namespace scrutiny
                         break;
                     }
 
-                    bool const callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v);
+                    bool const callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v, SCRUTINY_NULL);
                     if (!callback_success)
                     {
                         code = protocol::ResponseCode::FailureToProceed;
@@ -1237,7 +1242,7 @@ namespace scrutiny
                     continue;
                 }
 
-                bool const write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v);
+                bool const write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v, SCRUTINY_NULL);
                 if (!write_success)
                 {
                     code = protocol::ResponseCode::FailureToProceed;

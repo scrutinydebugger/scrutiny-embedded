@@ -20,7 +20,6 @@ namespace scrutiny
         m_main2loop_msg.clear();
         m_loop2main_msg.clear();
 #if SCRUTINY_ENABLE_DATALOGGING
-        m_owns_datalogger = false;
         m_datalogger_data_acquired = false;
         m_datalogger = main_handler->datalogger();
 #else
@@ -42,27 +41,27 @@ namespace scrutiny
             {
 #if SCRUTINY_ENABLE_DATALOGGING
             case Main2LoopMessageID::TAKE_DATALOGGER_OWNERSHIP:
-                m_owns_datalogger = true;
+                m_datalogger->set_owner(this);
                 m_datalogger_data_acquired = false;
                 msg_out.message_id = Loop2MainMessageID::DATALOGGER_OWNERSHIP_TAKEN;
                 m_loop2main_msg.send(msg_out);
                 break;
             case Main2LoopMessageID::DATALOGGER_ARM_TRIGGER:
-                if (m_owns_datalogger)
+                if (owns_datalogger())
                 {
                     m_datalogger->arm_trigger();
                 }
                 break;
             case Main2LoopMessageID::DATALOGGER_DISARM_TRIGGER:
-                if (m_owns_datalogger)
+                if (owns_datalogger())
                 {
                     m_datalogger->disarm_trigger();
                 }
                 break;
             case Main2LoopMessageID::RELEASE_DATALOGGER_OWNERSHIP:
-                if (m_owns_datalogger)
+                if (owns_datalogger())
                 {
-                    m_owns_datalogger = false;
+                    m_datalogger->set_owner(SCRUTINY_NULL);
                     msg_out.message_id = Loop2MainMessageID::DATALOGGER_OWNERSHIP_RELEASED;
                     m_loop2main_msg.send(msg_out);
                 }
@@ -74,7 +73,7 @@ namespace scrutiny
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        if (m_owns_datalogger)
+        if (owns_datalogger())
         {
             m_datalogger->process();
 

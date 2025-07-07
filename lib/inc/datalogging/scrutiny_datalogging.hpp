@@ -35,12 +35,14 @@ namespace scrutiny
         /// @param operand The operand to read
         /// @param val Output value
         /// @param variable_type Output variable type
+        /// @param caller the calling LoopHandler. Null if done by the MainHandler
         /// @return true on success. false on failure
         bool fetch_operand(
             MainHandler const *const main_handler,
             Operand const *const operand,
             AnyType *const val,
-            VariableType::eVariableType *const variable_type);
+            VariableType::eVariableType *const variable_type,
+            LoopHandler *const caller);
     } // namespace datalogging
 } // namespace scrutiny
 

@@ -43,8 +43,9 @@ class TestMemoryControlRPV : public ScrutinyTest
 };
 
 // ==== Test Runtime Published Valuers
-static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
+static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval, scrutiny::LoopHandler *const caller)
 {
+    static_cast<void>(caller);
     uint32_t v1 = 0x12345678;
     float v2 = 1.34f;
     uint16_t v3 = 0xabcd;
@@ -150,8 +151,9 @@ struct AllTypeResult
 };
 static AllTypeResult dest_buffer_for_rpv_write;
 
-static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval)
+static bool rpv_write_callback(const scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval, scrutiny::LoopHandler *const caller)
 {
+    static_cast<void>(caller);
     if (rpv.id == 0x1000 && rpv.type == scrutiny::VariableType::uint8)
     {
         dest_buffer_for_rpv_write.some_u8 = inval->uint8;

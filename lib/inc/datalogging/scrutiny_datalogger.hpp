@@ -22,6 +22,7 @@
 namespace scrutiny
 {
     class MainHandler;
+    class LoopHandler;
 
     namespace datalogging
     {
@@ -120,6 +121,11 @@ namespace scrutiny
             /// @brief Returns the number of bytes acquired since the trigger event.
             buffer_size_t data_counter_since_trigger(void) const;
 
+            /// @brief Return the LoopHandler that owns the datalogger. Null if owned by the MainHandler. This value is updated by the owner himself.
+            inline LoopHandler *get_owner(void) const { return m_owner; }
+            /// @brief Sets the LoopHandler that owns the datalogger. Null if owned by the MainHandler. This value is updated by the owner himself.
+            inline void set_owner(LoopHandler *const owner) { m_owner = owner; }
+
             /// @brief Forces the trigger condition to be fulfilled, triggering an acquisition if the datalogger is armed.
             void force_trigger(void)
             {
@@ -143,7 +149,7 @@ namespace scrutiny
                 m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
 
             Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::eState m_state;       // Internal state
+            State::eState m_state;      // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
 
@@ -159,6 +165,7 @@ namespace scrutiny
             uint16_t m_config_id;                     // The configuration ID given by the server
             buffer_size_t m_log_points_after_trigger; // Number of log entry counted after the trigger condition was fulfilled.
 
+            LoopHandler *m_owner; // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
             struct
             {
                 bool previous_val;                        // Trigger condition result of the previous cycle

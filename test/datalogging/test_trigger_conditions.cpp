@@ -12,8 +12,9 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
-static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
+static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval, scrutiny::LoopHandler *const caller)
 {
+    static_cast<void>(caller);
     if (rpv.id == 0x1234 && rpv.type == scrutiny::VariableType::uint32)
     {
         outval->uint32 = 0xaabbccdd;

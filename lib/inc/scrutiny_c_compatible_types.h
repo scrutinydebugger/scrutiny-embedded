@@ -134,9 +134,10 @@ typedef struct
 } scrutiny_c_runtime_published_value_t;
 
 /// @brief Callback called on Runtime Published Value read
-typedef int (*scrutiny_c_rpv_read_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t *outval);
+typedef int (*scrutiny_c_rpv_read_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t *outval, void *const caller);
 /// @brief Callback called on Runtime Published Value write
-typedef int (*scrutiny_c_rpv_write_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t const *inval);
+typedef int (
+    *scrutiny_c_rpv_write_callback_t)(scrutiny_c_runtime_published_value_t const rpv, scrutiny_c_any_type_t const *inval, void *const caller);
 
 #if SCRUTINY_ENABLE_DATALOGGING
 typedef void (*scrutiny_c_datalogging_trigger_callback_t)();

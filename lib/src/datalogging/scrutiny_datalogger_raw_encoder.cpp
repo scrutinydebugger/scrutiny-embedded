@@ -114,7 +114,7 @@ namespace scrutiny
         }
 
         /// @brief Takes a snapshot of the data to log and write it into the datalogger buffer
-        void RawFormatEncoder::encode_next_entry(void)
+        void RawFormatEncoder::encode_next_entry(LoopHandler *const caller)
         {
             if (m_error)
             {
@@ -148,7 +148,10 @@ namespace scrutiny
                     uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
                     uint8_t const typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
-                    m_main_handler->get_rpv_read_callback()(rpv, &outval);   // We assume that this is not nullptr. We rely on datalogger::configure
+                    m_main_handler->get_rpv_read_callback()(
+                        rpv,
+                        &outval,
+                        caller); // We assume that this is not nullptr. We rely on datalogger::configure
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }
