@@ -23,10 +23,11 @@ using namespace std;
 
 static uint32_t g_u32_rpv1000 = 0;
 static uint32_t g_trigger_callback_count = 0;
+static LoopHandler *g_last_rpv_callback_caller = SCRUTINY_NULL;
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
-    static_cast<void>(caller);
+    g_last_rpv_callback_caller = caller;
     if (rpv.id == 0x1234 && rpv.type == VariableType::uint32)
     {
         outval->uint32 = 0xaabbccdd;
@@ -121,6 +122,7 @@ class TestDatalogger : public ScrutinyTest
         memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
 
         g_trigger_callback_count = 0;
+        g_last_rpv_callback_caller = SCRUTINY_NULL;
     }
 };
 
@@ -271,6 +273,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     float var1 = 0.0;
     int32_t var2 = 0;
     float trigger_val = 0.0f;
+    FixedFrequencyLoopHandler loop_handler(100000, "testloop");
+    datalogger.set_owner(&loop_handler);
 
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 4;
@@ -311,7 +315,10 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         std::string error_msg = "probe_location=" + NumberToString(probe_location);
         datalogger.config()->copy_from(&dlconfig);
         datalogger.configure(&tb);
-
+        if (probe_loop == 0)
+        {
+            EXPECT_NULL(g_last_rpv_callback_caller);
+        }
         datalogger.process();
         tb.step(10);
         datalogger.process();
@@ -323,6 +330,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
             datalogger.process();
             tb.step(10);
         }
+        EXPECT_EQ(g_last_rpv_callback_caller, &loop_handler);
         EXPECT_FALSE(datalogger.data_acquired()) << error_msg;
 
         datalogger.arm_trigger();
