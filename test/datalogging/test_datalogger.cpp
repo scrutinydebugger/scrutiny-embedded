@@ -24,8 +24,9 @@ using namespace std;
 static uint32_t g_u32_rpv1000 = 0;
 static uint32_t g_trigger_callback_count = 0;
 
-static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
+static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
+    static_cast<void>(caller);
     if (rpv.id == 0x1234 && rpv.type == VariableType::uint32)
     {
         outval->uint32 = 0xaabbccdd;

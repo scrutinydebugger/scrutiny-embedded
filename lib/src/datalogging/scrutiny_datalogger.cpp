@@ -31,6 +31,7 @@ namespace scrutiny
             m_main_handler = main_handler;
             m_buffer_size = buffer_size;
             m_trigger_callback = trigger_callback;
+            m_owner = SCRUTINY_NULL;
 
             m_encoder.init(main_handler, &m_config, buffer, buffer_size);
             m_acquisition_id = 0;
@@ -337,7 +338,7 @@ namespace scrutiny
         {
             if (++m_decimation_counter >= m_config.decimation)
             {
-                m_encoder.encode_next_entry();
+                m_encoder.encode_next_entry(m_owner);
                 m_decimation_counter = 0;
             }
         }
@@ -371,7 +372,7 @@ namespace scrutiny
 
                 for (unsigned int i = 0; i < nb_operand; i++)
                 {
-                    if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &opvals[i], &optypes[i]) == false)
+                    if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &opvals[i], &optypes[i], SCRUTINY_NULL) == false)
                     {
                         return false;
                     }

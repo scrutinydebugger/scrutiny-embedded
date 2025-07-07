@@ -14,6 +14,8 @@
 
 namespace scrutiny
 {
+    class LoopHandler;
+
     namespace ctypes
     {
 #include "scrutiny_c_compatible_types.h"
@@ -144,9 +146,9 @@ namespace scrutiny
     };
 
     /// @brief Callback called on Runtime Published Value read
-    typedef bool (*RpvReadCallback)(RuntimePublishedValue const rpv, AnyType *outval);
+    typedef bool (*RpvReadCallback)(RuntimePublishedValue const rpv, AnyType *outval, LoopHandler *const caller);
     /// @brief Callback called on Runtime Published Value write
-    typedef bool (*RpvWriteCallback)(RuntimePublishedValue const rpv, AnyType const *inval);
+    typedef bool (*RpvWriteCallback)(RuntimePublishedValue const rpv, AnyType const *inval, LoopHandler *const caller);
 
     /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
     struct MemoryBlock

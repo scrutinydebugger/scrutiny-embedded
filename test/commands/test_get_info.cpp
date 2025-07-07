@@ -261,18 +261,20 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     Reads the number of Runtime Published Values
 */
 
-static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval)
+static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval, scrutiny::LoopHandler *const caller)
 {
     static_cast<void>(rpv);
     static_cast<void>(outval);
+    static_cast<void>(caller);
     // nothing to do here.
     return true;
 }
 
-static bool rpv_write_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval)
+static bool rpv_write_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType const *inval, scrutiny::LoopHandler *const caller)
 {
     static_cast<void>(rpv);
     static_cast<void>(inval);
+    static_cast<void>(caller);
     // nothing to do here.
     return true;
 }

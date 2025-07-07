@@ -109,8 +109,9 @@ struct
 #endif
 } rpvStorage;
 
-int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrutiny_c_any_type_t *outval)
+int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrutiny_c_any_type_t *outval, scrutiny_c_loop_handler_t* const caller)
 {
+    (void)caller;
     int ok = 1;
     if (rpv.id == 0x1000)
     {
@@ -166,8 +167,9 @@ int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrut
     return ok;
 }
 
-int TestAppRPVWriteCallback(const scrutiny_c_runtime_published_value_t rpv, const scrutiny_c_any_type_t *inval)
+int TestAppRPVWriteCallback(const scrutiny_c_runtime_published_value_t rpv, const scrutiny_c_any_type_t *inval, scrutiny_c_loop_handler_t* const caller)
 {
+    (void) caller;
     int ok = 1;
     if (rpv.id == 0x1000)
     {

@@ -100,7 +100,8 @@ namespace scrutiny
             MainHandler const *const main_handler,
             Operand const *const operand,
             AnyType *const val,
-            VariableType::eVariableType *const variable_type)
+            VariableType::eVariableType *const variable_type,
+            LoopHandler *const caller)
         {
             bool success = true;
             if (operand->type == OperandType::LITERAL)
@@ -112,7 +113,7 @@ namespace scrutiny
             {
                 RuntimePublishedValue rpv;
                 main_handler->get_rpv(operand->data.rpv.id, &rpv);
-                success = main_handler->get_rpv_read_callback()(rpv, val);
+                success = main_handler->get_rpv_read_callback()(rpv, val, caller);
                 *variable_type = rpv.type;
             }
             else if (operand->type == OperandType::VAR)

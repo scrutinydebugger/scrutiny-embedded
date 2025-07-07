@@ -96,7 +96,7 @@ namespace scrutiny
             m_name(name)
 #if SCRUTINY_ENABLE_DATALOGGING
             ,
-            m_datalogger(SCRUTINY_NULL), m_owns_datalogger(false), m_datalogger_data_acquired(false), m_support_datalogging(true)
+            m_datalogger(SCRUTINY_NULL), m_datalogger_data_acquired(false), m_support_datalogging(true)
 #endif
         {
         }
@@ -149,7 +149,7 @@ namespace scrutiny
 
         inline bool owns_datalogger(void) const
         {
-            return m_owns_datalogger;
+            return (m_datalogger->get_owner() == this);
         }
 #endif
 
@@ -171,8 +171,6 @@ namespace scrutiny
 #if SCRUTINY_ENABLE_DATALOGGING
         /// @brief A pointer to the datalogger object part of the Main Handler
         datalogging::DataLogger *m_datalogger;
-        /// @brief Tells wether this loop is the owner of the datalogger
-        bool m_owns_datalogger;
         /// @brief Indicates if data has been acquired and ready to be downloaded or saved
         bool m_datalogger_data_acquired;
         /// @brief Indicates if this loop can do datalogging

@@ -16,8 +16,9 @@
 
 using namespace scrutiny;
 
-static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval)
+static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
+    static_cast<void>(caller);
     if (rpv.id == 0x8888 && rpv.type == VariableType::float32)
     {
         outval->float32 = 1.7f;
