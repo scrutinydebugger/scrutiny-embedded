@@ -417,7 +417,7 @@ namespace scrutiny
         }
 
         // Check if the last request received is a valid "Comm Discover request".
-        bool CommHandler::received_connect_request(void)
+        bool CommHandler::received_connect_request(void) const
         {
             if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
             {
@@ -471,7 +471,7 @@ namespace scrutiny
             return m_nbytes_to_send - m_nbytes_sent;
         }
 
-        bool CommHandler::check_crc(Request const *const req) const
+        bool CommHandler::check_crc(Request const *const req)
         {
             uint32_t crc = 0;
             uint8_t header_data[4];
