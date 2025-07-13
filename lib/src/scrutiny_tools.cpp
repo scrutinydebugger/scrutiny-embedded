@@ -15,29 +15,29 @@ namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const newsize)
+        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size)
         {
-            if (newsize <= 1)
+            if (size <= 1)
             {
                 return VariableTypeSize::_8;
             }
-            else if (newsize <= 2)
+            else if (size <= 2)
             {
                 return VariableTypeSize::_16;
             }
-            else if (newsize <= 4)
+            else if (size <= 4)
             {
                 return VariableTypeSize::_32;
             }
-            else if (newsize <= 8)
+            else if (size <= 8)
             {
                 return VariableTypeSize::_64;
             }
-            else if (newsize <= 16)
+            else if (size <= 16)
             {
                 return VariableTypeSize::_128;
             }
-            else if (newsize <= 32)
+            else if (size <= 32)
             {
                 return VariableTypeSize::_256;
             }

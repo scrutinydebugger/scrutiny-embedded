@@ -68,7 +68,7 @@ namespace scrutiny
             /// @brief Tells if the Request object has a CRC that matches its payload content.
             /// @param req The request to check
             /// @return True if the CRC is valid. False otherwise
-            bool check_crc(Request const *const req) const;
+            static bool check_crc(Request const *const req);
 
             // Writes the CRC property of the response based on the payload content.
             void add_crc(Response *const response) const;
@@ -137,7 +137,7 @@ namespace scrutiny
           protected:
             void process_active_request(void);
             bool received_discover_request(void);
-            bool received_connect_request(void);
+            bool received_connect_request(void) const;
 
             class RxFSMState
             {
