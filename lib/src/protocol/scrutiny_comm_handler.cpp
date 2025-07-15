@@ -342,7 +342,7 @@ namespace scrutiny
                 uint16_t const data_byte_sent = (m_nbytes_sent - 5);
                 if (data_byte_sent < m_active_response.data_length)
                 {
-                    uint16_t const remaining_data_bytes = m_active_response.data_length - (m_nbytes_sent - 5);
+                    uint16_t const remaining_data_bytes = static_cast<uint16_t>(m_active_response.data_length - (m_nbytes_sent - 5U));
                     uint16_t const user_request_remaining = (len - i);
                     // Don't read more than available.
                     uint16_t const data_bytes_to_copy =
@@ -358,19 +358,19 @@ namespace scrutiny
                 {
                     if (m_nbytes_sent == crc_position)
                     {
-                        buffer[i] = (m_active_response.crc >> 24u) & 0xFFu;
+                        buffer[i] = static_cast<uint8_t>((m_active_response.crc >> 24u) & 0xFFu);
                     }
                     else if (m_nbytes_sent == crc_position + 1u)
                     {
-                        buffer[i] = (m_active_response.crc >> 16u) & 0xFFu;
+                        buffer[i] = static_cast<uint8_t>((m_active_response.crc >> 16u) & 0xFFu);
                     }
                     else if (m_nbytes_sent == crc_position + 2u)
                     {
-                        buffer[i] = (m_active_response.crc >> 8) & 0xFFu;
+                        buffer[i] = static_cast<uint8_t>((m_active_response.crc >> 8) & 0xFFu);
                     }
                     else if (m_nbytes_sent == crc_position + 3u)
                     {
-                        buffer[i] = (m_active_response.crc >> 0u) & 0xFFu;
+                        buffer[i] = static_cast<uint8_t>((m_active_response.crc >> 0u) & 0xFFu);
                     }
                     else
                     {
@@ -477,8 +477,8 @@ namespace scrutiny
             uint8_t header_data[4];
             header_data[0] = req->command_id;
             header_data[1] = req->subfunction_id;
-            header_data[2] = (req->data_length >> 8) & 0xFF;
-            header_data[3] = req->data_length & 0xFF;
+            header_data[2] = static_cast<uint8_t>((req->data_length >> 8) & 0xFF);
+            header_data[3] = static_cast<uint8_t>(req->data_length & 0xFF);
             crc = tools::crc32(header_data, sizeof(header_data));
             crc = tools::crc32(req->data, req->data_length, crc);
             return (crc == req->crc);
@@ -493,8 +493,8 @@ namespace scrutiny
             header[0] = response->command_id;
             header[1] = response->subfunction_id;
             header[2] = response->response_code;
-            header[3] = (response->data_length >> 8) & 0xFF;
-            header[4] = response->data_length & 0xFF;
+            header[3] = static_cast<uint8_t>((response->data_length >> 8) & 0xFF);
+            header[4] = static_cast<uint8_t>(response->data_length & 0xFF);
 
             uint32_t const crc = tools::crc32(header, sizeof(header));
             response->crc = tools::crc32(response->data, response->data_length, crc);

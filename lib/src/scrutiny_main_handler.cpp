@@ -144,8 +144,8 @@ namespace scrutiny
         VariableType::eVariableType *const output_type) const
     {
         bool success = true;
-        uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
-        uint_fast8_t const output_required_size = ((bitsize - 1) >> 3) + 1;
+        uint_fast8_t const fetch_required_size = static_cast<uint8_t>(((bitoffset + bitsize - 1) >> 3) + 1);
+        uint_fast8_t const output_required_size = static_cast<uint8_t>(((bitsize - 1) >> 3) + 1);
         VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size(fetch_required_size);
         VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
@@ -214,12 +214,13 @@ namespace scrutiny
                         {
                             mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
                         }
-                        val->uint16 &= mask.uint16;
+
+                        val->uint16 &= static_cast<uint16_t>(mask.uint16);
                         if (var_tt == VariableTypeType::_sint)
                         {
                             if (val->uint16 >> (bitsize - 1))
                             {
-                                val->uint16 |= (~mask.uint16);
+                                val->uint16 |= static_cast<uint16_t>(~mask.uint16);
                             }
                         }
                     }
@@ -230,12 +231,12 @@ namespace scrutiny
                         {
                             mask.uint32 |= (static_cast<uint_fast32_t>(1) << i);
                         }
-                        val->uint32 &= mask.uint32;
+                        val->uint32 &= static_cast<uint32_t>(mask.uint32);
                         if (var_tt == VariableTypeType::_sint)
                         {
                             if (val->uint32 >> (bitsize - 1))
                             {
-                                val->uint32 |= (~mask.uint32);
+                                val->uint32 |= static_cast<uint32_t>(~mask.uint32);
                             }
                         }
                     }

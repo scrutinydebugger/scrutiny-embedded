@@ -73,7 +73,8 @@ else()
     )
 
     target_compile_options(scrutiny-embedded PRIVATE 
-        -Werror 
+        -Wall -Wextra -Wpedantic -Werror -Wconversion -Wno-unused-parameter -Wno-unused-function -Wno-unused-variable -Wno-unused-but-set-variable
+        -Wno-unused-value -Wno-unused-label -Wno-unused-local-typedefs -Wno-unused-result -Wshadow -Wduplicated-cond -Wduplicated-branches -Wlogical-op
         ${COMPILER_NO_PIE_OPTION}
     )
 

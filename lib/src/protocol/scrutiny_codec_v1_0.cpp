@@ -44,7 +44,7 @@ namespace scrutiny
                 length = codecs::decode_16_bits_big_endian(&m_buffer[cursor]);
                 cursor += 2;
 
-                m_required_tx_buffer_size += addr_size + 2 + length;
+                m_required_tx_buffer_size += static_cast<uint16_t>(addr_size + 2 + length);
 
                 if (cursor == m_request_datasize)
                 {
