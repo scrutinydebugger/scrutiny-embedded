@@ -6,6 +6,10 @@ The library has 2 data streams going in and out. It is the responsability of the
 
 For the integration guide, see : https://scrutinydebugger.com/guide-instrumentation.html
 
+## Troubleshooting
+
+Refer to the [troubleshooting guide online.](https://scrutinydebugger.com/guide-instrumentation.html#troubleshooting)
+
 ## Example of integration
 The following example is taken from the Arduino example and show how to initialize the library and how the glue code between Scrutiny Embedded Lib and a serial port can be written.
 
@@ -82,3 +86,4 @@ void main()
 }
 
 ```
+
