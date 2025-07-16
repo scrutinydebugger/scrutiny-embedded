@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as static-analysis
-ARG CPPCHECK_VERSION="2.10.3"
+ARG CPPCHECK_VERSION="2.17.1"
 ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
 ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
@@ -22,7 +22,7 @@ RUN apt-get update \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
     && cd "/tmp/${CPPCHECK_FOLDER}" \
-    && make MATCHCOMPILER=no FILESDIR=/usr/share/cppcheck HAVE_RULES=no CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j2 \
+    && make FILESDIR=/usr/share/cppcheck CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j2 \
     && FILESDIR=/usr/share/cppcheck make install  \
     && cd /tmp/ \
     && rm -rf "/tmp/${CPPCHECK_FOLDER}" \
