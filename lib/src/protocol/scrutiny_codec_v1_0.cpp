@@ -209,6 +209,84 @@ namespace scrutiny
 
         //==============================================================
 
+        void TypedReadRequestParser::validate(void)
+        {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            uint32_t cursor = 0;
+
+            while (true)
+            {
+                uint8_t length;
+                if (addr_size + 1 > static_cast<uint16_t>(m_request_datasize - cursor))
+                {
+                    m_invalid = true;
+                    return;
+                }
+
+                cursor += addr_size;
+                length = m_buffer[cursor++];
+                if (length != 1 && length != 2 && length != 4 && length != 8)
+                {
+                    m_invalid = true;
+                    return;
+                }
+
+                m_required_tx_buffer_size += addr_size + 1 + length;
+
+                if (cursor == m_request_datasize)
+                {
+                    break;
+                }
+            }
+        }
+
+        void TypedReadRequestParser::init(Request const *const request)
+        {
+            m_buffer = request->data;
+            m_request_datasize = request->data_length;
+            reset();
+            validate();
+        }
+
+        void TypedReadRequestParser::next(TypedMemoryRegion *const typedmem)
+        {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            uint8_t type_size;
+            uintptr_t addr;
+            if (m_finished || m_invalid)
+            {
+                return;
+            }
+
+            if (addr_size + 1 > static_cast<uint16_t>(m_request_datasize - m_bytes_read))
+            {
+                m_finished = true;
+                m_invalid = true;
+                return;
+            }
+
+            m_bytes_read += codecs::decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
+            type_size = m_buffer[m_bytes_read++];
+
+            typedmem->start_address = reinterpret_cast<uint8_t *>(addr);
+            typedmem->type_size = type_size;
+
+            if (m_bytes_read == m_request_datasize)
+            {
+                m_finished = true;
+            }
+        }
+
+        void TypedReadRequestParser::reset(void)
+        {
+            m_bytes_read = 0;
+            m_invalid = false;
+            m_finished = false;
+            m_required_tx_buffer_size = 0;
+        }
+
+        //==============================================================
+
         void ReadMemoryBlocksResponseEncoder::init(Response *const response, uint16_t const max_size)
         {
             m_size_limit = max_size;
@@ -242,6 +320,66 @@ namespace scrutiny
         }
 
         void ReadMemoryBlocksResponseEncoder::reset(void)
+        {
+            m_cursor = 0;
+            m_overflow = false;
+        }
+
+        //==============================================================
+
+        void TypedReadResponseEncoder::init(Response *const response, uint16_t const max_size)
+        {
+            m_size_limit = max_size;
+            m_buffer = response->data;
+            m_response = response;
+            reset();
+        }
+
+        void TypedReadResponseEncoder::write(TypedMemoryRegion const *const typedmem)
+        {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+
+            if (typedmem->type_size > MAXIMUM_TX_BUFFER_SIZE - addr_size - 1) // Make sure that the addition below doesn't blow up
+            {
+                m_overflow = true;
+                return;
+            }
+
+            if (addr_size + 1 + typedmem->type_size > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+
+            m_cursor += codecs::encode_address_big_endian(typedmem->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(typedmem->type_size, &m_buffer[m_cursor]);
+
+            if (typedmem->type_size == 1)
+            {
+                m_cursor += codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(typedmem->start_address), &m_buffer[m_cursor]);
+            }
+            else if (typedmem->type_size == 2)
+            {
+                m_cursor += codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(typedmem->start_address), &m_buffer[m_cursor]);
+            }
+            else if (typedmem->type_size == 4)
+            {
+                m_cursor += codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(typedmem->start_address), &m_buffer[m_cursor]);
+            }
+            else if (typedmem->type_size == 8)
+            {
+                m_cursor += codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(typedmem->start_address), &m_buffer[m_cursor]);
+            }
+            else
+            {
+                return;
+            }
+
+            m_cursor += typedmem->type_size;
+            m_response->data_length = m_cursor;
+        }
+
+        void TypedReadResponseEncoder::reset(void)
         {
             m_cursor = 0;
             m_overflow = false;
@@ -958,6 +1096,19 @@ namespace scrutiny
             response->data_length = 0;
             encoders.m_memory_control_read_response_encoder.init(response, max_size);
             return &encoders.m_memory_control_read_response_encoder;
+        }
+
+        TypedReadRequestParser *CodecV1_0::decode_request_memory_control_typed_read(Request const *const request)
+        {
+            parsers.m_memory_control_typed_read_request_parser.init(request);
+            return &parsers.m_memory_control_typed_read_request_parser;
+        }
+
+        TypedReadResponseEncoder *CodecV1_0::encode_response_memory_control_typed_read(Response *const response, uint16_t const max_size)
+        {
+            response->data_length = 0;
+            encoders.m_memory_control_typed_read_response_encoder.init(response, max_size);
+            return &encoders.m_memory_control_typed_read_response_encoder;
         }
 
         WriteMemoryBlocksRequestParser *CodecV1_0::decode_request_memory_control_write(Request const *const request, bool const masked_write)

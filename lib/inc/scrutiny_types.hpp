@@ -158,6 +158,14 @@ namespace scrutiny
         uint8_t *source_data;
         uint8_t *mask;
     };
+
+    struct TypedMemoryRegion
+    {
+        uint8_t *start_address;
+        uint8_t type_size;
+        AnyTypeFast *source_data;
+        AnyTypeFast *mask;
+    };
 } // namespace scrutiny
 
 #endif //  ___SCRUTINY_TYPES_H___

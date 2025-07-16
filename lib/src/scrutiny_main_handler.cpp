@@ -1028,6 +1028,14 @@ namespace scrutiny
                 scrutiny::AnyType v;
             } write_rpv;
 
+            struct
+            {
+                protocol::TypedReadRequestParser *typed_read_parser;
+                protocol::TypedReadResponseEncoder *typed_read_encoder;
+                TypedMemoryRegion mem;
+
+            } typed_read;
+
         } stack;
 
         switch (static_cast<protocol::MemoryControl::Subfunction::eSubfunction>(request->subfunction_id))
@@ -1258,6 +1266,52 @@ namespace scrutiny
                 }
             }
 
+            break;
+        }
+        case protocol::MemoryControl::Subfunction::TypedRead:
+        {
+            code = protocol::ResponseCode::OK;
+
+            stack.typed_read.typed_read_parser = m_codec.decode_request_memory_control_typed_read(request);
+            stack.typed_read.typed_read_encoder = m_codec.encode_response_memory_control_typed_read(response, m_comm_handler.tx_buffer_size());
+
+            // We avoid playing in memory unless we are 100% sure the request is good.
+            if (!stack.typed_read.typed_read_parser->is_valid())
+            {
+                code = protocol::ResponseCode::InvalidRequest;
+                break;
+            }
+
+            if (stack.typed_read.typed_read_parser->required_tx_buffer_size() > m_comm_handler.tx_buffer_size())
+            {
+                code = protocol::ResponseCode::Overflow;
+                break;
+            }
+
+            while (!stack.typed_read.typed_read_parser->finished())
+            {
+                stack.typed_read.typed_read_parser->next(&stack.typed_read.mem);
+
+                if (!stack.typed_read.typed_read_parser->is_valid())
+                {
+                    code = protocol::ResponseCode::InvalidRequest;
+                    break;
+                }
+
+                if (touches_forbidden_region(stack.typed_read.mem.start_address, stack.typed_read.mem.type_size ))
+                {
+                    code = protocol::ResponseCode::Forbidden;
+                    break;
+                }
+
+                stack.typed_read.typed_read_encoder->write(&stack.typed_read.mem);
+
+                if (stack.typed_read.typed_read_encoder->overflow())
+                {
+                    code = protocol::ResponseCode::Overflow;
+                    break;
+                }
+            }
             break;
         }
 

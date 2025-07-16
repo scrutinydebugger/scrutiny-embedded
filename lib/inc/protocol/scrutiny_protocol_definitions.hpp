@@ -188,7 +188,8 @@ namespace scrutiny
                     Write = 2,
                     WriteMasked = 3,
                     ReadRPV = 4,
-                    WriteRPV = 5
+                    WriteRPV = 5,
+                    TypedRead = 6
                 };
                 // clang-format on
             };

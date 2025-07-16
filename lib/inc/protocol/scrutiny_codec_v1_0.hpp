@@ -73,6 +73,42 @@ namespace scrutiny
             bool m_overflow;
         };
 
+        class TypedReadRequestParser
+        {
+          public:
+            void init(Request const *const request);
+            void next(TypedMemoryRegion *const mem_region);
+            inline bool finished(void) const { return m_finished; };
+            inline bool is_valid(void) const { return !m_invalid; };
+            inline uint16_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
+            void reset(void);
+
+          protected:
+            void validate();
+            uint8_t *m_buffer;
+            uint16_t m_bytes_read;
+            uint16_t m_request_datasize;
+            uint16_t m_required_tx_buffer_size;
+            bool m_finished;
+            bool m_invalid;
+        };
+
+        class TypedReadResponseEncoder
+        {
+          public:
+            void init(Response *const response, uint16_t const max_size);
+            void write(TypedMemoryRegion const *const typedmem);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
+
+          protected:
+            uint8_t *m_buffer;
+            Response *m_response;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
+            bool m_overflow;
+        };
+
         class WriteMemoryBlocksRequestParser
         {
           public:
@@ -452,6 +488,9 @@ namespace scrutiny
             ReadMemoryBlocksRequestParser *decode_request_memory_control_read(Request const *const request);
             ReadMemoryBlocksResponseEncoder *encode_response_memory_control_read(Response *const response, uint16_t const max_size);
 
+            TypedReadRequestParser *decode_request_memory_control_typed_read(Request const *const request);
+            TypedReadResponseEncoder *encode_response_memory_control_typed_read(Response *const response, uint16_t const max_size);
+
             WriteMemoryBlocksRequestParser *decode_request_memory_control_write(Request const *const request, bool const masked_wirte);
             WriteMemoryBlocksResponseEncoder *encode_response_memory_control_write(Response *const response, uint16_t const max_size);
 
@@ -486,6 +525,7 @@ namespace scrutiny
             union
             {
                 ReadMemoryBlocksRequestParser m_memory_control_read_request_parser;
+                TypedReadRequestParser m_memory_control_typed_read_request_parser;
                 WriteMemoryBlocksRequestParser m_memory_control_write_request_parser;
                 ReadRPVRequestParser m_memory_control_read_rpv_parser;
                 WriteRPVRequestParser m_memory_control_write_rpv_parser;
@@ -494,6 +534,7 @@ namespace scrutiny
             union
             {
                 ReadMemoryBlocksResponseEncoder m_memory_control_read_response_encoder;
+                TypedReadResponseEncoder m_memory_control_typed_read_response_encoder;
                 WriteMemoryBlocksResponseEncoder m_memory_control_write_response_encoder;
                 GetRPVDefinitionResponseEncoder m_get_rpv_definition_response_encoder;
                 ReadRPVResponseEncoder m_read_rpv_response_encoder;

@@ -803,3 +803,166 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         scrutiny_handler.process(0);
     }
 }
+
+// ================ Typed Read / Write
+
+TEST_F(TestMemoryControl, TestTypedReadSingleItem)
+{
+    struct TestCase
+    {
+        void *addr;
+        scrutiny::VariableType::eVariableType type;
+    };
+    // Building request
+    float vfloat = 3.14159;
+    uint8_t viunt8 = 0x55;
+    uint16_t vuint16 = 0x1234;
+    uint32_t vuint32 = 0x12345678;
+    uint64_t vuint64 = 0x123456789abcdef0;
+
+    std::vector<TestCase> tests_cases = { TestCase{ &vfloat, scrutiny::VariableType::float32 },
+                                          TestCase{ &viunt8, scrutiny::VariableType::uint8 },
+                                          TestCase{ &vuint16, scrutiny::VariableType::uint16 },
+                                          TestCase{ &vuint32, scrutiny::VariableType::uint32 },
+                                          TestCase{ &vuint64, scrutiny::VariableType::uint64 } };
+
+    for (size_t i = 0; i < tests_cases.size(); i++)
+    {
+        SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+        uint8_t const type_size = scrutiny::tools::get_type_size(tests_cases[i].type);
+        uint8_t request_data[8 + addr_size + 1] = { 3, 6, 0, addr_size + 1 };
+
+        unsigned int index = 4;
+        index += encode_addr(&request_data[index], tests_cases[i].addr);
+        request_data[index++] = type_size;
+
+        add_crc(request_data, sizeof(request_data) - 4);
+
+        // Building expected response
+        uint8_t tx_buffer[32];
+        const uint8_t datalen = addr_size + 1 + type_size;
+        const size_t expected_response_size = 9 + datalen;
+        uint8_t expected_response[32] = { 0x83, 6, 0, 0, datalen };
+        ASSERT_GT(sizeof(expected_response), expected_response_size);
+        index = 5;
+        index += encode_addr(&expected_response[index], tests_cases[i].addr);
+        expected_response[index++] = type_size;
+        if (tests_cases[i].addr == &vfloat)
+        {
+            void *ptr = static_cast<void *>(&vfloat);
+            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), expected_response);
+        }
+        else if (tests_cases[i].addr == &viunt8)
+        {
+            index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), expected_response);
+        }
+        else if (tests_cases[i].addr == &vuint16)
+        {
+            index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), expected_response);
+        }
+        else if (tests_cases[i].addr == &vuint32)
+        {
+            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), expected_response);
+        }
+        else if (tests_cases[i].addr == &vuint64)
+        {
+            index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), expected_response);
+        }
+
+        add_crc(expected_response, expected_response_size - 4);
+
+        // Process
+        scrutiny_handler.receive_data(request_data, sizeof(request_data));
+        scrutiny_handler.process(0);
+
+        uint16_t n_to_read = scrutiny_handler.data_to_send();
+        ASSERT_GT(n_to_read, 0u) << "test case " << i;
+        ASSERT_LT(n_to_read, sizeof(tx_buffer)) << "test case " << i;
+        EXPECT_EQ(n_to_read, expected_response_size) << "test case " << i;
+
+        uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+        EXPECT_EQ(nread, n_to_read) << "test case " << i;
+
+        ASSERT_BUF_EQ(tx_buffer, expected_response, expected_response_size) << "test case " << i;
+    }
+}
+
+TEST_F(TestMemoryControl, TestTypedReadMultipleItem)
+{
+
+    // Building request
+    float vfloat = 3.14159;
+    uint8_t viunt8 = 0x55;
+    uint16_t vuint16 = 0x1234;
+    uint32_t vuint32 = 0x12345678;
+    uint64_t vuint64 = 0x123456789abcdef0;
+    bool vbool = true;
+
+    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    uint8_t request_data[8 + 6 * (addr_size + 1)] = { 3, 6, 0, 6 * (addr_size + 1) };
+
+    unsigned int index = 4;
+    index += encode_addr(&request_data[index], &vfloat);
+    request_data[index++] = 4;
+    index += encode_addr(&request_data[index], &viunt8);
+    request_data[index++] = 1;
+    index += encode_addr(&request_data[index], &vuint16);
+    request_data[index++] = 2;
+    index += encode_addr(&request_data[index], &vuint32);
+    request_data[index++] = 4;
+    index += encode_addr(&request_data[index], &vuint64);
+    request_data[index++] = 8;
+    index += encode_addr(&request_data[index], &vbool);
+    request_data[index++] = 1;
+
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    uint8_t tx_buffer[128];
+    const uint8_t datalen = 6 * (addr_size + 1) + 4 + 1 + 2 + 4 + 8 + 1;
+    const size_t expected_response_size = 9 + datalen;
+    uint8_t expected_response[128] = { 0x83, 6, 0, 0, datalen };
+    ASSERT_GT(sizeof(expected_response), expected_response_size);
+    index = 5;
+
+    index += encode_addr(&expected_response[index], &vfloat);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_32);
+    void *ptr = static_cast<void *>(&vfloat);
+    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), expected_response);
+
+    index += encode_addr(&expected_response[index], &viunt8);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_8);
+    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), expected_response);
+
+    index += encode_addr(&expected_response[index], &vuint16);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_16);
+    index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), expected_response);
+
+    index += encode_addr(&expected_response[index], &vuint32);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_32);
+    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), expected_response);
+
+    index += encode_addr(&expected_response[index], &vuint64);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_64);
+    index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), expected_response);
+
+    index += encode_addr(&expected_response[index], &vbool);
+    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_8);
+    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&vbool), expected_response);
+
+    add_crc(expected_response, expected_response_size - 4);
+
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    EXPECT_EQ(n_to_read, expected_response_size);
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    EXPECT_EQ(nread, n_to_read);
+
+    ASSERT_BUF_EQ(tx_buffer, expected_response, expected_response_size);
+}
