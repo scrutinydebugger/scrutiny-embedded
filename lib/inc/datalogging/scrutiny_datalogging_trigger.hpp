@@ -136,7 +136,6 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]) SCRUTINY_OVERRIDE;
-                inline unsigned int get_operand_count(void) const SCRUTINY_OVERRIDE { return 0; }
             };
 
             // cppcheck-suppress[noConstructor]

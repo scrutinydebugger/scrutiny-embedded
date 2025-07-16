@@ -390,93 +390,93 @@ namespace scrutiny
         class CodecV1_0
         {
           public:
-            ResponseCode::eResponseCode encode_response_protocol_version(
+            static ResponseCode::eResponseCode encode_response_protocol_version(
                 ResponseData::GetInfo::GetProtocolVersion const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_software_id(Response *const response);
-            ResponseCode::eResponseCode encode_response_special_memory_region_count(
+            static ResponseCode::eResponseCode encode_response_software_id(Response *const response);
+            static ResponseCode::eResponseCode encode_response_special_memory_region_count(
                 ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_special_memory_region_location(
+            static ResponseCode::eResponseCode encode_response_special_memory_region_location(
                 ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_supported_features(
+            static ResponseCode::eResponseCode encode_response_supported_features(
                 ResponseData::GetInfo::GetSupportedFeatures const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_get_rpv_count(
+            static ResponseCode::eResponseCode encode_response_get_rpv_count(
                 ResponseData::GetInfo::GetRPVCount const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_get_loop_count(
+            static ResponseCode::eResponseCode encode_response_get_loop_count(
                 ResponseData::GetInfo::GetLoopCount const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_get_loop_definition(
+            static ResponseCode::eResponseCode encode_response_get_loop_definition(
                 ResponseData::GetInfo::GetLoopDefinition const *const response_data,
                 Response *const response);
 
-            ResponseCode::eResponseCode encode_response_comm_discover(
+            static ResponseCode::eResponseCode encode_response_comm_discover(
                 ResponseData::CommControl::Discover const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_comm_heartbeat(
+            static ResponseCode::eResponseCode encode_response_comm_heartbeat(
                 ResponseData::CommControl::Heartbeat const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_comm_get_params(
+            static ResponseCode::eResponseCode encode_response_comm_get_params(
                 ResponseData::CommControl::GetParams const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_comm_connect(
+            static ResponseCode::eResponseCode encode_response_comm_connect(
                 ResponseData::CommControl::Connect const *const response_data,
                 Response *const response);
 
-            ResponseCode::eResponseCode decode_request_get_special_memory_region_location(
+            static ResponseCode::eResponseCode decode_request_get_special_memory_region_location(
                 Request const *const request,
                 RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data);
-            ResponseCode::eResponseCode decode_request_get_rpv_definition(
+            static ResponseCode::eResponseCode decode_request_get_rpv_definition(
                 Request const *const request,
                 RequestData::GetInfo::GetRPVDefinition *const request_data);
-            ResponseCode::eResponseCode decode_request_get_loop_definition(
+            static ResponseCode::eResponseCode decode_request_get_loop_definition(
                 Request const *const request,
                 RequestData::GetInfo::GetLoopDefinition *const request_data);
 
-            ResponseCode::eResponseCode decode_request_comm_discover(
+            static ResponseCode::eResponseCode decode_request_comm_discover(
                 Request const *const request,
                 RequestData::CommControl::Discover *const request_data);
-            ResponseCode::eResponseCode decode_request_comm_heartbeat(
+            static ResponseCode::eResponseCode decode_request_comm_heartbeat(
                 Request const *const request,
                 RequestData::CommControl::Heartbeat *const request_data);
-            ResponseCode::eResponseCode decode_request_comm_connect(
+            static ResponseCode::eResponseCode decode_request_comm_connect(
                 Request const *const request,
                 RequestData::CommControl::Connect *const request_data);
-            ResponseCode::eResponseCode decode_request_comm_disconnect(
+            static ResponseCode::eResponseCode decode_request_comm_disconnect(
                 Request const *const request,
                 RequestData::CommControl::Disconnect *const request_data);
 
-            ReadMemoryBlocksRequestParser *decode_request_memory_control_read(Request const *const request);
-            ReadMemoryBlocksResponseEncoder *encode_response_memory_control_read(Response *const response, uint16_t const max_size);
+            static ReadMemoryBlocksRequestParser *decode_request_memory_control_read(Request const *const request);
+            static ReadMemoryBlocksResponseEncoder *encode_response_memory_control_read(Response *const response, uint16_t const max_size);
 
-            WriteMemoryBlocksRequestParser *decode_request_memory_control_write(Request const *const request, bool const masked_wirte);
-            WriteMemoryBlocksResponseEncoder *encode_response_memory_control_write(Response *const response, uint16_t const max_size);
+            static WriteMemoryBlocksRequestParser *decode_request_memory_control_write(Request const *const request, bool const masked_write);
+            static WriteMemoryBlocksResponseEncoder *encode_response_memory_control_write(Response *const response, uint16_t const max_size);
 
-            GetRPVDefinitionResponseEncoder *encode_response_get_rpv_definition(Response *const response, uint16_t const max_size);
-            ReadRPVRequestParser *decode_request_memory_control_read_rpv(Request const *const request);
-            ReadRPVResponseEncoder *encode_response_memory_control_read_rpv(Response *const response, uint16_t const max_size);
+            static GetRPVDefinitionResponseEncoder *encode_response_get_rpv_definition(Response *const response, uint16_t const max_size);
+            static ReadRPVRequestParser *decode_request_memory_control_read_rpv(Request const *const request);
+            static ReadRPVResponseEncoder *encode_response_memory_control_read_rpv(Response *const response, uint16_t const max_size);
 
-            WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler *main_handler);
-            WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size);
+            static WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler *main_handler);
+            static WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size);
 
 #if SCRUTINY_ENABLE_DATALOGGING
-            ResponseCode::eResponseCode encode_response_datalogging_get_setup(
+            static ResponseCode::eResponseCode encode_response_datalogging_get_setup(
                 ResponseData::DataLogControl::GetSetup const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_datalogging_status(
+            static ResponseCode::eResponseCode encode_response_datalogging_status(
                 ResponseData::DataLogControl::GetStatus const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_datalogging_get_acquisition_metadata(
+            static ResponseCode::eResponseCode encode_response_datalogging_get_acquisition_metadata(
                 ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
                 Response *const response);
-            ResponseCode::eResponseCode encode_response_datalogging_read_acquisition(
+            static ResponseCode::eResponseCode encode_response_datalogging_read_acquisition(
                 ResponseData::DataLogControl::ReadAcquisition const *const response_data,
                 Response *const response,
                 bool *const finished);
-            ResponseCode::eResponseCode decode_datalogging_configure_request(
+            static ResponseCode::eResponseCode decode_datalogging_configure_request(
                 Request const *const request,
                 RequestData::DataLogControl::Configure *const request_data,
                 datalogging::Configuration *const config);

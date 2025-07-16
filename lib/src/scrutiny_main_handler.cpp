@@ -129,7 +129,7 @@ namespace scrutiny
 
         if (read_memory(val, addr, typesize) == false)
         {
-            memset(val, 0, sizeof(AnyType));
+            *val = {};
             return false;
         }
         return true;
@@ -269,7 +269,7 @@ namespace scrutiny
         if (!success)
         {
             *output_type = VariableType::unknown;
-            memset(val, 0, sizeof(AnyType));
+            *val = {};
         }
         else
         {

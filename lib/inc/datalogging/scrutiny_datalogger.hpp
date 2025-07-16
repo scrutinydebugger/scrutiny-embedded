@@ -138,7 +138,7 @@ namespace scrutiny
           protected:
             void process_acquisition(void);
             void stamp_trigger_point(void);
-            bool acquisition_completed(void);
+            bool acquisition_completed(void) const;
             void write_uncompressed_entry(void);
             uint16_t read_next_entry_size(buffer_size_t *cursor);
             void write_diff_bits(uint8_t *new_entry, uint8_t *previous_entry);

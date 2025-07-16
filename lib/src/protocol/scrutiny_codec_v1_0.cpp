@@ -419,7 +419,7 @@ namespace scrutiny
                 m_finished = true;
             }
 
-            return !m_invalid;
+            return true;
         }
 
         void ReadRPVRequestParser::reset(void)
@@ -557,7 +557,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = sizeof(response_data->nbr_readonly_region);
             SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = sizeof(response_data->nbr_forbidden_region);
             SCRUTINY_CONSTEXPR uint16_t datalen = readonly_region_count_size + forbidden_region_count_size;
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -575,8 +577,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t region_type_size = sizeof(response_data->region_type);
             SCRUTINY_CONSTEXPR uint16_t region_index_size = sizeof(response_data->region_index);
             SCRUTINY_CONSTEXPR uint16_t datalen = region_type_size + region_index_size + 2 * addr_size;
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -595,8 +598,9 @@ namespace scrutiny
             Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t datalen = 1;
-
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
+            
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) 
             {
                 return ResponseCode::Overflow;
             }
@@ -676,8 +680,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t name_length_size = sizeof(response_data->loop_name_length);
 
             SCRUTINY_CONSTEXPR uint16_t datalen = loop_id_size + loop_type_size + attribute_field_size + name_length_size;
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -729,7 +734,9 @@ namespace scrutiny
         {
             SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -745,7 +752,9 @@ namespace scrutiny
         {
             SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -776,8 +785,9 @@ namespace scrutiny
             display_name_length = (display_name_length > MAX_DISPLAY_NAME_LENGTH) ? MAX_DISPLAY_NAME_LENGTH : display_name_length;
 
             uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) 
             {
                 return ResponseCode::Overflow;
             }
@@ -798,8 +808,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(response_data->session_id);
             SCRUTINY_CONSTEXPR uint16_t challenge_response_size = sizeof(response_data->challenge_response);
             SCRUTINY_CONSTEXPR uint16_t datalen = session_id_size + challenge_response_size;
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -830,8 +841,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_pos = max_bitrate_pos + max_bitrate_size;
             SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_pos = heartbeat_timeout_pos + heartbeat_timeout_size;
             SCRUTINY_CONSTEXPR uint16_t address_size_pos = comm_rx_timeout_pos + comm_rx_timeout_size;
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -859,7 +871,7 @@ namespace scrutiny
             SCRUTINY_STATIC_ASSERT(
                 sizeof(response_data->magic) == sizeof(CommControl::CONNECT_MAGIC),
                 "Mismatch between codec definition and protocol constant.");
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) 
             {
                 return ResponseCode::Overflow;
             }
@@ -1000,7 +1012,7 @@ namespace scrutiny
             return &encoders.m_write_rpv_response_encoder;
         }
 
-        WriteRPVRequestParser *CodecV1_0::decode_request_memory_control_write_rpv(Request const *const request, MainHandler *const main_handler)
+        WriteRPVRequestParser *CodecV1_0::decode_request_memory_control_write_rpv(Request const *const request, MainHandler const *const main_handler)
         {
             parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
             return &parsers.m_memory_control_write_rpv_parser;
@@ -1037,7 +1049,7 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t datalen = state_len + bytes_to_acquire_len + write_counter_len;
             SCRUTINY_STATIC_ASSERT(datalen == 1 + 4 + 4, "Bad data length");
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress knownConditionTrueFalse
             {
                 return ResponseCode::Overflow;
             }
@@ -1064,7 +1076,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t datalen =
                 acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
 
-            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
+            SCRUTINY_STATIC_ASSERT(datalen > MINIMUM_TX_BUFFER_SIZE, "Minimum TX buffer size is too small for this response");
+
+            if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length) //cppcheck-suppress[knownConditionTrueFalse], static assert not available on all platforms
             {
                 return ResponseCode::Overflow;
             }
@@ -1086,7 +1100,7 @@ namespace scrutiny
             bool *const finished)
         {
             SCRUTINY_CONSTEXPR uint16_t minimum_datalen = 16;
-            if (minimum_datalen > MINIMUM_TX_BUFFER_SIZE && minimum_datalen > response->data_max_length)
+            if (minimum_datalen > MINIMUM_TX_BUFFER_SIZE && minimum_datalen > response->data_max_length) 
             {
                 return ResponseCode::Overflow;
             }

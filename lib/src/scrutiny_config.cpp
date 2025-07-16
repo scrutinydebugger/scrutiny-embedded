@@ -62,9 +62,9 @@ namespace scrutiny
         m_forbidden_range_count = count;
     }
 
-    void Config::set_readonly_address_range(AddressRange const *range, uint8_t const count)
+    void Config::set_readonly_address_range(AddressRange const *ranges, uint8_t const count)
     {
-        m_readonly_address_ranges = range;
+        m_readonly_address_ranges = ranges;
         m_readonly_range_count = count;
     }
 

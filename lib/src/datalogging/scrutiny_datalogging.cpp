@@ -138,7 +138,7 @@ namespace scrutiny
 
             if (!success)
             {
-                memset(val, 0, sizeof(AnyType));
+                *val = {};
                 *variable_type = VariableType::float32;
             }
 

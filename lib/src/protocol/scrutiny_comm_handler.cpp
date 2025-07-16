@@ -391,7 +391,7 @@ namespace scrutiny
         }
 
         // Check if the last request received is a valid "Comm Discover request".
-        bool CommHandler::received_discover_request(void)
+        bool CommHandler::received_discover_request(void) const
         {
             if (m_active_request.command_id != static_cast<uint8_t>(CommandId::CommControl))
             {

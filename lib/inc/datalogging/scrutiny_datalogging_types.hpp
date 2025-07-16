@@ -128,7 +128,7 @@ namespace scrutiny
         {
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
-            void copy_from(TriggerConfig *other)
+            void copy_from(const TriggerConfig * other)
             {
                 for (unsigned int i = 0; i < MAX_OPERANDS; i++)
                 {

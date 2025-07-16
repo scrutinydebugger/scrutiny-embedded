@@ -11,9 +11,9 @@
 
 #ifdef __cplusplus
 #if __cplusplus >= 201103
-#define SCRUTINY_HAS_CPP11 true
+#define SCRUTINY_HAS_CPP11 1
 #else
-#define SCRUTINY_HAS_CPP11 false
+#define SCRUTINY_HAS_CPP11 0
 #endif
 #endif
 
