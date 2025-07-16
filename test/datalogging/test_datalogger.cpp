@@ -73,6 +73,7 @@ class TestDatalogger : public ScrutinyTest
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
     RuntimePublishedValue rpvs[3];
+    FixedFrequencyLoopHandler loop_handler;
 
     uint8_t buffer_canary_1[512];
     uint8_t dlbuffer[128];
@@ -90,6 +91,7 @@ class TestDatalogger : public ScrutinyTest
         forbidden_buffer2(),
         readonly_buffer(),
         readonly_buffer2(),
+        loop_handler(100000, "TestLoop"),
         buffer_canary_1(),
         dlbuffer(),
         buffer_canary_2()
@@ -273,7 +275,6 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     float var1 = 0.0;
     int32_t var2 = 0;
     float trigger_val = 0.0f;
-    FixedFrequencyLoopHandler loop_handler(100000, "testloop");
     datalogger.set_owner(&loop_handler);
 
     datalogging::Configuration dlconfig;

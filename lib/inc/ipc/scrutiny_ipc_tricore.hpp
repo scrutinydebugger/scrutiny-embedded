@@ -16,7 +16,8 @@
 #error "Only works for tricore architecture"
 #endif
 
-static inline void _scrutiny_ldmst(volatile void *address, uint32_t mask, uint32_t value)
+//cppcheck-suppress [constParameterPointer] cppcheck cannot see the pointer being manipulated in assembly.
+static inline void _scrutiny_ldmst(volatile void * address, uint32_t mask, uint32_t value)
 {
     __asm__ __volatile__(
         "mov %H2,%1 \n\

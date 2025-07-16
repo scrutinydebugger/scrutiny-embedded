@@ -136,7 +136,7 @@ namespace scrutiny
 
           protected:
             void process_active_request(void);
-            bool received_discover_request(void);
+            bool received_discover_request(void) const;
             bool received_connect_request(void) const;
 
             class RxFSMState
