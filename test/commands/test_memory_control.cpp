@@ -889,7 +889,6 @@ TEST_F(TestMemoryControl, TestTypedReadSingleItem)
 
 TEST_F(TestMemoryControl, TestTypedReadMultipleItem)
 {
-
     // Building request
     float vfloat = 3.14159;
     uint8_t viunt8 = 0x55;
@@ -965,4 +964,123 @@ TEST_F(TestMemoryControl, TestTypedReadMultipleItem)
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, expected_response_size);
+}
+
+TEST_F(TestMemoryControl, TestTypedReadUnsupportedSize)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::TypedRead);
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+
+    // Building request
+    uint32_t vuint32 = 0x12345678;
+
+    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    uint8_t request_data[8 + 6 * (addr_size + 1)] = { 3, 6, 0, 6 * (addr_size + 1) };
+
+    unsigned int index = 4;
+    index += encode_addr(&request_data[index], &vuint32);
+    request_data[index++] = 3; // 3 is not supported
+
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    uint8_t tx_buffer[128];
+
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    EXPECT_EQ(nread, n_to_read);
+
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
+}
+
+TEST_F(TestMemoryControl, TestTypedReadLimitNoOverflow)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::TypedRead);
+    const scrutiny::protocol::ResponseCode::eResponseCode ok = scrutiny::protocol::ResponseCode::OK;
+    // Building request
+    uint32_t vuint32 = 0x12345678;
+
+    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR int max_nb_uint32 = (sizeof(_tx_buffer) - 9) / (sizeof(void *) + 4 + 1);
+
+    SCRUTINY_CONSTEXPR uint32_t datalen = max_nb_uint32 * (addr_size + 1);
+
+    uint8_t request_data[8 + datalen] = { 3, 6, datalen >> 8, datalen & 0xFF };
+
+    unsigned int index = 4;
+    for (int i = 0; i < max_nb_uint32; i++)
+    {
+        index += encode_addr(&request_data[index], &vuint32);
+        request_data[index++] = 4; // 3 is not supported
+    }
+
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    uint8_t tx_buffer[sizeof(_tx_buffer)];
+
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    EXPECT_EQ(nread, n_to_read);
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok);
+}
+
+TEST_F(TestMemoryControl, TestTypedReadOverflow)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint8_t const subfn = static_cast<uint8_t>(scrutiny::protocol::MemoryControl::Subfunction::TypedRead);
+    const scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
+    // Building request
+    uint32_t vuint32 = 0x12345678;
+
+    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR int max_nb_uint32 = (sizeof(_tx_buffer) - 9) / (sizeof(void *) + 4 + 1) + 1; // +1 will cause the overflow!
+
+    SCRUTINY_CONSTEXPR uint32_t datalen = max_nb_uint32 * (addr_size + 1);
+
+    uint8_t request_data[8 + datalen] = { 3, 6, datalen >> 8, datalen & 0xFF };
+
+    unsigned int index = 4;
+    for (int i = 0; i < max_nb_uint32; i++)
+    {
+        index += encode_addr(&request_data[index], &vuint32);
+        request_data[index++] = 4; // 3 is not supported
+    }
+
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    uint8_t tx_buffer[sizeof(_tx_buffer)];
+
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    EXPECT_EQ(nread, n_to_read);
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow);
 }
