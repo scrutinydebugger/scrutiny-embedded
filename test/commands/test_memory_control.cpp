@@ -850,23 +850,23 @@ TEST_F(TestMemoryControl, TestTypedReadSingleItem)
         if (tests_cases[i].addr == &vfloat)
         {
             void *ptr = static_cast<void *>(&vfloat);
-            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), expected_response);
+            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), &expected_response[index]);
         }
         else if (tests_cases[i].addr == &viunt8)
         {
-            index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), expected_response);
+            index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), &expected_response[index]);
         }
         else if (tests_cases[i].addr == &vuint16)
         {
-            index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), expected_response);
+            index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), &expected_response[index]);
         }
         else if (tests_cases[i].addr == &vuint32)
         {
-            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), expected_response);
+            index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), &expected_response[index]);
         }
         else if (tests_cases[i].addr == &vuint64)
         {
-            index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), expected_response);
+            index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), &expected_response[index]);
         }
 
         add_crc(expected_response, expected_response_size - 4);
@@ -926,29 +926,29 @@ TEST_F(TestMemoryControl, TestTypedReadMultipleItem)
     index = 5;
 
     index += encode_addr(&expected_response[index], &vfloat);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_32);
+    expected_response[index++] = 4;
     void *ptr = static_cast<void *>(&vfloat);
-    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), expected_response);
+    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(ptr), &expected_response[index]);
 
     index += encode_addr(&expected_response[index], &viunt8);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_8);
-    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), expected_response);
+    expected_response[index++] = 1;
+    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&viunt8), &expected_response[index]);
 
     index += encode_addr(&expected_response[index], &vuint16);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_16);
-    index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), expected_response);
+    expected_response[index++] = 2;
+    index += scrutiny::codecs::encode_16_bits_big_endian(*reinterpret_cast<uint16_t *>(&vuint16), &expected_response[index]);
 
     index += encode_addr(&expected_response[index], &vuint32);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_32);
-    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), expected_response);
+    expected_response[index++] = 4;
+    index += scrutiny::codecs::encode_32_bits_big_endian(*reinterpret_cast<uint32_t *>(&vuint32), &expected_response[index]);
 
     index += encode_addr(&expected_response[index], &vuint64);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_64);
-    index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), expected_response);
+    expected_response[index++] = 8;
+    index += scrutiny::codecs::encode_64_bits_big_endian(*reinterpret_cast<uint64_t *>(&vuint64), &expected_response[index]);
 
     index += encode_addr(&expected_response[index], &vbool);
-    expected_response[index++] = static_cast<uint8_t>(scrutiny::VariableTypeSize::_8);
-    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&vbool), expected_response);
+    expected_response[index++] = 1;
+    index += scrutiny::codecs::encode_8_bits(*reinterpret_cast<uint8_t *>(&vbool), &expected_response[index]);
 
     add_crc(expected_response, expected_response_size - 4);
 

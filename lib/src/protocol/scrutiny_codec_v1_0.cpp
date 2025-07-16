@@ -375,7 +375,6 @@ namespace scrutiny
                 return;
             }
 
-            m_cursor += typedmem->type_size;
             m_response->data_length = m_cursor;
         }
 
