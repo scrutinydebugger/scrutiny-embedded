@@ -75,7 +75,7 @@ function (scrutiny_postbuild TARGET)
         if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
             set(arg_SFD_FILENAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${arg_SFD_FILENAME})
         else()
-            set(arg_SFD_FILENAME ${CMAKE_BINARY_DIR}/${arg_SFD_FILENAME})
+            set(arg_SFD_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/${arg_SFD_FILENAME})
         endif()
     endif()
 
@@ -105,7 +105,7 @@ function (scrutiny_postbuild TARGET)
         if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
             set(arg_TAGGED_EXECUTABLE_NAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${arg_TAGGED_EXECUTABLE_NAME})
         else()
-            set(arg_TAGGED_EXECUTABLE_NAME ${CMAKE_BINARY_DIR}/${arg_TAGGED_EXECUTABLE_NAME})
+            set(arg_TAGGED_EXECUTABLE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${arg_TAGGED_EXECUTABLE_NAME})
         endif()
     endif()
 
@@ -142,7 +142,7 @@ function (scrutiny_postbuild TARGET)
     
     add_custom_command(OUTPUT ${arg_SFD_FILENAME}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
-        COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description"
+        COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description for ${TARGET}"
         COMMAND ${CMAKE_COMMAND} -E rm -rf ${arg_WORKDIR}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${arg_WORKDIR}
         COMMAND ${arg_SCRUTINY_CMD} 

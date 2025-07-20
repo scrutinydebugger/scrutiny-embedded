@@ -75,7 +75,15 @@ else()
         -gdwarf-4
     )
 
+    scrutiny_postbuild(${PROJECT_NAME}
+        INSTALL_SFD
+
+        METADATA_PROJECT_NAME "Scrutiny CTestAPP" 
+        METADATA_AUTHOR "" 
+        METADATA_VERSION "1.0.0"
+
+        ALIAS_FILES
+            assets/aliases.json
+    )
+
 endif()
-
-
-
