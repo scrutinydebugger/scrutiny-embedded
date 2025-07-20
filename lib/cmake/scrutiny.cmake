@@ -140,6 +140,8 @@ function (scrutiny_postbuild TARGET)
 
     # --- Make the SFD ---
     
+    message("arg_INSTALL_SFD = ${arg_INSTALL_SFD}")
+
     add_custom_command(OUTPUT ${arg_SFD_FILENAME}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
         COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description for ${TARGET}"
@@ -155,8 +157,8 @@ function (scrutiny_postbuild TARGET)
         COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
-        COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${arg_SFD_FILENAME}
-        COMMAND ${arg_SCRUTINY_CMD} $<IF:$<BOOL:arg_INSTALL_SFD>,install-sfd,noop> ${arg_SFD_FILENAME}
+        COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${arg_SFD_FILENAME} $<$<BOOL:arg_INSTALL_SFD>,--install>
+        #COMMAND ${arg_SCRUTINY_CMD} $<IF:$<BOOL:arg_INSTALL_SFD>,install-sfd,noop> ${arg_SFD_FILENAME}
     )
     add_custom_target(${SFD_TARGET} ALL DEPENDS ${arg_SFD_FILENAME})
     set_target_properties(${SFD_TARGET} PROPERTIES TARGET_FILE ${arg_SFD_FILENAME}) 
