@@ -85,12 +85,7 @@ function (scrutiny_postbuild TARGET)
         message(SEND_ERROR "${TARGET} msut be an executable. Got : ${TARGET_TYPE}")
     endif ()
     
-    # Give the target we created to the caller
     get_target_property(TARGET_SUFFIX ${TARGET} SUFFIX)
-    set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged)
-    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
-        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
-    endif()
 
     # Tagged executable validation
     if (NOT arg_TAGGED_EXECUTABLE_NAME)
@@ -98,6 +93,13 @@ function (scrutiny_postbuild TARGET)
         if (TARGET_SUFFIX)  # Apply the same suffix as the source
             set(arg_TAGGED_EXECUTABLE_NAME ${arg_TAGGED_EXECUTABLE_NAME}${TARGET_SUFFIX})
         endif()
+    endif()
+
+        # Give the target we created to the caller
+    
+    # set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged)
+    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
+        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${arg_TAGGED_EXECUTABLE_NAME} PARENT_SCOPE)
     endif()
 
     # If relative path, try to place next to the binary
@@ -165,7 +167,7 @@ function (scrutiny_postbuild TARGET)
         DEPENDS ${TARGET}
         COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${arg_TAGGED_EXECUTABLE_NAME}
     )
-    
+
     add_executable(${arg_TAGGED_EXECUTABLE_NAME} IMPORTED GLOBAL)
    # add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${arg_TAGGED_EXECUTABLE_NAME})
    # set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${arg_TAGGED_EXECUTABLE_NAME})
