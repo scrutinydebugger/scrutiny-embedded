@@ -96,7 +96,6 @@ function (scrutiny_postbuild TARGET)
         endif()
     endif()
     if (arg_TAGGED_EXECUTABLE_PATH_VAR)
-        message("+++++ arg_TAGGED_EXECUTABLE_PATH_VAR=${arg_TAGGED_EXECUTABLE_PATH_VAR}")
         set(${arg_TAGGED_EXECUTABLE_PATH_VAR} ${TAGGED_EXECUTABLE_ABSPATH} PARENT_SCOPE)
     endif()
 
