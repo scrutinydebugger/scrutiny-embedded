@@ -92,7 +92,7 @@ function (scrutiny_postbuild TARGET)
 
     # Tagged executable validation
     if (NOT arg_TAGGED_EXECUTABLE_NAME)
-        set(arg_TAGGED_EXECUTABLE_NAME ${TARGET}-tagged)    # Default value
+        set(arg_TAGGED_EXECUTABLE_NAME ${TARGET}_tagged)    # Default value
         if (TARGET_SUFFIX)  # Apply the same suffix as the source
             set(arg_TAGGED_EXECUTABLE_NAME ${arg_TAGGED_EXECUTABLE_NAME}${TARGET_SUFFIX})
         endif()
