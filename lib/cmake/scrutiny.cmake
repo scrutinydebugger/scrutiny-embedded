@@ -95,13 +95,6 @@ function (scrutiny_postbuild TARGET)
         endif()
     endif()
 
-        # Give the target we created to the caller
-    
-    # set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged)
-    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
-        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${arg_TAGGED_EXECUTABLE_NAME} PARENT_SCOPE)
-    endif()
-
     # If relative path, try to place next to the binary
     if (NOT IS_ABSOLUTE ${arg_TAGGED_EXECUTABLE_NAME})
         if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -169,6 +162,9 @@ function (scrutiny_postbuild TARGET)
     )
 
     add_executable(${arg_TAGGED_EXECUTABLE_NAME} IMPORTED GLOBAL)
+    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
+        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${arg_TAGGED_EXECUTABLE_NAME} PARENT_SCOPE)
+    endif()
    # add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${arg_TAGGED_EXECUTABLE_NAME})
    # set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${arg_TAGGED_EXECUTABLE_NAME})
     
