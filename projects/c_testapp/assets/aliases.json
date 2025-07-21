@@ -6,13 +6,13 @@
         "target" : "/rpv/x5001"
     },
     "/alias/enable_var" : {
-        "target" : "/static/main.cpp/process_interactive_data()/enable"
+        "target" : "/static/main.c/process_interactive_data/enable"
     },
     "/alias/counter_var" : {
-        "target" : "/static/main.cpp/process_interactive_data()/counter"
+        "target" : "/static/main.c/process_interactive_data/counter"
     },
     "/alias/counter_var_x2+1000" : {
-        "target" : "/static/main.cpp/process_interactive_data()/counter",
+        "target" : "/static/main.c/process_interactive_data/counter",
         "gain" : 2,
         "offset" : 1000
     }

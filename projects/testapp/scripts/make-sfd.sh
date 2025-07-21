@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Can be called manually without invoking cmake.
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 set -u
