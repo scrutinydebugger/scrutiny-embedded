@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y \
     cmake \
     git \
     wget \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install scrutinydebugger
@@ -19,8 +21,6 @@ ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
     && apt-get install -y \ 
     build-essential \
-    python3 \
-    python3-pip \
     libpcre3-dev \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
