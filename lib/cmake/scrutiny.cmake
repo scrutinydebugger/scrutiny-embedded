@@ -87,8 +87,6 @@ function (scrutiny_postbuild TARGET)
     
     # Give the target we created to the caller
     get_target_property(TARGET_SUFFIX ${TARGET} SUFFIX)
-    set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged)
-
 
     # Tagged executable validation
     if (NOT arg_TAGGED_EXECUTABLE_NAME)
@@ -98,12 +96,18 @@ function (scrutiny_postbuild TARGET)
         endif()
     endif()
 
+    if (IS_ABSOLUTE ${arg_TAGGED_EXECUTABLE_NAME})
+        message(SEND_ERROR "Executable name cannot be an absolute path")
+    endif()
+
+    set(TAGGED_EXECUTABLE_TARGET ${arg_TAGGED_EXECUTABLE_NAME})
+
     # If relative path, try to place next to the binary
     if (NOT IS_ABSOLUTE ${arg_TAGGED_EXECUTABLE_NAME})
         if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-            set(arg_TAGGED_EXECUTABLE_NAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${arg_TAGGED_EXECUTABLE_NAME})
+            set(TAGGED_EXECUTABLE_ABS_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${arg_TAGGED_EXECUTABLE_NAME})
         else()
-            set(arg_TAGGED_EXECUTABLE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${arg_TAGGED_EXECUTABLE_NAME})
+            set(TAGGED_EXECUTABLE_ABS_PATH ${CMAKE_CURRENT_BINARY_DIR}/${arg_TAGGED_EXECUTABLE_NAME})
         endif()
     endif()
 
@@ -160,12 +164,12 @@ function (scrutiny_postbuild TARGET)
     endif()   
     
     # --- Make the tagged binary ---
-    add_custom_command(OUTPUT ${arg_TAGGED_EXECUTABLE_NAME}
+    add_custom_command(OUTPUT ${TAGGED_EXECUTABLE_ABS_PATH}
         DEPENDS ${TARGET}
-        COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${arg_TAGGED_EXECUTABLE_NAME}
+        COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${TAGGED_EXECUTABLE_ABS_PATH}
     )
-    add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${arg_TAGGED_EXECUTABLE_NAME})
-    set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${arg_TAGGED_EXECUTABLE_NAME})
+    add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${TAGGED_EXECUTABLE_ABS_PATH})
+    set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${TAGGED_EXECUTABLE_ABS_PATH})
     if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
         set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
     endif()
