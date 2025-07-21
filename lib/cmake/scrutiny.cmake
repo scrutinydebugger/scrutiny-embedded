@@ -88,9 +88,7 @@ function (scrutiny_postbuild TARGET)
     # Give the target we created to the caller
     get_target_property(TARGET_SUFFIX ${TARGET} SUFFIX)
     set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged)
-    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
-        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
-    endif()
+
 
     # Tagged executable validation
     if (NOT arg_TAGGED_EXECUTABLE_NAME)
@@ -111,9 +109,6 @@ function (scrutiny_postbuild TARGET)
 
     # SFD
     set(SFD_TARGET ${TARGET}_sfd)
-    if (arg_SFD_TARGET_VAR)
-        set(${arg_SFD_TARGET_VAR} ${SFD_TARGET} PARENT_SCOPE)
-    endif()    
 
     # Metadata
     set(METADATA_ARGS "")
@@ -160,13 +155,24 @@ function (scrutiny_postbuild TARGET)
     set_target_properties(${SFD_TARGET} PROPERTIES TARGET_FILE ${arg_SFD_FILENAME}) 
     
 
+    if (arg_SFD_TARGET_VAR)
+        set(${arg_SFD_TARGET_VAR} ${SFD_TARGET} PARENT_SCOPE)
+    endif()   
+    
+
+
+
     # --- Make the tagged binary ---
     add_custom_command(OUTPUT ${arg_TAGGED_EXECUTABLE_NAME}
         DEPENDS ${TARGET}
         COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${arg_TAGGED_EXECUTABLE_NAME}
     )
     add_custom_target(${TAGGED_EXECUTABLE_TARGET}_custom ALL DEPENDS ${arg_TAGGED_EXECUTABLE_NAME})
-    add_executable(${TAGGED_EXECUTABLE_TARGET} ALIAS ${TAGGED_EXECUTABLE_TARGET}_custom)
+    add_executable(${TAGGED_EXECUTABLE_TARGET} IMPORTED)
+    add_dependencies(${TAGGED_EXECUTABLE_TARGET} ${TAGGED_EXECUTABLE_TARGET}_custom)
     set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${arg_TAGGED_EXECUTABLE_NAME})
     
+    if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
+        set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
+    endif()
 endfunction()
