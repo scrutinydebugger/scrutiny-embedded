@@ -159,20 +159,13 @@ function (scrutiny_postbuild TARGET)
         set(${arg_SFD_TARGET_VAR} ${SFD_TARGET} PARENT_SCOPE)
     endif()   
     
-
-
-
     # --- Make the tagged binary ---
     add_custom_command(OUTPUT ${arg_TAGGED_EXECUTABLE_NAME}
         DEPENDS ${TARGET}
         COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${arg_TAGGED_EXECUTABLE_NAME}
     )
     add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${arg_TAGGED_EXECUTABLE_NAME})
-   # add_executable(${TAGGED_EXECUTABLE_TARGET} IMPORTED)
-    #add_dependencies(${TAGGED_EXECUTABLE_TARGET} ${TAGGED_EXECUTABLE_TARGET}_custom)
     set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${arg_TAGGED_EXECUTABLE_NAME})
-    set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_TYPE EXECUTABLE)
-   # get_target_property(TARGET_TYPE ${TARGET} TYPE)
     if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
         set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
     endif()
