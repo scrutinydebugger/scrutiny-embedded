@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
+RUN python3 -m pip install scrutinydebugger
+
 FROM base as static-analysis
 ARG CPPCHECK_VERSION="2.10.3"
 ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
@@ -28,8 +30,6 @@ RUN apt-get update \
     && cd /tmp/ \
     && rm -rf "/tmp/${CPPCHECK_FOLDER}" \
     && rm -rf /var/lib/apt/lists/*
-
-RUN python3 -m pip install scrutinydebugger
 
 FROM base as native-gcc
 RUN apt-get update && apt-get install -y \
