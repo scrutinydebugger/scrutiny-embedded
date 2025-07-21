@@ -96,7 +96,7 @@ function (scrutiny_postbuild TARGET)
         endif()
     endif()
     if (${arg_TAGGED_EXECUTABLE_PATH_VAR})
-        set(${TAGGED_EXECUTABLE_PATH_VAR} ${TAGGED_EXECUTABLE_ABSPATH} PARENT_SCOPE)
+        set(${arg_TAGGED_EXECUTABLE_PATH_VAR} ${TAGGED_EXECUTABLE_ABSPATH} PARENT_SCOPE)
     endif()
 
 
@@ -115,8 +115,8 @@ function (scrutiny_postbuild TARGET)
             set(SFD_ABSPATH ${CMAKE_CURRENT_BINARY_DIR}/${arg_SFD_FILENAME})
         endif()
     endif()
-    if (${SFD_PATH_VAR})
-        set(${SFD_PATH_VAR} ${SFD_ABSPATH} PARENT_SCOPE)
+    if (${arg_SFD_PATH_VAR})
+        set(${arg_SFD_PATH_VAR} ${SFD_ABSPATH} PARENT_SCOPE)
     endif()
 
 
