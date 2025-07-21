@@ -7,12 +7,10 @@ CPPCHECK_ARGS="-I $LIB_ROOT/inc $LIB_ROOT \
     --error-exitcode=-1
     --enable=all
     --std=c++11
-    --suppress=memsetClassFloat
+    --check-level=exhaustive
     --suppress=missingIncludeSystem
     --suppress=unusedFunction
-    --suppress=missingIncludeSystem
     --suppress=preprocessorErrorDirective
-    --suppress=unmatchedSuppression
     --inline-suppr
     --inconclusive
     -DSCRUTINY_STATIC_ANALYSIS"
