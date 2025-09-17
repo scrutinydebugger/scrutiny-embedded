@@ -111,9 +111,7 @@ void file1SetValues()
 
 int funcInFile1(int a, int b)
 {
-#if SCRUTINY_HAS_CPP11
     static volatile long long staticLongInFuncFile1 = -0x123456789abcdef;
     (void)staticLongInFuncFile1;
-#endif
     return a + b;
 }

@@ -11,6 +11,7 @@
 #include "file1.hpp"
 #include "file2.hpp"
 #include "file3.hpp"
+#include "file4.hpp"
 #include "scrutiny.hpp"
 #include "udp_bridge.hpp"
 
@@ -251,6 +252,7 @@ void init_all_values()
     file1SetValues();
     file2SetValues();
     file3SetValues();
+    file4SetValues();
     funcInFile1(1, 2);
     file2func1();
     file2func1(123);
