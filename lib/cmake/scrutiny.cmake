@@ -44,7 +44,7 @@ function (scrutiny_postbuild TARGET)
     if (NOT arg_SCRUTINY_CMD)
         find_program(arg_SCRUTINY_CMD "scrutiny" REQUIRED)
     else()
-        # Do nothing. Trust the user. He could apss "python -m scuritny"
+        # Do nothing. Trust the user. He could pass "python -m scrutiny"
     endif()
     message(STATUS "Using scrutiny at ${arg_SCRUTINY_CMD}")
 
@@ -123,13 +123,13 @@ function (scrutiny_postbuild TARGET)
     # Metadata
     set(METADATA_ARGS "")
     if (arg_METADATA_PROJECT_NAME)
-        set(METADATA_ARGS ${METADATA_ARGS} --project-name ${arg_METADATA_PROJECT_NAME})
+        set(METADATA_ARGS ${METADATA_ARGS} --project-name "\"${arg_METADATA_PROJECT_NAME}\"")
     endif()
     if (arg_METADATA_AUTHOR)
-        set(METADATA_ARGS ${METADATA_ARGS} --author ${arg_METADATA_AUTHOR})
+        set(METADATA_ARGS ${METADATA_ARGS} --author "\"${arg_METADATA_AUTHOR}\"")
     endif()
     if (arg_METADATA_VERSION)
-        set(METADATA_ARGS ${METADATA_ARGS} --version ${arg_METADATA_VERSION})
+        set(METADATA_ARGS ${METADATA_ARGS} --version "\"${arg_METADATA_VERSION}\"")
     endif()
 
     # Convert alias file path to absolute path relative to source
@@ -147,20 +147,21 @@ function (scrutiny_postbuild TARGET)
     add_custom_command(OUTPUT ${SFD_ABSPATH}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
         COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description for ${TARGET}"
-        COMMAND ${CMAKE_COMMAND} -E rm -rf ${arg_WORKDIR}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${arg_WORKDIR}
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "\"${arg_WORKDIR}\""
+        COMMAND ${CMAKE_COMMAND} -E make_directory "\"${arg_WORKDIR}\""
         COMMAND ${arg_SCRUTINY_CMD} 
-            elf2varmap $<TARGET_FILE:${TARGET}> 
-            --output ${arg_WORKDIR} 
+            elf2varmap "\"$<TARGET_FILE:${TARGET}>\""
+            --output "\"${arg_WORKDIR}\""
             --loglevel error 
             --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
             --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
-            --cppfilt ${arg_CPPFILT}
-        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
-        COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
-        COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
-        COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${SFD_ABSPATH} $<$<BOOL:${arg_INSTALL_SFD}>:--install>
+            --cppfilt "\"${arg_CPPFILT}\""
+        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id "\"$<TARGET_FILE:${TARGET}>\"" --output "\"${arg_WORKDIR}\"" 
+        COMMAND ${arg_SCRUTINY_CMD} make-metadata --output "\"${arg_WORKDIR}\"" ${METADATA_ARGS}    # METADATA_ARGS are quoted already
+        COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> "\"${arg_WORKDIR}\"" --file ${ALIAS_LIST_ABS}
+        COMMAND ${arg_SCRUTINY_CMD} make-sfd "\"${arg_WORKDIR}\"" "\"${SFD_ABSPATH}\"" $<$<BOOL:${arg_INSTALL_SFD}>:--install>
     )
+    
 
     set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged_target)
     set(SFD_TARGET ${TARGET}_sfd_target)
@@ -180,7 +181,7 @@ function (scrutiny_postbuild TARGET)
     # --- Make the tagged binary ---
     add_custom_command(OUTPUT ${TAGGED_EXECUTABLE_ABSPATH}
         DEPENDS ${TARGET}
-        COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id $<TARGET_FILE:${PROJECT_NAME}> ${TAGGED_EXECUTABLE_ABSPATH}
+        COMMAND ${arg_SCRUTINY_CMD} tag-firmware-id "\"$<TARGET_FILE:${PROJECT_NAME}>\"" "\"${TAGGED_EXECUTABLE_ABSPATH}\""
     )
     add_custom_target(${TAGGED_EXECUTABLE_TARGET} ALL DEPENDS ${TAGGED_EXECUTABLE_ABSPATH})
     set_target_properties(${TAGGED_EXECUTABLE_TARGET} PROPERTIES TARGET_FILE ${TAGGED_EXECUTABLE_ABSPATH})
