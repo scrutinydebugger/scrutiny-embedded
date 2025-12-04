@@ -44,7 +44,7 @@ function (scrutiny_postbuild TARGET)
     if (NOT arg_SCRUTINY_CMD)
         find_program(arg_SCRUTINY_CMD "scrutiny" REQUIRED)
     else()
-        # Do nothing. Trust the user. He could apss "python -m scuritny"
+        # Do nothing. Trust the user. He could pass "python -m scrutiny"
     endif()
     message(STATUS "Using scrutiny at ${arg_SCRUTINY_CMD}")
 
@@ -150,17 +150,18 @@ function (scrutiny_postbuild TARGET)
         COMMAND ${CMAKE_COMMAND} -E rm -rf "\"${arg_WORKDIR}\""
         COMMAND ${CMAKE_COMMAND} -E make_directory "\"${arg_WORKDIR}\""
         COMMAND ${arg_SCRUTINY_CMD} 
-            elf2varmap $<TARGET_FILE:${TARGET}> 
+            elf2varmap "\"$<TARGET_FILE:${TARGET}>\""
             --output "\"${arg_WORKDIR}\""
             --loglevel error 
             --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
             --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
             --cppfilt "\"${arg_CPPFILT}\""
-        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output "\"${arg_WORKDIR}\"" 
+        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id "\"$<TARGET_FILE:${TARGET}>\"" --output "\"${arg_WORKDIR}\"" 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output "\"${arg_WORKDIR}\"" ${METADATA_ARGS}    # METADATA_ARGS are quoted already
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> "\"${arg_WORKDIR}\"" --file ${ALIAS_LIST_ABS}
         COMMAND ${arg_SCRUTINY_CMD} make-sfd "\"${arg_WORKDIR}\"" "\"${SFD_ABSPATH}\"" $<$<BOOL:${arg_INSTALL_SFD}>:--install>
     )
+    
 
     set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged_target)
     set(SFD_TARGET ${TARGET}_sfd_target)
