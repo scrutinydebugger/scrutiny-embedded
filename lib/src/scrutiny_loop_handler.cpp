@@ -25,7 +25,7 @@ namespace scrutiny
 #else
         static_cast<void>(main_handler);
 #endif
-        return Status::eStatus::SUCCESS;
+        return Status::SUCCESS;
     }
 
     void LoopHandler::process_common(timediff_t const timestep_100ns)
