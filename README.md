@@ -70,7 +70,10 @@ void scrutiny_configure()
     - Configure User Command service
     - etc.
   */
-  scrutiny_handler.init(&config);
+  if (scrutiny_handler.init(&config) != scrutiny::Status::SUCCESS)
+  {
+    // Error handling
+  }
 }
 
 
