@@ -14,6 +14,7 @@
 #include "scrutiny_ipc.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include "scrutiny_types.hpp"
 #include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING
