@@ -24,11 +24,11 @@ extern "C"
 
     /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::MainHandler)`
     extern size_t const SCRUTINY_C_MAIN_HANDLER_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::Config)`
+    /// @brief Amount of memory required to construct a `scrutiny::Config`. Contains `sizeof(scrutiny::Config)`
     extern size_t const SCRUTINY_C_CONFIG_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(FixedFrequencyLoopHandler)`
+    /// @brief Amount of memory required to construct a `scrutiny::FixedFrequencyLoopHandler`. Contains `sizeof(FixedFrequencyLoopHandler)`
     extern size_t const SCRUTINY_C_LOOP_HANDLER_FF_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(VariableFrequencyLoopHandler)`
+    /// @brief Amount of memory required to construct a `scrutiny::VariableFrequencyLoopHandler`. Contains `sizeof(VariableFrequencyLoopHandler)`
     extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
 
     // ==== MainHandler ====
@@ -44,7 +44,8 @@ extern "C"
     /// Initialize The MainHandler
     /// @param main_handler The `MainHandler` object to work on.
     /// @param config The configuration to apply on the `MainHandler`.
-    void scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *main_handler, scrutiny_c_config_t *config);
+    /// return SCRUTINY_C_SUCCESS on success, SCRUTINY_C_ERROR otherwise
+    scrutiny_c_status_e scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *main_handler, scrutiny_c_config_t *config);
 
     /// @brief Wrapper for `MainHandler::process()`
     /// @param main_handler The `MainHandler` object to work on.

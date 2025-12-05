@@ -34,6 +34,19 @@ namespace scrutiny
         // clang-format on
     };
 
+    /// @brief A status code returned by scrutiny functions
+    class Status
+    {
+      public:
+        // clang-format off
+        SCRUTINY_ENUM(eStatus, uint_least8_t)
+        {
+            SUCCESS = ctypes::SCRUTINY_C_SUCCESS,
+            ERROR = ctypes::SCRUTINY_C_ERROR
+        };
+        // clang-format on
+    };
+
     /// @brief Represents an address range with a start an a end.
     typedef ctypes::scrutiny_c_address_range_t AddressRange;
 

@@ -14,6 +14,7 @@
 #include "scrutiny_ipc.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include "scrutiny_types.hpp"
 #include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING
@@ -155,7 +156,8 @@ namespace scrutiny
 
       protected:
         /// @brief Initialize the Loop Handler
-        void init(MainHandler *const main_handler);
+        /// @return SUCCESS ons uccess, ERROR otherwise
+        Status::eStatus init(MainHandler *const main_handler);
 
         /// @brief Process method common to both FixedFreqLoop and VariableFreqLoop
         /// @param timestep_100ns Timestep since last call
