@@ -31,7 +31,8 @@ namespace scrutiny
 
         /// @brief Initialize the scrutiny Main Handler
         /// @param config A pointer to configuration object. A copy will be made, therefore given configuration can be on the stack.
-        void init(Config const *const config);
+        /// @return SUCCESS or ERROR
+        Status::eStatus init(Config const *const config);
 
         /// @brief Gets the Runtime Published Definition from its ID
         /// @param id The RPV ID
@@ -179,7 +180,7 @@ namespace scrutiny
         bool touches_forbidden_region(void const *const addr_start, size_t const length) const;
         bool touches_readonly_region(MemoryBlock const *const block) const;
         bool touches_readonly_region(void const *const addr_start, size_t const length) const;
-        void check_config(void);
+        Status::eStatus check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time
         protocol::CommHandler m_comm_handler;  // The communication handler that parses the request and manages the buffers
@@ -223,17 +224,17 @@ namespace scrutiny
             datalogging::DataLogger datalogger; // The Datalogger object
             ThreadSafeData threadsafe_data;     // Data that got read from the datalogger through IPC
 
-            LoopHandler *owner;                       // LoopHandler that presently own the Datalogger
-            LoopHandler *new_owner;                   // LoopHandler that is requested to take ownership of the  Datalogger
+            LoopHandler *owner;                        // LoopHandler that presently own the Datalogger
+            LoopHandler *new_owner;                    // LoopHandler that is requested to take ownership of the  Datalogger
             DataloggingError::eDataloggingError error; // Error related to datalogging mechanism
-            bool request_arm_trigger;                 // Flag indicating that a request has been made to arm the trigger
-            bool request_ownership_release;           // Flag indicating that a request has been made to release ownership of the datalogger
-            bool request_disarm_trigger;              // Flag indicating that a request has been made to darm the trigger
-            bool pending_ownership_release;           // Flag indicating that a request for ownership release is presently being processed
-            bool reading_in_progress;                 // Flag indicating that the datalogging data is presently being read by the user.
-            uint8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
-            uint32_t read_acquisition_crc;            // CRC of the datalogging buffer content
-        } m_datalogging;                              // All data related to the datalogging feature
+            bool request_arm_trigger;                  // Flag indicating that a request has been made to arm the trigger
+            bool request_ownership_release;            // Flag indicating that a request has been made to release ownership of the datalogger
+            bool request_disarm_trigger;               // Flag indicating that a request has been made to darm the trigger
+            bool pending_ownership_release;            // Flag indicating that a request for ownership release is presently being processed
+            bool reading_in_progress;                  // Flag indicating that the datalogging data is presently being read by the user.
+            uint8_t read_acquisition_rolling_counter;  // Counter to validate the order of the data packet being read
+            uint32_t read_acquisition_crc;             // CRC of the datalogging buffer content
+        } m_datalogging;                               // All data related to the datalogging feature
 #endif
     };
 } // namespace scrutiny

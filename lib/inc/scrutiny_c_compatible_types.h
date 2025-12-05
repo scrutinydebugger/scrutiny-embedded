@@ -24,6 +24,12 @@ typedef enum
     SCRUTINY_C_ENDIANNESS_BIG
 } scrutiny_c_endianness_e;
 
+typedef enum
+{
+    SCRUTINY_C_SUCCESS,
+    SCRUTINY_C_ERROR
+} scrutiny_c_status_e;
+
 typedef struct
 {
     void *start;

@@ -15,7 +15,7 @@
 
 namespace scrutiny
 {
-    void LoopHandler::init(MainHandler *const main_handler)
+    Status::eStatus LoopHandler::init(MainHandler *const main_handler)
     {
         m_main2loop_msg.clear();
         m_loop2main_msg.clear();
@@ -25,6 +25,7 @@ namespace scrutiny
 #else
         static_cast<void>(main_handler);
 #endif
+        return Status::eStatus::SUCCESS;
     }
 
     void LoopHandler::process_common(timediff_t const timestep_100ns)

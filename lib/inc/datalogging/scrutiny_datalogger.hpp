@@ -54,7 +54,7 @@ namespace scrutiny
             /// @param buffer_size Size of the logging buffer
             /// @param trigger_callback A function pointer to call when the datalogging trigger condition trigs. Executed in the owner loop (no thread
             /// safety)
-            void init(
+            Status::eStatus init(
                 MainHandler const *const main_handler,
                 uint8_t *const buffer,
                 buffer_size_t const buffer_size,

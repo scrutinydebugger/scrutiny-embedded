@@ -21,7 +21,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        void DataLogger::init(
+        Status::eStatus DataLogger::init(
             MainHandler const *const main_handler,
             uint8_t *const buffer,
             buffer_size_t const buffer_size,
@@ -37,6 +37,8 @@ namespace scrutiny
             m_acquisition_id = 0;
 
             reset();
+
+            return Status::SUCCESS;
         }
 
         void DataLogger::reset(void)

@@ -44,6 +44,7 @@ extern "C"
     /// Initialize The MainHandler
     /// @param main_handler The `MainHandler` object to work on.
     /// @param config The configuration to apply on the `MainHandler`.
+    /// return SCRUTINY_C_SUCCESS on success, SCRUTINY_C_ERROR otherwise
     void scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *main_handler, scrutiny_c_config_t *config);
 
     /// @brief Wrapper for `MainHandler::process()`

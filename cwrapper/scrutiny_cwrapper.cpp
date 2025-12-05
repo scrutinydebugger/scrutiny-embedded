@@ -47,9 +47,9 @@ extern "C"
         return reinterpret_cast<scrutiny_c_main_handler_t *>(new (mem) scrutiny::MainHandler); // Placement new
     }
 
-    void scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *mh, scrutiny_c_config_t *config)
+    scrutiny_c_status_e scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *mh, scrutiny_c_config_t *config)
     {
-        get_main_handler(mh)->init(get_config(config));
+        return (scrutiny_c_status_e)get_main_handler(mh)->init(get_config(config));
     }
 
     void scrutiny_c_main_handler_process(scrutiny_c_main_handler_t *mh, scrutiny_c_timediff_t const timestep)

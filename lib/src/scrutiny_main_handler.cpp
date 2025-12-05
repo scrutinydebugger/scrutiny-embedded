@@ -32,7 +32,7 @@ namespace scrutiny
     {
     }
 
-    void MainHandler::init(Config const *const config)
+    Status::eStatus MainHandler::init(Config const *const config)
     {
         m_processing_request = false;
         m_disconnect_pending = false;
@@ -47,25 +47,39 @@ namespace scrutiny
             &m_timebase,
             m_config.session_counter_seed);
 
-        check_config();
-        if (!m_enabled)
+        if (check_config() != Status::SUCCESS)
         {
             m_comm_handler.disable();
+            return Status::ERROR;
         }
 
         // If there's an init error with the comm handler, we disable as well.
         if (!m_comm_handler.is_enabled())
         {
             m_enabled = false;
+            return Status::ERROR;
         }
 
         for (uint16_t i = 0; i < m_config.m_loop_count; i++)
         {
-            m_config.m_loops[i]->init(this);
+            if (m_config.m_loops[i]->init(this) != Status::SUCCESS)
+            {
+                return Status::ERROR;
+            }
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        m_datalogging.datalogger.init(this, m_config.m_datalogger_buffer, m_config.m_datalogger_buffer_size, m_config.m_datalogger_trigger_callback);
+        Status::eStatus const datalog_init_status = m_datalogging.datalogger.init(
+            this,
+            m_config.m_datalogger_buffer,
+            m_config.m_datalogger_buffer_size,
+            m_config.m_datalogger_trigger_callback);
+
+        if (datalog_init_status != Status::SUCCESS)
+        {
+            return Status::ERROR;
+        }
+
         m_datalogging.owner = SCRUTINY_NULL;
         m_datalogging.new_owner = SCRUTINY_NULL;
         m_datalogging.error = DataloggingError::NoError;
@@ -80,9 +94,10 @@ namespace scrutiny
         m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion = 0;
         m_datalogging.threadsafe_data.write_counter_since_trigger = 0;
 #endif
+        return Status::SUCCESS;
     }
 
-    void MainHandler::check_config()
+    Status::eStatus MainHandler::check_config()
     {
         m_enabled = true;
         if (m_config.m_rx_buffer == SCRUTINY_NULL || m_config.m_rx_buffer_size < protocol::MINIMUM_RX_BUFFER_SIZE ||
@@ -104,6 +119,8 @@ namespace scrutiny
                 m_enabled = false;
             }
         }
+
+        return (m_enabled) ? Status::SUCCESS : Status::ERROR;
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING
