@@ -53,6 +53,15 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     )
 endif()
 
+if (SCRUTINY_BUILD_CWRAPPER)
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_cwrapper.cpp
+    )
+    target_link_libraries(${PROJECT_NAME}
+        scrutiny-cwrapper
+    )
+endif()
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

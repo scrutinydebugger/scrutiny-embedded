@@ -352,7 +352,7 @@
             "docstring": "Command line parsing"
         },
         "cwrapper/elf-symdump/src/main.c": {
-            "docstring": "A simple tool that read a .elf and finds the value of a symbol if available"
+            "docstring": "A simple tool that read a .elf and finds the value of a symbol if available. Invoked like: \n scrutoiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2"
         },
         "projects/testapp/include/file4.hpp": {
             "docstring": "Placeholder file for variable extraction test"

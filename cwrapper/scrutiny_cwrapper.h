@@ -30,7 +30,7 @@ extern "C"
     /// @brief C equivalent of the C++ `scrutiny::VariableFrequencyLoopHandler`
     typedef void scrutiny_c_loop_handler_vf_t;
 
-#ifdef SCRUTINY_C_USE_COMPILE_TIME_CONSTANTS
+#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
 #include "scrutiny_cwrapper_cpp_constants.h" // These can be codegen by CMake using scrutiny-elf-symdump external project
 #else
 /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::MainHandler)`

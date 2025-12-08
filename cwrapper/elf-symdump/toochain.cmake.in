@@ -1,3 +1,5 @@
+# A template that needs to be configured by CMake so that we can invoke a Native build from a CMake using a cross-compiler
+
 set(CMAKE_TRY_COMPILE_TARGET_TYPE EXECUTABLE)
 set(CMAKE_SYSTEM_NAME @CMAKE_HOST_SYSTEM_NAME@)
 set(CMAKE_SYSTEM_PROCESSOR @CMAKE_HOST_SYSTEM_PROCESSOR@) 

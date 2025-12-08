@@ -1,5 +1,7 @@
 //    main.c
-//        A simple tool that read a .elf and finds the value of a symbol if available
+//        A simple tool that read a .elf and finds the value of a symbol if available. Invoked
+//        like: 
+//         scrutoiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
