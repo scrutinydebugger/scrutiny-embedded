@@ -21,6 +21,9 @@ target_link_libraries(${PROJECT_NAME}_OBJ scrutiny-embedded)
 add_library(${PROJECT_NAME} )
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_OBJ)
 
+message("==== CMAKE_HOST_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}")
+message("==== CMAKE_HOST_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}")
+
 if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     include(ExternalProject)
     set(SYMDUMP_PROJECT_NAME "scrutiny-elf-symdump")

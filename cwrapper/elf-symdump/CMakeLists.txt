@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.16.3)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE EXECUTABLE)
 
+message("====> CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+message("====> CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
+
 option(SCRUTINY_ELF_SYMDUMP_STRICT_BUILD "Build with strict options" ON)
 
 project(scrutiny-elf-symdump)
