@@ -29,7 +29,7 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
         SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/elf-symdump 
         PREFIX ${SYMDUMP_PROJECT_NAME}
         CMAKE_ARGS
-            -D CMAKE_CROSSCOMPILING=OFF # No effect
+            -D CMAKE_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}
             -D SCRUTINY_ELF_SYMDUMP_STRICT_BUILD=OFF     # For maximum compatibility in case of untested compiler
             -D CMAKE_INSTALL_PREFIX=${SYMDUMP_INSTALL_DIR}
     )
