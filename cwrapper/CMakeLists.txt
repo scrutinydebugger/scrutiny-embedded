@@ -7,7 +7,7 @@ project(scrutiny-cwrapper)
 
 option(SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS "Extract the C++ constants from the wrapper lib an create a header" ON)
 
-add_library(${PROJECT_NAME}_OBJ OBJECT
+add_library(${PROJECT_NAME}_OBJ OBJECT  # Object file so we can extract the .o to pass to symdump
     scrutiny_cwrapper.cpp
 )
 
@@ -18,10 +18,16 @@ target_include_directories(${PROJECT_NAME}_OBJ PUBLIC
 
 target_link_libraries(${PROJECT_NAME}_OBJ scrutiny-embedded)
 
+# Create the library used by the user
 add_library(${PROJECT_NAME} )
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_OBJ)
 
 if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
+    # We want to have the C++ size constants at compile time.
+    # We'll extract them from scrutiny-cwrapper.obj and codegen a header file.
+    # Only way to have the size of a C++ class in C at compile time. 
+    # Source: Trust me, I tried. Raise an issue if you have a better way
+
     include(ExternalProject)
     set(SYMDUMP_PROJECT_NAME "scrutiny-elf-symdump")
     set(SYMDUMP_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SYMDUMP_PROJECT_NAME}" )
@@ -32,7 +38,6 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
         SOURCE_DIR ${SYMDUMP_SOURCE_DIR} 
         PREFIX ${SYMDUMP_PROJECT_NAME}
         CMAKE_ARGS
-            -D CMAKE_CROSSCOMPILING=OFF
             -D CMAKE_TOOLCHAIN_FILE=${CMAKE_BINARY_DIR}/host_toochain.cmake
             -D SCRUTINY_ELF_SYMDUMP_STRICT_BUILD=OFF     # For maximum compatibility in case of untested compiler
             -D CMAKE_INSTALL_PREFIX=${SYMDUMP_INSTALL_DIR}
@@ -59,7 +64,7 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS)
 
     install(FILES ${CPP_CONSTANT_FILE} 
-        DESTINATION ${INSTALL_FOLDER}/cwrapper
+        DESTINATION ${INSTALL_FOLDER}/cwrapper  # Install the codegened header
     )
 endif()
 
