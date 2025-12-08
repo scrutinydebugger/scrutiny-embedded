@@ -2,10 +2,10 @@
 //        Test suite for the datalogger object. Test its capacity to log, trigger access bitfields
 //        and report error on bad config.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutinytest/scrutinytest.hpp"
 #include <vector>

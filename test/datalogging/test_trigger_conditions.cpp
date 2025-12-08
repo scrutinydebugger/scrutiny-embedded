@@ -1,10 +1,10 @@
 //    test_trigger_conditions.cpp
 //        Test datalogging trigger conditions
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstring>

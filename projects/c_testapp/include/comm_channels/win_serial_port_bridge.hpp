@@ -1,10 +1,10 @@
 //    win_serial_port_bridge.hpp
 //        Windows serial port abstraction
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___WIN_SERIAL_PORT_BRIDGE_H___
 #define ___WIN_SERIAL_PORT_BRIDGE_H___

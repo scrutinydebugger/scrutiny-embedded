@@ -1,10 +1,10 @@
 //    scrutiny_ipc_std_atomic.hpp
 //        An implementation of the Scrutiny IPC based on C++11 std::atomic.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_IPC_STD_ATOMIC_H___
 #define ___SCRUTINY_IPC_STD_ATOMIC_H___

@@ -1,3 +1,11 @@
+//    scrutiny_cwrapper.h
+//        A C Wrapper for the Scrutiny embedded library
+//
+//   - License : MIT - See LICENSE file
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//    Copyright (c) 2021 Scrutiny Debugger
+
 #ifndef SCRUTINY_C_WRAPPER_H
 #define SCRUTINY_C_WRAPPER_H
 

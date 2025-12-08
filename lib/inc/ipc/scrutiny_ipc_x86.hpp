@@ -2,10 +2,10 @@
 //        An implementation of the Scrutiny IPC that uses assembly x86 intrinsics. Meant for
 //        testing with C++98. From C++11, std::atomic covers the x86 case
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_IPC_X86_H___
 #define ___SCRUTINY_IPC_X86_H___

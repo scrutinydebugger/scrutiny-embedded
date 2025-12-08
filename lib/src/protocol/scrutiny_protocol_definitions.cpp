@@ -1,10 +1,10 @@
 //    scrutiny_protocol_definitions.cpp
 //        Instanciation of protocol definitions such as magic payload.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "protocol/scrutiny_protocol_definitions.hpp"
 #include <stdint.h>

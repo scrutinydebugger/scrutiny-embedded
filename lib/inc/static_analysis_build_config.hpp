@@ -2,10 +2,10 @@
 //        Stubbed configuration file used for static analysis with hardcoded values instead
 //        of values coming from cmake
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___STATIC_ANALYSIS_BUILD_CONFIG_H___
 #define ___STATIC_ANALYSIS_BUILD_CONFIG_H___

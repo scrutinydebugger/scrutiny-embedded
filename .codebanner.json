@@ -1,6 +1,7 @@
 {
     "folders": [
         "lib",
+        "cwrapper",
         "projects",
         "test"
     ],
@@ -327,6 +328,19 @@
         },
         "test/main.cpp": {
             "docstring": "The default main for launching the test framework"
+        },
+        "cwrapper/scrutiny_cwrapper.h": {
+            "docstring": "A C Wrapper for the Scrutiny embedded library"
+        },
+        "cwrapper/scrutiny_cwrapper.cpp": {
+            "docstring": "A C Wrapper for the Scrutiny embedded library"
+        },
+        "projects/testapp/include/file4.hpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/file4.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
         }
-    }
+    },
+    "authors": {}
 }

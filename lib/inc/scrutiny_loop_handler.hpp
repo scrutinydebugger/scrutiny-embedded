@@ -3,10 +3,10 @@
 //        Loop Handler is to be run in a specific time domain and will make some features available
 //        that depends on the execution requency such as embedded datalogging
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_LOOP_HANDLER_H___
 #define ___SCRUTINY_LOOP_HANDLER_H___

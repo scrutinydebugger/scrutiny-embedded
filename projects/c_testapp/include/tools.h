@@ -1,10 +1,10 @@
 //    tools.h
 //        Some tools used across the C TestApp project
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef __C_TESTAPP_TOOLS_H__
 #define __C_TESTAPP_TOOLS_H__

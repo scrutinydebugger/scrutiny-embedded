@@ -2,10 +2,10 @@
 //        Class that can reads the data encoded by the datalogging encoder. It does what the
 //        server would do for testing purpose
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "datalogging/raw_format_parser.hpp"
 #include "scrutiny.hpp"

@@ -2,10 +2,10 @@
 //        Class that handles the encoding of the datalogger data. RawFormat just copy to memory,
 //        no encoding scheme.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_DATALOGGER_RAW_ENCODER___
 #define ___SCRUTINY_DATALOGGER_RAW_ENCODER___

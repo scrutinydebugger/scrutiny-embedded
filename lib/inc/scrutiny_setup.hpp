@@ -2,10 +2,10 @@
 //        Compile-time configuration of embedded Scrutiny module.
 //        This configuration is global for the module and should be set once per project
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #define SCRUTINY_PROTOCOL_VERSION(MAJOR, MINOR) ((((MAJOR) << 8) & 0xFF00) | ((MINOR)&0xFF))
 #define SCRUTINY_PROTOCOL_VERSION_MAJOR(v) ((v >> 8) & 0xFF)
