@@ -1,10 +1,10 @@
 //    test_ipc.cpp
 //        Test for the Inter-process communication tools
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_ipc.hpp"
 #include "scrutinytest/scrutinytest.hpp"

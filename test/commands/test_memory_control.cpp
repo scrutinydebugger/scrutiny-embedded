@@ -1,10 +1,10 @@
 //    test_memory_control.cpp
 //        Test the behaviour of the embedded module when MemoryControl commands are received
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"

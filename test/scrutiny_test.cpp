@@ -3,10 +3,10 @@
 //        All test should inherit this class.
 //         Includes bunch of helper for easy testing.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_test.hpp"
 #include "scrutiny.hpp"

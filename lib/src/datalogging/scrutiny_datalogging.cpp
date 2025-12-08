@@ -1,10 +1,10 @@
 //    scrutiny_datalogging.cpp
 //        Implementation of some datalogging features
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "datalogging/scrutiny_datalogging.hpp"
 #include "scrutiny_main_handler.hpp"

@@ -1,10 +1,10 @@
 //    scrutiny_codec_v1_0.cpp
 //        Encode/Decode functions for the Scrutiny Protocol V1.0
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include <stdint.h>
 #include <string.h>

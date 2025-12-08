@@ -1,10 +1,10 @@
 //    scrutiny_datalogging_trigger.cpp
 //        The implementation of the datalogging trigger conditions operators
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging.hpp"

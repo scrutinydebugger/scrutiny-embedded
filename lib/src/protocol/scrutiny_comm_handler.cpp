@@ -2,10 +2,10 @@
 //        Manage the tranport-ish layer of the communication protocol. Converts Request/Response
 //        to byte stream and validate CRC
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include <string.h>
 

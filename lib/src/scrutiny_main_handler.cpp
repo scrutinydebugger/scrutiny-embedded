@@ -1,10 +1,10 @@
 //    scrutiny_main_handler.cpp
 //        The main scrutiny class to be manipulated by the user.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_common_codecs.hpp"

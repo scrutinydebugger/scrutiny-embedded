@@ -2,10 +2,10 @@
 //        File to be included to get access to the datalogging encoders/readers. Abstract the
 //        handling of different encoding.
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_DATALOGGING_DATA_ENCODING_H___
 #define ___SCRUTINY_DATALOGGING_DATA_ENCODING_H___

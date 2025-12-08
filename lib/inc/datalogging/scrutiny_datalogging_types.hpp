@@ -1,10 +1,10 @@
 //    scrutiny_datalogging_types.hpp
 //        Types used across datalogging feature
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_DATALOGGING_TYPES_H___
 #define ___SCRUTINY_DATALOGGING_TYPES_H___

@@ -1,10 +1,10 @@
 //    udp_bridge.c
 //        UDP interface fopr the C testapp. Used to talk with the server
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "udp_bridge.h"
 #include "scrutiny_cwrapper.h"

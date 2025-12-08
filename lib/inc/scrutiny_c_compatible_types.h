@@ -2,10 +2,10 @@
 //        Types declaration that are valid in both C and C++. The C++ library extend them,
 //        the C-Wrapper uses them directly
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_setup.hpp"
 #include <stdint.h>

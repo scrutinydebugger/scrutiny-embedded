@@ -1,10 +1,10 @@
 //    scrutiny_timebase.hpp
 //        Minimalist helper to keep track of time
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_TIMEBASE_H___
 #define ___SCRUTINY_TIMEBASE_H___

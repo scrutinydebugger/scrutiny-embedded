@@ -2,10 +2,10 @@
 //        Definition of a run-time configuration of the scrutiny module.
 //        To be filled in startup phase
 //
-//   - License : MIT - See LICENSE file.
+//   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//   Copyright (c) 2021 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef ___SCRUTINY_CONFIG_H___
 #define ___SCRUTINY_CONFIG_H___
