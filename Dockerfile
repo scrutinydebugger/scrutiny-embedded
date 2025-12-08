@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
     wget \
     python3 \
     python3-pip \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install scrutinydebugger
