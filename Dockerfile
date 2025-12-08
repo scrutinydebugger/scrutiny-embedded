@@ -32,8 +32,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as native-gcc
-RUN apt-get update && apt-get install -y \
-    && rm -rf /var/lib/apt/lists/*
 
 FROM base as avr-gcc
 RUN apt-get update && apt-get install -y \
