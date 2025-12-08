@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
 
     CmdOptions args;
     parse_cmd(argc, argv, &args);
+    if (args.symbol_name_prefix == NULL)
+    {
+        args.symbol_name_prefix = "";
+    }
 
     SymbolData *wanted_symbol_data = malloc(args.symbol_count * sizeof(SymbolData));
     CHECK(wanted_symbol_data != NULL, "Cannot allocate memory");
@@ -194,11 +198,11 @@ int main(int argc, char *argv[])
 
         if (ofile)
         {
-            fprintf(ofile, "#define %s 0x%lx\n", wanted_symbol->name, symbol_val);
+            fprintf(ofile, "#define %s%s 0x%lx\n", args.symbol_name_prefix, wanted_symbol->name, symbol_val);
         }
         else
         {
-            fprintf(stdout, "%s=0x%lx\n", wanted_symbol->name, symbol_val);
+            fprintf(stdout, "%s%s=0x%lx\n", args.symbol_name_prefix, wanted_symbol->name, symbol_val);
         }
     }
 

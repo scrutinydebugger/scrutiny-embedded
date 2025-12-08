@@ -351,10 +351,10 @@ enum channel_type_e
     }
 
 #ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
-    static uint8_t  main_handler_buffer[SCRUTINY_C_MAIN_HANDLER_SIZE];
-    static uint8_t  config_buffer[SCRUTINY_C_CONFIG_SIZE];
-    static uint8_t  ff_loop_buffer[SCRUTINY_C_LOOP_HANDLER_FF_SIZE];
-    static uint8_t  vf_loop_buffer[SCRUTINY_C_LOOP_HANDLER_VF_SIZE];
+    static uint8_t  main_handler_buffer[CPP_CONST_SCRUTINY_C_MAIN_HANDLER_SIZE];
+    static uint8_t  config_buffer[CPP_CONST_SCRUTINY_C_CONFIG_SIZE];
+    static uint8_t  ff_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_FF_SIZE];
+    static uint8_t  vf_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_VF_SIZE];
 #endif
 
 void process_scrutiny_lib(comm_channel_interface_t *channel)

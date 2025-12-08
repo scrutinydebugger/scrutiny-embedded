@@ -19,6 +19,7 @@ void parse_cmd(int argc, char *argv[], CmdOptions *options)
     options->ofile = NULL;
     options->symbols = NULL;
     options->symbol_count = 0;
+    options->symbol_name_prefix = NULL;
 
     int cursor = 1;
 
@@ -43,6 +44,15 @@ void parse_cmd(int argc, char *argv[], CmdOptions *options)
             continue;
         }
 
+        if (strcmp(argv[cursor], "-p") == 0)
+        {
+            CHECK(cursor + 1 < argc, "Missing symbol name prefix");
+            CHECK(options->symbol_name_prefix == NULL, "Only one symbol prefix can be specified");
+            options->symbol_name_prefix = argv[cursor + 1];
+            cursor += 2;
+            continue;
+        }
+        
         options->symbols = &argv[cursor];
         options->symbol_count = argc - cursor;
         break;
