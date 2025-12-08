@@ -28,7 +28,7 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     include(ExternalProject)
     set(SYMDUMP_PROJECT_NAME "scrutiny-elf-symdump")
     set(SYMDUMP_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SYMDUMP_PROJECT_NAME}" )
-    configure_file(${SYMDUMP_SOURCE_DIR}/toochain.cmake.in (${SYMDUMP_SOURCE_DIR}/toochain.cmake )
+    configure_file(${SYMDUMP_SOURCE_DIR}/toochain.cmake.in ${SYMDUMP_SOURCE_DIR}/toochain.cmake )
 
     ExternalProject_Add(${SYMDUMP_PROJECT_NAME}
         SOURCE_DIR ${SYMDUMP_SOURCE_DIR} 
