@@ -28,17 +28,15 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     include(ExternalProject)
     set(SYMDUMP_PROJECT_NAME "scrutiny-elf-symdump")
     set(SYMDUMP_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SYMDUMP_PROJECT_NAME}" )
-#    execute_process(
-#        COMMAND ${CMAKE_COMMAND} -E REMOVE_DIRECTORY build
-#        COMMAND ${CMAKE_COMMAND} -E MAKE_DIRECTORY build
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/elf-symdump
-#    )
+    set(SYMDUMP_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/elf-symdump )
+    configure_file(${SYMDUMP_SOURCE_DIR}/toochain.cmake.in toochain.cmake )
+
     ExternalProject_Add(${SYMDUMP_PROJECT_NAME}
-        SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/elf-symdump 
+        SOURCE_DIR ${SYMDUMP_SOURCE_DIR} 
         PREFIX ${SYMDUMP_PROJECT_NAME}
         CMAKE_ARGS
             -D CMAKE_CROSSCOMPILING=OFF
-            -D CMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/../cmake/native.cmake
+            -D CMAKE_TOOLCHAIN_FILE=${SYMDUMP_SOURCE_DIR}/toochain.cmake
             -D SCRUTINY_ELF_SYMDUMP_STRICT_BUILD=OFF     # For maximum compatibility in case of untested compiler
             -D CMAKE_INSTALL_PREFIX=${SYMDUMP_INSTALL_DIR}
     )
