@@ -12,25 +12,25 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#define CHECK(cond, msg)                                                                                               \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(cond))                                                                                                   \
-        {                                                                                                              \
-            fprintf(stderr, "%s\n", msg);                                                                              \
-            fflush(stderr);                                                                                            \
-            exit(EXIT_FAILURE);                                                                                        \
-        }                                                                                                              \
-                                                                                                                       \
+#define CHECK(cond, msg)                                                                                                                             \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        if (!(cond))                                                                                                                                 \
+        {                                                                                                                                            \
+            fprintf(stderr, "%s\n", msg);                                                                                                            \
+            fflush(stderr);                                                                                                                          \
+            exit(EXIT_FAILURE);                                                                                                                      \
+        }                                                                                                                                            \
+                                                                                                                                                     \
     } while (0)
 
-#define UNREACHABLE()                                                                                                  \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        fprintf(stderr, "unreachable code\n");                                                                         \
-        fflush(stderr);                                                                                                \
-        fflush(stdout);                                                                                                \
-        abort();                                                                                                       \
+#define UNREACHABLE()                                                                                                                                \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        fprintf(stderr, "unreachable code\n");                                                                                                       \
+        fflush(stderr);                                                                                                                              \
+        fflush(stdout);                                                                                                                              \
+        abort();                                                                                                                                     \
     } while (0)
 
 #endif

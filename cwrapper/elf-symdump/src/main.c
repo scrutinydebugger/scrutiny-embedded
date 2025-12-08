@@ -1,6 +1,6 @@
 //    main.c
 //        A simple tool that read a .elf and finds the value of a symbol if available. Invoked
-//        like: 
+//        like:
 //         scrutoiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2
 //
 //   - License : MIT - See LICENSE file
@@ -62,9 +62,7 @@ int main(int argc, char *argv[])
     {
         nread = fread(fbuf, 1, elf_header.e_shentsize, ifile);
         CHECK(nread == elf_header.e_shentsize, "Cannot read Section header");
-        CHECK(
-            elf_read_section_header(&elf_header, fbuf, &section_headers[i]) == ELF_OK,
-            "Failed to read section header");
+        CHECK(elf_read_section_header(&elf_header, fbuf, &section_headers[i]) == ELF_OK, "Failed to read section header");
 
         if (section_headers[i].sh_type == SHT_SYMTAB)
         {
@@ -111,12 +109,7 @@ int main(int argc, char *argv[])
                 CHECK(nread == symbol_size, "Failed to read symbol");
                 CHECK(elf_read_symbol(&elf_header, fbuf, &symbol) == ELF_OK, "Failed to read symbol");
                 ELFSectionHeader *strtab = &section_headers[symtabs[i].strtab_index];
-                ELFStatus rc = elf_read_str(
-                    ifile,
-                    strtab,
-                    symbol.st_name,
-                    wanted_symbol_data[k].name,
-                    sizeof(wanted_symbol_data[k].name));
+                ELFStatus rc = elf_read_str(ifile, strtab, symbol.st_name, wanted_symbol_data[k].name, sizeof(wanted_symbol_data[k].name));
                 CHECK(rc == ELF_OK, "Cannot read symbol name");
                 if (strlen(wanted_symbol_data[k].name) > 0)
                 {
@@ -173,9 +166,7 @@ int main(int argc, char *argv[])
 
         uint64_t const value_section_offset = wanted_symbol->symbol.st_value - section->sh_addr;
         FSEEK_ELFFILE(section->sh_offset + value_section_offset);
-        CHECK(
-            fread(fbuf, 1, wanted_symbol->symbol.st_size, ifile) == wanted_symbol->symbol.st_size,
-            "Failed to read symbol value");
+        CHECK(fread(fbuf, 1, wanted_symbol->symbol.st_size, ifile) == wanted_symbol->symbol.st_size, "Failed to read symbol value");
         uint64_t symbol_val = 0;
         switch (wanted_symbol->symbol.st_size)
         {

@@ -158,10 +158,7 @@ typedef struct
     uint16_t strtab_index;
 } ELFSymbolTable;
 
-ELFStatus elf_read_section_header(
-    ELFHeader const *const elfheader,
-    uint8_t const *const data,
-    ELFSectionHeader *const header);
+ELFStatus elf_read_section_header(ELFHeader const *const elfheader, uint8_t const *const data, ELFSectionHeader *const header);
 
 ELFStatus elf_read_symbol(ELFHeader const *const elfheader, uint8_t const *const buf, ELFSymbol *const symbol);
 ELFStatus elf_read_str(
@@ -171,10 +168,7 @@ ELFStatus elf_read_str(
     char *const buf,
     size_t const size);
 ELFStatus elf_read_header(FILE *const fptr, ELFHeader *const elf_header);
-ELFStatus elf_read_symtab(
-    ELFHeader const *const elf_header,
-    ELFSectionHeader const *const sh,
-    ELFSymbolTable *const symtab);
+ELFStatus elf_read_symtab(ELFHeader const *const elf_header, ELFSectionHeader const *const sh, ELFSymbolTable *const symtab);
 size_t elf_symbol_size(ELFHeader const *const elf_header);
 
 uint8_t read_8(ELFEndianess const endianness, uint8_t const buf[]);

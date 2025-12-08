@@ -25,22 +25,19 @@ uint8_t const ELF_MAGIC[4] = { 0x7F, 'E', 'L', 'F' };
 #define ELF_SYMBOL_32BITS_SIZE 16
 #define ELF_SYMBOL_64BITS_SIZE 24
 
-#define ELF_ASSERT(cond, msg)                                                                                          \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(cond))                                                                                                   \
-        {                                                                                                              \
-            fprintf(stderr, "%s\n", msg);                                                                              \
-            fflush(stderr);                                                                                            \
-            return ELF_FAIL;                                                                                           \
-        }                                                                                                              \
-                                                                                                                       \
+#define ELF_ASSERT(cond, msg)                                                                                                                        \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        if (!(cond))                                                                                                                                 \
+        {                                                                                                                                            \
+            fprintf(stderr, "%s\n", msg);                                                                                                            \
+            fflush(stderr);                                                                                                                          \
+            return ELF_FAIL;                                                                                                                         \
+        }                                                                                                                                            \
+                                                                                                                                                     \
     } while (0)
 
-ELFStatus elf_read_section_header(
-    ELFHeader const *const elfheader,
-    uint8_t const *const data,
-    ELFSectionHeader *const header)
+ELFStatus elf_read_section_header(ELFHeader const *const elfheader, uint8_t const *const data, ELFSectionHeader *const header)
 {
     if (elfheader->e_class == ELF_CLASS_32BITS)
     {
@@ -125,13 +122,11 @@ uint32_t read_32(ELFEndianess const endianness, uint8_t const buf[])
 {
     if (endianness == ELF_ENDIAN_LITTLE)
     {
-        return (((uint32_t)buf[3]) << 24) | (((uint32_t)buf[2]) << 16) | (((uint32_t)buf[1]) << 8) |
-               (((uint32_t)buf[0]) << 0);
+        return (((uint32_t)buf[3]) << 24) | (((uint32_t)buf[2]) << 16) | (((uint32_t)buf[1]) << 8) | (((uint32_t)buf[0]) << 0);
     }
     else if (endianness == ELF_ENDIAN_BIG)
     {
-        return (((uint32_t)buf[0]) << 24) | (((uint32_t)buf[1]) << 16) | (((uint32_t)buf[2]) << 8) |
-               (((uint32_t)buf[3]) << 0);
+        return (((uint32_t)buf[0]) << 24) | (((uint32_t)buf[1]) << 16) | (((uint32_t)buf[2]) << 8) | (((uint32_t)buf[3]) << 0);
     }
     return 0;
 }
@@ -140,15 +135,13 @@ uint64_t read_64(ELFEndianess const endianness, uint8_t const buf[])
 {
     if (endianness == ELF_ENDIAN_LITTLE)
     {
-        return (((uint64_t)buf[7]) << 56) | (((uint64_t)buf[6]) << 48) | (((uint64_t)buf[5]) << 40) |
-               (((uint64_t)buf[4]) << 32) | (((uint64_t)buf[3]) << 24) | (((uint64_t)buf[2]) << 16) |
-               (((uint64_t)buf[1]) << 8) | (((uint64_t)buf[0]) << 0);
+        return (((uint64_t)buf[7]) << 56) | (((uint64_t)buf[6]) << 48) | (((uint64_t)buf[5]) << 40) | (((uint64_t)buf[4]) << 32) |
+               (((uint64_t)buf[3]) << 24) | (((uint64_t)buf[2]) << 16) | (((uint64_t)buf[1]) << 8) | (((uint64_t)buf[0]) << 0);
     }
     else if (endianness == ELF_ENDIAN_BIG)
     {
-        return (((uint64_t)buf[0]) << 56) | (((uint64_t)buf[1]) << 48) | (((uint64_t)buf[2]) << 40) |
-               (((uint64_t)buf[3]) << 32) | (((uint64_t)buf[4]) << 24) | (((uint64_t)buf[5]) << 16) |
-               (((uint64_t)buf[6]) << 8) | (((uint64_t)buf[7]) << 0);
+        return (((uint64_t)buf[0]) << 56) | (((uint64_t)buf[1]) << 48) | (((uint64_t)buf[2]) << 40) | (((uint64_t)buf[3]) << 32) |
+               (((uint64_t)buf[4]) << 24) | (((uint64_t)buf[5]) << 16) | (((uint64_t)buf[6]) << 8) | (((uint64_t)buf[7]) << 0);
     }
     return 0;
 }
@@ -208,9 +201,7 @@ ELFStatus elf_read_header(FILE *const fptr, ELFHeader *const elf_header)
 
     ELF_ASSERT(memcmp(elf_header->e_magic, ELF_MAGIC, sizeof(ELF_MAGIC)) == 0, "Invalid header magic");
 
-    ELF_ASSERT(
-        elf_header->e_endianness == ELF_ENDIAN_LITTLE || elf_header->e_endianness == ELF_ENDIAN_BIG,
-        "Invalid endianness");
+    ELF_ASSERT(elf_header->e_endianness == ELF_ENDIAN_LITTLE || elf_header->e_endianness == ELF_ENDIAN_BIG, "Invalid endianness");
     ELF_ASSERT(elf_header->e_class == ELF_CLASS_32BITS || elf_header->e_class == ELF_CLASS_64BITS, "Invalid class");
 
     ELF_ASSERT(fseek(fptr, 0, SEEK_SET) == 0, "Failed to seek in header");
@@ -251,10 +242,7 @@ size_t elf_symbol_size(ELFHeader const *const elf_header)
     return (elf_header->e_class == ELF_CLASS_32BITS) ? ELF_SYMBOL_32BITS_SIZE : ELF_SYMBOL_64BITS_SIZE;
 }
 
-ELFStatus elf_read_symtab(
-    ELFHeader const *const elf_header,
-    ELFSectionHeader const *const sh,
-    ELFSymbolTable *const symtab)
+ELFStatus elf_read_symtab(ELFHeader const *const elf_header, ELFSectionHeader const *const sh, ELFSymbolTable *const symtab)
 
 {
     uint32_t const symbol_size = elf_symbol_size(elf_header);

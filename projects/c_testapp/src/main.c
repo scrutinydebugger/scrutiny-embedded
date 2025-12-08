@@ -109,7 +109,7 @@ struct
 #endif
 } rpvStorage;
 
-int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrutiny_c_any_type_t *outval, scrutiny_c_loop_handler_t* const caller)
+int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrutiny_c_any_type_t *outval, scrutiny_c_loop_handler_t *const caller)
 {
     (void)caller;
     int ok = 1;
@@ -167,9 +167,12 @@ int TestAppRPVReadCallback(const scrutiny_c_runtime_published_value_t rpv, scrut
     return ok;
 }
 
-int TestAppRPVWriteCallback(const scrutiny_c_runtime_published_value_t rpv, const scrutiny_c_any_type_t *inval, scrutiny_c_loop_handler_t* const caller)
+int TestAppRPVWriteCallback(
+    const scrutiny_c_runtime_published_value_t rpv,
+    const scrutiny_c_any_type_t *inval,
+    scrutiny_c_loop_handler_t *const caller)
 {
-    (void) caller;
+    (void)caller;
     int ok = 1;
     if (rpv.id == 0x1000)
     {
@@ -351,10 +354,10 @@ enum channel_type_e
     }
 
 #ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
-    static uint8_t  main_handler_buffer[CPP_CONST_SCRUTINY_C_MAIN_HANDLER_SIZE];
-    static uint8_t  config_buffer[CPP_CONST_SCRUTINY_C_CONFIG_SIZE];
-    static uint8_t  ff_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_FF_SIZE];
-    static uint8_t  vf_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_VF_SIZE];
+static uint8_t main_handler_buffer[CPP_CONST_SCRUTINY_C_MAIN_HANDLER_SIZE];
+static uint8_t config_buffer[CPP_CONST_SCRUTINY_C_CONFIG_SIZE];
+static uint8_t ff_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_FF_SIZE];
+static uint8_t vf_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_VF_SIZE];
 #endif
 
 void process_scrutiny_lib(comm_channel_interface_t *channel)
@@ -362,13 +365,14 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 
     uint8_t buffer[1024];
 
-
-    #ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
     scrutiny_c_main_handler_t *scrutiny_handler = scrutiny_c_main_handler_construct(main_handler_buffer, sizeof(main_handler_buffer));
     scrutiny_c_config_t *config = scrutiny_c_config_construct(config_buffer, sizeof(config_buffer));
-    scrutiny_c_loop_handler_ff_t *ff_loop = scrutiny_c_loop_handler_fixed_freq_construct(ff_loop_buffer, sizeof(ff_loop_buffer), 100000, "100Hz Loop");
-    scrutiny_c_loop_handler_vf_t *vf_loop = scrutiny_c_loop_handler_variable_freq_construct(vf_loop_buffer,sizeof(vf_loop_buffer),"Variable freq loop");
-    #else 
+    scrutiny_c_loop_handler_ff_t *ff_loop =
+        scrutiny_c_loop_handler_fixed_freq_construct(ff_loop_buffer, sizeof(ff_loop_buffer), 100000, "100Hz Loop");
+    scrutiny_c_loop_handler_vf_t *vf_loop =
+        scrutiny_c_loop_handler_variable_freq_construct(vf_loop_buffer, sizeof(vf_loop_buffer), "Variable freq loop");
+#else
     scrutiny_c_main_handler_t *scrutiny_handler =
         scrutiny_c_main_handler_construct(malloc(SCRUTINY_C_MAIN_HANDLER_SIZE), SCRUTINY_C_MAIN_HANDLER_SIZE);
     scrutiny_c_config_t *config = scrutiny_c_config_construct(malloc(SCRUTINY_C_CONFIG_SIZE), SCRUTINY_C_CONFIG_SIZE);
@@ -380,7 +384,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
         SCRUTINY_C_LOOP_HANDLER_VF_SIZE,
         "Variable freq loop");
 
-    #endif
+#endif
     if (scrutiny_handler == NULL)
         ERR_RETURN("Failed to allocate scrutiny_handler");
     if (config == NULL)

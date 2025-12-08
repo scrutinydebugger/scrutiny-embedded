@@ -52,7 +52,7 @@ void parse_cmd(int argc, char *argv[], CmdOptions *options)
             cursor += 2;
             continue;
         }
-        
+
         options->symbols = &argv[cursor];
         options->symbol_count = argc - cursor;
         break;

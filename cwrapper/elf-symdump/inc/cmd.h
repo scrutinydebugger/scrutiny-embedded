@@ -15,7 +15,7 @@ typedef struct
     char *ifile;
     char **symbols;
     int symbol_count;
-    char* symbol_name_prefix;
+    char *symbol_name_prefix;
 } CmdOptions;
 
 void parse_cmd(int argc, char *argv[], CmdOptions *options);

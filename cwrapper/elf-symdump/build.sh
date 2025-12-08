@@ -1,14 +1,9 @@
 #!/bin/bash
 
-#    build.sh
-#        A build script for scrutiny-elf-symdump
-#
-#   - License : MIT - See LICENSE file
-#   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-elf-symdump)
-#
-#    Copyright (c) 2025 Scrutiny Debugger
-
 set -euo pipefail
+
+APP_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$APP_ROOT"
 
 mkdir -p build
 cd build

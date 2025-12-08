@@ -1,3 +1,11 @@
+//    test_cwrapper.cpp
+//        A testsuite for the CWrapper
+//
+//   - License : MIT - See LICENSE file
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//    Copyright (c) 2021 Scrutiny Debugger
+
 #include "scrutiny_cwrapper.h"
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
