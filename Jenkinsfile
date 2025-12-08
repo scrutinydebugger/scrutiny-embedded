@@ -175,7 +175,6 @@ pipeline {
                     }
                     steps{
                         sh '''
-                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/aarch64-linux-gcc.cmake \
                         SCRUTINY_BUILD_TEST=1 \
                         SCRUTINY_BUILD_TESTAPP=1 \
                         scripts/build.sh
