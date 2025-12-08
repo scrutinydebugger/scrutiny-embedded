@@ -2,9 +2,9 @@
 //        ELF parsing functions
 //
 //   - License : MIT - See LICENSE file
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-elf-symdump)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//    Copyright (c) 2025 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "elf.h"
 #include <stddef.h>

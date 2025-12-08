@@ -359,6 +359,7 @@
         },
         "projects/testapp/src/file4.cpp": {
             "docstring": "Placeholder file for variable extraction test"
+        }
     },
     "authors": {}
 }

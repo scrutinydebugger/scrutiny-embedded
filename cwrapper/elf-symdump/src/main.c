@@ -1,11 +1,10 @@
 //    main.c
-//        Main entry point. Call like :
-//        scrutiny-elf-symdump <filename> <symbol1> <symbol2> ...
+//        A simple tool that read a .elf and finds the value of a symbol if available
 //
 //   - License : MIT - See LICENSE file
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-elf-symdump)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//    Copyright (c) 2025 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #include "check.h"
 #include "cmd.h"

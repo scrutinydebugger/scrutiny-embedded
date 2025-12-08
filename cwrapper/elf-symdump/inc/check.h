@@ -1,10 +1,10 @@
-//    main.h
-//        Main header
+//    check.h
+//        Macros to do verbose asserts
 //
 //   - License : MIT - See LICENSE file
-//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-elf-symdump)
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
 //
-//    Copyright (c) 2025 Scrutiny Debugger
+//    Copyright (c) 2021 Scrutiny Debugger
 
 #ifndef MAIN_H
 #define MAIN_H
