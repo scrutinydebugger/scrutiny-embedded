@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     python3 \
     python3-pip \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install scrutinydebugger
@@ -20,7 +21,6 @@ ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHEC
 ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
     && apt-get install -y \ 
-    build-essential \
     libpcre3-dev \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
@@ -33,7 +33,6 @@ RUN apt-get update \
 
 FROM base as native-gcc
 RUN apt-get update && apt-get install -y \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base as avr-gcc
