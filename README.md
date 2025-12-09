@@ -1,6 +1,6 @@
 # Scrutiny Embedded
-Scrutiny Debugger embedded C++ instrumentation library.
-This library must be linked against your C++ project and called periodically.
+Scrutiny Debugger embedded C++ instrumentation library (and C Wrapper).
+This library must be linked against your C/C++ project and called periodically.
 
 The library has 2 data streams going in and out. It is the responsability of the integrator to bring the data to and from a hardware communication device such as a Serial Port, a CAN bus, IP stack or any other. 
 
