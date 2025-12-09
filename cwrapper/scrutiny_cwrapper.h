@@ -1,5 +1,5 @@
 //    scrutiny_cwrapper.h
-//        A C Wrapper for the Scrutiny embedded library
+//        A C Wrapper for the scrutiny-embedded library
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -30,15 +30,18 @@ extern "C"
     /// @brief C equivalent of the C++ `scrutiny::VariableFrequencyLoopHandler`
     typedef void scrutiny_c_loop_handler_vf_t;
 
-    /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::MainHandler)`
-    extern size_t const SCRUTINY_C_MAIN_HANDLER_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::Config`. Contains `sizeof(scrutiny::Config)`
-    extern size_t const SCRUTINY_C_CONFIG_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::FixedFrequencyLoopHandler`. Contains `sizeof(FixedFrequencyLoopHandler)`
-    extern size_t const SCRUTINY_C_LOOP_HANDLER_FF_SIZE;
-    /// @brief Amount of memory required to construct a `scrutiny::VariableFrequencyLoopHandler`. Contains `sizeof(VariableFrequencyLoopHandler)`
-    extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
-
+#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#include "scrutiny_cwrapper_cpp_constants.h" // These can be codegen by CMake using scrutiny-elf-symdump external project
+#else
+/// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::MainHandler)`
+extern size_t const SCRUTINY_C_MAIN_HANDLER_SIZE;
+/// @brief Amount of memory required to construct a `scrutiny::Config`. Contains `sizeof(scrutiny::Config)`
+extern size_t const SCRUTINY_C_CONFIG_SIZE;
+/// @brief Amount of memory required to construct a `scrutiny::FixedFrequencyLoopHandler`. Contains `sizeof(FixedFrequencyLoopHandler)`
+extern size_t const SCRUTINY_C_LOOP_HANDLER_FF_SIZE;
+/// @brief Amount of memory required to construct a `scrutiny::VariableFrequencyLoopHandler`. Contains `sizeof(VariableFrequencyLoopHandler)`
+extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
+#endif
     // ==== MainHandler ====
 
     /// @brief Wrapper for `MainHandler::MainHandler()`.

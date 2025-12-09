@@ -33,6 +33,10 @@ else()
     )
 endif ()
 
+if (SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS)
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE
    ${CMAKE_CURRENT_LIST_DIR}/include
    ${CMAKE_CURRENT_LIST_DIR}/include/comm_channels

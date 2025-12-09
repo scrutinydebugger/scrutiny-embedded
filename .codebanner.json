@@ -10,7 +10,8 @@
         "*.hpp",
         "*.h",
         "*.c",
-        "*.cmake"
+        "*.cmake",
+        ".sh"
     ],
     "exclude_patterns": [
         "projects/platformio/*",
@@ -329,17 +330,38 @@
         "test/main.cpp": {
             "docstring": "The default main for launching the test framework"
         },
-        "cwrapper/scrutiny_cwrapper.h": {
-            "docstring": "A C Wrapper for the Scrutiny embedded library"
-        },
         "cwrapper/scrutiny_cwrapper.cpp": {
-            "docstring": "A C Wrapper for the Scrutiny embedded library"
+            "docstring": "A C Wrapper for the scrutiny-embedded library"
+        },
+        "cwrapper/scrutiny_cwrapper.h": {
+            "docstring": "A C Wrapper for the scrutiny-embedded library"
+        },
+        "cwrapper/elf-symdump/inc/check.h": {
+            "docstring": "Macros to do verbose asserts"
+        },
+        "cwrapper/elf-symdump/inc/cmd.h": {
+            "docstring": "Command line parsing"
+        },
+        "cwrapper/elf-symdump/inc/elf.h": {
+            "docstring": "ELF structure and constants definitions"
+        },
+        "cwrapper/elf-symdump/src/elf.c": {
+            "docstring": "ELF parsing functions"
+        },
+        "cwrapper/elf-symdump/src/cmd.c": {
+            "docstring": "Command line parsing"
+        },
+        "cwrapper/elf-symdump/src/main.c": {
+            "docstring": "A simple tool that read a .elf and finds the value of a symbol if available. Invoked like: \n scrutoiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2"
         },
         "projects/testapp/include/file4.hpp": {
             "docstring": "Placeholder file for variable extraction test"
         },
         "projects/testapp/src/file4.cpp": {
             "docstring": "Placeholder file for variable extraction test"
+        },
+        "test/test_cwrapper.cpp": {
+            "docstring": "A testsuite for the CWrapper"
         }
     },
     "authors": {}
