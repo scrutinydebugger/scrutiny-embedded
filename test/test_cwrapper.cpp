@@ -14,7 +14,7 @@ class TestCWrapper : public ScrutinyTest
 {
 };
 
-#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#if defined(SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS) && SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS == 1
 
 TEST_F(TestCWrapper, TestExtractSymbols)
 {

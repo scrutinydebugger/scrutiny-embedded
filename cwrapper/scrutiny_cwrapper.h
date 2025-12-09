@@ -30,7 +30,7 @@ extern "C"
     /// @brief C equivalent of the C++ `scrutiny::VariableFrequencyLoopHandler`
     typedef void scrutiny_c_loop_handler_vf_t;
 
-#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#if defined(SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS) && SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS == 1
 #include "scrutiny_cwrapper_cpp_constants.h" // These can be codegen by CMake using scrutiny-elf-symdump external project
 #else
 /// @brief Amount of memory required to construct a `scrutiny::MainHandler`. Contains `sizeof(scrutiny::MainHandler)`
@@ -144,10 +144,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @brief Wrapper for `Config::set_loops()`
     /// Defines the different loops (tasks) in the application.
     /// @param config The `scrutiny::Config` object to work on
-    /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
+    /// @param loops Arrays of pointer to the `scrutiny::LoopHandler`.
     /// This array must be allocated outside of Scrutiny and stay
     /// allocated forever as no copy will be made
-    /// @param loop_count Number of `scrutiny::LoopHandlers`
+    /// @param loop_count Number of `scrutiny::LoopHandler`
     void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint8_t const loop_count);
 
     /// @brief Wrapper for `Config::set_user_command_callback()`
