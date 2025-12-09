@@ -353,7 +353,7 @@ enum channel_type_e
         break;                                                                                                                                       \
     }
 
-#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#if defined(SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS) && SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS==1
 static uint8_t main_handler_buffer[CPP_CONST_SCRUTINY_C_MAIN_HANDLER_SIZE];
 static uint8_t config_buffer[CPP_CONST_SCRUTINY_C_CONFIG_SIZE];
 static uint8_t ff_loop_buffer[CPP_CONST_SCRUTINY_C_LOOP_HANDLER_FF_SIZE];
@@ -365,7 +365,7 @@ void process_scrutiny_lib(comm_channel_interface_t *channel)
 
     uint8_t buffer[1024];
 
-#ifdef SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS
+#if defined(SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS) && SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS==1
     scrutiny_c_main_handler_t *scrutiny_handler = scrutiny_c_main_handler_construct(main_handler_buffer, sizeof(main_handler_buffer));
     scrutiny_c_config_t *config = scrutiny_c_config_construct(config_buffer, sizeof(config_buffer));
     scrutiny_c_loop_handler_ff_t *ff_loop =

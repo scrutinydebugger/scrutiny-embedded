@@ -46,22 +46,31 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     set(ELF_SYMDUP ${SYMDUMP_INSTALL_DIR}/bin/${SYMDUMP_PROJECT_NAME})
     set(GENERATED_HEADER_DIR "${PROJECT_BINARY_DIR}/generated")
     set(CPP_CONSTANT_FILE "${GENERATED_HEADER_DIR}/scrutiny_cwrapper_cpp_constants.h")
-    set(CPP_CONSTANTS SCRUTINY_C_MAIN_HANDLER_SIZE SCRUTINY_C_CONFIG_SIZE SCRUTINY_C_LOOP_HANDLER_FF_SIZE SCRUTINY_C_LOOP_HANDLER_VF_SIZE )
-    add_custom_command(
+    set(CPP_CONSTANTS 
+        SCRUTINY_C_MAIN_HANDLER_SIZE 
+        SCRUTINY_C_CONFIG_SIZE 
+        SCRUTINY_C_LOOP_HANDLER_FF_SIZE 
+        SCRUTINY_C_LOOP_HANDLER_VF_SIZE 
+    )
+
+    # Codegen the cosntants header
+    add_custom_command( 
         OUTPUT ${CPP_CONSTANT_FILE}
         DEPENDS ${SYMDUMP_PROJECT_NAME} ${PROJECT_NAME}_OBJ
         COMMAND ${ELF_SYMDUP} ARGS -i $<TARGET_OBJECTS:${PROJECT_NAME}_OBJ> -o ${CPP_CONSTANT_FILE} -p CPP_CONST_  ${CPP_CONSTANTS}
     )
 
     target_include_directories(${PROJECT_NAME} PUBLIC
-        $<BUILD_INTERFACE:${GENERATED_HEADER_DIR}>
+        $<BUILD_INTERFACE:${GENERATED_HEADER_DIR}>  # Enable in-tree builds of projects and tests.
     )
 
-    add_custom_target(SCRUTINY_CPP_CONSTANTS_TARGET
+    add_custom_target(SCRUTINY_CPP_CONSTANTS_TARGET # Custom target is required for add_dependencies()
         DEPENDS ${CPP_CONSTANT_FILE}
     )
     add_dependencies(${PROJECT_NAME} SCRUTINY_CPP_CONSTANTS_TARGET)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC 
+        SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS=1
+    )
 
     install(FILES ${CPP_CONSTANT_FILE} 
         DESTINATION ${INSTALL_FOLDER}/cwrapper  # Install the codegened header
