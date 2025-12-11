@@ -143,6 +143,12 @@ function (scrutiny_postbuild TARGET)
 
     list(LENGTH ALIAS_LIST_ABS ALIAS_COUNT)     # Count the alias file to skip that step if 0
 
+    if (arg_INSTALL_SFD)
+        set(INSTALL_SFD_CMDLINE_ARG "--install")
+    else()
+        # Do not define on purpose to avoid passing "" as argument. command is VERBATIM
+    endif()
+    
     
     add_custom_command(OUTPUT ${SFD_ABSPATH}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
@@ -160,7 +166,7 @@ function (scrutiny_postbuild TARGET)
         COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
-        COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${SFD_ABSPATH} $<$<BOOL:${arg_INSTALL_SFD}>:--install>
+        COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${SFD_ABSPATH} ${INSTALL_SFD_CMDLINE_ARG}
     )
     
 
