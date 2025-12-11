@@ -34,6 +34,8 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     set(SYMDUMP_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/elf-symdump )
     configure_file(${SYMDUMP_SOURCE_DIR}/toochain.cmake.in ${PROJECT_BINARY_DIR}/host_toochain.cmake )
 
+    message(STATUS "PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR}")
+
     ExternalProject_Add(${SYMDUMP_PROJECT_NAME}
         SOURCE_DIR ${SYMDUMP_SOURCE_DIR} 
         PREFIX ${SYMDUMP_PROJECT_NAME}
