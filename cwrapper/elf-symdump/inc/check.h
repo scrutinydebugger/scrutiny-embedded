@@ -24,6 +24,18 @@
                                                                                                                                                      \
     } while (0)
 
+#define CHECK_FORMAT_ARG1(cond, format_str, arg)                                                                                                     \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        if (!(cond))                                                                                                                                 \
+        {                                                                                                                                            \
+            fprintf(stderr, (format_str), (arg));                                                                                                    \
+            fflush(stderr);                                                                                                                          \
+            exit(EXIT_FAILURE);                                                                                                                      \
+        }                                                                                                                                            \
+                                                                                                                                                     \
+    } while (0)
+
 #define UNREACHABLE()                                                                                                                                \
     do                                                                                                                                               \
     {                                                                                                                                                \
