@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Failed to open file %s\n", args.ifile);
         return EXIT_FAILURE;
     }
-    CHECK(ifile != NULL, "Cannot open file");
+    CHECK_FORMAT_ARG1(ifile != NULL, "Cannot open input file %s", args.ifile);
     CHECK(elf_read_header(ifile, &elf_header) == ELF_OK, "Failed to read ELF header");
 
     CHECK(sizeof(fbuf) >= elf_header.e_phentsize, "e_phentsize too big");
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     if (args.ofile != NULL)
     {
         ofile = fopen(args.ofile, "w");
-        CHECK(ofile != NULL, "Cannot open output file");
+        CHECK_FORMAT_ARG1(ofile != NULL, "Cannot open output file %s", args.ofile);
 
         fprintf(ofile, "#ifndef _SCRUTINY_C_WRAPPER_CPP_CONSTANTS_H_\n");
         fprintf(ofile, "#define _SCRUTINY_C_WRAPPER_CPP_CONSTANTS_H_\n\n");
