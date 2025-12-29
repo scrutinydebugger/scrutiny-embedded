@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/file2.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/file3.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/file4.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/file5.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.cpp
