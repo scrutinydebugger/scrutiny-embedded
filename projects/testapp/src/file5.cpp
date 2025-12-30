@@ -7,6 +7,7 @@ namespace File5NamespaceA
     {
         int32_t i32;
         int32_t *i32_ptr;
+        uint16_t u16_array[5];
     };
 
     struct File5StructB
@@ -28,6 +29,8 @@ namespace File5NamespaceA
     File5StructA file5_structA;
     File5StructB file5_structB;
 
+    File5StructB file5_structb_array[2];
+
 } // namespace File5NamespaceA
 
 namespace File5NamespaceB
@@ -45,6 +48,7 @@ namespace File5NamespaceB
 
     File5NamespaceA::File5StructA *file5_structA_ptr{ nullptr };
     File5NamespaceA::File5StructB *file5_structB_ptr{ nullptr };
+    File5NamespaceA::File5StructB *file5_structB_array_ptr{ nullptr };
 
 } // namespace File5NamespaceB
 
@@ -53,7 +57,7 @@ void file5SetValues()
     File5NamespaceA::file5i64 = -0x123456789abcdef;
     File5NamespaceA::file5i32 = -0x77553311;
     File5NamespaceA::file5i16 = -0x2A3C;
-    File5NamespaceA::file5i8 = -0xAB;
+    File5NamespaceA::file5i8 = -0x35;
     File5NamespaceA::file5u64 = 0x98765432123456;
     File5NamespaceA::file5u32 = 0xaabbccdd;
     File5NamespaceA::file5u16 = 0xFDCE;
@@ -71,9 +75,22 @@ void file5SetValues()
 
     File5NamespaceB::file5_structA_ptr = &File5NamespaceA::file5_structA;
     File5NamespaceB::file5_structB_ptr = &File5NamespaceA::file5_structB;
+    File5NamespaceB::file5_structB_array_ptr = File5NamespaceA::file5_structb_array;
 
     File5NamespaceA::file5_structA.i32 = 31415926;
     File5NamespaceA::file5_structA.i32_ptr = &File5NamespaceA::file5i32;
-    File5NamespaceA::file5_structB.u32 = 0x9746134644;
-    File5NamespaceA::file5_structB.structA_ptr = &File5NamespaceA::file5_structA
+    File5NamespaceA::file5_structA.u16_array[0] = 0x121;
+    File5NamespaceA::file5_structA.u16_array[1] = 0x122;
+    File5NamespaceA::file5_structA.u16_array[2] = 0x123;
+    File5NamespaceA::file5_structA.u16_array[3] = 0x124;
+    File5NamespaceA::file5_structA.u16_array[4] = 0x125;
+
+    File5NamespaceA::file5_structB.u32 = 0x97461346;
+    File5NamespaceA::file5_structB.structA_ptr = &File5NamespaceA::file5_structA;
+
+    File5NamespaceA::file5_structb_array[0].u32 = 0x1195735;
+    File5NamespaceA::file5_structb_array[0].structA_ptr = &File5NamespaceA::file5_structA;
+
+    File5NamespaceA::file5_structb_array[1].u32 = 0x1284629;
+    File5NamespaceA::file5_structb_array[1].structA_ptr = &File5NamespaceA::file5_structA;
 }

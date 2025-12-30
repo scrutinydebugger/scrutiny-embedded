@@ -3,3 +3,4 @@
 out
 build
 *.o
+unittest_outputs
