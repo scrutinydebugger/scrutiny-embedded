@@ -3,6 +3,7 @@
 
 namespace File5NamespaceA
 {
+#pragma pack(push, 1)
     struct File5StructA
     {
         int32_t i32;
@@ -15,6 +16,7 @@ namespace File5NamespaceA
         uint32_t u32;
         File5StructA *structA_ptr;
     };
+#pragma pack(pop)
 
     int64_t file5i64;
     int32_t file5i32;
