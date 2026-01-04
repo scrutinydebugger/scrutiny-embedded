@@ -16,6 +16,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/file2.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/file3.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/file4.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/file5.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.cpp
@@ -45,6 +46,10 @@ target_link_libraries(${PROJECT_NAME}
     scrutiny-embedded   
 )
 
+if (NOT SCRUTINY_TESTAPP_DWARF_VERSION)
+    set(SCRUTINY_TESTAPP_DWARF_VERSION 4)
+endif()
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")    # MSVC doesn't support dwarf output. We still allows build of testapp.
     target_compile_options(${PROJECT_NAME} PRIVATE 
         /W4 /Od /WX
@@ -68,7 +73,7 @@ else()
 
     target_compile_options(${PROJECT_NAME} PRIVATE
         ${COMPILER_NO_PIE_OPTION}  
-        -gdwarf-4
+        -gdwarf-${SCRUTINY_TESTAPP_DWARF_VERSION}
         -O0
         -Wall -Wextra -Wpedantic -Werror
     )
@@ -80,7 +85,7 @@ else()
 
     target_link_options(${PROJECT_NAME} PUBLIC
         ${LINKER_NO_PIE_OPTION}
-        -gdwarf-4
+        -gdwarf-${SCRUTINY_TESTAPP_DWARF_VERSION}
     )
 
     scrutiny_postbuild(${PROJECT_NAME}

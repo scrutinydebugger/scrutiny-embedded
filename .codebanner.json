@@ -360,6 +360,12 @@
         "projects/testapp/src/file4.cpp": {
             "docstring": "Placeholder file for variable extraction test"
         },
+        "projects/testapp/include/file5.hpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
+        "projects/testapp/src/file5.cpp": {
+            "docstring": "Placeholder file for variable extraction test"
+        },
         "test/test_cwrapper.cpp": {
             "docstring": "A testsuite for the CWrapper"
         }
