@@ -32,6 +32,7 @@ function (scrutiny_postbuild TARGET)
         METADATA_VERSION        # OPTIONAL: The version of the project, embedded in the .sfd file
         
         CPPFILT                 # OPTIONAL: The binary to use for demangling. Default to "c++filt" if not provided
+        DEREFERENCE_POINTERS    # OPTIONAL: When generating the VarMap, create elements for pointed variables. 
     )
     set(multiValueArgs 
         ALIAS_FILES             # OPTIONAL: List of file containing an alias definition. Will eb embedded in the .sfd
@@ -148,8 +149,14 @@ function (scrutiny_postbuild TARGET)
     else()
         # Do not define on purpose to avoid passing "" as argument. command is VERBATIM
     endif()
-    
-    
+
+    set(DEREFERENCE_OPTION "")
+    if (arg_DEREFERENCE_POINTERS)
+        if (${arg_DEREFERENCE_POINTERS})
+            set(DEREFERENCE_OPTION "--dereference-pointers")
+        endif()
+    endif()
+
     add_custom_command(OUTPUT ${SFD_ABSPATH}
         DEPENDS ${TARGET} ${ALIAS_LIST_ABS}
         VERBATIM
@@ -163,6 +170,7 @@ function (scrutiny_postbuild TARGET)
             --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
             --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
             --cppfilt ${arg_CPPFILT}
+            ${DEREFERENCE_OPTION}
         COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
