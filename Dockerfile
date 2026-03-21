@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 RUN python3 -m pip install scrutinydebugger
 
 FROM base as static-analysis
-ARG CPPCHECK_VERSION="2.10.3"
+ARG CPPCHECK_VERSION="2.20.0"
 ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
 ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
