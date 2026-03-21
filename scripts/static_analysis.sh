@@ -10,11 +10,11 @@ CPPCHECK_ARGS="-I $LIB_ROOT/inc $LIB_ROOT \
     --suppress=memsetClassFloat
     --suppress=missingIncludeSystem
     --suppress=unusedFunction
-    --suppress=missingIncludeSystem
     --suppress=preprocessorErrorDirective
     --suppress=unmatchedSuppression
     --inline-suppr
     --inconclusive
+    --check-level=exhaustive
     -DSCRUTINY_STATIC_ANALYSIS"
 
 PLATFORMS="unix32 unix64 win32A win32W win64 avr8 elbrus-e1cp pic8 pic8-enhanced pic16 mips32 native"
