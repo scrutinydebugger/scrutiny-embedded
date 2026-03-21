@@ -29,7 +29,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_codecs.cpp
-    
+
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_tx_parsing.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_comm_handler.cpp
@@ -46,10 +46,10 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_trigger_conditions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_datalogging_types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_datalogger.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_raw_encoder.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/raw_format_parser.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_datalogger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_raw_encoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/raw_format_parser.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp
     )
 endif()
 

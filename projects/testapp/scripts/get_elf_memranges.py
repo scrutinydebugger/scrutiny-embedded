@@ -5,7 +5,7 @@ sections = ['.text', '.data', '.bss', '.rodata']
 
 if len(sys.argv) < 2:
     raise Exception('Missing filename')
-    
+
 with open(sys.argv[1], 'rb') as f:
     ef = ELFFile(f)
 

@@ -17,10 +17,10 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.c
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.c
     ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/udp_bridge.c
-)  
+)
 
 if (WIN32)
-    target_link_libraries(${PROJECT_NAME} 
+    target_link_libraries(${PROJECT_NAME}
         wsock32
     )
 
@@ -47,7 +47,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")    # MSVC doesn't support dwarf output. We still allows build of testapp.
-    target_compile_options(${PROJECT_NAME} PRIVATE 
+    target_compile_options(${PROJECT_NAME} PRIVATE
         /W4 /Od /WX
     )
 
@@ -68,10 +68,10 @@ else()
     endif()
 
     target_compile_options(${PROJECT_NAME} PRIVATE
-        ${COMPILER_NO_PIE_OPTION}  
+        ${COMPILER_NO_PIE_OPTION}
         -gdwarf-4
         -O0
-        -Wall -Wextra -Wpedantic -Werror 
+        -Wall -Wextra -Wpedantic -Werror
     )
 
     target_link_options(${PROJECT_NAME} PUBLIC
@@ -82,8 +82,8 @@ else()
     scrutiny_postbuild(${PROJECT_NAME}
         INSTALL_SFD
 
-        METADATA_PROJECT_NAME "Scrutiny CTestAPP" 
-        METADATA_AUTHOR "" 
+        METADATA_PROJECT_NAME "Scrutiny CTestAPP"
+        METADATA_AUTHOR ""
         METADATA_VERSION "1.0.0"
 
         ALIAS_FILES

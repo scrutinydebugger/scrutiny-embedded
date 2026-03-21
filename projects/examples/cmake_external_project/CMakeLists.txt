@@ -17,7 +17,7 @@ ExternalProject_Add(scrutiny-embedded
         -DSCRUTINY_ENABLE_DATALOGGING=1
         -DSCRUTINY_SUPPORT_64BITS=1
         -DSCRUTINY_BUILD_TEST=0
-    INSTALL_COMMAND 
+    INSTALL_COMMAND
         COMMAND ${CMAKE_COMMAND} --install ${SCRUTINY_PREFIX}/build
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCRUTINY_PREFIX}/build/install/ ${SCRUTINY_DEST_FOLDER}
     BUILD_BYPRODUCTS
@@ -32,5 +32,3 @@ add_dependencies(${PROJECT_NAME} scrutiny-embedded)
 # Makes scrutiny available to the compiler (headers and static lib)
 target_link_libraries(${PROJECT_NAME} ${SCRUTINY_DEST_FOLDER}/libscrutiny-embedded.a)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SCRUTINY_DEST_FOLDER}/inc)
-
-

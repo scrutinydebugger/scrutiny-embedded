@@ -2,7 +2,7 @@
 Scrutiny Debugger embedded C++ instrumentation library (and C Wrapper).
 This library must be linked against your C/C++ project and called periodically.
 
-The library has 2 data streams going in and out. It is the responsability of the integrator to bring the data to and from a hardware communication device such as a Serial Port, a CAN bus, IP stack or any other. 
+The library has 2 data streams going in and out. It is the responsability of the integrator to bring the data to and from a hardware communication device such as a Serial Port, a CAN bus, IP stack or any other.
 
 For the integration guide, see : https://scrutinydebugger.com/guide-instrumentation.html
 
@@ -25,11 +25,11 @@ uint8_t scrutiny_tx_buffer[48];   // Transmit buffer - Keep global
 void process_scrutiny_loop()
 {
     static uint32_t last_call_us = 0;
-  
+
     // Compute time difference
     uint32_t current_us = micros(); // Reads microseconds
     uint32_t timestep_us = current_us - last_call_us;
-    
+
     // Receive data
     int16_t c = Serial.read();
     if (c != -1)
@@ -37,9 +37,9 @@ void process_scrutiny_loop()
         uint8_t uc = static_cast<uint8_t>(c);
         scrutiny_handler.receive_data(&uc, 1);  // Data from Serial port pushed into scrutiny-embedded lib
     }
-    
+
     scrutiny_handler.process(timestep_us * 10); // Timesteps are counted in multiple of 100ns
-    
+
     // Sends data
     uint8_t buffer[16];
     if (scrutiny_handler.data_to_send() > 0)
@@ -49,7 +49,7 @@ void process_scrutiny_loop()
     }
 
 
-    last_call_us = current_us;  
+    last_call_us = current_us;
 }
 
 
@@ -62,7 +62,7 @@ void scrutiny_configure()
 
   config.max_bitrate = 100000;      // Optional bitrate limit
   config.display_name = "MyDevice"; // Optional name for broadcasting
-  /* 
+  /*
     Multiple additional configurations to control:
     - Memory regions access (forbidden and read-only)
     - Configure datalogging
@@ -89,4 +89,3 @@ void main()
 }
 
 ```
-

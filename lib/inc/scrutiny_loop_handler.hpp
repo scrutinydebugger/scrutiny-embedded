@@ -49,9 +49,9 @@ namespace scrutiny
             SCRUTINY_ENUM(eMain2LoopMessageID, uint_least8_t)
             {
 #if SCRUTINY_ENABLE_DATALOGGING
-                RELEASE_DATALOGGER_OWNERSHIP, 
-                TAKE_DATALOGGER_OWNERSHIP, 
-                DATALOGGER_ARM_TRIGGER, 
+                RELEASE_DATALOGGER_OWNERSHIP,
+                TAKE_DATALOGGER_OWNERSHIP,
+                DATALOGGER_ARM_TRIGGER,
                 DATALOGGER_DISARM_TRIGGER
 #endif
             };
@@ -65,9 +65,9 @@ namespace scrutiny
             SCRUTINY_ENUM(eLoop2MainMessageID, uint_least8_t)
             {
 #if SCRUTINY_ENABLE_DATALOGGING
-                DATALOGGER_OWNERSHIP_TAKEN, 
+                DATALOGGER_OWNERSHIP_TAKEN,
                 DATALOGGER_OWNERSHIP_RELEASED,
-                DATALOGGER_DATA_ACQUIRED, 
+                DATALOGGER_DATA_ACQUIRED,
                 DATALOGGER_STATUS_UPDATE
 #endif
             };
