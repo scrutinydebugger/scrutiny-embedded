@@ -10,7 +10,6 @@ CPPCHECK_ARGS="-I $LIB_ROOT/inc $LIB_ROOT \
     --suppress=memsetClassFloat
     --suppress=missingIncludeSystem
     --suppress=unusedFunction
-    --suppress=missingIncludeSystem
     --suppress=preprocessorErrorDirective
     --suppress=unmatchedSuppression
     --inline-suppr
