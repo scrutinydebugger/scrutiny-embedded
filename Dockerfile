@@ -62,3 +62,4 @@ RUN apt-get update && apt-get install -y \
     gcc-arm-none-eabi \
     && rm -rf /var/lib/apt/lists/*
 
+    FROM base AS CI
