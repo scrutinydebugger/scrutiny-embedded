@@ -25,7 +25,7 @@ RUN apt-get update \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
     && cd "/tmp/${CPPCHECK_FOLDER}" \
-    && make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=no CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j2 \
+    && make FILESDIR=/usr/share/cppcheck CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" -j2 \
     && FILESDIR=/usr/share/cppcheck make install  \
     && cd /tmp/ \
     && rm -rf "/tmp/${CPPCHECK_FOLDER}" \
