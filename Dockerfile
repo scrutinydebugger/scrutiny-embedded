@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /tmp/
 
 RUN apt-get update && apt-get install -y \
-    ninja-build \ 
+    ninja-build \
     cmake \
     git \
     wget \
@@ -20,7 +20,7 @@ ARG CPPCHECK_VERSION="2.20.0"
 ARG CPPCHECK_URL="https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
 ARG CPPCHECK_FOLDER="cppcheck-${CPPCHECK_VERSION}"
 RUN apt-get update \
-    && apt-get install -y \ 
+    && apt-get install -y \
     libpcre3-dev \
     && wget $CPPCHECK_URL -O /tmp/cppcheck.tar.gz \
     && tar -xvzf /tmp/cppcheck.tar.gz -C /tmp/ \
@@ -43,19 +43,19 @@ RUN apt-get update && apt-get install -y \
 FROM base AS native-clang
 RUN apt-get update && apt-get install -y \
     clang \
-    && rm -rf /var/lib/apt/lists/*    
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base AS powerpc64-linux-gcc
 RUN apt-get update && apt-get install -y \
     gcc-powerpc64-linux-gnu \
     g++-powerpc64-linux-gnu \
-    && rm -rf /var/lib/apt/lists/*    
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base AS aarch64-linux-gcc
 RUN apt-get update && apt-get install -y \
     gcc-aarch64-linux-gnu \
     g++-aarch64-linux-gnu \
-    && rm -rf /var/lib/apt/lists/*    
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base AS arm-none-gcc
 RUN apt-get update && apt-get install -y \

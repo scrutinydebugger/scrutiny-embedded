@@ -11,7 +11,7 @@ add_library(${PROJECT_NAME}_OBJ OBJECT  # Object file so we can extract the .o t
     scrutiny_cwrapper.cpp
 )
 
-target_include_directories(${PROJECT_NAME}_OBJ PUBLIC 
+target_include_directories(${PROJECT_NAME}_OBJ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:cwrapper>
     )
@@ -25,7 +25,7 @@ target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_OBJ)
 if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     # We want to have the C++ size constants at compile time.
     # We'll extract them from scrutiny-cwrapper.obj and codegen a header file.
-    # Only way to have the size of a C++ class in C at compile time. 
+    # Only way to have the size of a C++ class in C at compile time.
     # Source: Trust me, I tried. Raise an issue if you have a better way
 
     include(ExternalProject)
@@ -37,7 +37,7 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     message(STATUS "PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR}")
 
     ExternalProject_Add(${SYMDUMP_PROJECT_NAME}
-        SOURCE_DIR ${SYMDUMP_SOURCE_DIR} 
+        SOURCE_DIR ${SYMDUMP_SOURCE_DIR}
         PREFIX ${SYMDUMP_PROJECT_NAME}
         CMAKE_ARGS
             -D CMAKE_TOOLCHAIN_FILE=${PROJECT_BINARY_DIR}/host_toochain.cmake
@@ -48,15 +48,15 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
     set(ELF_SYMDUP ${SYMDUMP_INSTALL_DIR}/bin/${SYMDUMP_PROJECT_NAME})
     set(GENERATED_HEADER_DIR "${PROJECT_BINARY_DIR}/generated")
     set(CPP_CONSTANT_FILE "${GENERATED_HEADER_DIR}/scrutiny_cwrapper_cpp_constants.h")
-    set(CPP_CONSTANTS 
-        SCRUTINY_C_MAIN_HANDLER_SIZE 
-        SCRUTINY_C_CONFIG_SIZE 
-        SCRUTINY_C_LOOP_HANDLER_FF_SIZE 
-        SCRUTINY_C_LOOP_HANDLER_VF_SIZE 
+    set(CPP_CONSTANTS
+        SCRUTINY_C_MAIN_HANDLER_SIZE
+        SCRUTINY_C_CONFIG_SIZE
+        SCRUTINY_C_LOOP_HANDLER_FF_SIZE
+        SCRUTINY_C_LOOP_HANDLER_VF_SIZE
     )
 
     # Codegen the cosntants header
-    add_custom_command( 
+    add_custom_command(
         OUTPUT ${CPP_CONSTANT_FILE}
         DEPENDS ${SYMDUMP_PROJECT_NAME} ${PROJECT_NAME}_OBJ
         COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_HEADER_DIR}
@@ -71,22 +71,22 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
         DEPENDS ${CPP_CONSTANT_FILE}
     )
     add_dependencies(${PROJECT_NAME} SCRUTINY_CPP_CONSTANTS_TARGET)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC 
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
         SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS=1
     )
 
-    install(FILES ${CPP_CONSTANT_FILE} 
+    install(FILES ${CPP_CONSTANT_FILE}
         DESTINATION ${INSTALL_FOLDER}/cwrapper  # Install the codegened header
     )
 endif()
 
 
 # ----- INSTALL -----
-install(FILES "scrutiny_cwrapper.h" 
+install(FILES "scrutiny_cwrapper.h"
     DESTINATION ${INSTALL_FOLDER}/cwrapper
 )
 
 install(
-    TARGETS ${PROJECT_NAME} 
+    TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION ${INSTALL_FOLDER}/cwrapper
 )

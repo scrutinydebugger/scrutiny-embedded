@@ -7,7 +7,7 @@ if [[ $(uname -s) == CYGWIN* ]];then
 APP_ROOT=$(cygpath -w "$APP_ROOT")
 fi
 
-set -x 
+set -x
 
 BUILD_CONTEXT="${BUILD_CONTEXT:-dev}"
 BUILD_DIR="$APP_ROOT/build-${BUILD_CONTEXT}"

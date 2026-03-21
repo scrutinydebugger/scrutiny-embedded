@@ -9,15 +9,15 @@
 function (scrutiny_postbuild TARGET)
 
     # Scrutiny Embedded Post-Build stage
-    # Produces Scrutiny Firmware Description (.sfd) file & and copy of the 
+    # Produces Scrutiny Firmware Description (.sfd) file & and copy of the
     # executable injected with the firmware ID (hash of the file)
 
-    set(options OPTIONAL 
+    set(options OPTIONAL
         INSTALL_SFD     # The created SFD will be installed locally after being created
     )
 
-    set(oneValueArgs 
-        WORK_FOLDER     # OPTIONAL: The temporary folder used to build the SFD file. 
+    set(oneValueArgs
+        WORK_FOLDER     # OPTIONAL: The temporary folder used to build the SFD file.
         SCRUTINY_CMD    # OPTIONAL: Path to the scrutiny binary
         SFD_FILENAME    # OPTIONAL: Name to give to the .sfd file
 
@@ -30,11 +30,11 @@ function (scrutiny_postbuild TARGET)
         METADATA_PROJECT_NAME   # OPTIONAL: The name of the project, embedded in the .sfd file
         METADATA_AUTHOR         # OPTIONAL: The name of the project author, embedded in the .sfd file
         METADATA_VERSION        # OPTIONAL: The version of the project, embedded in the .sfd file
-        
+
         CPPFILT                 # OPTIONAL: The binary to use for demangling. Default to "c++filt" if not provided
-        DEREFERENCE_POINTERS    # OPTIONAL: When generating the VarMap, create elements for pointed variables. 
+        DEREFERENCE_POINTERS    # OPTIONAL: When generating the VarMap, create elements for pointed variables.
     )
-    set(multiValueArgs 
+    set(multiValueArgs
         ALIAS_FILES             # OPTIONAL: List of file containing an alias definition. Will eb embedded in the .sfd
         CU_IGNORE_PATTERNS      # OPTIONAL: A list of compile unit to ignore. It can be the file basename or a file path with a glob pattern
         PATH_IGNORE_PATTERNS    # OPTIONAL: A list of variable path to ignore. Specified as a glob pattern
@@ -54,7 +54,7 @@ function (scrutiny_postbuild TARGET)
     else()
         find_program(arg_CPPFILT "c++filt" REQUIRED HINTS ${arg_CPPFILT})
     endif()
-    
+
     # Validate work folder
     if (NOT arg_WORKDIR)
         set(arg_WORKDIR ${CMAKE_CURRENT_BINARY_DIR}/_scrutiny_${TARGET}_sfd_workfolder) # Default value
@@ -74,7 +74,7 @@ function (scrutiny_postbuild TARGET)
     if (NOT TARGET_TYPE STREQUAL "EXECUTABLE")
         message(SEND_ERROR "${TARGET} msut be an executable. Got : ${TARGET_TYPE}")
     endif ()
-    
+
     # Give the target we created to the caller
     get_target_property(TARGET_SUFFIX ${TARGET} SUFFIX)
 
@@ -163,36 +163,36 @@ function (scrutiny_postbuild TARGET)
         COMMAND ${CMAKE_COMMAND} -E echo "Generating Scrutiny Firmware Description for ${TARGET}"
         COMMAND ${CMAKE_COMMAND} -E rm -rf ${arg_WORKDIR}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${arg_WORKDIR}
-        COMMAND ${arg_SCRUTINY_CMD} 
+        COMMAND ${arg_SCRUTINY_CMD}
             elf2varmap $<TARGET_FILE:${TARGET}>
             --output ${arg_WORKDIR}
-            --loglevel error 
+            --loglevel error
             --cu_ignore_patterns ${arg_CU_IGNORE_PATTERNS}
             --path_ignore_patterns ${arg_PATH_IGNORE_PATTERNS}
             --cppfilt ${arg_CPPFILT}
             ${DEREFERENCE_OPTION}
-        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR} 
+        COMMAND ${arg_SCRUTINY_CMD} get-firmware-id $<TARGET_FILE:${TARGET}> --output ${arg_WORKDIR}
         COMMAND ${arg_SCRUTINY_CMD} make-metadata --output ${arg_WORKDIR} ${METADATA_ARGS}
         COMMAND ${arg_SCRUTINY_CMD} $<IF:$<NOT:$<EQUAL:${ALIAS_COUNT},0>>,add-alias,noop> ${arg_WORKDIR} --file ${ALIAS_LIST_ABS}
         COMMAND ${arg_SCRUTINY_CMD} make-sfd ${arg_WORKDIR} ${SFD_ABSPATH} ${INSTALL_SFD_CMDLINE_ARG}
     )
-    
+
 
     set(TAGGED_EXECUTABLE_TARGET ${TARGET}_tagged_target)
     set(SFD_TARGET ${TARGET}_sfd_target)
 
     if (arg_SFD_TARGET_VAR)
         set(${arg_SFD_TARGET_VAR} ${SFD_TARGET} PARENT_SCOPE)
-    endif()   
+    endif()
 
     if (arg_TAGGED_EXECUTABLE_TARGET_VAR)
         set(${arg_TAGGED_EXECUTABLE_TARGET_VAR} ${TAGGED_EXECUTABLE_TARGET} PARENT_SCOPE)
     endif()
 
-    # --- SFD 
+    # --- SFD
     add_custom_target(${SFD_TARGET} ALL DEPENDS ${SFD_ABSPATH})
-    set_target_properties(${SFD_TARGET} PROPERTIES TARGET_FILE ${SFD_ABSPATH}) 
-    
+    set_target_properties(${SFD_TARGET} PROPERTIES TARGET_FILE ${SFD_ABSPATH})
+
     # --- Make the tagged binary ---
     add_custom_command(OUTPUT ${TAGGED_EXECUTABLE_ABSPATH}
         DEPENDS ${TARGET}

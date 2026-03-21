@@ -21,10 +21,10 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/include_test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/argument_parser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/comm_channels/udp_bridge.cpp
-)  
+)
 
 if (WIN32)
-    target_link_libraries(${PROJECT_NAME} 
+    target_link_libraries(${PROJECT_NAME}
         wsock32
     )
 
@@ -43,7 +43,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME}
-    scrutiny-embedded   
+    scrutiny-embedded
 )
 
 if (NOT SCRUTINY_TESTAPP_DWARF_VERSION)
@@ -51,7 +51,7 @@ if (NOT SCRUTINY_TESTAPP_DWARF_VERSION)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")    # MSVC doesn't support dwarf output. We still allows build of testapp.
-    target_compile_options(${PROJECT_NAME} PRIVATE 
+    target_compile_options(${PROJECT_NAME} PRIVATE
         /W4 /Od /WX
     )
 
@@ -72,14 +72,14 @@ else()
     endif()
 
     target_compile_options(${PROJECT_NAME} PRIVATE
-        ${COMPILER_NO_PIE_OPTION}  
+        ${COMPILER_NO_PIE_OPTION}
         -gdwarf-${SCRUTINY_TESTAPP_DWARF_VERSION}
         -O0
         -Wall -Wextra -Wpedantic -Werror
     )
 
-    target_compile_options(scrutiny-embedded PRIVATE 
-        -Werror 
+    target_compile_options(scrutiny-embedded PRIVATE
+        -Werror
         ${COMPILER_NO_PIE_OPTION}
     )
 
@@ -91,8 +91,8 @@ else()
     scrutiny_postbuild(${PROJECT_NAME}
         INSTALL_SFD
 
-        METADATA_PROJECT_NAME "Scrutiny TestAPP" 
-        METADATA_AUTHOR "" 
+        METADATA_PROJECT_NAME "Scrutiny TestAPP"
+        METADATA_AUTHOR ""
         METADATA_VERSION "1.0.0"
 
         ALIAS_FILES
@@ -100,5 +100,3 @@ else()
     )
 
 endif()
-
-

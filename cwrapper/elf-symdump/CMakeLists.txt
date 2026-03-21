@@ -7,7 +7,7 @@ option(SCRUTINY_ELF_SYMDUMP_STRICT_BUILD "Build with strict options" ON)
 
 project(scrutiny-elf-symdump)
 
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
     src/main.c
     src/elf.c
     src/cmd.c

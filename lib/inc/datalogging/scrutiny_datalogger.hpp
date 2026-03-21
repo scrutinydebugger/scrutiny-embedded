@@ -38,11 +38,11 @@ namespace scrutiny
                 // clang-format off
                 SCRUTINY_ENUM(eState, uint_least8_t)
                 {
-                    IDLE, 
-                    CONFIGURED, 
-                    ARMED, 
-                    TRIGGERED, 
-                    ACQUISITION_COMPLETED, 
+                    IDLE,
+                    CONFIGURED,
+                    ARMED,
+                    TRIGGERED,
+                    ACQUISITION_COMPLETED,
                     ERROR
                 };
                 // clang-format on

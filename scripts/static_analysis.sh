@@ -19,7 +19,7 @@ CPPCHECK_ARGS="-I $LIB_ROOT/inc $LIB_ROOT \
 
 PLATFORMS="unix32 unix64 win32A win32W win64 avr8 elbrus-e1cp pic8 pic8-enhanced pic16 mips32 native"
 for PLATFORM in $PLATFORMS
-do 
+do
     echo "===== Platform: $PLATFORM ====="
     cppcheck $CPPCHECK_ARGS --platform=$PLATFORM -DSCRUTINY_ENABLE_DATALOGGING=0 -DSCRUTINY_SUPPORT_64BITS=0
     cppcheck $CPPCHECK_ARGS --platform=$PLATFORM -DSCRUTINY_ENABLE_DATALOGGING=0 -DSCRUTINY_SUPPORT_64BITS=1

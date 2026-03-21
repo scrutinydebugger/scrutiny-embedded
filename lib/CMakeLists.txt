@@ -15,7 +15,7 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scrutiny_tools.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_comm_handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_codec_v1_0.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_definitions.cpp    
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/protocol/scrutiny_protocol_definitions.cpp
 )
 
 if (SCRUTINY_ENABLE_DATALOGGING)
@@ -47,7 +47,7 @@ set(SCRUTINY_PROTOCOL_VERSION_MINOR 0 CACHE STRING "Protocol version minor")
 set(SCRUTINY_DATALOGGING_MAX_SIGNAL 32 CACHE STRING "Maximum number of datalogging signal if datalogging is enabled")
 set(SCRUTINY_DATALOGGING_ENCODING  SCRUTINY_DATALOGGING_ENCODING_RAW CACHE STRING "Datalogging encoding scheme")
 set(SCRUTINY_DATALOGGING_BUFFER_32BITS  OFF CACHE STRING "Allow datalogging buffers bigger than 65536 bytes")
- 
+
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/inc/scrutiny_build_config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
@@ -62,7 +62,7 @@ endif()
 
 # ----- INSTALL -----
 install(
-    DIRECTORY inc 
+    DIRECTORY inc
     DESTINATION ${INSTALL_FOLDER}
     PATTERN "*.hpp.in" EXCLUDE
 )
@@ -84,7 +84,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 install(
-    TARGETS ${PROJECT_NAME} 
-    ARCHIVE DESTINATION ${INSTALL_FOLDER} 
+    TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION ${INSTALL_FOLDER}
 )
-
