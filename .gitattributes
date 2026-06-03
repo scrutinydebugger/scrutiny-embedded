@@ -1,6 +1,10 @@
 *.txt text eol=lf
 *.cpp text eol=lf
+*.c text eol=lf
 *.hpp text eol=lf
+*.h text eol=lf
 *.json text eol=lf
 *.cmake text eol=lf
 *.md text eol=lf
+*.sh text eol=lf
+*.bat text eol=lf
