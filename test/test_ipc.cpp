@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if (defined(__STDCPP_THREADS__) && __STDCPP_THREADS__)
+#if (defined(__STDCPP_THREADS__) && __STDCPP_THREADS__) && SCRUTINY_HAS_CPP11
 #include <chrono>
 #include <thread>
 #elif (defined(_POSIX_THREADS) || defined(_REENTRANT))
