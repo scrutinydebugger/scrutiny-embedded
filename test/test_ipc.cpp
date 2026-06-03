@@ -135,7 +135,7 @@ TEST(TestIPC, CheckWithThread)
     uint32_t my_value = 0;
     uint32_t expected_thread_value = 0;
 
-if defined(TEST_IPC_CPPTHREAD)
+#if defined(TEST_IPC_CPPTHREAD)
     std::thread thread(thread_func);
 #elif defined(TEST_IPC_POSIX_THREAD)
     pthread_t thread;
@@ -188,7 +188,7 @@ if defined(TEST_IPC_CPPTHREAD)
 #endif
     }
 
-if defined(TEST_IPC_CPPTHREAD)
+#if defined(TEST_IPC_CPPTHREAD)
     thread.join();
 #elif defined(TEST_IPC_POSIX_THREAD)
     ASSERT_EQ(pthread_join(thread, NULL), 0);
