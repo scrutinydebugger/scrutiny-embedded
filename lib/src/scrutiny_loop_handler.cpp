@@ -90,7 +90,7 @@ namespace scrutiny
                 {
                     msg_out.message_id = Loop2MainMessageID::DATALOGGER_STATUS_UPDATE;
                     msg_out.data.datalogger_status_update.state = m_datalogger->get_state();
-                    if (msg_out.data.datalogger_status_update.state == datalogging::DataLogger::State::TRIGGERED)
+                    if (msg_out.data.datalogger_status_update.state == datalogging::DataLogger::State::Triggered)
                     {
                         // write counter gets reset on trigger
                         msg_out.data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion =

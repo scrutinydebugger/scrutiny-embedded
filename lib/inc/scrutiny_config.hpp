@@ -59,8 +59,8 @@ namespace scrutiny
         void set_published_values(
             RuntimePublishedValue const *array,
             uint16_t const nbr,
-            RpvReadCallback const rd_cb = SCRUTINY_NULL,
-            RpvWriteCallback const wr_cb = SCRUTINY_NULL);
+            RpvReadCallback const rd_cb = reinterpret_cast<RpvReadCallback>(SCRUTINY_NULL),
+            RpvWriteCallback const wr_cb = reinterpret_cast<RpvWriteCallback>(SCRUTINY_NULL));
 
         /// @brief Defines the different loops (tasks) in the application.
         /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
@@ -98,7 +98,7 @@ namespace scrutiny
         /// @brief Returns true if a callback has been set to support the UserCallback service call
         inline bool is_user_command_callback_set(void) const
         {
-            return m_user_command_callback != SCRUTINY_NULL;
+            return reinterpret_cast<void*>(m_user_command_callback) != SCRUTINY_NULL;
         }
 
         /// @brief Returns true if the communication buffers were sets
@@ -122,13 +122,13 @@ namespace scrutiny
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Read callback has been given
         inline bool is_read_published_values_configured(void) const
         {
-            return (m_rpv_read_callback != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
+            return (reinterpret_cast<void*>(m_rpv_read_callback) != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
         };
 
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Write callback has been given
         inline bool is_write_published_values_configured(void) const
         {
-            return (m_rpv_write_callback != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
+            return (reinterpret_cast<void*>(m_rpv_write_callback) != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
         };
 
         /// @brief Returns true if a list of loops (tasks) were defined

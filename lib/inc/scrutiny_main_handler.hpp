@@ -84,13 +84,13 @@ namespace scrutiny
         /// @brief  Returns true if the datalogger has data available. Thread safe
         inline bool datalogging_data_available(void) const
         {
-            return m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ACQUISITION_COMPLETED; // Thread safe.
+            return m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::AcquisitionComplete; // Thread safe.
         }
 
         /// @brief Returns true if the datalogger is in an error state. Thread safe
         inline bool datalogging_error(void) const
         {
-            return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::ERROR) ||
+            return (m_datalogging.threadsafe_data.datalogger_state == datalogging::DataLogger::State::Error) ||
                    m_datalogging.error != DataloggingError::NoError;
         }
 

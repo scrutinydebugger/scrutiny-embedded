@@ -43,7 +43,7 @@ namespace scrutiny
 
         void DataLogger::reset(void)
         {
-            m_state = State::IDLE;
+            m_state = State::Idle;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
             m_trigger.active_condition = SCRUTINY_NULL;
@@ -174,7 +174,7 @@ namespace scrutiny
 
                 for (uint_least8_t i = 0; i < m_config.items_count; i++)
                 {
-                    if (m_config.items_to_log[i].type == LoggableType::RPV)
+                    if (m_config.items_to_log[i].type == LoggableType::Rpv)
                     {
                         if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
@@ -186,11 +186,11 @@ namespace scrutiny
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.items_to_log[i].type == LoggableType::MEMORY)
+                    else if (m_config.items_to_log[i].type == LoggableType::Memory)
                     {
                         // Nothing to validate
                     }
-                    else if (m_config.items_to_log[i].type == LoggableType::TIME)
+                    else if (m_config.items_to_log[i].type == LoggableType::Time)
                     {
                         // Nothing to validate
                     }
@@ -207,52 +207,52 @@ namespace scrutiny
                 m_encoder.set_timebase(m_timebase);
                 m_trigger.active_condition->reset(m_trigger.conditions.data());
                 m_encoder.reset();
-                m_state = State::CONFIGURED;
+                m_state = State::Configured;
             }
             else
             {
-                m_state = State::ERROR;
+                m_state = State::Error;
             }
         }
 
         void DataLogger::arm_trigger(void)
         {
-            if (m_state == State::CONFIGURED || m_state == State::ACQUISITION_COMPLETED || m_state == State::TRIGGERED)
+            if (m_state == State::Configured || m_state == State::AcquisitionComplete || m_state == State::Triggered)
             {
-                m_state = State::ARMED;
+                m_state = State::Armed;
             }
         }
 
         void DataLogger::disarm_trigger(void)
         {
-            if (m_state == State::ARMED || m_state == State::ACQUISITION_COMPLETED || m_state == State::TRIGGERED)
+            if (m_state == State::Armed || m_state == State::AcquisitionComplete || m_state == State::Triggered)
             {
-                m_state = State::CONFIGURED;
+                m_state = State::Configured;
             }
         }
 
         void DataLogger::process(void)
         {
-            // IDLE --> CONFIGURED --> ARMED --> TRIGGERED --> ACQUISITION_COMPLETED.
+            // IDLE --> CONFIGURED --> ARMED --> TRIGGERED --> AcquisitionComplete.
             // We acquire in both CONFIGURED and ARMED state so that we can have data before the trigger as well.
 
             switch (m_state)
             {
-            case State::IDLE:
-            case State::ERROR:
-            case State::ACQUISITION_COMPLETED:
+            case State::Idle:
+            case State::Error:
+            case State::AcquisitionComplete:
                 break;
-            case State::CONFIGURED:
-            case State::ARMED:
-            case State::TRIGGERED:
+            case State::Configured:
+            case State::Armed:
+            case State::Triggered:
                 if (m_encoder.error())
                 {
-                    m_state = State::ERROR;
+                    m_state = State::Error;
                 }
                 else
                 {
                     process_acquisition();
-                    if (m_state == State::ARMED)
+                    if (m_state == State::Armed)
                     {
                         if (check_trigger())
                         {
@@ -261,16 +261,16 @@ namespace scrutiny
                                 m_trigger_callback();
                             }
                             stamp_trigger_point();
-                            m_state = State::TRIGGERED;
+                            m_state = State::Triggered;
                         }
                     }
 
-                    if (m_state == State::TRIGGERED)
+                    if (m_state == State::Triggered)
                     {
                         if (acquisition_completed())
                         {
                             m_acquisition_id++;
-                            m_state = State::ACQUISITION_COMPLETED;
+                            m_state = State::AcquisitionComplete;
                             m_log_points_after_trigger = m_encoder.get_entry_write_counter();
                         }
                     }
@@ -301,12 +301,12 @@ namespace scrutiny
 
         bool DataLogger::acquisition_completed(void)
         {
-            if (m_state == State::ACQUISITION_COMPLETED)
+            if (m_state == State::AcquisitionComplete)
             {
                 return true;
             }
 
-            if (m_state == State::TRIGGERED)
+            if (m_state == State::Triggered)
             {
                 if (m_config.timeout_100ns > 0)
                 {
@@ -327,13 +327,13 @@ namespace scrutiny
 
         datalogging::buffer_size_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
         {
-            return (m_state == State::TRIGGERED) ? m_remaining_data_to_write : 0;
+            return (m_state == State::Triggered) ? m_remaining_data_to_write : 0;
         }
 
         datalogging::buffer_size_t DataLogger::data_counter_since_trigger(void) const
         {
             // This counter gets reset when trigger happens.
-            return (m_state == State::TRIGGERED) ? m_encoder.get_data_write_counter() : 0;
+            return (m_state == State::Triggered) ? m_encoder.get_data_write_counter() : 0;
         }
 
         void DataLogger::process_acquisition(void)
@@ -348,7 +348,7 @@ namespace scrutiny
         bool DataLogger::check_trigger(void)
         {
             SCRUTINY_STATIC_ASSERT(MAX_OPERANDS >= 2, "Expect at least 2 operands for relational comparison");
-            if (m_state != State::ARMED)
+            if (m_state != State::Armed)
             {
                 return false;
             }

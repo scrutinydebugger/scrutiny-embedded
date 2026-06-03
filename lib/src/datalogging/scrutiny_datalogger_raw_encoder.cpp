@@ -133,7 +133,7 @@ namespace scrutiny
             datalogging::buffer_size_t cursor = m_next_entry_write_index * m_entry_size;
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
-                if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
                     m_main_handler->read_memory(
                         &m_buffer[cursor],
@@ -141,7 +141,7 @@ namespace scrutiny
                         m_config->items_to_log[i].data.memory.size);
                     cursor += m_config->items_to_log[i].data.memory.size; // We verified that this is not 0 in init
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
                     AnyType outval;
@@ -155,7 +155,7 @@ namespace scrutiny
                     codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
@@ -217,11 +217,11 @@ namespace scrutiny
                     break;
                 }
                 uint_fast8_t elem_size = 0;
-                if (m_config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
                     elem_size = m_config->items_to_log[i].data.memory.size;
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
 
@@ -234,7 +234,7 @@ namespace scrutiny
                         elem_size = tools::get_type_size(rpv.type);
                     }
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::TIME)
+                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     elem_size = sizeof(scrutiny::timestamp_t);
                 }

@@ -152,9 +152,9 @@ namespace scrutiny
             // clang-format off
             SCRUTINY_ENUM(eLoggableType, uint_least8_t)
             {
-                MEMORY = 0,
-                RPV = 1,
-                TIME = 2
+                Memory = 0,
+                Rpv = 1,
+                Time = 2
             };
             // clang-format on
         };

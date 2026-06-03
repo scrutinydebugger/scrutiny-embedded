@@ -9,9 +9,11 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
+#include <stdint.h>
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
+#include "scrutiny_compiler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
 
@@ -38,12 +40,12 @@ namespace scrutiny
                 // clang-format off
                 SCRUTINY_ENUM(eState, uint_least8_t)
                 {
-                    IDLE,
-                    CONFIGURED,
-                    ARMED,
-                    TRIGGERED,
-                    ACQUISITION_COMPLETED,
-                    ERROR
+                    Idle,
+                    Configured,
+                    Armed,
+                    Triggered,
+                    AcquisitionComplete,
+                    Error
                 };
                 // clang-format on
             };
@@ -58,7 +60,7 @@ namespace scrutiny
                 MainHandler const *const main_handler,
                 unsigned char *const buffer,
                 buffer_size_t const buffer_size,
-                trigger_callback_t trigger_callback = SCRUTINY_NULL);
+                trigger_callback_t trigger_callback = reinterpret_cast<trigger_callback_t>(SCRUTINY_NULL));
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase The timebase used for time logging & trigger management
@@ -73,7 +75,7 @@ namespace scrutiny
 
             /// @brief Tells if data has been acquired and ready to be read
             /// @return True if data is acquired
-            inline bool data_acquired(void) const { return m_state == State::ACQUISITION_COMPLETED; }
+            inline bool data_acquired(void) const { return m_state == State::AcquisitionComplete; }
 
             /// @brief  Returns the acquisition ID of the last acquisition
             inline uint16_t get_acquisition_id(void) const { return m_acquisition_id; }
@@ -82,7 +84,7 @@ namespace scrutiny
             inline uint16_t get_config_id(void) const { return m_config_id; }
 
             /// @brief Tells if the datalogger is armed and waiting for a trigger
-            inline bool armed(void) const { return m_state == State::ARMED; }
+            inline bool armed(void) const { return m_state == State::Armed; }
 
             /// @brief Returns the Datalogger state
             inline DataLogger::State::eState get_state(void) const { return m_state; }
@@ -107,7 +109,7 @@ namespace scrutiny
             inline Configuration *config(void) { return &m_config; }
 
             /// @brief Returns true if the datalogger is in error state
-            inline bool in_error(void) const { return m_state == State::ERROR; }
+            inline bool in_error(void) const { return m_state == State::Error; }
 
             /// @brief Returns true if the active configuration is valid. Must be called after a call to "configure"
             inline bool config_valid(void) const { return m_config_valid; }
@@ -129,7 +131,7 @@ namespace scrutiny
             /// @brief Forces the trigger condition to be fulfilled, triggering an acquisition if the datalogger is armed.
             void force_trigger(void)
             {
-                if (m_state == State::ARMED)
+                if (m_state == State::Armed)
                 {
                     m_manual_trigger = true;
                 }

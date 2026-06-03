@@ -229,9 +229,9 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         cursor += codecs::encode_8_bits(static_cast<uint8_t>(dlconfig->items_to_log[i].type), &buffer[cursor]);
         switch (dlconfig->items_to_log[i].type)
         {
-        case datalogging::LoggableType::TIME:
+        case datalogging::LoggableType::Time:
             break;
-        case datalogging::LoggableType::MEMORY:
+        case datalogging::LoggableType::Memory:
             if (cursor + 1 + sizeof(void *) > max_size)
             {
                 return 0;
@@ -239,7 +239,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             cursor += codecs::encode_address_big_endian(dlconfig->items_to_log[i].data.memory.address, &buffer[cursor]);
             cursor += codecs::encode_8_bits(dlconfig->items_to_log[i].data.memory.size, &buffer[cursor]);
             break;
-        case datalogging::LoggableType::RPV:
+        case datalogging::LoggableType::Rpv:
             if (cursor + 2 > max_size)
             {
                 return 0;
@@ -262,11 +262,11 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     refconfig.timeout_100ns = 0x11223344;
     refconfig.items_count = 3;
 
-    refconfig.items_to_log[0].type = datalogging::LoggableType::TIME;
-    refconfig.items_to_log[1].type = datalogging::LoggableType::MEMORY;
+    refconfig.items_to_log[0].type = datalogging::LoggableType::Time;
+    refconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
     refconfig.items_to_log[1].data.memory.address = &m_some_var_logged1;
     refconfig.items_to_log[1].data.memory.size = sizeof(m_some_var_logged1);
-    refconfig.items_to_log[2].type = datalogging::LoggableType::RPV;
+    refconfig.items_to_log[2].type = datalogging::LoggableType::Rpv;
     refconfig.items_to_log[2].data.rpv.id = 0x8888;
 
     refconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
@@ -473,7 +473,7 @@ TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
     SCRUTINY_CONSTEXPR uint8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.items_to_log[0].type = datalogging::LoggableType::RPV;
+    refconfig.items_to_log[0].type = datalogging::LoggableType::Rpv;
     refconfig.items_to_log[0].data.rpv.id = 0x9999; // doesn't exist
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);

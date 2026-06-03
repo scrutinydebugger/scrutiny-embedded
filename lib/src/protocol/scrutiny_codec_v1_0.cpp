@@ -1230,7 +1230,7 @@ namespace scrutiny
 
                 switch (config->items_to_log[i].type)
                 {
-                case datalogging::LoggableType::MEMORY:
+                case datalogging::LoggableType::Memory:
                 {
                     if (request->data_length < cursor + sizeof(void *) + 1)
                     {
@@ -1242,7 +1242,7 @@ namespace scrutiny
                     config->items_to_log[i].data.memory.size = request->data[cursor++];
                     break;
                 }
-                case datalogging::LoggableType::RPV:
+                case datalogging::LoggableType::Rpv:
                 {
                     if (request->data_length < cursor + sizeof(uint16_t))
                     {
@@ -1253,7 +1253,7 @@ namespace scrutiny
                     cursor += sizeof(uint16_t);
                     break;
                 }
-                case datalogging::LoggableType::TIME:
+                case datalogging::LoggableType::Time:
                 {
                     break;
                 }

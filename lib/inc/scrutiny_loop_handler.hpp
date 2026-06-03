@@ -97,7 +97,7 @@ namespace scrutiny
             m_name(name)
 #if SCRUTINY_ENABLE_DATALOGGING
             ,
-            m_datalogger(SCRUTINY_NULL), m_datalogger_data_acquired(false), m_support_datalogging(true)
+            m_datalogger(static_cast<scrutiny::datalogging::DataLogger *>(SCRUTINY_NULL)), m_datalogger_data_acquired(false), m_support_datalogging(true)
 #endif
         {
         }

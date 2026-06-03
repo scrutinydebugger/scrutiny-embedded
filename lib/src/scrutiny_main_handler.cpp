@@ -333,7 +333,7 @@ namespace scrutiny
             m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion =
                 msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
             m_datalogging.threadsafe_data.write_counter_since_trigger = msg->data.datalogger_status_update.write_counter_since_trigger;
-            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
+            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::AcquisitionComplete)
             {
                 m_datalogging.reading_in_progress = false;
             }
@@ -1519,7 +1519,7 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->items_count; i++)
             {
-                if (config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                if (config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
                     if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
                     {
@@ -1527,7 +1527,7 @@ namespace scrutiny
                         break;
                     }
                 }
-                else if (config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                else if (config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
                     if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].data.rpv.id))
                     {
@@ -1672,14 +1672,11 @@ namespace scrutiny
                 {
                     m_datalogging.reading_in_progress = false;
                 }
-
-                break;
             }
             else
             {
                 code = protocol::ResponseCode::FailureToProceed;
                 m_datalogging.reading_in_progress = false;
-                break;
             }
             break;
         }

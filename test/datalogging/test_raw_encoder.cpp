@@ -79,15 +79,15 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     dlconfig.items_count = 3;
 
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
     dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
     dlconfig.items_to_log[0].data.memory.address = &var1;
 
-    dlconfig.items_to_log[1].type = datalogging::LoggableType::MEMORY;
+    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
     dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
     dlconfig.items_to_log[1].data.memory.address = &var2;
 
-    dlconfig.items_to_log[2].type = datalogging::LoggableType::TIME;
+    dlconfig.items_to_log[2].type = datalogging::LoggableType::Time;
 
     encoder.init(&scrutiny_handler, &dlconfig, dlbuffer, sizeof(dlbuffer));
     encoder.set_timebase(&timebase);
