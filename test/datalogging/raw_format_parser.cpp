@@ -10,7 +10,11 @@
 #include "datalogging/raw_format_parser.hpp"
 #include "scrutiny.hpp"
 
-void RawFormatParser::init(scrutiny::MainHandler *main_handler, scrutiny::datalogging::Configuration *config, uint8_t *buffer, uint32_t buffer_size)
+void RawFormatParser::init(
+    scrutiny::MainHandler *main_handler,
+    scrutiny::datalogging::Configuration *config,
+    unsigned char *buffer,
+    uint32_t buffer_size)
 {
     m_error = false;
     m_main_handler = main_handler;
@@ -35,7 +39,7 @@ void RawFormatParser::parse(uint32_t entry_count)
     uint32_t entry_size = 0;
     for (uint16_t i = 0; i < m_config->items_count; i++)
     {
-        std::vector<uint8_t> item_data;
+        std::vector<unsigned char> item_data;
         uint32_t elem_size = 0;
 
         if (m_config->items_to_log[i].type == scrutiny::datalogging::LoggableType::Memory)
@@ -70,7 +74,7 @@ void RawFormatParser::parse(uint32_t entry_count)
 
     for (uint32_t i = 0; i < entry_count; i++)
     {
-        std::vector<std::vector<uint8_t> > entry(m_config->items_count);
+        std::vector<std::vector<unsigned char> > entry(m_config->items_count);
         for (uint16_t j = 0; j < m_config->items_count; j++)
         {
             uint32_t elem_size = 0;
@@ -95,7 +99,7 @@ void RawFormatParser::parse(uint32_t entry_count)
                 return;
             }
 
-            std::vector<uint8_t> item_data(elem_size);
+            std::vector<unsigned char> item_data(elem_size);
             for (uint32_t k = 0; k < elem_size; k++)
             {
                 item_data[k] = m_buffer[cursor++];

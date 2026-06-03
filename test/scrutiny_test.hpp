@@ -29,26 +29,26 @@
 class ScrutinyTest : public scrutinytest::TestCase
 {
   protected:
-    inline std::vector<uint8_t> make_payload_1(uint8_t v0)
+    inline std::vector<unsigned char> make_payload_1(unsigned char v0)
     {
-        std::vector<uint8_t> o;
+        std::vector<unsigned char> o;
         o.resize(1);
         o[0] = v0;
         return o;
     }
 
-    inline std::vector<uint8_t> make_payload_2(uint8_t v0, uint8_t v1)
+    inline std::vector<unsigned char> make_payload_2(unsigned char v0, unsigned char v1)
     {
-        std::vector<uint8_t> o;
+        std::vector<unsigned char> o;
         o.resize(2);
         o[0] = v0;
         o[1] = v1;
         return o;
     }
 
-    inline std::vector<uint8_t> make_payload_4(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3)
+    inline std::vector<unsigned char> make_payload_4(unsigned char v0, unsigned char v1, unsigned char v2, unsigned char v3)
     {
-        std::vector<uint8_t> o;
+        std::vector<unsigned char> o;
         o.resize(4);
         o[0] = v0;
         o[1] = v1;
@@ -57,9 +57,17 @@ class ScrutinyTest : public scrutinytest::TestCase
         return o;
     }
 
-    inline std::vector<uint8_t> make_payload_8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7)
+    inline std::vector<unsigned char> make_payload_8(
+        unsigned char v0,
+        unsigned char v1,
+        unsigned char v2,
+        unsigned char v3,
+        unsigned char v4,
+        unsigned char v5,
+        unsigned char v6,
+        unsigned char v7)
     {
-        std::vector<uint8_t> o;
+        std::vector<unsigned char> o;
         o.resize(8);
         o[0] = v0;
         o[1] = v1;
@@ -85,15 +93,15 @@ class ScrutinyTest : public scrutinytest::TestCase
         return static_cast<float>(static_cast<int>(v + 0.5 * sign));
     }
 
-    void add_crc(uint8_t *data, uint16_t data_len);
+    void add_crc(unsigned char *data, uint16_t data_len);
     void add_crc(scrutiny::protocol::Response *response);
-    void fill_buffer_incremental(uint8_t *buffer, uint32_t length);
-    unsigned int encode_addr(uint8_t *buffer, void *addr);
+    void fill_buffer_incremental(unsigned char *buffer, uint32_t length);
+    unsigned int encode_addr(unsigned char *buffer, void *addr);
 
     bool TEST_IS_PROTOCOL_RESPONSE(
-        uint8_t *buffer,
+        unsigned char *buffer,
         scrutiny::protocol::CommandId::eCommandId cmd,
-        uint8_t subfunction,
+        uint_least8_t subfunction,
         scrutiny::protocol::ResponseCode::eResponseCode code);
 };
 

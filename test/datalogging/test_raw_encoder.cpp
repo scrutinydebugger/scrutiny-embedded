@@ -25,12 +25,12 @@ class TestRawEncoder : public ScrutinyTest
     datalogging::Configuration dlconfig;
     datalogging::RawFormatEncoder encoder;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
-    uint8_t buffer_canary_1[512];
-    uint8_t dlbuffer[128];
-    uint8_t buffer_canary_2[512];
+    unsigned char buffer_canary_1[512];
+    unsigned char dlbuffer[128];
+    unsigned char buffer_canary_2[512];
 
     TestRawEncoder() :
         ScrutinyTest(),
@@ -72,8 +72,8 @@ void TestRawEncoder::check_canaries()
 TEST_F(TestRawEncoder, BasicEncoding)
 {
     Timebase timebase;
-    uint8_t dst_buffer[10];
-    uint8_t compare_buf[128];
+    unsigned char dst_buffer[10];
+    unsigned char compare_buf[128];
     float var1;
     uint32_t var2;
 
@@ -135,10 +135,10 @@ TEST_F(TestRawEncoder, BasicEncoding)
     memcpy(&compare_buf[28], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[32]);
 
-    uint8_t const chunk_size = sizeof(dst_buffer);
-    uint8_t const nbchunk = static_cast<uint8_t>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
+    unsigned char const chunk_size = sizeof(dst_buffer);
+    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
-    for (uint8_t i = 0; i < nbchunk; i++)
+    for (unsigned char i = 0; i < nbchunk; i++)
     {
         uint32_t nread = reader->read(dst_buffer, chunk_size);
         total_read += nread;

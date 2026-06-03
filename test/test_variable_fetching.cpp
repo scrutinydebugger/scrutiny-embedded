@@ -18,13 +18,13 @@ class TestVariableFetching : public ScrutinyTest
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
-    uint8_t forbidden_buffer[128];
-    uint8_t forbidden_buffer2[128];
-    uint8_t readonly_buffer[128];
-    uint8_t readonly_buffer2[128];
+    unsigned char forbidden_buffer[128];
+    unsigned char forbidden_buffer2[128];
+    unsigned char readonly_buffer[128];
+    unsigned char readonly_buffer2[128];
 
     scrutiny::AddressRange readonly_ranges[2];
     scrutiny::AddressRange forbidden_ranges[2];
@@ -61,7 +61,7 @@ class TestVariableFetching : public ScrutinyTest
 
 TEST_F(TestVariableFetching, RandomFetch)
 {
-    uint8_t some_buffer[32];
+    unsigned char some_buffer[32];
 
     float f32 = 1.2345f;
     double f64 = 3.1415926;
@@ -113,14 +113,15 @@ TEST_F(TestVariableFetching, NoAccess)
 
 TEST_F(TestVariableFetching, Bitfield)
 {
-    uint8_t some_buffer[32];
+    unsigned char some_buffer[32];
     memset(some_buffer, 0xFF, sizeof(some_buffer));
 
 #pragma pack(push, 1)
+#if CHAR_BIT == 8
     struct
     {
-        uint8_t pad : 2;
-        uint8_t val : 3;
+        unsigned char pad : 2;
+        unsigned char val : 3;
     } data_u8;
 
     struct
@@ -128,7 +129,7 @@ TEST_F(TestVariableFetching, Bitfield)
         int8_t pad : 2;
         int8_t val : 5;
     } data_s8;
-
+#endif
     struct
     {
         uint16_t pad : 4;
@@ -155,9 +156,9 @@ TEST_F(TestVariableFetching, Bitfield)
 
     struct
     {
-        uint8_t pad : 2;
+        uint16_t pad : 2;
         bool b1 : 1;
-        uint8_t pad2 : 2;
+        uint16_t pad2 : 2;
         bool b2 : 1;
     } data_bool;
 

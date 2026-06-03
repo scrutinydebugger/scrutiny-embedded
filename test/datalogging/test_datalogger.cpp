@@ -62,21 +62,21 @@ class TestDatalogger : public ScrutinyTest
     Config config;
     datalogging::DataLogger datalogger;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
-    uint8_t forbidden_buffer[128];
-    uint8_t forbidden_buffer2[128];
-    uint8_t readonly_buffer[128];
-    uint8_t readonly_buffer2[128];
+    unsigned char forbidden_buffer[128];
+    unsigned char forbidden_buffer2[128];
+    unsigned char readonly_buffer[128];
+    unsigned char readonly_buffer2[128];
 
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
     RuntimePublishedValue rpvs[3];
 
-    uint8_t buffer_canary_1[512];
-    uint8_t dlbuffer[128];
-    uint8_t buffer_canary_2[512];
+    unsigned char buffer_canary_1[512];
+    unsigned char dlbuffer[128];
+    unsigned char buffer_canary_2[512];
 
     TestDatalogger() :
         ScrutinyTest(),
@@ -304,13 +304,13 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
     dlconfig.trigger.operands[1].data.literal.val = 100.0f;
 
-    uint8_t probe_location = 0;
+    uint_least8_t probe_location = 0;
     for (uint16_t probe_loop = 0; probe_loop <= 255; probe_loop++)
     {
         var1 = 0.0;
         var2 = 0;
         trigger_val = 0.0f;
-        probe_location = static_cast<uint8_t>(probe_loop);
+        probe_location = static_cast<uint_least8_t>(probe_loop & 0xFF);
         dlconfig.probe_location = probe_location;
         std::string error_msg = "probe_location=" + NumberToString(probe_location);
         datalogger.config()->copy_from(&dlconfig);
@@ -376,9 +376,9 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 #error "Unsupported parser"
 #endif
 
-        uint8_t output_buffer_canary1[512];
-        uint8_t output_buffer[output_buffer_required_size];
-        uint8_t output_buffer_canary2[512];
+        unsigned char output_buffer_canary1[512];
+        unsigned char output_buffer[output_buffer_required_size];
+        unsigned char output_buffer_canary2[512];
 
         memset(output_buffer_canary1, 0xAA, sizeof(output_buffer_canary1));
         memset(output_buffer_canary2, 0x55, sizeof(output_buffer_canary2));
@@ -407,15 +407,15 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
         // Validate data now;
 
-        vector<vector<vector<uint8_t> > > data = parser.get();
+        vector<vector<vector<unsigned char> > > data = parser.get();
 
         for (size_t i = 0; i < data.size(); i++)
         {
-            vector<vector<uint8_t> > entry = data[i];
+            vector<vector<unsigned char> > entry = data[i];
             ASSERT_EQ(entry.size(), 4); // 4 signals logged
             if (i > 0)
             {
-                vector<vector<uint8_t> > last_entry = data[i - 1];
+                vector<vector<unsigned char> > last_entry = data[i - 1];
                 float check_var1 = *reinterpret_cast<float *>(entry[0].data());
                 float check_last_var1 = *reinterpret_cast<float *>(last_entry[0].data());
 
@@ -476,12 +476,12 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
     dlconfig.trigger.operand_count = 0;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::AlwaysTrue;
 
-    uint8_t probe_location = 0;
+    unsigned char probe_location = 0;
     for (uint16_t probe_loop = 0; probe_loop <= 255; probe_loop++)
     {
         var1 = 0.0;
         var2 = 0;
-        probe_location = static_cast<uint8_t>(probe_loop);
+        probe_location = static_cast<unsigned char>(probe_loop);
         dlconfig.probe_location = probe_location;
         std::string error_msg = "probe_location=" + NumberToString(probe_location);
         datalogger.reset();
@@ -550,25 +550,25 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 #else
 #error "Unsupported parser"
 #endif
-    uint8_t output_buffer[output_buffer_required_size] = { 0 };
+    unsigned char output_buffer[output_buffer_required_size] = { 0 };
     datalogger.get_reader()->reset();
     datalogger.get_reader()->read(output_buffer, sizeof(output_buffer));
     parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
     parser.parse(datalogger.get_reader()->get_entry_count());
     ASSERT_FALSE(parser.error());
-    vector<vector<vector<uint8_t> > > data = parser.get();
+    vector<vector<vector<unsigned char> > > data = parser.get();
     SCRUTINY_STATIC_ASSERT(sizeof(timestamp_t) == sizeof(uint32_t), "Expect timestamp to be 32 bits");
 
     ASSERT_EQ(data.size(), datalogger.get_reader()->get_entry_count());
     for (size_t i = 0; i < data.size(); i++)
     {
-        vector<vector<uint8_t> > entry = data[i];
+        vector<vector<unsigned char> > entry = data[i];
         ASSERT_EQ(entry.size(), 1); // 1 signal = time
 
         scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian(entry[0].data());
         if (i > 0)
         {
-            vector<vector<uint8_t> > last_entry = data[i - 1];
+            vector<vector<unsigned char> > last_entry = data[i - 1];
             scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian(last_entry[0].data());
             ASSERT_EQ(timestamp - last_timestamp, 5) << "Entry #" << i;
         }

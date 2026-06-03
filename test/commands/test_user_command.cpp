@@ -30,8 +30,8 @@ class TestUserCommand : public ScrutinyTest
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[TX_BUFFER_SIZE];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[TX_BUFFER_SIZE];
 
     TestUserCommand() :
         ScrutinyTest(),
@@ -73,10 +73,10 @@ void my_callback1(
 }
 
 void my_callback2(
-    uint8_t const subfunction,
-    uint8_t const *request_data,
+    unsigned char const subfunction,
+    unsigned char const *request_data,
     uint16_t const request_data_length,
-    uint8_t *response_data,
+    unsigned char *response_data,
     uint16_t *response_data_length,
     uint16_t const response_max_data_length)
 {
@@ -89,15 +89,15 @@ void my_callback2(
 
 TEST_F(TestUserCommand, TestCommandCalled)
 {
-    uint8_t tx_buffer[32];
+    unsigned char tx_buffer[32];
     config.set_user_command_callback(my_callback1);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8 + 3] = { 4, 0xAA, 0, 3, 0x12, 0x34, 0x56 };
+    unsigned char request_data[8 + 3] = { 4, 0xAA, 0, 3, 0x12, 0x34, 0x56 };
     add_crc(request_data, sizeof(request_data) - 4);
 
-    uint8_t expected_response[9 + 4] = { 0x84, 0xAA, 0, 0, 4, 0x11, 0x22, 0x33, 0x44 };
+    unsigned char expected_response[9 + 4] = { 0x84, 0xAA, 0, 0, 4, 0x11, 0x22, 0x33, 0x44 };
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -123,12 +123,12 @@ TEST_F(TestUserCommand, TestResponseOverflow)
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::UserCommand;
     const scrutiny::protocol::ResponseCode::eResponseCode code = scrutiny::protocol::ResponseCode::Overflow;
 
-    uint8_t tx_buffer[32];
+    unsigned char tx_buffer[32];
     config.set_user_command_callback(my_callback2);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8] = { 4, 0, 0, 0 };
+    unsigned char request_data[8] = { 4, 0, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -145,12 +145,12 @@ TEST_F(TestUserCommand, TestNoCallback)
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::UserCommand;
     const scrutiny::protocol::ResponseCode::eResponseCode code = scrutiny::protocol::ResponseCode::UnsupportedFeature;
 
-    uint8_t tx_buffer[32];
+    unsigned char tx_buffer[32];
     // No callback set on purpose
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    uint8_t request_data[8] = { 4, 0, 0, 0 };
+    unsigned char request_data[8] = { 4, 0, 0, 0 };
     add_crc(request_data, sizeof(request_data) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
