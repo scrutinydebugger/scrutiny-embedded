@@ -11,16 +11,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if !(SCRUTINY_BUILD_WINDOWS || SCRUTINY_BUILD_X64 || SCRUTINY_BUILD_X86)
-#error "Test require an OS with thread capabilities."
-#endif
-
-#if SCRUTINY_HAS_CPP11
+#if (defined(__STDCPP_THREADS__) && __STDCPP_THREADS__)
 #include <chrono>
 #include <thread>
-#else
+#elif (defined(_POSIX_THREADS) || defined(_REENTRANT))
 #include <ctime>
 #include <pthread.h>
+#else
+#error "Test require an OS with thread capabilities."
 #endif
 
 class SomeEnum
