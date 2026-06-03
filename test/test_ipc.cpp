@@ -17,8 +17,10 @@
 
 #if SCRUTINY_HAS_CPP11 && defined(__STDCPP_THREADS__) && __STDCPP_THREADS__
 #include <thread>
+#define TEST_IPC_CPPTHREAD
 #elif defined(_POSIX_THREADS) || defined(_REENTRANT)
 #include <pthread.h>
+#define TEST_IPC_POSIX_THREAD
 #else
 // Win32 with c++98 ???
 #error "Test require an OS with thread capabilities."
@@ -132,14 +134,20 @@ TEST(TestIPC, CheckWithThread)
 
     uint32_t my_value = 0;
     uint32_t expected_thread_value = 0;
-#if SCRUTINY_HAS_CPP11
+
+if defined(TEST_IPC_CPPTHREAD)
     std::thread thread(thread_func);
-    auto t1 = std::chrono::high_resolution_clock::now();
-#else
+#elif defined(TEST_IPC_POSIX_THREAD)
     pthread_t thread;
-    std::clock_t t1 = std::clock();
     ASSERT_EQ(pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
 #endif
+
+#if SCRUTINY_HAS_CPP11
+    auto t1 = std::chrono::high_resolution_clock::now();
+#else
+    std::clock_t t1 = std::clock();
+#endif
+
     while (!thread_data.thread_exit)
     {
         if (thread_data.msg_from_thread.has_content())
@@ -180,9 +188,9 @@ TEST(TestIPC, CheckWithThread)
 #endif
     }
 
-#if SCRUTINY_HAS_CPP11
+if defined(TEST_IPC_CPPTHREAD)
     thread.join();
-#else
+#elif defined(TEST_IPC_POSIX_THREAD)
     ASSERT_EQ(pthread_join(thread, NULL), 0);
 #endif
 
