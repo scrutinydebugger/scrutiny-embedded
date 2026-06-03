@@ -15,7 +15,7 @@
 #include <unistd.h>
 #endif
 
-#if defined(__STDCPP_THREADS__) && __STDCPP_THREADS__
+#if SCRUTINY_HAS_CPP11 && defined(__STDCPP_THREADS__) && __STDCPP_THREADS__
 #include <thread>
 #elif defined(_POSIX_THREADS) || defined(_REENTRANT)
 #include <pthread.h>
