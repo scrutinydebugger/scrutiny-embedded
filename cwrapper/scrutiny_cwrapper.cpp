@@ -84,12 +84,18 @@ extern "C"
         get_config(config)->set_buffers(rx_buffer, rx_buffer_size, tx_buffer, tx_buffer_size);
     }
 
-    void scrutiny_c_config_set_forbidden_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count)
+    void scrutiny_c_config_set_forbidden_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count)
     {
         get_config(config)->set_forbidden_address_range(reinterpret_cast<scrutiny::AddressRange const *>(ranges), count);
     }
 
-    void scrutiny_c_config_set_readonly_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count)
+    void scrutiny_c_config_set_readonly_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count)
     {
         get_config(config)->set_readonly_address_range(reinterpret_cast<scrutiny::AddressRange const *>(ranges), count);
     }

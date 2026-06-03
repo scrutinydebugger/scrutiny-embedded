@@ -114,7 +114,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
     /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
     /// @param count Number of ranges in the given array
-    void scrutiny_c_config_set_forbidden_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count);
+    void scrutiny_c_config_set_forbidden_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count);
 
     /// @brief Wrapper for `Config::set_readonly_address_range()
     /// Defines some memory sections that are read-only`
@@ -123,7 +126,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
     /// Consider using `scrutiny::tools::make_address_range()` to generate these objects in a one-liner
     /// @param count Number of ranges in the given array
-    void scrutiny_c_config_set_readonly_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count);
+    void scrutiny_c_config_set_readonly_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count);
 
     /// @brief Wrapper for `scrutiny::set_published_values()`
     /// Configures the Runtime Published Values
@@ -164,7 +170,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @param config The `scrutiny::Config` object to work on
     /// @param buffer The datalogging buffer
     /// @param buffer_size The datalogging buffer size
-    void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, unsigned char *buffer, scrutiny_c_datalogging_buffer_size_t buffer_size);
+    void scrutiny_c_config_set_datalogging_buffers(
+        scrutiny_c_config_t *config,
+        unsigned char *buffer,
+        scrutiny_c_datalogging_buffer_size_t buffer_size);
 
     /// @brief Wrapper for `Config::set_datalogging_trigger_callback()`
     /// Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
