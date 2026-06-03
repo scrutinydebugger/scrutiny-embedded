@@ -210,26 +210,26 @@ namespace scrutiny
         bool memory_write_enable;
 
       private:
-        unsigned char *m_rx_buffer;                           // The comm Rx buffer
+        unsigned char *m_rx_buffer;                     // The comm Rx buffer
         uint16_t m_rx_buffer_size;                      // The comm Rx buffer size
-        unsigned char *m_tx_buffer;                           // The comm Tx buffer
+        unsigned char *m_tx_buffer;                     // The comm Tx buffer
         uint16_t m_tx_buffer_size;                      // The comm Tx buffer size
         AddressRange const *m_forbidden_address_ranges; // The forbidden address range array pointer. nullptr if unset
-        uint_least8_t m_forbidden_range_count;                // The forbidden address range count
+        uint_least8_t m_forbidden_range_count;          // The forbidden address range count
         AddressRange const *m_readonly_address_ranges;  // The read-only address range array pointer. nullptr if unset
-        uint_least8_t m_readonly_range_count;                 // The read-only address range count
+        uint_least8_t m_readonly_range_count;           // The read-only address range count
         RuntimePublishedValue const *m_rpvs;            // The array of Runtime Published Values. nullptr if unset
         uint16_t m_rpv_count;                           // The number of Runtime Published Values in the RPV array
         RpvReadCallback m_rpv_read_callback;            // The callback to perform read operation on a Runtime Published Value (RPV)
         RpvWriteCallback m_rpv_write_callback;          // The callback to perform write operation on a Runtime Published Value (RPV)
         LoopHandler **m_loops;                          // The array of Loop Handler pointers
-        uint_least8_t m_loop_count;                           // Number of Loop Handler in the array
+        uint_least8_t m_loop_count;                     // Number of Loop Handler in the array
 
         /// @brief Callback to be called on a User Command request.
         user_command_callback_t m_user_command_callback; // Callback to call when a User Command service call is requested by the server
 
 #if SCRUTINY_ENABLE_DATALOGGING
-        unsigned char *m_datalogger_buffer;                                  // Buffer that stores the datalogging data
+        unsigned char *m_datalogger_buffer;                            // Buffer that stores the datalogging data
         datalogging::buffer_size_t m_datalogger_buffer_size;           // size of the datalogging buffer
         datalogging::trigger_callback_t m_datalogger_trigger_callback; // Callback to call upon datalogging acquisition triggers
 #endif

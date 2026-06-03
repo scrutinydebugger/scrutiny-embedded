@@ -6,9 +6,9 @@
 //
 //    Copyright (c) 2021 Scrutiny Debugger
 
+#include <limits.h>
 #include <stdint.h>
 #include <string.h>
-#include <limits.h>
 
 #include "protocol/scrutiny_codec_v1_0.hpp"
 #include "scrutiny_common_codecs.hpp"
@@ -478,11 +478,11 @@ namespace scrutiny
             ok_to_process = true;
             switch (typesize)
             {
-#if CHAR_BIT == 8                
+#if CHAR_BIT == 8
             case 1:
                 v->uint8 = m_buffer[m_bytes_read];
                 break;
-#endif            
+#endif
             case 2:
                 v->uint16 = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;

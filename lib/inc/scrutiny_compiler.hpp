@@ -61,7 +61,7 @@
 #elif defined(__tricore__) || defined(__tricore) || defined(tricore)
 #undef SCRUTINY_BUILD_TRICORE
 #define SCRUTINY_BUILD_TRICORE 1
-#elif defined(__TMS320C28XX__) 
+#elif defined(__TMS320C28XX__)
 #undef SCRUTINY_BUILD_TI_C28
 #define SCRUTINY_BUILD_TI_C28 1
 #endif

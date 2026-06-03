@@ -9,8 +9,8 @@
 #include "scrutiny_common_codecs.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Condition always true
@@ -106,7 +106,7 @@ namespace scrutiny
 
             switch (typesize)
             {
-#if CHAR_BIT == 8                
+#if CHAR_BIT == 8
             case 1:
                 *buffer = val->uint8;
                 break;

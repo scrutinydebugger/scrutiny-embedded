@@ -20,24 +20,27 @@ namespace scrutiny
         IPCMessage() { clear(); }
 
         /// @brief Tells if the message content is valid and can be read.
-        inline bool has_content(void) const { 
+        inline bool has_content(void) const
+        {
             uint16_t primask = __disable_interrupts();
-            bool const written = m_written; 
+            bool const written = m_written;
             __restore_interrupts(primask);
-            return written; 
+            return written;
         }
 
         /// @brief Mark the message as ready to be read using an atomic operation
-        inline void commit(void) { 
+        inline void commit(void)
+        {
             uint16_t primask = __disable_interrupts();
-            m_written = true; 
+            m_written = true;
             __restore_interrupts(primask);
         }
 
         /// @brief  Deletes the message content and leave rooms for the next one.
-        inline void clear(void) { 
+        inline void clear(void)
+        {
             uint16_t primask = __disable_interrupts();
-            m_written = false; 
+            m_written = false;
             __restore_interrupts(primask);
         }
 

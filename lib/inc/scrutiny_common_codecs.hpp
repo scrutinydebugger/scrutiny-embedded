@@ -19,26 +19,26 @@ namespace scrutiny
     namespace codecs
     {
 
-        inline uint_least8_t encode_8_bits(uint_least8_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_8_bits(uint_least8_t const value, unsigned char *const buff)
         {
             buff[0] = static_cast<unsigned char>(value & 0xFF);
             return 1;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_8_bits(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_8_bits(T const value, unsigned char *const buff) = delete;
 #endif
 
-        inline uint_least8_t encode_16_bits_big_endian(uint16_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_16_bits_big_endian(uint16_t const value, unsigned char *const buff)
         {
             buff[0] = static_cast<unsigned char>((value >> 8) & 0xFF);
             buff[1] = static_cast<unsigned char>((value >> 0) & 0xFF);
             return 2;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_16_bits_big_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_16_bits_big_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
-        inline uint_least8_t encode_32_bits_big_endian(uint32_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_32_bits_big_endian(uint32_t const value, unsigned char *const buff)
         {
             buff[0] = static_cast<unsigned char>((value >> 24) & 0xFFu);
             buff[1] = static_cast<unsigned char>((value >> 16) & 0xFFu);
@@ -47,10 +47,10 @@ namespace scrutiny
             return 4;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_32_bits_big_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_32_bits_big_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
-        inline uint_least8_t encode_float_big_endian(float const value, unsigned char * const buff)
+        inline uint_least8_t encode_float_big_endian(float const value, unsigned char *const buff)
         {
             SCRUTINY_STATIC_ASSERT(sizeof(uint32_t) == sizeof(float), "Expect float to be 32 bits");
             uint32_t uv;
@@ -59,11 +59,11 @@ namespace scrutiny
             return 4;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_float_big_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_float_big_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
-        inline uint_least8_t encode_64_bits_big_endian(uint64_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_64_bits_big_endian(uint64_t const value, unsigned char *const buff)
         {
             buff[0] = static_cast<unsigned char>((value >> 56) & 0xFFu);
             buff[1] = static_cast<unsigned char>((value >> 48) & 0xFFu);
@@ -77,21 +77,21 @@ namespace scrutiny
             return 8;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_64_bits_big_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_64_bits_big_endian(T const value, unsigned char *const buff) = delete;
 #endif
 #endif
 
-        inline uint_least8_t encode_16_bits_little_endian(uint16_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_16_bits_little_endian(uint16_t const value, unsigned char *const buff)
         {
             buff[1] = static_cast<unsigned char>((value >> 8) & 0xFFu);
             buff[0] = static_cast<unsigned char>((value >> 0) & 0xFFu);
             return 2;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_16_bits_little_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_16_bits_little_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
-        inline uint_least8_t encode_32_bits_little_endian(uint32_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_32_bits_little_endian(uint32_t const value, unsigned char *const buff)
         {
             buff[3] = static_cast<unsigned char>((value >> 24) & 0xFFu);
             buff[2] = static_cast<unsigned char>((value >> 16) & 0xFFu);
@@ -100,10 +100,10 @@ namespace scrutiny
             return 4;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_32_bits_little_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_32_bits_little_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
-        inline uint_least8_t encode_float_little_endian(float const value, unsigned char * const buff)
+        inline uint_least8_t encode_float_little_endian(float const value, unsigned char *const buff)
         {
             SCRUTINY_STATIC_ASSERT(sizeof(uint32_t) == sizeof(float), "Expect float to be 32 bits");
             uint32_t uv;
@@ -112,11 +112,11 @@ namespace scrutiny
             return 4;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_float_little_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_float_little_endian(T const value, unsigned char *const buff) = delete;
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
-        inline uint_least8_t encode_64_bits_little_endian(uint64_t const value, unsigned char * const buff)
+        inline uint_least8_t encode_64_bits_little_endian(uint64_t const value, unsigned char *const buff)
         {
             buff[7] = static_cast<unsigned char>((value >> 56) & 0xFFu);
             buff[6] = static_cast<unsigned char>((value >> 48) & 0xFFu);
@@ -129,7 +129,7 @@ namespace scrutiny
             return 8;
         }
 #if SCRUTINY_HAS_CPP11
-        template <class T> inline uint_least8_t encode_64_bits_little_endian(T const value, unsigned char * const buff) = delete;
+        template <class T> inline uint_least8_t encode_64_bits_little_endian(T const value, unsigned char *const buff) = delete;
 #endif
         inline uint64_t decode_64_bits_big_endian(unsigned char const *const buff)
         {
@@ -219,8 +219,11 @@ namespace scrutiny
         uint_least8_t encode_address_big_endian(void const *const addr, unsigned char *const buf);
         uint_least8_t encode_address_big_endian(uintptr_t const addr, unsigned char *const buf);
 
-        uint_least8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, VariableType::eVariableType const vartype, unsigned char * const buffer);
-        uint_least8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, uint_least8_t const typesize, unsigned char * const buffer);
+        uint_least8_t encode_anytype_big_endian(
+            scrutiny::AnyType const *const val,
+            VariableType::eVariableType const vartype,
+            unsigned char *const buffer);
+        uint_least8_t encode_anytype_big_endian(scrutiny::AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer);
     } // namespace codecs
 } // namespace scrutiny
 

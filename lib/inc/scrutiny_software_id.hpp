@@ -12,7 +12,7 @@
 #include "scrutiny_setup.hpp"
 #include <limits.h>
 
-#define SCRUTINY_SOFTWARE_ID_LENGTH 16u / (CHAR_BIT/8)
+#define SCRUTINY_SOFTWARE_ID_LENGTH 16u / (CHAR_BIT / 8)
 
 // Randomly generated
 #if CHAR_BIT == 8
@@ -21,14 +21,13 @@
         0xA9, 0xDC, 0xC0, 0x65, 0x28, 0xFD, 0x41, 0xFA, 0x7C, 0xE8, 0x63, 0xD6, 0xAA, 0x94, 0xA7, 0x08                                               \
     }
 #elif CHAR_BIT == 16
-#define SCRUTINY_SOFTWARE_ID_PLACEHOLDER                                                                             \
-    {                                                                                                                \
-        0xA9DC, 0xC065, 0x28FD, 0x41FA, 0x7CE8, 0x63D6, 0xAA94, 0xA708                                               \
+#define SCRUTINY_SOFTWARE_ID_PLACEHOLDER                                                                                                             \
+    {                                                                                                                                                \
+        0xA9DC, 0xC065, 0x28FD, 0x41FA, 0x7CE8, 0x63D6, 0xAA94, 0xA708                                                                               \
     }
 #else
 #error
 #endif
-
 
 namespace scrutiny
 {

@@ -11,8 +11,8 @@
 #include "scrutiny_loop_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
-#include <string.h>
 #include <limits.h>
+#include <string.h>
 
 namespace scrutiny
 {
@@ -182,14 +182,14 @@ namespace scrutiny
             success = fetch_variable(addr, fetch_variable_type, val);
             if (success)
             {
-#if CHAR_BIT == 8                
+#if CHAR_BIT == 8
                 if (fetch_type_size == VariableTypeSize::_8)
                 {
                     val->uint8 >>= bitoffset;
                 }
-                else 
-#endif                
-                if (fetch_type_size == VariableTypeSize::_16)
+                else
+#endif
+                    if (fetch_type_size == VariableTypeSize::_16)
                 {
                     val->uint16 >>= bitoffset;
                 }
@@ -212,7 +212,7 @@ namespace scrutiny
                 {
                     AnyTypeFast mask;
                     uint_fast8_t i;
-#if CHAR_BIT == 8                     
+#if CHAR_BIT == 8
                     if (output_type_size == VariableTypeSize::_8)
                     {
                         mask.uint8 = 1;
@@ -229,9 +229,9 @@ namespace scrutiny
                             }
                         }
                     }
-                    else 
-#endif                    
-                    if (output_type_size == VariableTypeSize::_16)
+                    else
+#endif
+                        if (output_type_size == VariableTypeSize::_16)
                     {
                         mask.uint16 = 0x1FF;
                         for (i = 9; i < bitsize; i++)

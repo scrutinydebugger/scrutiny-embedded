@@ -8,8 +8,8 @@
 //    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_setup.hpp"
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 
 typedef void (*scrutiny_c_user_command_callback_t)(
     uint_least8_t const subfunction,
@@ -99,7 +99,7 @@ typedef union
 
 #if CHAR_BIT == 8
     int8_t sint8;
-#endif    
+#endif
     int16_t sint16;
     int32_t sint32;
 

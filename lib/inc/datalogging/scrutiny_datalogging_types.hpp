@@ -128,7 +128,7 @@ namespace scrutiny
         {
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
-            void copy_from(TriggerConfig const * const other)
+            void copy_from(TriggerConfig const *const other)
             {
                 for (unsigned int i = 0; i < MAX_OPERANDS; i++)
                 {
@@ -141,7 +141,7 @@ namespace scrutiny
             }
 
             SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
-            uint_least8_t operand_count;                                             // Number of given operands
+            uint_least8_t operand_count;                                       // Number of given operands
             uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
             Operand operands[MAX_OPERANDS];                                    // The operand definitions
         };
@@ -201,7 +201,7 @@ namespace scrutiny
             LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
 
             uint_least8_t items_count; // Number of items to logs
-            uint16_t decimation; // Decimation of the acquisition. Effectively reduce the sampling rate
+            uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
             uint_least8_t probe_location;
             uint32_t timeout_100ns; // Time after which an acquisition is considered complete even if the buffer is not full

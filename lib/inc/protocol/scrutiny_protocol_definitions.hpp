@@ -11,8 +11,8 @@
 #define ___SCRUTINY_PROTOCOL_DEFINITION_H___
 
 #include "scrutiny_setup.hpp"
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 
 namespace scrutiny
 {
