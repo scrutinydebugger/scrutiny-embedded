@@ -11,6 +11,7 @@
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 #include <string.h>
+#include <limits.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -42,14 +43,14 @@ namespace scrutiny
                 tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->boolean));
                 break;
             }
-
+#if CHAR_BIT==8
             case VariableType::sint8:
             {
                 *vtype = BiggestSint;
                 tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint8));
                 break;
             }
-
+#endif
             case VariableType::sint16:
             {
                 *vtype = BiggestSint;
@@ -63,14 +64,14 @@ namespace scrutiny
                 tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint32));
                 break;
             }
-
+#if CHAR_BIT==8
             case VariableType::uint8:
             {
                 *vtype = BiggestUint;
                 tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->uint8));
                 break;
             }
-
+#endif
             case VariableType::uint16:
             {
                 *vtype = BiggestUint;

@@ -10,6 +10,7 @@
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 #include <stdint.h>
+#include <limits.h>
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Condition always true
@@ -18,7 +19,7 @@ namespace scrutiny
 {
     namespace codecs
     {
-        uint8_t decode_address_big_endian(uint8_t const *const buf, uintptr_t *const addr)
+        uint_least8_t decode_address_big_endian(unsigned char const *const buf, uintptr_t *const addr)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -52,15 +53,15 @@ namespace scrutiny
 
             *addr = computed_addr;
 
-            return static_cast<uint8_t>(addr_size);
+            return static_cast<uint_least8_t>(addr_size);
         }
 
-        uint8_t encode_address_big_endian(void const *const addr, uint8_t *const buf)
+        uint_least8_t encode_address_big_endian(void const *const addr, unsigned char *const buf)
         {
             return encode_address_big_endian(reinterpret_cast<uintptr_t>(addr), buf);
         }
 
-        uint8_t encode_address_big_endian(uintptr_t const addr, uint8_t *const buf)
+        uint_least8_t encode_address_big_endian(uintptr_t const addr, unsigned char *const buf)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -69,45 +70,47 @@ namespace scrutiny
 
             if (addr_size >= 1)
             {
-                buf[i--] = static_cast<uint8_t>((addr >> (0 * (addr_size >= 1))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (0 * (addr_size >= 1))) & 0xFF);
             }
 
             if (addr_size >= 2)
             {
-                buf[i--] = static_cast<uint8_t>((addr >> (8 * (addr_size >= 2))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (8 * (addr_size >= 2))) & 0xFF);
             }
 
             if (addr_size >= 4)
             {
-                buf[i--] = static_cast<uint8_t>((addr >> (16 * (addr_size >= 4))) & 0xFF);
-                buf[i--] = static_cast<uint8_t>((addr >> (24 * (addr_size >= 4))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (16 * (addr_size >= 4))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (24 * (addr_size >= 4))) & 0xFF);
             }
 
             if (addr_size == 8)
             {
-                buf[i--] = static_cast<uint8_t>((addr >> (32 * (addr_size >= 8))) & 0xFF);
-                buf[i--] = static_cast<uint8_t>((addr >> (40 * (addr_size >= 8))) & 0xFF);
-                buf[i--] = static_cast<uint8_t>((addr >> (48 * (addr_size >= 8))) & 0xFF);
-                buf[i--] = static_cast<uint8_t>((addr >> (56 * (addr_size >= 8))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (32 * (addr_size >= 8))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (40 * (addr_size >= 8))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (48 * (addr_size >= 8))) & 0xFF);
+                buf[i--] = static_cast<unsigned char>((addr >> (56 * (addr_size >= 8))) & 0xFF);
             }
 
-            return static_cast<uint8_t>(addr_size);
+            return static_cast<uint_least8_t>(addr_size);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *const val, VariableType::eVariableType const vartype, uint8_t *const buffer)
+        uint_least8_t encode_anytype_big_endian(AnyType const *const val, VariableType::eVariableType const vartype, unsigned char *const buffer)
         {
-            uint8_t const typesize = tools::get_type_size(vartype);
+            uint_least8_t const typesize = tools::get_type_size(vartype);
             return encode_anytype_big_endian(val, typesize, buffer);
         }
 
-        uint8_t encode_anytype_big_endian(AnyType const *const val, uint8_t const typesize, uint8_t *const buffer)
+        uint_least8_t encode_anytype_big_endian(AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer)
         {
 
             switch (typesize)
             {
+#if CHAR_BIT == 8                
             case 1:
                 *buffer = val->uint8;
                 break;
+#endif
             case 2:
                 codecs::encode_16_bits_big_endian(val->uint16, buffer);
                 break;

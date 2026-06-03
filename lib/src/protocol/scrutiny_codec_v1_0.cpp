@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
 
 #include "protocol/scrutiny_codec_v1_0.hpp"
 #include "scrutiny_common_codecs.hpp"
@@ -83,7 +84,7 @@ namespace scrutiny
             length = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
-            memblock->start_address = reinterpret_cast<uint8_t *>(addr);
+            memblock->start_address = reinterpret_cast<unsigned char *>(addr);
             memblock->length = length;
 
             if (m_bytes_read == m_request_datasize)
@@ -179,12 +180,12 @@ namespace scrutiny
                 return;
             }
 
-            memblock->start_address = reinterpret_cast<uint8_t *>(addr);
-            memblock->source_data = reinterpret_cast<uint8_t *>(&m_buffer[m_bytes_read]);
+            memblock->start_address = reinterpret_cast<unsigned char *>(addr);
+            memblock->source_data = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
             m_bytes_read += length;
             if (m_masked_write)
             {
-                memblock->mask = reinterpret_cast<uint8_t *>(&m_buffer[m_bytes_read]);
+                memblock->mask = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
                 m_bytes_read += length;
             }
             else
@@ -298,7 +299,7 @@ namespace scrutiny
             }
 
             m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits(static_cast<uint8_t>(rpv->type), &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(static_cast<uint_least8_t>(rpv->type), &m_buffer[m_cursor]);
             m_response->data_length = m_cursor;
         }
 
@@ -320,7 +321,7 @@ namespace scrutiny
 
         void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
         {
-            uint8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size(rpv->type);
             // id (2) + type (1)
             if (2u + typesize > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -358,7 +359,7 @@ namespace scrutiny
 
         void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
         {
-            uint8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size(rpv->type);
             // id (2) + datalen (1)
             if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -466,7 +467,7 @@ namespace scrutiny
                 return false;
             }
 
-            uint8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size(rpv->type);
 
             if (typesize > static_cast<uint16_t>(m_request_len - m_bytes_read))
             {
@@ -477,9 +478,11 @@ namespace scrutiny
             ok_to_process = true;
             switch (typesize)
             {
+#if CHAR_BIT == 8                
             case 1:
                 v->uint8 = m_buffer[m_bytes_read];
                 break;
+#endif            
             case 2:
                 v->uint16 = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
                 break;
@@ -581,7 +584,7 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = static_cast<uint8_t>(response_data->region_type);
+            response->data[0] = static_cast<uint_least8_t>(response_data->region_type);
             response->data[1] = response_data->region_index;
             codecs::encode_address_big_endian(response_data->start, &response->data[2]);
             codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
@@ -671,7 +674,7 @@ namespace scrutiny
             SCRUTINY_STATIC_ASSERT(sizeof(timediff_t) == 4, "Unsupported timediff size");
             SCRUTINY_CONSTEXPR uint16_t loop_id_size = sizeof(response_data->loop_id);
             SCRUTINY_CONSTEXPR uint16_t loop_type_size = sizeof(response_data->loop_type);
-            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = sizeof(uint8_t); // datalogging is embedded in bitfield
+            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = sizeof(uint_least8_t); // datalogging is embedded in bitfield
             SCRUTINY_CONSTEXPR uint16_t timestep_100ns_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_100ns);
             SCRUTINY_CONSTEXPR uint16_t name_length_size = sizeof(response_data->loop_name_length);
 
@@ -707,7 +710,7 @@ namespace scrutiny
                 return ResponseCode::FailureToProceed;
             }
 
-            uint8_t loop_name_length = response_data->loop_name_length;
+            uint_least8_t loop_name_length = response_data->loop_name_length;
             loop_name_length = (loop_name_length > MAX_LOOP_NAME_LENGTH) ? MAX_LOOP_NAME_LENGTH : loop_name_length;
 
             if (cursor + name_length_size + loop_name_length > response->data_max_length)
@@ -772,7 +775,7 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t display_name_length_pos = firmware_id_pos + software_id_size;
             SCRUTINY_CONSTEXPR uint16_t display_name_pos = display_name_length_pos + display_name_length_size;
 
-            uint8_t display_name_length = response_data->display_name_length;
+            uint_least8_t display_name_length = response_data->display_name_length;
             display_name_length = (display_name_length > MAX_DISPLAY_NAME_LENGTH) ? MAX_DISPLAY_NAME_LENGTH : display_name_length;
 
             uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
@@ -786,7 +789,7 @@ namespace scrutiny
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             memcpy(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
-            response->data[display_name_length_pos] = static_cast<uint8_t>(display_name_length);
+            response->data[display_name_length_pos] = static_cast<unsigned char>(display_name_length & 0xFF);
             memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length); // Probably fails with char 16 bits here...
             return ResponseCode::OK;
         }
@@ -1106,7 +1109,7 @@ namespace scrutiny
                 *finished = true;
             }
 
-            response->data[0] = static_cast<uint8_t>(*finished);
+            response->data[0] = static_cast<unsigned char>(*finished);
 
             return protocol::ResponseCode::OK;
         }
@@ -1172,7 +1175,7 @@ namespace scrutiny
                 }
                 case datalogging::OperandType::VAR:
                 {
-                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    if (request->data_length < cursor + 1 + sizeof(void *))
                     {
                         return ResponseCode::InvalidRequest;
                     }
@@ -1184,7 +1187,7 @@ namespace scrutiny
                 }
                 case datalogging::OperandType::VARBIT:
                 {
-                    if (request->data_length < cursor + sizeof(uint8_t) + sizeof(void *))
+                    if (request->data_length < cursor + 3 + sizeof(void *))
                     {
                         return ResponseCode::InvalidRequest;
                     }
@@ -1204,7 +1207,7 @@ namespace scrutiny
                 }
             }
 
-            if (request->data_length < cursor + sizeof(uint8_t))
+            if (request->data_length < cursor + 1)
             {
                 return ResponseCode::InvalidRequest;
             }
@@ -1218,7 +1221,7 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->items_count; i++)
             {
-                if (request->data_length < cursor + sizeof(uint8_t))
+                if (request->data_length < cursor + 1)
                 {
                     return ResponseCode::InvalidRequest;
                 }
@@ -1229,7 +1232,7 @@ namespace scrutiny
                 {
                 case datalogging::LoggableType::MEMORY:
                 {
-                    if (request->data_length < cursor + sizeof(void *) + sizeof(uint8_t))
+                    if (request->data_length < cursor + sizeof(void *) + 1)
                     {
                         return ResponseCode::InvalidRequest;
                     }

@@ -9,12 +9,13 @@
 
 #include "scrutiny_setup.hpp"
 #include <stdint.h>
+#include <limits.h>
 
 typedef void (*scrutiny_c_user_command_callback_t)(
-    uint8_t const subfunction,
-    uint8_t const *request_data,
+    uint_least8_t const subfunction,
+    unsigned char const *request_data,
     uint16_t const request_data_length,
-    uint8_t *response_data,
+    unsigned char *response_data,
     uint16_t *response_data_length,
     uint16_t const response_max_data_length);
 
@@ -90,11 +91,15 @@ typedef enum
 
 typedef union
 {
+#if CHAR_BIT == 8
     uint8_t uint8;
+#endif
     uint16_t uint16;
     uint32_t uint32;
 
+#if CHAR_BIT == 8
     int8_t sint8;
+#endif    
     int16_t sint16;
     int32_t sint32;
 
@@ -136,7 +141,7 @@ typedef union
 typedef struct
 {
     uint16_t id;
-    uint8_t type;
+    uint_least8_t type;
 } scrutiny_c_runtime_published_value_t;
 
 /// @brief Callback called on Runtime Published Value read

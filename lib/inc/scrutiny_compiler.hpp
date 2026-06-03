@@ -43,6 +43,7 @@
 #define SCRUTINY_BUILD_X64 0
 #define SCRUTINY_BUILD_X86 0
 #define SCRUTINY_BUILD_TRICORE 0
+#define SCRUTINY_BUILD_TI_C28 0
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) ||               \
     defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
@@ -60,6 +61,9 @@
 #elif defined(__tricore__) || defined(__tricore) || defined(tricore)
 #undef SCRUTINY_BUILD_TRICORE
 #define SCRUTINY_BUILD_TRICORE 1
+#elif defined(__TMS320C28XX__) 
+#undef SCRUTINY_BUILD_TI_C28
+#define SCRUTINY_BUILD_TI_C28 1
 #endif
 
 #endif //___SCRUTINY_COMPILER_HPP___
