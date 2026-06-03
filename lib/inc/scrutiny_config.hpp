@@ -59,8 +59,8 @@ namespace scrutiny
         void set_published_values(
             RuntimePublishedValue const *array,
             uint16_t const nbr,
-            RpvReadCallback const rd_cb = SCRUTINY_NULL,
-            RpvWriteCallback const wr_cb = SCRUTINY_NULL);
+            RpvReadCallback const rd_cb = SCRUTINY_NULL_FN_PTR(RpvReadCallback),
+            RpvWriteCallback const wr_cb = SCRUTINY_NULL_FN_PTR(RpvWriteCallback));
 
         /// @brief Defines the different loops (tasks) in the application.
         /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.

@@ -60,7 +60,7 @@ namespace scrutiny
                 MainHandler const *const main_handler,
                 unsigned char *const buffer,
                 buffer_size_t const buffer_size,
-                trigger_callback_t trigger_callback = SCRUTINY_NULL);
+                trigger_callback_t trigger_callback = SCRUTINY_NULL_FN_PTR(trigger_callback_t));
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase The timebase used for time logging & trigger management
