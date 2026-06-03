@@ -98,7 +98,7 @@ namespace scrutiny
         /// @brief Returns true if a callback has been set to support the UserCallback service call
         inline bool is_user_command_callback_set(void) const
         {
-            return reinterpret_cast<void *>(m_user_command_callback) != SCRUTINY_NULL;
+            return m_user_command_callback != SCRUTINY_NULL_FN_PTR(user_command_callback_t);
         }
 
         /// @brief Returns true if the communication buffers were sets
@@ -122,13 +122,13 @@ namespace scrutiny
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Read callback has been given
         inline bool is_read_published_values_configured(void) const
         {
-            return (reinterpret_cast<void *>(m_rpv_read_callback) != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
+            return (m_rpv_read_callback != SCRUTINY_NULL_FN_PTR(RpvReadCallback) && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
         };
 
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Write callback has been given
         inline bool is_write_published_values_configured(void) const
         {
-            return (reinterpret_cast<void *>(m_rpv_write_callback) != SCRUTINY_NULL && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
+            return (m_rpv_write_callback != SCRUTINY_NULL_FN_PTR(RpvWriteCallback) && m_rpvs != SCRUTINY_NULL && m_rpv_count > 0);
         };
 
         /// @brief Returns true if a list of loops (tasks) were defined
