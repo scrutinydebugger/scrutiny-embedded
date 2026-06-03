@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
   scrutinytest
   GIT_REPOSITORY https://github.com/scrutinydebugger/scrutiny-test-framework
-  GIT_TAG 52110794f54e2c6a7c8026523b23f3f396b1ea44
+  GIT_TAG 2a473687d3e546d5215db6517f176f554c59553b
 )
 
 set(SCRUTINYTEST_DISABLE_EXCEPTIONS OFF)
