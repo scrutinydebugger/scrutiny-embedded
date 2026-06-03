@@ -535,14 +535,14 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
     datalogger.arm_trigger();
     datalogger.force_trigger();
     i = 0;
-    while (datalogger.get_state() != scrutiny::datalogging::DataLogger::State::ACQUISITION_COMPLETED && i < max_loop)
+    while (datalogger.get_state() != scrutiny::datalogging::DataLogger::State::AcquisitionCompleted && i < max_loop)
     {
         datalogger.process();
         tb.step(5);
         i++;
     }
     datalogger.process();
-    ASSERT_EQ(datalogger.get_state(), scrutiny::datalogging::DataLogger::State::ACQUISITION_COMPLETED);
+    ASSERT_EQ(datalogger.get_state(), scrutiny::datalogging::DataLogger::State::AcquisitionCompleted);
 
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
     RawFormatParser parser;

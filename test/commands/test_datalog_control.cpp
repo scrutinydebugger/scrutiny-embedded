@@ -667,7 +667,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
 {
 
     // Get Status
-    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Idle, 0, 0);
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
@@ -678,11 +678,11 @@ TEST_F(TestDatalogControl, TestGetStatus)
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
 
-    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Configured, 0, 0);
     scrutiny_handler.datalogger()->arm_trigger();
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
-    check_get_status(datalogging::DataLogger::State::ARMED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Armed, 0, 0);
 
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
     test_configure(0, 0, refconfig, protocol::ResponseCode::Overflow, false);
@@ -695,7 +695,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     EXPECT_IS_PROTOCOL_RESPONSE(dummy_buffer, protocol::CommandId::DataLogControl, 2, protocol::ResponseCode::Overflow);
     scrutiny_handler.process(0);
 
-    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0); // Gets reset if in error.
+    check_get_status(datalogging::DataLogger::State::Idle, 0, 0); // Gets reset if in error.
 
     refconfig = get_valid_reference_configuration();
     refconfig.decimation = 1;
@@ -703,11 +703,11 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0);
     fixed_freq_loop.process();
 
-    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Configured, 0, 0);
     scrutiny_handler.datalogger()->arm_trigger();
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
-    check_get_status(datalogging::DataLogger::State::ARMED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Armed, 0, 0);
 
     // We are rmed. We will force a full acquisition and make sure it is correctly reported.
     scrutiny_handler.datalogger()->force_trigger();
@@ -724,7 +724,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     fixed_freq_loop.process();
     scrutiny_handler.process(1);
     ASSERT_TRUE(scrutiny_handler.datalogger()->data_acquired());
-    check_get_status(datalogging::DataLogger::State::ACQUISITION_COMPLETED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::AcquisitionCompleted, 0, 0);
 }
 
 TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
@@ -980,7 +980,7 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
 {
     uint8_t tx_buffer[32] = { 0 };
     // Get Status
-    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Idle, 0, 0);
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     test_configure(0, 0, refconfig, protocol::ResponseCode::OK); // Assign to Loop 0 (Fixed freq)
@@ -991,7 +991,7 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
     fixed_freq_loop.process();   // Send status
     scrutiny_handler.process(0); // Receive status
 
-    check_get_status(datalogging::DataLogger::State::CONFIGURED, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Configured, 0, 0);
     EXPECT_TRUE(scrutiny_handler.datalogging_ownership_taken());
 
     uint8_t request_data[8] = { 5, 8, 0, 0 };
@@ -1010,7 +1010,7 @@ TEST_F(TestDatalogControl, TestResetDatalogger)
     EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 8, protocol::ResponseCode::OK);
     EXPECT_FALSE(scrutiny_handler.datalogging_ownership_taken());
     // Acquisition complete. Process for IPC message to be transferred from loop to main
-    check_get_status(datalogging::DataLogger::State::IDLE, 0, 0);
+    check_get_status(datalogging::DataLogger::State::Idle, 0, 0);
 }
 
 #endif

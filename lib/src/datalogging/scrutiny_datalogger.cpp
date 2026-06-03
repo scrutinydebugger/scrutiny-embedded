@@ -217,7 +217,7 @@ namespace scrutiny
 
         void DataLogger::arm_trigger(void)
         {
-            if (m_state == State::Configured || m_state == State::AcquisitionComplete || m_state == State::Triggered)
+            if (m_state == State::Configured || m_state == State::AcquisitionCompleted || m_state == State::Triggered)
             {
                 m_state = State::Armed;
             }
@@ -225,7 +225,7 @@ namespace scrutiny
 
         void DataLogger::disarm_trigger(void)
         {
-            if (m_state == State::Armed || m_state == State::AcquisitionComplete || m_state == State::Triggered)
+            if (m_state == State::Armed || m_state == State::AcquisitionCompleted || m_state == State::Triggered)
             {
                 m_state = State::Configured;
             }
@@ -233,14 +233,14 @@ namespace scrutiny
 
         void DataLogger::process(void)
         {
-            // IDLE --> CONFIGURED --> ARMED --> TRIGGERED --> AcquisitionComplete.
-            // We acquire in both CONFIGURED and ARMED state so that we can have data before the trigger as well.
+            // Idle --> Configured --> Armed --> Triggered --> AcquisitionCompleted.
+            // We acquire in both Configured and Armed state so that we can have data before the trigger as well.
 
             switch (m_state)
             {
             case State::Idle:
             case State::Error:
-            case State::AcquisitionComplete:
+            case State::AcquisitionCompleted:
                 break;
             case State::Configured:
             case State::Armed:
@@ -270,7 +270,7 @@ namespace scrutiny
                         if (acquisition_completed())
                         {
                             m_acquisition_id++;
-                            m_state = State::AcquisitionComplete;
+                            m_state = State::AcquisitionCompleted;
                             m_log_points_after_trigger = m_encoder.get_entry_write_counter();
                         }
                     }
@@ -301,7 +301,7 @@ namespace scrutiny
 
         bool DataLogger::acquisition_completed(void)
         {
-            if (m_state == State::AcquisitionComplete)
+            if (m_state == State::AcquisitionCompleted)
             {
                 return true;
             }

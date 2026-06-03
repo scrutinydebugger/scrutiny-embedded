@@ -333,7 +333,7 @@ namespace scrutiny
             m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion =
                 msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
             m_datalogging.threadsafe_data.write_counter_since_trigger = msg->data.datalogger_status_update.write_counter_since_trigger;
-            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::AcquisitionComplete)
+            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::AcquisitionCompleted)
             {
                 m_datalogging.reading_in_progress = false;
             }

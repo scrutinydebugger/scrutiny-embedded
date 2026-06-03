@@ -169,20 +169,20 @@ namespace scrutiny
         {
             switch (val)
             {
-            case DataLogger::State::IDLE:
-                out << "IDLE";
+            case DataLogger::State::Idle:
+                out << "Idle";
                 break;
-            case DataLogger::State::ARMED:
-                out << "ARMED";
+            case DataLogger::State::Armed:
+                out << "Armed";
                 break;
-            case DataLogger::State::CONFIGURED:
-                out << "CONFIGURED";
+            case DataLogger::State::Configured:
+                out << "Configured";
                 break;
-            case DataLogger::State::ACQUISITION_COMPLETED:
-                out << "ACQUISITION_COMPLETED";
+            case DataLogger::State::AcquisitionCompleted:
+                out << "AcquisitionCompleted";
                 break;
-            case DataLogger::State::ERROR:
-                out << "ERROR";
+            case DataLogger::State::Error:
+                out << "Error";
                 break;
             default:
                 out << "UNKNOWN";

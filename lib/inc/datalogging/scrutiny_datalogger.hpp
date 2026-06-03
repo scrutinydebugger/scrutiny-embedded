@@ -9,13 +9,13 @@
 #ifndef ___SCRUTINY_DATALOGGER_H___
 #define ___SCRUTINY_DATALOGGER_H___
 
-#include <stdint.h>
 #include "datalogging/scrutiny_datalogging_data_encoding.hpp"
 #include "datalogging/scrutiny_datalogging_trigger.hpp"
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "scrutiny_compiler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -44,7 +44,7 @@ namespace scrutiny
                     Configured,
                     Armed,
                     Triggered,
-                    AcquisitionComplete,
+                    AcquisitionCompleted,
                     Error
                 };
                 // clang-format on
@@ -60,7 +60,7 @@ namespace scrutiny
                 MainHandler const *const main_handler,
                 unsigned char *const buffer,
                 buffer_size_t const buffer_size,
-                trigger_callback_t trigger_callback = reinterpret_cast<trigger_callback_t>(SCRUTINY_NULL));
+                trigger_callback_t trigger_callback = SCRUTINY_NULL);
 
             /// @brief Configure the datalogger with a configuration received by the server
             /// @param timebase The timebase used for time logging & trigger management
@@ -75,7 +75,7 @@ namespace scrutiny
 
             /// @brief Tells if data has been acquired and ready to be read
             /// @return True if data is acquired
-            inline bool data_acquired(void) const { return m_state == State::AcquisitionComplete; }
+            inline bool data_acquired(void) const { return m_state == State::AcquisitionCompleted; }
 
             /// @brief  Returns the acquisition ID of the last acquisition
             inline uint16_t get_acquisition_id(void) const { return m_acquisition_id; }
