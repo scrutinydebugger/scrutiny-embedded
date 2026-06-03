@@ -68,7 +68,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @param main_handler The `MainHandler` object to work on.
     /// @param data Pointer to the data buffer
     /// @param len Length of the data
-    void scrutiny_c_main_handler_receive_data(scrutiny_c_main_handler_t *main_handler, uint8_t const *data, uint16_t const len);
+    void scrutiny_c_main_handler_receive_data(scrutiny_c_main_handler_t *main_handler, unsigned char const *data, uint16_t const len);
 
     /// @brief Wrapper for `MainHandler::pop_data()`.
     /// Reads data from the scrutiny-embedded lib output stream so it can be sent to the server
@@ -76,7 +76,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @param buffer Buffer to write the data into
     /// @param len Maximum length of the data to read
     /// @return Number of bytes actually read
-    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *main_handler, uint8_t *buffer, uint16_t const len);
+    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *main_handler, unsigned char *buffer, uint16_t const len);
 
     /// @brief Wrapper for `MainHandler::data_to_send()`.
     /// Tells how much data is available in the scrutiny-embedded lib output stream
@@ -102,9 +102,9 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @param tx_buffer_size Transmission buffer size
     void scrutiny_c_config_set_buffers(
         scrutiny_c_config_t *config,
-        uint8_t *rx_buffer,
+        unsigned char *rx_buffer,
         uint16_t const rx_buffer_size,
-        uint8_t *tx_buffer,
+        unsigned char *tx_buffer,
         uint16_t const tx_buffer_size);
 
     /// @brief Wrapper for `Config::set_forbidden_address_range()`
@@ -114,7 +114,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
     /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
     /// @param count Number of ranges in the given array
-    void scrutiny_c_config_set_forbidden_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint8_t const count);
+    void scrutiny_c_config_set_forbidden_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count);
 
     /// @brief Wrapper for `Config::set_readonly_address_range()
     /// Defines some memory sections that are read-only`
@@ -123,7 +123,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
     /// Consider using `scrutiny::tools::make_address_range()` to generate these objects in a one-liner
     /// @param count Number of ranges in the given array
-    void scrutiny_c_config_set_readonly_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint8_t const count);
+    void scrutiny_c_config_set_readonly_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint_least8_t const count);
 
     /// @brief Wrapper for `scrutiny::set_published_values()`
     /// Configures the Runtime Published Values
@@ -148,7 +148,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// This array must be allocated outside of Scrutiny and stay
     /// allocated forever as no copy will be made
     /// @param loop_count Number of `scrutiny::LoopHandler`
-    void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint8_t const loop_count);
+    void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint_least8_t const loop_count);
 
     /// @brief Wrapper for `Config::set_user_command_callback()`
     /// Sets a callback to be called by Scrutiny after a request to the UserCommand function.
@@ -164,7 +164,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @param config The `scrutiny::Config` object to work on
     /// @param buffer The datalogging buffer
     /// @param buffer_size The datalogging buffer size
-    void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, uint8_t *buffer, scrutiny_c_datalogging_buffer_size_t buffer_size);
+    void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, unsigned char *buffer, scrutiny_c_datalogging_buffer_size_t buffer_size);
 
     /// @brief Wrapper for `Config::set_datalogging_trigger_callback()`
     /// Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
