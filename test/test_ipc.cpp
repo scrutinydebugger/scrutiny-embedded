@@ -11,14 +11,23 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if (defined(__STDCPP_THREADS__) && __STDCPP_THREADS__) && SCRUTINY_HAS_CPP11
-#include <chrono>
+#if __unix__
+#include <unistd.h>
+#endif
+
+#if defined(__STDCPP_THREADS__) && __STDCPP_THREADS__
 #include <thread>
-#elif (defined(_POSIX_THREADS) || defined(_REENTRANT))
-#include <ctime>
+#elif defined(_POSIX_THREADS) || defined(_REENTRANT)
 #include <pthread.h>
 #else
+// Win32 with c++98 ???
 #error "Test require an OS with thread capabilities."
+#endif
+
+#if SCRUTINY_HAS_CPP11
+#include <chrono>
+#else
+#include <ctime>
 #endif
 
 class SomeEnum
