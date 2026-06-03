@@ -416,17 +416,17 @@ TEST_F(TestDatalogger, ComplexAcquisition)
             if (i > 0)
             {
                 vector<vector<unsigned char> > last_entry = data[i - 1];
-                float check_var1 = *reinterpret_cast<float *>(entry[0].data());
-                float check_last_var1 = *reinterpret_cast<float *>(last_entry[0].data());
+                float check_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(entry[0]));
+                float check_last_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(last_entry[0]));
 
-                int32_t check_var2 = *reinterpret_cast<int32_t *>(entry[1].data());
-                int32_t check_last_var2 = *reinterpret_cast<int32_t *>(last_entry[1].data());
+                int32_t check_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(entry[1]));
+                int32_t check_last_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(last_entry[1]));
 
-                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian(entry[2].data());
-                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian(last_entry[2].data());
+                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[2]));
+                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[2]));
 
-                uint32_t check_time = codecs::decode_32_bits_big_endian(entry[3].data());
-                uint32_t check_last_time = codecs::decode_32_bits_big_endian(last_entry[3].data());
+                uint32_t check_time = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[3]));
+                uint32_t check_last_time = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[3]));
 
                 EXPECT_EQ(check_var1 - check_last_var1, 2.0f) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_var2 - check_last_var2, -2) << "i=" << i << "," << error_msg;
@@ -442,9 +442,9 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
         EXPECT_NEAR(trigger_location, static_cast<uint32_t>(data.size() - datalogger.log_points_after_trigger()), 1u);
 
-        float mid_var1 = *reinterpret_cast<float *>(data[trigger_location][0].data());
-        int32_t mid_var2 = *reinterpret_cast<int32_t *>(data[trigger_location][1].data());
-        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian(data[trigger_location][2].data());
+        float mid_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(data[trigger_location][0]));
+        int32_t mid_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(data[trigger_location][1]));
+        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(data[trigger_location][2]));
 
         // Validate position of trigger and end of graph. Allow a margin of 3 (1.5 entry because decimation=2)
         EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
@@ -565,11 +565,11 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
         vector<vector<unsigned char> > entry = data[i];
         ASSERT_EQ(entry.size(), 1); // 1 signal = time
 
-        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian(entry[0].data());
+        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[0]));
         if (i > 0)
         {
             vector<vector<unsigned char> > last_entry = data[i - 1];
-            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian(last_entry[0].data());
+            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[0]));
             ASSERT_EQ(timestamp - last_timestamp, 5) << "Entry #" << i;
         }
     }

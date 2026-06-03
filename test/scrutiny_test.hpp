@@ -1,4 +1,4 @@
-//    scrutiny_test.hpp
+//    scrutinytest.hpp
 //        Base class for CPP unit tests.
 //        All test should inherit this class.
 //         Includes bunch of helper for easy testing.
@@ -25,6 +25,12 @@
     SCRUTINYTEST_ASSERT_WITH_DETAILS(                                                                                                                \
         TEST_IS_PROTOCOL_RESPONSE(buffer, cmd, subfunction, code),                                                                                   \
         "ASSERT_IS_PROTOCOL_RESPONSE(" #buffer "," #cmd "," #subfunction "," #code ")")
+
+#if SCRUTINY_HAS_CPP11
+#define GET_VEC_DATA(v) (v.data())
+#else
+#define GET_VEC_DATA(v) (&v[0])
+#endif
 
 class ScrutinyTest : public scrutinytest::TestCase
 {

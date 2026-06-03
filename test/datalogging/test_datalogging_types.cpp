@@ -35,10 +35,12 @@ TEST(TestDataLoggingTypes, ConvertToCompareType)
     scrutiny::VariableType::eVariableType vtype;
     scrutiny::AnyType v;
 
+#if CHAR_BIT == 8
     vtype = scrutiny::VariableType::sint8;
     v.sint8 = -50;
     scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
     EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -50);
+#endif
 
     vtype = scrutiny::VariableType::sint16;
     v.sint16 = -1000;
@@ -50,10 +52,12 @@ TEST(TestDataLoggingTypes, ConvertToCompareType)
     scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
     EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -100000);
 
+#if CHAR_BIT == 8
     vtype = scrutiny::VariableType::uint8;
     v.uint8 = 50;
     scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
     EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_uint, 50u);
+#endif
 
     vtype = scrutiny::VariableType::uint16;
     v.uint16 = 1000;

@@ -10,6 +10,7 @@
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
+#include <climits>
 
 #include <map>
 #include <vector>
@@ -62,11 +63,12 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint16 = v3;
     }
-
+#if CHAR_BIT == 8
     else if (rpv.id == 0x9000 && rpv.type == scrutiny::VariableType::uint8)
     {
         outval->uint8 = 0x99;
     }
+#endif    
     else if (rpv.id == 0x9001 && rpv.type == scrutiny::VariableType::uint16)
     {
         outval->uint16 = 0xA5A5;
@@ -75,10 +77,12 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint32 = 0x99887766;
     }
+#if CHAR_BIT == 8    
     else if (rpv.id == 0x9004 && rpv.type == scrutiny::VariableType::sint8)
     {
         outval->sint8 = -64;
     }
+#endif
     else if (rpv.id == 0x9005 && rpv.type == scrutiny::VariableType::sint16)
     {
         outval->sint16 = -30000;
@@ -120,10 +124,12 @@ struct AllTypeResult
 
     void clear()
     {
+#if CHAR_BIT == 8        
         some_u8 = 0;
+        some_s8 = 0;
+#endif        
         some_u16 = 0;
         some_u32 = 0;
-        some_s8 = 0;
         some_s16 = 0;
         some_s32 = 0;
         some_f32 = 0;
@@ -136,14 +142,13 @@ struct AllTypeResult
 
 #if CHAR_BIT == 8
     unsigned char some_u8;
-#endif
-    uint16_t some_u16;
-    uint32_t some_u32;
-
-#if CHAR_BIT == 8
     int8_t some_s8;
 #endif
+    
+    uint16_t some_u16;
     int16_t some_s16;
+    
+    uint32_t some_u32;
     int32_t some_s32;
 
     float some_f32;
@@ -718,10 +723,12 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     EXPECT_EQ(nread, n_to_read);
     ASSERT_BUF_EQ(tx_buffer, expected_response, required_response_size);
 
+#if CHAR_BIT == 8
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u8, 0x55u);
+    EXPECT_EQ(dest_buffer_for_rpv_write.some_s8, -64);
+#endif
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u16, 0xABCDu);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_u32, 0x12345678u);
-    EXPECT_EQ(dest_buffer_for_rpv_write.some_s8, -64);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s16, -30000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_s32, -1000000000);
     EXPECT_EQ(dest_buffer_for_rpv_write.some_f32, 1.45f);

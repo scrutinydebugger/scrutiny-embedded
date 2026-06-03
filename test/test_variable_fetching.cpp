@@ -10,6 +10,7 @@
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstddef>
+#include <climits>
 
 class TestVariableFetching : public ScrutinyTest
 {
@@ -178,8 +179,10 @@ TEST_F(TestVariableFetching, Bitfield)
 
 #pragma pack(pop)
 
+#if CHAR_BIT == 8
     data_u8.val = 6;
     data_s8.val = -15;
+#endif
     data_u16.val = 300;
     data_s16.val = -400;
     data_u32.val = 100000;
@@ -191,8 +194,11 @@ TEST_F(TestVariableFetching, Bitfield)
     data_bool.b1 = true;
     data_bool.b2 = static_cast<bool>(123);
 
+#if CHAR_BIT == 8    
+    // Fixme
     memcpy(&some_buffer[0], &data_u8, sizeof(data_u8));
     memcpy(&some_buffer[1], &data_s8, sizeof(data_s8));
+#endif    
     memcpy(&some_buffer[2], &data_u16, sizeof(data_u16));
     memcpy(&some_buffer[4], &data_s16, sizeof(data_s16));
     memcpy(&some_buffer[6], &data_u32, sizeof(data_u32));
@@ -204,9 +210,10 @@ TEST_F(TestVariableFetching, Bitfield)
     memcpy(&some_buffer[23], &data_s64, sizeof(data_s64));
 #endif
 
+    bool success;
     scrutiny::AnyType outval;
     scrutiny::VariableType::eVariableType outtype;
-    bool success;
+#if CHAR_BIT == 8
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[0], scrutiny::VariableTypeType::_uint, 2, 3, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint8, data_u8.val);
@@ -216,7 +223,7 @@ TEST_F(TestVariableFetching, Bitfield)
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.sint8, data_s8.val);
     EXPECT_EQ(outtype, scrutiny::VariableType::sint8);
-
+#endif
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[2], scrutiny::VariableTypeType::_uint, 4, 10, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint16, data_u16.val);

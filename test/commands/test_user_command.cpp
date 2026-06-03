@@ -73,7 +73,7 @@ void my_callback1(
 }
 
 void my_callback2(
-    unsigned char const subfunction,
+    uint_least8_t const subfunction,
     unsigned char const *request_data,
     uint16_t const request_data_length,
     unsigned char *response_data,
