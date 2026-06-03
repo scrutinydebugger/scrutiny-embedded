@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
 #if !(SCRUTINY_BUILD_WINDOWS || SCRUTINY_BUILD_X64 || SCRUTINY_BUILD_X86)
 #error "Test require an OS with thread capabilities."
 #endif

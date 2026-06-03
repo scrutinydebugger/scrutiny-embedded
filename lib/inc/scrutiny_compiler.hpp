@@ -47,8 +47,6 @@
 #define SCRUTINY_BUILD_TRICORE 0
 #define SCRUTINY_BUILD_TI_C28 0
 
-
-
 #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN32__) || defined(__CYGWIN64__) || defined(_MSC_VER) || defined(_WIN64) ||               \
     defined(__WIN64__) || defined(__MINGW32__) || defined(__MINGW64__)
 #undef SCRUTINY_BUILD_WINDOWS

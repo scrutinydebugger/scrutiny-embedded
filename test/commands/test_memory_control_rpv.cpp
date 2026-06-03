@@ -9,8 +9,8 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
-#include <cstring>
 #include <climits>
+#include <cstring>
 
 #include <map>
 #include <vector>
@@ -68,7 +68,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint8 = 0x99;
     }
-#endif    
+#endif
     else if (rpv.id == 0x9001 && rpv.type == scrutiny::VariableType::uint16)
     {
         outval->uint16 = 0xA5A5;
@@ -77,7 +77,7 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     {
         outval->uint32 = 0x99887766;
     }
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     else if (rpv.id == 0x9004 && rpv.type == scrutiny::VariableType::sint8)
     {
         outval->sint8 = -64;
@@ -124,10 +124,10 @@ struct AllTypeResult
 
     void clear()
     {
-#if CHAR_BIT == 8        
+#if CHAR_BIT == 8
         some_u8 = 0;
         some_s8 = 0;
-#endif        
+#endif
         some_u16 = 0;
         some_u32 = 0;
         some_s16 = 0;
@@ -144,10 +144,10 @@ struct AllTypeResult
     unsigned char some_u8;
     int8_t some_s8;
 #endif
-    
+
     uint16_t some_u16;
     int16_t some_s16;
-    
+
     uint32_t some_u32;
     int32_t some_s32;
 

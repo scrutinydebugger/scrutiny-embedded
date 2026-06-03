@@ -9,8 +9,8 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
-#include <cstddef>
 #include <climits>
+#include <cstddef>
 
 class TestVariableFetching : public ScrutinyTest
 {
@@ -194,11 +194,11 @@ TEST_F(TestVariableFetching, Bitfield)
     data_bool.b1 = true;
     data_bool.b2 = static_cast<bool>(123);
 
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     // Fixme
     memcpy(&some_buffer[0], &data_u8, sizeof(data_u8));
     memcpy(&some_buffer[1], &data_s8, sizeof(data_s8));
-#endif    
+#endif
     memcpy(&some_buffer[2], &data_u16, sizeof(data_u16));
     memcpy(&some_buffer[4], &data_s16, sizeof(data_s16));
     memcpy(&some_buffer[6], &data_u32, sizeof(data_u32));
