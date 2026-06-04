@@ -152,7 +152,6 @@ TEST(TestIPC, CheckWithThread)
     clock_gettime(CLOCK_MONOTONIC, &t1);
 #endif
 
-
     while (!thread_data.thread_exit)
     {
         if (thread_data.msg_from_thread.has_content())

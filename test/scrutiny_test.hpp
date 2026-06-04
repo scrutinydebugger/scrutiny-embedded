@@ -86,7 +86,6 @@ class ScrutinyTest : public scrutinytest::TestCase
         return o;
     }
 
-
     template <typename T> std::string NumberToString(T Number)
     {
         std::ostringstream ss;
@@ -94,7 +93,8 @@ class ScrutinyTest : public scrutinytest::TestCase
         {
             ss << static_cast<int>(Number);
         }
-        else{
+        else
+        {
             ss << Number;
         }
 

@@ -22,20 +22,21 @@
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
 
-#define SIZEOF_8BITS(T) (sizeof(T)*(CHAR_BIT/8))
+#define SIZEOF_8BITS(T) (sizeof(T) * (CHAR_BIT / 8))
 
 namespace scrutiny
 {
     namespace protocol
     {
-        inline void memcpy_dilate_8bits(void* const dst, void const * const src, size_t const nb_8bits)
+        inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
         {
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-            for (int_fast8_t i=0; i<(nb_8bits >> 1); i++){
-                static_cast<unsigned char*>(dst)[2*i] = (src[i] >> 8) & 0xFF;
-                static_cast<unsigned char*>(dst)[2*i+1] = (src[i] & 0xFF);
+            for (int_fast8_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[2 * i] = (src[i] >> 8) & 0xFF;
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (src[i] & 0xFF);
             }
 #endif
         }
@@ -598,8 +599,8 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = static_cast<uint_least8_t>(response_data->region_type) & 0xFF ;
-            response->data[1] = response_data->region_index & 0xFF ;
+            response->data[0] = static_cast<uint_least8_t>(response_data->region_type) & 0xFF;
+            response->data[1] = response_data->region_index & 0xFF;
             codecs::encode_address_big_endian(response_data->start, &response->data[2]);
             codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
             response->data_length = 1 + 1 + addr_size + addr_size;
@@ -669,7 +670,7 @@ namespace scrutiny
             Request const *const request,
             RequestData::GetInfo::GetLoopDefinition *const request_data)
         {
-            SCRUTINY_CONSTEXPR uint16_t loop_id_len = 1; //sizeof(request_data->loop_id);
+            SCRUTINY_CONSTEXPR uint16_t loop_id_len = 1; // sizeof(request_data->loop_id);
             SCRUTINY_CONSTEXPR uint16_t datalen = loop_id_len;
 
             if (request->data_length != datalen)
@@ -686,9 +687,9 @@ namespace scrutiny
             Response *const response)
         {
             SCRUTINY_STATIC_ASSERT(SIZEOF_8BITS(timediff_t) == 4, "Unsupported timediff size");
-            SCRUTINY_CONSTEXPR uint16_t loop_id_size = 1 ;
+            SCRUTINY_CONSTEXPR uint16_t loop_id_size = 1;
             SCRUTINY_CONSTEXPR uint16_t loop_type_size = 1;
-            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = 1 ; // datalogging is embedded in bitfield
+            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = 1; // datalogging is embedded in bitfield
             SCRUTINY_CONSTEXPR uint16_t timestep_100ns_size = 4;
             SCRUTINY_CONSTEXPR uint16_t name_length_size = 1;
 
@@ -883,7 +884,7 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            memcpy(&response->data[0], response_data->magic, magic_size);   // No need to dilate, array not packed
+            memcpy(&response->data[0], response_data->magic, magic_size); // No need to dilate, array not packed
             codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
 
             return ResponseCode::OK;
@@ -1122,7 +1123,7 @@ namespace scrutiny
                 *finished = true;
             }
 
-            codecs::encode_8_bits( static_cast<uint_least8_t>((*finished) ? 1 : 0), &response->data[0]);
+            codecs::encode_8_bits(static_cast<uint_least8_t>((*finished) ? 1 : 0), &response->data[0]);
 
             return protocol::ResponseCode::OK;
         }
@@ -1136,7 +1137,6 @@ namespace scrutiny
             {
                 return ResponseCode::InvalidRequest;
             }
-
 
             request_data->loop_id = request->data[0] & 0xFF;
             request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
