@@ -95,7 +95,7 @@ TEST_F(TestFetchOperands, TestFetchLiteral)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::LITERAL;
+    operand.type = OperandType::Literal;
     operand.data.literal.val = 0.1234f;
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype, SCRUTINY_NULL);
     EXPECT_TRUE(success);
@@ -111,7 +111,7 @@ TEST_F(TestFetchOperands, TestFetchVar)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::VAR;
+    operand.type = OperandType::Var;
     operand.data.var.addr = &my_var;
     operand.data.var.datatype = scrutiny::VariableType::float32;
 
@@ -128,7 +128,7 @@ TEST_F(TestFetchOperands, TestFetchRPV)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::RPV;
+    operand.type = OperandType::Rpv;
 
     operand.data.rpv.id = 0x1234;
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype, SCRUTINY_NULL);
@@ -160,7 +160,7 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::VARBIT;
+    operand.type = OperandType::VarBit;
 
     operand.data.varbit.addr = &my_struct;
     operand.data.varbit.datatype = scrutiny::VariableType::sint16;
@@ -191,7 +191,7 @@ TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::VAR;
+    operand.type = OperandType::Var;
     operand.data.var.addr = forbidden_buffer;
     operand.data.var.datatype = scrutiny::VariableType::uint8;
 
@@ -205,7 +205,7 @@ TEST_F(TestFetchOperands, TestFetchInexistandRPV)
     scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::RPV;
+    operand.type = OperandType::Rpv;
     operand.data.rpv.id = 0xAAAA;
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype, SCRUTINY_NULL);
@@ -234,7 +234,7 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     bool success = false;
 
     Operand operand;
-    operand.type = OperandType::VARBIT;
+    operand.type = OperandType::VarBit;
     operand.data.varbit.addr = &my_struct;
     operand.data.varbit.datatype = scrutiny::VariableType::sint8;
 

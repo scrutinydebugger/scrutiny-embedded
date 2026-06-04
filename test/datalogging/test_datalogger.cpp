@@ -149,11 +149,11 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::VAR;
+    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
     dlconfig.trigger.operands[0].data.var.addr = &my_var;
     dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
+    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
     datalogger.config()->copy_from(&dlconfig);
@@ -190,11 +190,11 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::VAR;
+    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
     dlconfig.trigger.operands[0].data.var.addr = &my_var;
     dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
+    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
     dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
 
     datalogger.config()->copy_from(&dlconfig);
@@ -228,11 +228,11 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::GreaterThan;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::VAR;
+    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
     dlconfig.trigger.operands[0].data.var.addr = &my_var;
     dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
+    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
     dlconfig.trigger.operands[1].data.literal.val = 100;
 
     datalogger.config()->copy_from(&dlconfig);
@@ -297,11 +297,11 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::VAR;
+    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
     dlconfig.trigger.operands[0].data.var.addr = &trigger_val;
     dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::LITERAL;
+    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
     dlconfig.trigger.operands[1].data.literal.val = 100.0f;
 
     uint_least8_t probe_location = 0;

@@ -1486,7 +1486,7 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
             {
-                if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
+                if (config->trigger.operands[i].type == datalogging::OperandType::Var)
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
@@ -1496,7 +1496,7 @@ namespace scrutiny
                         break;
                     }
                 }
-                else if (config->trigger.operands[i].type == datalogging::OperandType::VARBIT)
+                else if (config->trigger.operands[i].type == datalogging::OperandType::VarBit)
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.varbit.addr,
@@ -1506,7 +1506,7 @@ namespace scrutiny
                         break;
                     }
                 }
-                else if (config->trigger.operands[i].type == datalogging::OperandType::RPV)
+                else if (config->trigger.operands[i].type == datalogging::OperandType::Rpv)
                 {
 
                     if (!m_config.is_read_published_values_configured() || !rpv_exists(config->trigger.operands[i].data.rpv.id))

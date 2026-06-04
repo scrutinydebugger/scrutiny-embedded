@@ -1124,15 +1124,15 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->loop_id = request->data[0];
+            request_data->loop_id = request->data[0] & 0xFF;
             request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
 
             config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
-            config->probe_location = request->data[5];
+            config->probe_location = request->data[5] & 0xFF;
             config->timeout_100ns = codecs::decode_32_bits_big_endian(&request->data[6]);
             config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(request->data[10]);
             config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian(&request->data[11]);
-            config->trigger.operand_count = request->data[15];
+            config->trigger.operand_count = request->data[15] & 0xFF;
 
             if (config->trigger.operand_count > datalogging::MAX_OPERANDS)
             {
@@ -1153,7 +1153,7 @@ namespace scrutiny
 
                 switch (optype)
                 {
-                case datalogging::OperandType::LITERAL:
+                case datalogging::OperandType::Literal:
                 {
                     if (request->data_length < cursor + sizeof(float))
                     {
@@ -1163,7 +1163,7 @@ namespace scrutiny
                     cursor += sizeof(float);
                     break;
                 }
-                case datalogging::OperandType::RPV:
+                case datalogging::OperandType::Rpv:
                 {
                     if (request->data_length < cursor + sizeof(uint16_t))
                     {
@@ -1173,7 +1173,7 @@ namespace scrutiny
                     cursor += sizeof(uint16_t);
                     break;
                 }
-                case datalogging::OperandType::VAR:
+                case datalogging::OperandType::Var:
                 {
                     if (request->data_length < cursor + 1 + sizeof(void *))
                     {
@@ -1185,7 +1185,7 @@ namespace scrutiny
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
                     break;
                 }
-                case datalogging::OperandType::VARBIT:
+                case datalogging::OperandType::VarBit:
                 {
                     if (request->data_length < cursor + 3 + sizeof(void *))
                     {

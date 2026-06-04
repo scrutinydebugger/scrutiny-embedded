@@ -105,24 +105,24 @@ namespace scrutiny
             LoopHandler *const caller)
         {
             bool success = true;
-            if (operand->type == OperandType::LITERAL)
+            if (operand->type == OperandType::Literal)
             {
                 val->float32 = operand->data.literal.val;
                 *variable_type = VariableType::float32;
             }
-            else if (operand->type == OperandType::RPV)
+            else if (operand->type == OperandType::Rpv)
             {
                 RuntimePublishedValue rpv;
                 main_handler->get_rpv(operand->data.rpv.id, &rpv);
                 success = main_handler->get_rpv_read_callback()(rpv, val, caller);
                 *variable_type = rpv.type;
             }
-            else if (operand->type == OperandType::VAR)
+            else if (operand->type == OperandType::Var)
             {
                 success = main_handler->fetch_variable(operand->data.var.addr, operand->data.var.datatype, val);
                 *variable_type = operand->data.var.datatype;
             }
-            else if (operand->type == OperandType::VARBIT)
+            else if (operand->type == OperandType::VarBit)
             {
                 success = main_handler->fetch_variable_bitfield(
                     operand->data.var.addr,

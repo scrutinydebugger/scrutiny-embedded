@@ -177,7 +177,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].type), &buffer[cursor]);
         switch (dlconfig->trigger.operands[i].type)
         {
-        case datalogging::OperandType::LITERAL:
+        case datalogging::OperandType::Literal:
             if (cursor + 4 > max_size)
             {
                 return 0;
@@ -185,7 +185,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             codecs::encode_float_big_endian(dlconfig->trigger.operands[i].data.literal.val, &buffer[cursor]);
             cursor += sizeof(float);
             break;
-        case datalogging::OperandType::RPV:
+        case datalogging::OperandType::Rpv:
             if (cursor + 2 > max_size)
             {
                 return 0;
@@ -193,7 +193,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             codecs::encode_16_bits_big_endian(dlconfig->trigger.operands[i].data.rpv.id, &buffer[cursor]);
             cursor += sizeof(uint16_t);
             break;
-        case datalogging::OperandType::VAR:
+        case datalogging::OperandType::Var:
             if (cursor + 1 + sizeof(void *) > max_size)
             {
                 return 0;
@@ -202,7 +202,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             cursor += codecs::encode_address_big_endian(dlconfig->trigger.operands[i].data.var.addr, &buffer[cursor]);
             break;
 
-        case datalogging::OperandType::VARBIT:
+        case datalogging::OperandType::VarBit:
             if (cursor + 1 + 1 + 1 + sizeof(void *) > max_size)
             {
                 return 0;
@@ -272,9 +272,9 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     refconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
     refconfig.trigger.hold_time_100ns = 0xaabbccdd;
     refconfig.trigger.operand_count = 2;
-    refconfig.trigger.operands[0].type = datalogging::OperandType::LITERAL;
+    refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
     refconfig.trigger.operands[0].data.literal.val = 3.1415926f;
-    refconfig.trigger.operands[1].type = datalogging::OperandType::VAR;
+    refconfig.trigger.operands[1].type = datalogging::OperandType::Var;
     refconfig.trigger.operands[1].data.var.addr = &m_some_var_operand1;
     refconfig.trigger.operands[1].data.var.datatype = VariableType::float32;
 
@@ -444,7 +444,7 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
     {
         std::string error_msg = std::string("i=") + NumberToString(i);
         datalogging::Configuration refconfig = get_valid_reference_configuration();
-        refconfig.trigger.operands[0].type = datalogging::OperandType::LITERAL;
+        refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
         refconfig.trigger.operands[0].data.literal.val = bad_values[i];
         test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest, true, error_msg);
     }
@@ -454,7 +454,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.operands[0].type = datalogging::OperandType::RPV;
+    refconfig.trigger.operands[0].type = datalogging::OperandType::Rpv;
     refconfig.trigger.operands[0].data.rpv.id = 0x9999; // doesn't exist
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);

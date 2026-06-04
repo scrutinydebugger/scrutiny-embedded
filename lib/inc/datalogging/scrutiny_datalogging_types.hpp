@@ -67,10 +67,10 @@ namespace scrutiny
             // clang-format off
             SCRUTINY_ENUM(eOperandType, uint_least8_t)
             {
-                LITERAL = 0,
-                VAR = 1,
-                VARBIT = 2,
-                RPV = 3
+                Literal = 0,
+                Var = 1,
+                VarBit = 2,
+                Rpv = 3
             };
             // clang-format on
         };

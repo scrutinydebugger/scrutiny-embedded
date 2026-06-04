@@ -120,14 +120,14 @@ namespace scrutiny
             {
                 for (uint_least8_t i = 0; i < m_config.trigger.operand_count; i++)
                 {
-                    if (m_config.trigger.operands[i].type == OperandType::LITERAL)
+                    if (m_config.trigger.operands[i].type == OperandType::Literal)
                     {
                         if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::RPV)
+                    else if (m_config.trigger.operands[i].type == OperandType::Rpv)
                     {
                         if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
@@ -139,14 +139,14 @@ namespace scrutiny
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::VAR)
+                    else if (m_config.trigger.operands[i].type == OperandType::Var)
                     {
                         if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::VARBIT)
+                    else if (m_config.trigger.operands[i].type == OperandType::VarBit)
                     {
                         // Works with and without 64bits support
                         if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) ||
