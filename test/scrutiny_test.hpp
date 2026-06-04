@@ -86,10 +86,18 @@ class ScrutinyTest : public scrutinytest::TestCase
         return o;
     }
 
+
     template <typename T> std::string NumberToString(T Number)
     {
         std::ostringstream ss;
-        ss << Number;
+        if (sizeof(T) == sizeof(char))
+        {
+            ss << static_cast<int>(Number);
+        }
+        else{
+            ss << Number;
+        }
+
         return ss.str();
     }
 

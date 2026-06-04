@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
   scrutinytest
   GIT_REPOSITORY https://github.com/scrutinydebugger/scrutiny-test-framework
-  GIT_TAG 2a473687d3e546d5215db6517f176f554c59553b
+  GIT_TAG 9e6c9764d6bec3ba991c7e9bd335816abd72abaa
 )
 
 set(SCRUTINYTEST_DISABLE_EXCEPTIONS OFF)
@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_timebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/test_codecs.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp

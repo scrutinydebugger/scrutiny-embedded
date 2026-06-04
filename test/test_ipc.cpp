@@ -29,7 +29,7 @@
 #if SCRUTINY_HAS_CPP11
 #include <chrono>
 #else
-#include <ctime>
+#include <time.h>
 #endif
 
 class SomeEnum
@@ -134,19 +134,24 @@ TEST(TestIPC, CheckWithThread)
 
     uint32_t my_value = 0;
     uint32_t expected_thread_value = 0;
+    bool timeout = false;
 
 #if defined(TEST_IPC_CPPTHREAD)
     std::thread thread(thread_func);
 #elif defined(TEST_IPC_POSIX_THREAD)
     pthread_t thread;
     ASSERT_EQ(pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
+#else
+#error
 #endif
 
 #if SCRUTINY_HAS_CPP11
     auto t1 = std::chrono::high_resolution_clock::now();
 #else
-    std::clock_t t1 = std::clock();
+    struct timespec t1;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
 #endif
+
 
     while (!thread_data.thread_exit)
     {
@@ -177,13 +182,16 @@ TEST(TestIPC, CheckWithThread)
         if (std::chrono::high_resolution_clock::now() - t1 > std::chrono::seconds(TIMEOUT_SEC))
         {
             thread_data.thread_exit = true;
+            timeout = true;
         }
 #else
-        std::clock_t t2 = std::clock();
-        double elapsed_secs = double(t2 - t1) / CLOCKS_PER_SEC;
+        struct timespec t2;
+        clock_gettime(CLOCK_MONOTONIC, &t2);
+        double elapsed_secs = double(t2.tv_sec - t1.tv_sec) + double(t2.tv_nsec - t1.tv_nsec) / 1e9;
         if (elapsed_secs > TIMEOUT_SEC)
         {
             thread_data.thread_exit = true;
+            timeout = true;
         }
 #endif
     }
@@ -192,8 +200,11 @@ TEST(TestIPC, CheckWithThread)
     thread.join();
 #elif defined(TEST_IPC_POSIX_THREAD)
     ASSERT_EQ(pthread_join(thread, NULL), 0);
+#else
+#error
 #endif
 
+    ASSERT_FALSE(timeout) << "Timed out after " << TIMEOUT_SEC << " seconds";
     EXPECT_FALSE(thread_data.error_found_in_main) << "At Iteration #" << thread_data.error_at_iter;
     EXPECT_FALSE(thread_data.error_found_in_thread) << "At Iteration #" << thread_data.error_at_iter;
     EXPECT_GE(my_value, 1000); // Local test > 3.5M

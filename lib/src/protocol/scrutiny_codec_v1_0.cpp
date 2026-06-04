@@ -22,14 +22,28 @@
 #pragma warning(disable : 4127) // Get rid of constexpr always true condition warning.
 #endif
 
+#define SIZEOF_8BITS(T) (sizeof(T)*(CHAR_BIT/8))
+
 namespace scrutiny
 {
     namespace protocol
     {
+        inline void memcpy_dilate_8bits(void* const dst, void const * const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (int_fast8_t i=0; i<(nb_8bits >> 1); i++){
+                static_cast<unsigned char*>(dst)[2*i] = (src[i] >> 8) & 0xFF;
+                static_cast<unsigned char*>(dst)[2*i+1] = (src[i] & 0xFF);
+            }
+#endif
+        }
+
         //==============================================================
         void ReadMemoryBlocksRequestParser::validate(void)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             uint32_t cursor = 0;
 
             while (true)
@@ -64,7 +78,7 @@ namespace scrutiny
 
         void ReadMemoryBlocksRequestParser::next(MemoryBlock *const memblock)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             uint16_t length;
             uintptr_t addr;
             if (m_finished || m_invalid)
@@ -114,7 +128,7 @@ namespace scrutiny
 
         void WriteMemoryBlocksRequestParser::validate(void)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             uint16_t cursor = 0;
 
             while (true)
@@ -152,7 +166,7 @@ namespace scrutiny
 
         void WriteMemoryBlocksRequestParser::next(MemoryBlock *const memblock)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             uint16_t length;
             uintptr_t addr;
             if (m_finished || m_invalid)
@@ -220,7 +234,7 @@ namespace scrutiny
 
         void ReadMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
 
             if (memblock->length > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2) // Make sure that the addition below doesn't blow up
             {
@@ -260,7 +274,7 @@ namespace scrutiny
 
         void WriteMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
 
             if (addr_size + 2u > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -541,7 +555,7 @@ namespace scrutiny
 
         ResponseCode::eResponseCode CodecV1_0::encode_response_software_id(Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(scrutiny::software_id);
+            SCRUTINY_CONSTEXPR uint16_t datalen = SIZEOF_8BITS(scrutiny::software_id);
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -549,7 +563,7 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            memcpy(response->data, scrutiny::software_id, sizeof(scrutiny::software_id));
+            memcpy_dilate_8bits(response->data, scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
             return ResponseCode::OK;
         }
 
@@ -557,15 +571,15 @@ namespace scrutiny
             ResponseData::GetInfo::GetSpecialMemoryRegionCount const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = sizeof(response_data->nbr_readonly_region);
-            SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = sizeof(response_data->nbr_forbidden_region);
+            SCRUTINY_CONSTEXPR uint16_t readonly_region_count_size = 1;
+            SCRUTINY_CONSTEXPR uint16_t forbidden_region_count_size = 1;
             SCRUTINY_CONSTEXPR uint16_t datalen = readonly_region_count_size + forbidden_region_count_size;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
-            response->data[0] = response_data->nbr_readonly_region;
-            response->data[1] = response_data->nbr_forbidden_region;
+            response->data[0] = response_data->nbr_readonly_region & 0xFF;
+            response->data[1] = response_data->nbr_forbidden_region & 0xFF;
             response->data_length = 2;
             return ResponseCode::OK;
         }
@@ -574,9 +588,9 @@ namespace scrutiny
             ResponseData::GetInfo::GetSpecialMemoryRegionLocation const *const response_data,
             Response *response)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
-            SCRUTINY_CONSTEXPR uint16_t region_type_size = sizeof(response_data->region_type);
-            SCRUTINY_CONSTEXPR uint16_t region_index_size = sizeof(response_data->region_index);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
+            SCRUTINY_CONSTEXPR uint16_t region_type_size = 1;
+            SCRUTINY_CONSTEXPR uint16_t region_index_size = 1;
             SCRUTINY_CONSTEXPR uint16_t datalen = region_type_size + region_index_size + 2 * addr_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
@@ -584,8 +598,8 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = static_cast<uint_least8_t>(response_data->region_type);
-            response->data[1] = response_data->region_index;
+            response->data[0] = static_cast<uint_least8_t>(response_data->region_type) & 0xFF ;
+            response->data[1] = response_data->region_index & 0xFF ;
             codecs::encode_address_big_endian(response_data->start, &response->data[2]);
             codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
             response->data_length = 1 + 1 + addr_size + addr_size;
@@ -635,9 +649,9 @@ namespace scrutiny
             RequestData::GetInfo::GetRPVDefinition *const request_data)
         {
             SCRUTINY_CONSTEXPR uint16_t start_index_pos = 0;
-            SCRUTINY_CONSTEXPR uint16_t start_index_size = sizeof(request_data->start_index);
+            SCRUTINY_CONSTEXPR uint16_t start_index_size = 2;
             SCRUTINY_CONSTEXPR uint16_t count_pos = start_index_size;
-            SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(request_data->count);
+            SCRUTINY_CONSTEXPR uint16_t count_size = 2;
 
             SCRUTINY_CONSTEXPR uint16_t datalen = start_index_size + count_size;
 
@@ -655,7 +669,7 @@ namespace scrutiny
             Request const *const request,
             RequestData::GetInfo::GetLoopDefinition *const request_data)
         {
-            SCRUTINY_CONSTEXPR uint16_t loop_id_len = sizeof(request_data->loop_id);
+            SCRUTINY_CONSTEXPR uint16_t loop_id_len = 1; //sizeof(request_data->loop_id);
             SCRUTINY_CONSTEXPR uint16_t datalen = loop_id_len;
 
             if (request->data_length != datalen)
@@ -671,12 +685,12 @@ namespace scrutiny
             ResponseData::GetInfo::GetLoopDefinition const *const response_data,
             Response *const response)
         {
-            SCRUTINY_STATIC_ASSERT(sizeof(timediff_t) == 4, "Unsupported timediff size");
-            SCRUTINY_CONSTEXPR uint16_t loop_id_size = sizeof(response_data->loop_id);
-            SCRUTINY_CONSTEXPR uint16_t loop_type_size = sizeof(response_data->loop_type);
-            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = sizeof(uint_least8_t); // datalogging is embedded in bitfield
-            SCRUTINY_CONSTEXPR uint16_t timestep_100ns_size = sizeof(response_data->loop_type_specific.fixed_freq.timestep_100ns);
-            SCRUTINY_CONSTEXPR uint16_t name_length_size = sizeof(response_data->loop_name_length);
+            SCRUTINY_STATIC_ASSERT(SIZEOF_8BITS(timediff_t) == 4, "Unsupported timediff size");
+            SCRUTINY_CONSTEXPR uint16_t loop_id_size = 1 ;
+            SCRUTINY_CONSTEXPR uint16_t loop_type_size = 1;
+            SCRUTINY_CONSTEXPR uint16_t attribute_field_size = 1 ; // datalogging is embedded in bitfield
+            SCRUTINY_CONSTEXPR uint16_t timestep_100ns_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t name_length_size = 1;
 
             SCRUTINY_CONSTEXPR uint16_t datalen = loop_id_size + loop_type_size + attribute_field_size + name_length_size;
 
@@ -685,8 +699,8 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = response_data->loop_id;
-            response->data[1] = response_data->loop_type;
+            response->data[0] = response_data->loop_id & 0xFF;
+            response->data[1] = response_data->loop_type & 0xFF;
             response->data[2] = 0;
 
             if (response_data->support_datalogging)
@@ -719,6 +733,7 @@ namespace scrutiny
             }
 
             response->data[cursor++] = response_data->loop_name_length;
+            // strings are 1 char per character. Unless the user uses utf-16, memcpy is fine with a 16bits byte
             memcpy(&response->data[cursor], response_data->loop_name, loop_name_length);
             cursor += loop_name_length;
 
@@ -730,7 +745,7 @@ namespace scrutiny
             ResponseData::GetInfo::GetRPVCount const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
+            SCRUTINY_CONSTEXPR uint16_t count_size = 2;
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -746,7 +761,7 @@ namespace scrutiny
             ResponseData::GetInfo::GetLoopCount const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t count_size = sizeof(response_data->count);
+            SCRUTINY_CONSTEXPR uint16_t count_size = 1;
             SCRUTINY_CONSTEXPR uint16_t datalen = count_size;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -764,8 +779,8 @@ namespace scrutiny
             ResponseData::CommControl::Discover const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t software_id_size = sizeof(scrutiny::software_id);
-            SCRUTINY_CONSTEXPR uint16_t display_name_length_size = sizeof(response_data->display_name_length);
+            SCRUTINY_CONSTEXPR uint16_t software_id_size = SIZEOF_8BITS(scrutiny::software_id);
+            SCRUTINY_CONSTEXPR uint16_t display_name_length_size = 1;
             SCRUTINY_CONSTEXPR uint16_t proto_maj_pos = 0;
             SCRUTINY_CONSTEXPR uint16_t proto_maj_size = 1;
             SCRUTINY_CONSTEXPR uint16_t proto_min_pos = proto_maj_pos + proto_maj_size;
@@ -788,9 +803,9 @@ namespace scrutiny
             response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-            memcpy(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
+            memcpy_dilate_8bits(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
             response->data[display_name_length_pos] = static_cast<unsigned char>(display_name_length & 0xFF);
-            memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length); // Probably fails with char 16 bits here...
+            memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length);
             return ResponseCode::OK;
         }
 
@@ -798,8 +813,8 @@ namespace scrutiny
             ResponseData::CommControl::Heartbeat const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(response_data->session_id);
-            SCRUTINY_CONSTEXPR uint16_t challenge_response_size = sizeof(response_data->challenge_response);
+            SCRUTINY_CONSTEXPR uint16_t session_id_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t challenge_response_size = 2;
             SCRUTINY_CONSTEXPR uint16_t datalen = session_id_size + challenge_response_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
@@ -818,12 +833,12 @@ namespace scrutiny
             ResponseData::CommControl::GetParams const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t rx_buffer_size_len = sizeof(response_data->data_rx_buffer_size);
-            SCRUTINY_CONSTEXPR uint16_t tx_buffer_size_len = sizeof(response_data->data_tx_buffer_size);
-            SCRUTINY_CONSTEXPR uint16_t max_bitrate_size = sizeof(response_data->max_bitrate);
-            SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_size = sizeof(response_data->heartbeat_timeout);
-            SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_size = sizeof(response_data->comm_rx_timeout);
-            SCRUTINY_CONSTEXPR uint16_t address_size_size = sizeof(response_data->address_size);
+            SCRUTINY_CONSTEXPR uint16_t rx_buffer_size_len = 2;
+            SCRUTINY_CONSTEXPR uint16_t tx_buffer_size_len = 2;
+            SCRUTINY_CONSTEXPR uint16_t max_bitrate_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t address_size_size = 1;
             SCRUTINY_CONSTEXPR uint16_t datalen =
                 rx_buffer_size_len + tx_buffer_size_len + max_bitrate_size + heartbeat_timeout_size + comm_rx_timeout_size + address_size_size;
 
@@ -846,7 +861,7 @@ namespace scrutiny
             codecs::encode_32_bits_big_endian(response_data->max_bitrate, &response->data[max_bitrate_pos]);
             codecs::encode_32_bits_big_endian(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
             codecs::encode_32_bits_big_endian(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
-            response->data[address_size_pos] = response_data->address_size; // Size in bytes
+            response->data[address_size_pos] = response_data->address_size; // Size in 8bits
 
             return ResponseCode::OK;
         }
@@ -856,7 +871,7 @@ namespace scrutiny
             Response *const response)
         {
             SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(response_data->magic);
-            SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(response_data->session_id);
+            SCRUTINY_CONSTEXPR uint16_t session_id_size = 4;
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size + session_id_size;
 
             SCRUTINY_STATIC_ASSERT(
@@ -868,7 +883,7 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            memcpy(&response->data[0], response_data->magic, magic_size);
+            memcpy(&response->data[0], response_data->magic, magic_size);   // No need to dilate, array not packed
             codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
 
             return ResponseCode::OK;
@@ -886,7 +901,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            memcpy(request_data->magic, request->data, magic_size);
+            memcpy(request_data->magic, request->data, magic_size); // No need to dilate, array not packed
 
             if (memcmp(CommControl::DISCOVER_MAGIC, request_data->magic, magic_size) != 0)
             {
@@ -900,8 +915,8 @@ namespace scrutiny
             Request const *const request,
             RequestData::CommControl::Heartbeat *const request_data)
         {
-            SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(request_data->session_id);
-            SCRUTINY_CONSTEXPR uint16_t challenge_size = sizeof(request_data->challenge);
+            SCRUTINY_CONSTEXPR uint16_t session_id_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t challenge_size = 2;
             SCRUTINY_CONSTEXPR uint16_t datalen = session_id_size + challenge_size;
 
             if (request->data_length != datalen)
@@ -927,7 +942,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            memcpy(request_data->magic, request->data, magic_size);
+            memcpy(request_data->magic, request->data, magic_size); // No need to dilate, array not packed
 
             return ResponseCode::OK;
         }
@@ -936,7 +951,7 @@ namespace scrutiny
             Request const *const request,
             RequestData::CommControl::Disconnect *const request_data)
         {
-            SCRUTINY_CONSTEXPR uint16_t session_id_size = sizeof(request_data->session_id);
+            SCRUTINY_CONSTEXPR uint16_t session_id_size = 4;
             SCRUTINY_CONSTEXPR uint16_t datalen = session_id_size;
 
             if (request->data_length != datalen)
@@ -1014,8 +1029,7 @@ namespace scrutiny
             ResponseData::DataLogControl::GetSetup const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t datalen =
-                sizeof(response_data->buffer_size) + sizeof(response_data->data_encoding) + sizeof(response_data->max_signal_count);
+            SCRUTINY_CONSTEXPR uint16_t datalen = 4 + 1 + 1;
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
@@ -1033,12 +1047,11 @@ namespace scrutiny
             ResponseData::DataLogControl::GetStatus const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t state_len = sizeof(response_data->state);
-            SCRUTINY_CONSTEXPR uint16_t bytes_to_acquire_len = sizeof(response_data->bytes_to_acquire_from_trigger_to_completion);
-            SCRUTINY_CONSTEXPR uint16_t write_counter_len = sizeof(response_data->write_counter_since_trigger);
+            SCRUTINY_CONSTEXPR uint16_t state_len = 1;
+            SCRUTINY_CONSTEXPR uint16_t bytes_to_acquire_len = 4;
+            SCRUTINY_CONSTEXPR uint16_t write_counter_len = 4;
 
             SCRUTINY_CONSTEXPR uint16_t datalen = state_len + bytes_to_acquire_len + write_counter_len;
-            SCRUTINY_STATIC_ASSERT(datalen == 1 + 4 + 4, "Bad data length");
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -1058,11 +1071,11 @@ namespace scrutiny
             ResponseData::DataLogControl::GetAcquisitionMetadata const *const response_data,
             Response *const response)
         {
-            SCRUTINY_CONSTEXPR uint16_t acquisition_id_size = sizeof(response_data->acquisition_id);
-            SCRUTINY_CONSTEXPR uint16_t config_id_size = sizeof(response_data->config_id);
-            SCRUTINY_CONSTEXPR uint16_t number_of_points_size = sizeof(response_data->number_of_points);
-            SCRUTINY_CONSTEXPR uint16_t data_size_size = sizeof(response_data->data_size);
-            SCRUTINY_CONSTEXPR uint16_t points_after_trigger_size = sizeof(response_data->points_after_trigger);
+            SCRUTINY_CONSTEXPR uint16_t acquisition_id_size = 2;
+            SCRUTINY_CONSTEXPR uint16_t config_id_size = 2;
+            SCRUTINY_CONSTEXPR uint16_t number_of_points_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t data_size_size = 4;
+            SCRUTINY_CONSTEXPR uint16_t points_after_trigger_size = 4;
 
             SCRUTINY_CONSTEXPR uint16_t datalen =
                 acquisition_id_size + config_id_size + number_of_points_size + data_size_size + points_after_trigger_size;
@@ -1095,7 +1108,7 @@ namespace scrutiny
             }
             *finished = false;
             // [0] is set at the end.
-            response->data[1] = response_data->rolling_counter;
+            codecs::encode_8_bits(response_data->rolling_counter, &response->data[1]);
             codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
 
             uint32_t const nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
@@ -1109,7 +1122,7 @@ namespace scrutiny
                 *finished = true;
             }
 
-            response->data[0] = static_cast<unsigned char>(*finished);
+            codecs::encode_8_bits( static_cast<uint_least8_t>((*finished) ? 1 : 0), &response->data[0]);
 
             return protocol::ResponseCode::OK;
         }
@@ -1123,6 +1136,7 @@ namespace scrutiny
             {
                 return ResponseCode::InvalidRequest;
             }
+
 
             request_data->loop_id = request->data[0] & 0xFF;
             request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
@@ -1155,27 +1169,27 @@ namespace scrutiny
                 {
                 case datalogging::OperandType::Literal:
                 {
-                    if (request->data_length < cursor + sizeof(float))
+                    if (request->data_length < cursor + SIZEOF_8BITS(float))
                     {
                         return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian(&request->data[cursor]);
-                    cursor += sizeof(float);
+                    cursor += SIZEOF_8BITS(float);
                     break;
                 }
                 case datalogging::OperandType::Rpv:
                 {
-                    if (request->data_length < cursor + sizeof(uint16_t))
+                    if (request->data_length < cursor + SIZEOF_8BITS(uint16_t))
                     {
                         return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
-                    cursor += sizeof(uint16_t);
+                    cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }
                 case datalogging::OperandType::Var:
                 {
-                    if (request->data_length < cursor + 1 + sizeof(void *))
+                    if (request->data_length < cursor + 1 + SIZEOF_8BITS(void *))
                     {
                         return ResponseCode::InvalidRequest;
                     }
@@ -1187,7 +1201,7 @@ namespace scrutiny
                 }
                 case datalogging::OperandType::VarBit:
                 {
-                    if (request->data_length < cursor + 3 + sizeof(void *))
+                    if (request->data_length < cursor + 3 + SIZEOF_8BITS(void *))
                     {
                         return ResponseCode::InvalidRequest;
                     }
@@ -1196,8 +1210,8 @@ namespace scrutiny
                     cursor += codecs::decode_address_big_endian(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
-                    config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++];
-                    config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++];
+                    config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++] & 0xFF;
+                    config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++] & 0xFF;
                     break;
                 }
                 default:
@@ -1212,7 +1226,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            config->items_count = request->data[cursor++];
+            config->items_count = request->data[cursor++] & 0xFF;
 
             if (config->items_count > SCRUTINY_DATALOGGING_MAX_SIGNAL)
             {
@@ -1232,7 +1246,7 @@ namespace scrutiny
                 {
                 case datalogging::LoggableType::Memory:
                 {
-                    if (request->data_length < cursor + sizeof(void *) + 1)
+                    if (request->data_length < cursor + SIZEOF_8BITS(void *) + 1)
                     {
                         return ResponseCode::InvalidRequest;
                     }
@@ -1244,13 +1258,13 @@ namespace scrutiny
                 }
                 case datalogging::LoggableType::Rpv:
                 {
-                    if (request->data_length < cursor + sizeof(uint16_t))
+                    if (request->data_length < cursor + SIZEOF_8BITS(uint16_t))
                     {
                         return ResponseCode::InvalidRequest;
                     }
 
                     config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
-                    cursor += sizeof(uint16_t);
+                    cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }
                 case datalogging::LoggableType::Time:
