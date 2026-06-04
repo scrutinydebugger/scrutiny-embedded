@@ -20,7 +20,6 @@ set(SCRUTINYTEST_MAX_TEST_SUITES 128)
 
 FetchContent_MakeAvailable(scrutinytest)
 
-find_package(Threads)
 
 project(scrutiny_unittest)
 add_executable(${PROJECT_NAME}
@@ -29,7 +28,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_timebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_codecs.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp
@@ -42,12 +41,6 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_user_command.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_datalog_control.cpp
     )
-
-if(Threads_FOUND)
-    target_sources(${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
-    )
-endif()
 
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
