@@ -197,6 +197,7 @@ TEST(TestIPC, CheckWithThread)
     }
 
 #if defined(TEST_IPC_CPPTHREAD)
+    ASSERT_TRUE(thread.joinable());
     thread.join();
 #elif defined(TEST_IPC_POSIX_THREAD)
     ASSERT_EQ(pthread_join(thread, NULL), 0);
