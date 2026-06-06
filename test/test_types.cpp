@@ -73,13 +73,13 @@ TEST(TestTypes, TestTypeType)
 
 TEST(TestTypes, TestMakeType)
 {
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::sint8);
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::uint8);
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_float, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::float8);
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_cfloat, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::cfloat8);
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::VariableTypeSize::_8), scrutiny::VariableType::boolean8);
-#endif 
+#endif
 
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_sint, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::sint16);
     ASSERT_EQ(scrutiny::tools::make_type(scrutiny::VariableTypeType::_uint, scrutiny::VariableTypeSize::_16), scrutiny::VariableType::uint16);

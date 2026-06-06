@@ -236,7 +236,7 @@ namespace scrutiny
 #endif
                         if (output_type_size == VariableTypeSize::_16)
                     {
-#if CHAR_BIT == 8                        
+#if CHAR_BIT == 8
                         mask.uint16 = 0x1FF;
                         for (i = 9; i < bitsize; i++)
 #else
