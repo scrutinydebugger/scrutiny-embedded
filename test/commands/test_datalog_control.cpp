@@ -14,6 +14,12 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
+#if __unix__ || SCRUTINY_BUILD_WINDOWS
+#define ALLOW_HEAVY_MEM_TEST 1
+#else
+#define ALLOW_HEAVY_MEM_TEST 0
+#endif
+
 using namespace scrutiny;
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
@@ -886,6 +892,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     EXPECT_EQ(gotten_crc, expected_crc);
 }
 
+#if ALLOW_HEAVY_MEM_TEST
 TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
 {
     unsigned char small_tx_buffer[32] = { 0 };
@@ -986,6 +993,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         EXPECT_BUF_EQ(read_data, reference_data, total_data_length) << "iteration=" << iteration;
     }
 }
+#endif
 
 TEST_F(TestDatalogControl, TestResetDatalogger)
 {
