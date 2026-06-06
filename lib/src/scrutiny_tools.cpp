@@ -78,7 +78,7 @@ namespace scrutiny
 
             if (tt == VariableTypeType::_boolean)
             {
-                return (ts == tools::get_platform_boolean_size()); // We can only read native bool
+                return (ts == tools::get_platform_boolean_size_8bits()); // We can only read native bool
             }
             else if (tt == VariableTypeType::_float)
             {
