@@ -37,7 +37,12 @@ namespace scrutiny
                 break;
             }
 #endif
-            case VariableType::boolean:
+#if CHAR_BIT == 8
+            case VariableType::boolean8:
+#endif
+            case VariableType::boolean16:
+            case VariableType::boolean32:
+            case VariableType::boolean: // No size encoded
             {
                 *vtype = BiggestUint;
                 tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->boolean));

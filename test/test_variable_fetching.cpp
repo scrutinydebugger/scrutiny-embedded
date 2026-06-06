@@ -252,12 +252,12 @@ TEST_F(TestVariableFetching, Bitfield)
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[14], scrutiny::VariableTypeType::_boolean, 2, 1, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.boolean, data_bool.b1);
-    EXPECT_EQ(outtype, scrutiny::VariableType::boolean);
+    EXPECT_EQ(outtype, scrutiny::VariableType::boolean8);
 
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[14], scrutiny::VariableTypeType::_boolean, 2, 1, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.boolean, data_bool.b2);
-    EXPECT_EQ(outtype, scrutiny::VariableType::boolean);
+    EXPECT_EQ(outtype, scrutiny::VariableType::boolean8);
 
 #if SCRUTINY_SUPPORT_64BITS
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[15], scrutiny::VariableTypeType::_uint, 7, 37, &outval, &outtype);

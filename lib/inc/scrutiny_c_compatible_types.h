@@ -54,7 +54,7 @@ typedef enum
 {
 #if CHAR_BIT == 8
     SCRUTINY_C_VARIABLE_TYPE_SIZE_8 = 0,
-#endif    
+#endif
     SCRUTINY_C_VARIABLE_TYPE_SIZE_16 = 1,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_32 = 2,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_64 = 3,
@@ -66,11 +66,11 @@ typedef enum
 /// @brief  Represent a datatype. Must match the python core module enum
 typedef enum
 {
-#if CHAR_BIT == 8    
-    SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
+#if CHAR_BIT == 8
+    SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
 #endif
 
     SCRUTINY_C_VARIABLE_TYPE_sint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
@@ -84,7 +84,14 @@ typedef enum
     SCRUTINY_C_VARIABLE_TYPE_cfloat32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
 
 #ifdef __cplusplus
-    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_undef, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_undef,
+#if CHAR_BIT == 8
+    SCRUTINY_C_VARIABLE_TYPE_boolean8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+#endif
+    SCRUTINY_C_VARIABLE_TYPE_boolean16 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean32 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
@@ -92,6 +99,8 @@ typedef enum
     SCRUTINY_C_VARIABLE_TYPE_uint64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,     // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_float64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean64 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
 #endif
     SCRUTINY_C_VARIABLE_TYPE_unknown = 0xFF
 } scrutiny_c_variable_type_e;
@@ -124,14 +133,14 @@ typedef union
 /// @brief The fast version of AnyType
 typedef union
 {
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     uint_fast8_t uint8;
     int_fast8_t sint8;
-#endif    
-    
+#endif
+
     uint_fast16_t uint16;
     int_fast16_t sint16;
-    
+
     uint_fast32_t uint32;
     int_fast32_t sint32;
 

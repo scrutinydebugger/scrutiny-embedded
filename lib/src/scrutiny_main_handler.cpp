@@ -141,7 +141,7 @@ namespace scrutiny
 
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
-        uint_least8_t typesize = tools::get_type_size_8bits(variable_type) / (CHAR_BIT/8);
+        uint_least8_t typesize = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
         if (typesize == 0 || typesize > sizeof(AnyType))
         {
             return false;

@@ -9,6 +9,7 @@
 #include "scrutiny_tools.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
+#include <limits.h>
 #include <stdint.h>
 
 namespace scrutiny
@@ -52,6 +53,11 @@ namespace scrutiny
             VariableTypeType::eVariableTypeType tt = get_var_type_type(vt);
             uint_least8_t ts = get_type_size_8bits(vt);
 
+            if (vt == VariableType::boolean) // Native bool. Unknown size.
+            {
+                return true;
+            }
+
             if (ts == 0)
             {
                 return false;
@@ -72,7 +78,7 @@ namespace scrutiny
 
             if (tt == VariableTypeType::_boolean)
             {
-                return (ts == 1);
+                return (ts == tools::get_platform_boolean_size()); // We can only read native bool
             }
             else if (tt == VariableTypeType::_float)
             {
