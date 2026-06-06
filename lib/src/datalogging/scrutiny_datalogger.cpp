@@ -161,7 +161,7 @@ namespace scrutiny
                         }
 
                         if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize >
-                            tools::get_type_size(m_config.trigger.operands[i].data.varbit.datatype))
+                            tools::get_type_size_8bits(m_config.trigger.operands[i].data.varbit.datatype))
                         {
                             m_config_valid = false;
                         }

@@ -75,10 +75,10 @@ namespace scrutiny
 #endif
         }
 
-        /// @brief Returns the size of a given type in bytes
+        /// @brief Returns the size of a given type in multiple of 8bits
         /// @param vt The VariableType object
-        /// @return Size in bytes
-        inline uint_least8_t get_type_size(VariableType::eVariableType const vt)
+        /// @return Size in multiple of 8bits
+        inline uint_least8_t get_type_size_8bits(VariableType::eVariableType const vt)
         {
             if (vt == VariableType::unknown)
             {
@@ -88,10 +88,10 @@ namespace scrutiny
             return 1 << (static_cast<unsigned int>(vt) & 0xF);
         }
 
-        /// @brief Returns the size of a given TypeSize in bytes
+        /// @brief Returns the size of a given TypeSize in multiple of 8bits
         /// @param ts The VariableTypeSize object
-        /// @return Size in bytes
-        inline uint_least8_t get_type_size(VariableTypeSize::eVariableTypeSize const ts)
+        /// @return Size in multiple of 8bits
+        inline uint_least8_t get_type_size_8bits(VariableTypeSize::eVariableTypeSize const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -99,6 +99,34 @@ namespace scrutiny
             }
 
             return 1 << (static_cast<unsigned int>(ts) & 0xF);
+        }
+
+        /// @brief Returns the size of a given type in bytes
+        /// @param vt The VariableType object
+        /// @return Size in bytes
+        inline uint_least8_t get_type_size_char(VariableType::eVariableType const vt)
+        {
+            if (vt == VariableType::unknown)
+            {
+                return 0;
+            }
+
+            uint_least8_t v = 1 << (static_cast<unsigned int>(vt) & 0xF);
+            return SCRUTINY_MAX(v/(CHAR_BIT/8), CHAR_BIT/8 )
+        }
+
+        /// @brief Returns the size of a given TypeSize in bytes
+        /// @param ts The VariableTypeSize object
+        /// @return Size in bytes
+        inline uint_least8_t get_type_size_char(VariableTypeSize::eVariableTypeSize const ts)
+        {
+            if (ts == VariableTypeSize::_undef)
+            {
+                return 0;
+            }
+
+            uint_least8_t v = 1 << (static_cast<unsigned int>(ts) & 0xF);
+            return SCRUTINY_MAX(v/(CHAR_BIT/8), CHAR_BIT/8 )
         }
 
         /// @brief Returns the Type Type of a given data type.

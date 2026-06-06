@@ -101,7 +101,7 @@ namespace scrutiny
 
         uint_least8_t encode_anytype_big_endian(AnyType const *const val, VariableType::eVariableType const vartype, unsigned char *const buffer)
         {
-            uint_least8_t const typesize = tools::get_type_size(vartype);
+            uint_least8_t const typesize = tools::get_type_size_8bits(vartype);
             return encode_anytype_big_endian(val, typesize, buffer);
         }
 

@@ -336,7 +336,7 @@ namespace scrutiny
 
         void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
         {
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
             // id (2) + type (1)
             if (2u + typesize > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -374,7 +374,7 @@ namespace scrutiny
 
         void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
         {
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
             // id (2) + datalen (1)
             if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
@@ -482,7 +482,7 @@ namespace scrutiny
                 return false;
             }
 
-            uint_least8_t const typesize = tools::get_type_size(rpv->type);
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
 
             if (typesize > static_cast<uint16_t>(m_request_len - m_bytes_read))
             {

@@ -69,28 +69,33 @@ TEST_F(TestVariableFetching, RandomFetch)
     uint16_t u16 = 0x1234;
     bool b = true;
 
-    memcpy(&some_buffer[0], &f32, sizeof(f32));
-    memcpy(&some_buffer[4], &f64, sizeof(f64));
-    memcpy(&some_buffer[4 + 8], &u16, sizeof(u16));
-    memcpy(&some_buffer[4 + 8 + 2], &b, sizeof(b));
+    SCRUTINY_CONSTEXPR size_t f32_offset = 0;
+    SCRUTINY_CONSTEXPR size_t f64_offset = f32_offset + sizeof(f32);
+    SCRUTINY_CONSTEXPR size_t u16_offset = f64_offset + sizeof(f64);
+    SCRUTINY_CONSTEXPR size_t bool_offset = u16_offset + sizeof(u16);
+
+    memcpy(&some_buffer[f32_offset], &f32, sizeof(f32));
+    memcpy(&some_buffer[f64_offset], &f64, sizeof(f64));
+    memcpy(&some_buffer[u16_offset], &u16, sizeof(u16));
+    memcpy(&some_buffer[bool_offset], &b, sizeof(b));
 
     scrutiny::AnyType outval;
     bool success;
-    success = scrutiny_handler.fetch_variable(&some_buffer[0], scrutiny::VariableType::float32, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[f32_offset], scrutiny::VariableType::float32, &outval);
     EXPECT_EQ(outval.float32, f32);
     EXPECT_TRUE(success);
 
 #if SCRUTINY_SUPPORT_64BITS
-    success = scrutiny_handler.fetch_variable(&some_buffer[4], scrutiny::VariableType::float64, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[f64_offset], scrutiny::VariableType::float64, &outval);
     EXPECT_EQ(outval.float64, f64);
     EXPECT_TRUE(success);
 #endif
 
-    success = scrutiny_handler.fetch_variable(&some_buffer[4 + 8], scrutiny::VariableType::uint16, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[u16_offset], scrutiny::VariableType::uint16, &outval);
     EXPECT_EQ(outval.uint16, u16);
     EXPECT_TRUE(success);
 
-    success = scrutiny_handler.fetch_variable(&some_buffer[4 + 8 + 2], scrutiny::VariableType::boolean, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[bool_offset], scrutiny::VariableType::boolean, &outval);
     EXPECT_EQ(outval.boolean, b);
     EXPECT_TRUE(success);
 }

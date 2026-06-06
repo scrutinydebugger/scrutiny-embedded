@@ -683,7 +683,7 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
 
     for (unsigned int i = 0; i < vals_and_payload.size(); i++)
     {
-        required_request_size += 2 + scrutiny::tools::get_type_size(vals_and_payload[i].type);
+        required_request_size += 2 + scrutiny::tools::get_type_size_8bits(vals_and_payload[i].type);
         required_response_size += 2 + 1; // id (2) + len (1)
     }
 

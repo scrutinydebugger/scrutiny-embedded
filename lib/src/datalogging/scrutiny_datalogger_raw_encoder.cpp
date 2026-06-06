@@ -147,7 +147,7 @@ namespace scrutiny
                     AnyType outval;
                     uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    uint_least8_t const typesize = tools::get_type_size(rpv.type); // Should be supported. We rely on datalogger::configure
+                    uint_least8_t const typesize = tools::get_type_size_8bits(rpv.type); // Should be supported. We rely on datalogger::configure
                     m_main_handler->get_rpv_read_callback()(
                         rpv,
                         &outval,
@@ -231,7 +231,7 @@ namespace scrutiny
                     }
                     else
                     {
-                        elem_size = tools::get_type_size(rpv.type);
+                        elem_size = tools::get_type_size_8bits(rpv.type);
                     }
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)

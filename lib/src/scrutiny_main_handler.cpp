@@ -141,7 +141,7 @@ namespace scrutiny
 
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
-        uint_least8_t typesize = tools::get_type_size(variable_type);
+        uint_least8_t typesize = tools::get_type_size_8bits(variable_type) / (CHAR_BIT/8);
         if (typesize == 0 || typesize > sizeof(AnyType))
         {
             return false;
@@ -171,7 +171,7 @@ namespace scrutiny
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
 
-        if (touches_forbidden_region(addr, tools::get_type_size(fetch_type_size)))
+        if (touches_forbidden_region(addr, tools::get_type_size_8bits(fetch_type_size)))
         {
             success = false;
         }
@@ -1492,7 +1492,7 @@ namespace scrutiny
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
-                            tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                            tools::get_type_size_8bits(config->trigger.operands[i].data.var.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;

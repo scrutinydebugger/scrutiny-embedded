@@ -11,24 +11,24 @@
 
 TEST(TestTypes, TestSize)
 {
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::sint8), 1);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::sint16), 2);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::sint32), 4);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::uint8), 1);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::uint16), 2);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::uint32), 4);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::float8), 1);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::float16), 2);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::float32), 4);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::cfloat8), 1);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::cfloat16), 2);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::cfloat32), 4);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::boolean), 1);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::sint8), 1);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::sint16), 2);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::sint32), 4);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::uint8), 1);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::uint16), 2);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::uint32), 4);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::float8), 1);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::float16), 2);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::float32), 4);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::cfloat8), 1);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::cfloat16), 2);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::cfloat32), 4);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::boolean), 1);
 #if SCRUTINY_SUPPORT_64BITS
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::sint64), 8);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::uint64), 8);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::float64), 8);
-    ASSERT_EQ(scrutiny::tools::get_type_size(scrutiny::VariableType::cfloat64), 8);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::sint64), 8);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::uint64), 8);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::float64), 8);
+    ASSERT_EQ(scrutiny::tools::get_type_size_8bits(scrutiny::VariableType::cfloat64), 8);
 #endif
 }
 

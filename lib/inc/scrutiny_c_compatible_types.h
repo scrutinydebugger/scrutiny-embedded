@@ -52,7 +52,9 @@ typedef enum
 /// @brief Represent a type size
 typedef enum
 {
+#if CHAR_BIT == 8
     SCRUTINY_C_VARIABLE_TYPE_SIZE_8 = 0,
+#endif    
     SCRUTINY_C_VARIABLE_TYPE_SIZE_16 = 1,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_32 = 2,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_64 = 3,
@@ -64,20 +66,29 @@ typedef enum
 /// @brief  Represent a datatype. Must match the python core module enum
 typedef enum
 {
+#if CHAR_BIT == 8    
     SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_sint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_sint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
+#endif
+
+    SCRUTINY_C_VARIABLE_TYPE_sint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_uint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_float16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+
+    SCRUTINY_C_VARIABLE_TYPE_sint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_uint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_float32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
+
 #ifdef __cplusplus
-    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+#if CHAR_BIT == 8
+    SCRUTINY_C_VARIABLE_TYPE_boolean8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+#endif    
+    SCRUTINY_C_VARIABLE_TYPE_boolean16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS

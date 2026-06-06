@@ -107,7 +107,9 @@ namespace scrutiny
             cfloat8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat8,
             cfloat16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat16,
             cfloat32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat32,
-            boolean = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean,
+            boolean8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean8,
+            boolean16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean16,
+            boolean32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean32,
 
 #if SCRUTINY_SUPPORT_64BITS
             uint64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint64,
