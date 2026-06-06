@@ -83,7 +83,7 @@ TEST_F(TestGetInfo, TestReadprotocolVersion)
 TEST_F(TestGetInfo, TestReadSoftwareId)
 {
     EXPECT_EQ(sizeof(scrutiny::software_id), SCRUTINY_SOFTWARE_ID_LENGTH);
-    unsigned char tx_buffer[ SIZEOF_8BITS(scrutiny::software_id) + 32];
+    unsigned char tx_buffer[SIZEOF_8BITS(scrutiny::software_id) + 32];
 
     // Make request
     unsigned char request_data[8 + SIZEOF_8BITS(scrutiny::software_id)] = { 1, 2, 0, 0 };
@@ -160,7 +160,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionCount)
 TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
 {
     unsigned char tx_buffer[32];
-    unsigned char *buf[4];
+    unsigned char buf[4];
 
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
@@ -229,7 +229,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
 
     unsigned char tx_buffer[32];
-    unsigned char *buf[4];
+    unsigned char buf[4];
 
     uintptr_t start = reinterpret_cast<uintptr_t>(buf);
     uintptr_t end = start + 4;
@@ -518,7 +518,7 @@ TEST_F(TestGetInfo, TestGetLoopCountNoLoopSet)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 {
-    const char* loop_name = "Loop1";
+    const char *loop_name = "Loop1";
     unsigned char tx_buffer[32];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 0 };
@@ -560,7 +560,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
 {
-    const char* loop_name = "Loop3";
+    const char *loop_name = "Loop3";
     unsigned char tx_buffer[64];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 2 }; // Read loop 2
@@ -598,7 +598,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
 {
-    const char* loop_name = "Loop2";
+    const char *loop_name = "Loop2";
     unsigned char tx_buffer[32];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 1 };
