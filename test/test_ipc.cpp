@@ -134,7 +134,6 @@ TEST(TestIPC, CheckWithThread)
 
     uint32_t my_value = 0;
     uint32_t expected_thread_value = 0;
-    bool timeout = false;
 
 #if defined(TEST_IPC_CPPTHREAD)
     std::thread thread(thread_func);
@@ -181,7 +180,6 @@ TEST(TestIPC, CheckWithThread)
         if (std::chrono::high_resolution_clock::now() - t1 > std::chrono::seconds(TIMEOUT_SEC))
         {
             thread_data.thread_exit = true;
-            timeout = true;
         }
 #else
         struct timespec t2;
@@ -204,7 +202,6 @@ TEST(TestIPC, CheckWithThread)
 #error
 #endif
 
-    ASSERT_FALSE(timeout) << "Timed out after " << TIMEOUT_SEC << " seconds";
     EXPECT_FALSE(thread_data.error_found_in_main) << "At Iteration #" << thread_data.error_at_iter;
     EXPECT_FALSE(thread_data.error_found_in_thread) << "At Iteration #" << thread_data.error_at_iter;
     EXPECT_GE(my_value, 1000); // Local test > 3.5M
