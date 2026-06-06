@@ -304,10 +304,12 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     unsigned char tx_buffer[128];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
+#if CHAR_BIT == 8           
         { 0x9000, scrutiny::VariableType::uint8 },
+        { 0x9004, scrutiny::VariableType::sint8 },
+#endif        
         { 0x9001, scrutiny::VariableType::uint16 },
         { 0x9002, scrutiny::VariableType::uint32 },
-        { 0x9004, scrutiny::VariableType::sint8 },
         { 0x9005, scrutiny::VariableType::sint16 },
         { 0x9006, scrutiny::VariableType::sint32 },
         { 0x9008, scrutiny::VariableType::float32 },
@@ -320,10 +322,12 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     typedef std::map<uint16_t, std::vector<unsigned char> > map_t;
     typedef std::pair<uint16_t, std::vector<unsigned char> > map_value_t;
     map_t expected_encoding;
+#if CHAR_BIT == 8    
     expected_encoding.insert(map_value_t(0x9000, make_payload_1(0x99)));
+    expected_encoding.insert(map_value_t(0x9004, make_payload_1(0xC0)));                   // -64
+#endif    
     expected_encoding.insert(map_value_t(0x9001, make_payload_2(0xA5, 0xA5)));
     expected_encoding.insert(map_value_t(0x9002, make_payload_4(0x99, 0x88, 0x77, 0x66)));
-    expected_encoding.insert(map_value_t(0x9004, make_payload_1(0xC0)));                   // -64
     expected_encoding.insert(map_value_t(0x9005, make_payload_2(0x8A, 0xD0)));             // -30000
     expected_encoding.insert(map_value_t(0x9006, make_payload_4(0xC4, 0x65, 0x36, 0x00))); // -1 000 000 000
     expected_encoding.insert(map_value_t(0x9008, make_payload_4(0x3f, 0xb9, 0x99, 0x9a))); // 1.45
@@ -631,10 +635,12 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     dest_buffer_for_rpv_write.clear();
 
     scrutiny::RuntimePublishedValue rpvs[] = {
+#if CHAR_BIT == 8        
         { 0x1000, scrutiny::VariableType::uint8 },
+        { 0x1004, scrutiny::VariableType::sint8 },
+#endif 
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
-        { 0x1004, scrutiny::VariableType::sint8 },
         { 0x1005, scrutiny::VariableType::sint16 },
         { 0x1006, scrutiny::VariableType::sint32 },
         { 0x1008, scrutiny::VariableType::float32 },
@@ -646,14 +652,16 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     };
     std::vector<TestEntry> vals_and_payload;
 
+#if CHAR_BIT == 8
     vals_and_payload.push_back(TestEntry::make(0x1000, scrutiny::VariableType::uint8, make_payload_1(0x55)));                    // 4-6
+    vals_and_payload.push_back(TestEntry::make(0x1004, scrutiny::VariableType::sint8, make_payload_1(0xC0)));                    // 25-27
+#endif    
     vals_and_payload.push_back(TestEntry::make(0x1001, scrutiny::VariableType::uint16, make_payload_2(0xAB, 0xCD)));             // 7-10
     vals_and_payload.push_back(TestEntry::make(0x1002, scrutiny::VariableType::uint32, make_payload_4(0x12, 0x34, 0x56, 0x78))); // 11-16
 #if SCRUTINY_SUPPORT_64BITS
     vals_and_payload.push_back(
         TestEntry::make(0x1003, scrutiny::VariableType::uint64, make_payload_8(0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10))); // 17-24
 #endif
-    vals_and_payload.push_back(TestEntry::make(0x1004, scrutiny::VariableType::sint8, make_payload_1(0xC0)));                    // 25-27
     vals_and_payload.push_back(TestEntry::make(0x1005, scrutiny::VariableType::sint16, make_payload_2(0x8A, 0xD0)));             // 28 - 31
     vals_and_payload.push_back(TestEntry::make(0x1006, scrutiny::VariableType::sint32, make_payload_4(0xC4, 0x65, 0x36, 0x00))); // 32 - 37
 #if SCRUTINY_SUPPORT_64BITS
@@ -756,10 +764,12 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
     unsigned char tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
+#if CHAR_BIT==8        
         { 0x1000, scrutiny::VariableType::uint8 },
+        { 0x1004, scrutiny::VariableType::sint8 },
+#endif        
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
-        { 0x1004, scrutiny::VariableType::sint8 },
         { 0x1005, scrutiny::VariableType::sint16 },
         { 0x1006, scrutiny::VariableType::sint32 },
         { 0x1008, scrutiny::VariableType::float32 },
