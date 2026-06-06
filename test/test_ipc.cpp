@@ -188,7 +188,6 @@ TEST(TestIPC, CheckWithThread)
         if (elapsed_secs > TIMEOUT_SEC)
         {
             thread_data.thread_exit = true;
-            timeout = true;
         }
 #endif
     }
