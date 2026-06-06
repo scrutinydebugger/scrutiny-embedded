@@ -313,8 +313,8 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         probe_location = static_cast<uint_least8_t>(probe_loop & 0xFF);
         dlconfig.probe_location = probe_location;
 #if SCRUTINYTEST_NO_OUTPUT
-        char const * error_msg="";      
-#else  
+        char const *error_msg = "";
+#else
         std::string error_msg = "probe_location=" + NumberToString(probe_location);
 #endif
         datalogger.config()->copy_from(&dlconfig);
@@ -488,10 +488,10 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
         probe_location = static_cast<unsigned char>(probe_loop);
         dlconfig.probe_location = probe_location;
 #if SCRUTINYTEST_NO_OUTPUT
-        char const * error_msg="";      
+        char const *error_msg = "";
 #else
         std::string error_msg = "probe_location=" + NumberToString(probe_location);
-#endif        
+#endif
         datalogger.reset();
         datalogger.config()->copy_from(&dlconfig);
         datalogger.configure(&tb);

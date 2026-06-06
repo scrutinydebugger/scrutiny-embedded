@@ -9,14 +9,14 @@
 //    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutinytest/scrutinytest.hpp"
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
-#include <cstddef>
 #include <stdint.h>
 #include <vector>
 #if !SCRUTINYTEST_NO_OUTPUT
-#include <string>
 #include <sstream>
+#include <string>
 #endif
 
 #include "scrutiny.hpp"
@@ -37,7 +37,7 @@
 #define GET_VEC_DATA(v) (&v[0])
 #endif
 
-#define SIZEOF_8BITS(x) (static_cast<size_t>(sizeof(x) * (CHAR_BIT/8)))
+#define SIZEOF_8BITS(x) (static_cast<size_t>(sizeof(x) * (CHAR_BIT / 8)))
 
 class ScrutinyTest : public scrutinytest::TestCase
 {
@@ -105,7 +105,7 @@ class ScrutinyTest : public scrutinytest::TestCase
         o[7] = v7;
         return o;
     }
-    
+
 #if !SCRUTINYTEST_NO_OUTPUT
     template <typename T> std::string NumberToString(T Number)
     {

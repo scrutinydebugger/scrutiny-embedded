@@ -41,7 +41,7 @@ class TestDatalogControl : public ScrutinyTest
 
     unsigned char _rx_buffer[256];
     unsigned char _tx_buffer[256];
-    unsigned char dlbuffer[256];
+    unsigned char dlbuffer[240];
     LoopHandler *loops[3];
 
     FixedFrequencyLoopHandler fixed_freq_loop;
@@ -64,7 +64,7 @@ class TestDatalogControl : public ScrutinyTest
         datalogging::Configuration refconfig,
         protocol::ResponseCode::eResponseCode expected_code,
         bool check_response = true,
-        char const* error_msg = "");
+        char const *error_msg = "");
     void check_get_status(datalogging::DataLogger::State::eState expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
@@ -294,7 +294,7 @@ void TestDatalogControl::test_configure(
     datalogging::Configuration refconfig,
     protocol::ResponseCode::eResponseCode expected_code,
     bool check_response,
-    char const* error_msg)
+    char const *error_msg)
 {
     static unsigned char request_data[256] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
@@ -412,7 +412,7 @@ TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
-    
+
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
 
@@ -444,11 +444,11 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
     {
 #if SCRUTINYTEST_NO_OUTPUT
-        const char* error_msg="";
-#else    
-        std::string s = std::string("i=") + NumberToString(i
-        char const* error_msg = s.c_str();
-#endif        
+        const char *error_msg = "";
+#else
+        std::string s = std::string("i=") + NumberToString(i);
+        char const *error_msg = s.c_str();
+#endif
         datalogging::Configuration refconfig = get_valid_reference_configuration();
         refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
         refconfig.trigger.operands[0].data.literal.val = bad_values[i];
@@ -825,7 +825,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    static unsigned char tx_buffer[sizeof(dlbuffer) + 32] = { 0 };
+    static unsigned char tx_buffer[sizeof(_tx_buffer)] = { 0 };
     uint16_t n_to_read;
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
@@ -941,10 +941,10 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         for (uint16_t i = 0; i < maximum_transfer_count && !finished; i++)
         {
 #if SCRUTINYTEST_NO_OUTPUT
-            const char* error_msg="";
+            const char *error_msg = "";
 #else
             std::string error_msg = std::string("iteration=") + NumberToString(iteration) + std::string(", i=") + NumberToString(i);
-#endif            
+#endif
             unsigned char validation_txbuffer[128];
 
             unsigned char request_data_after[8] = { 5, 7, 0, 0 };

@@ -10,14 +10,14 @@
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
 #include <limits.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Condition always true
 #endif
 
-#define SIZEOF_8BITS(T) ( static_cast<size_t>(sizeof(T) * (CHAR_BIT/8)) )
+#define SIZEOF_8BITS(T) (static_cast<size_t>(sizeof(T) * (CHAR_BIT / 8)))
 
 namespace scrutiny
 {

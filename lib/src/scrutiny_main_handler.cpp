@@ -14,7 +14,7 @@
 #include <limits.h>
 #include <string.h>
 
-#define SIZEOF_8BITS(T) ( static_cast<size_t>(sizeof(T) * (CHAR_BIT/8)) )
+#define SIZEOF_8BITS(T) (static_cast<size_t>(sizeof(T) * (CHAR_BIT / 8)))
 
 namespace scrutiny
 {

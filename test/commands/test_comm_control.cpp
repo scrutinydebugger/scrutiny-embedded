@@ -54,21 +54,19 @@ TEST_F(TestCommControl, TestDiscover)
 
     unsigned char tx_buffer[64];
     // proto_maj, proto_min, magic, name_len, name
-    unsigned char expected_response[9 + 2 + SIZEOF_8BITS(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH] = { 0x82,
-                                                                                                         1,
-                                                                                                         0,
-                                                                                                         0,
-                                                                                                         2 + SIZEOF_8BITS(scrutiny::software_id) + 1 +
-                                                                                                             DISPLAY_NAME_LENGTH }; // Version 1.0
+    unsigned char expected_response[9 + 2 + SIZEOF_8BITS(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH] = {
+        0x82,
+        1,
+        0,
+        0,
+        2 + SIZEOF_8BITS(scrutiny::software_id) + 1 + DISPLAY_NAME_LENGTH
+    }; // Version 1.0
 
     uint16_t index = 5;
     expected_response[index++] = 1;
     expected_response[index++] = 0;
     memcpy_dilate_8bits(&expected_response[index], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
-    int r1 = sizeof(scrutiny::software_id);
-    int r2 = SIZEOF_8BITS(scrutiny::software_id);
-    index += r2;
-    ASSERT_EQ(r1*2, r2);
+    index += SIZEOF_8BITS(scrutiny::software_id);
     expected_response[index++] = static_cast<unsigned char>(DISPLAY_NAME_LENGTH);
     std::memcpy(&expected_response[index], DISPLAY_NAME, DISPLAY_NAME_LENGTH);
 
@@ -81,7 +79,7 @@ TEST_F(TestCommControl, TestDiscover)
     ASSERT_GT(n_to_read, 0u);
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     EXPECT_EQ(n_to_read, sizeof(expected_response));
- 
+
     uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
 
