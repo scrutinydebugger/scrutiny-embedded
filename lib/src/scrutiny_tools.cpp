@@ -18,11 +18,14 @@ namespace scrutiny
     {
         VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size)
         {
+#if CHAR_BIT==8            
             if (size <= 1)
             {
                 return VariableTypeSize::_8;
             }
-            else if (size <= 2)
+            else 
+#endif            
+            if (size <= 2)
             {
                 return VariableTypeSize::_16;
             }

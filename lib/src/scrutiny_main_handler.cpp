@@ -141,13 +141,13 @@ namespace scrutiny
 
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
-        uint_least8_t typesize = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
-        if (typesize == 0 || typesize > sizeof(AnyType))
+        uint_least8_t typesize_char = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
+        if (typesize_char == 0 || typesize_char > sizeof(AnyType))
         {
             return false;
         }
 
-        if (read_memory(val, addr, typesize) == false)
+        if (read_memory(val, addr, typesize_char) == false)
         {
             memset(val, 0, sizeof(AnyType));
             return false;
@@ -170,8 +170,9 @@ namespace scrutiny
         VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
+        uint_least8_t const typesize_char = tools::get_type_size_8bits(fetch_variable_type) / (CHAR_BIT / 8);
 
-        if (touches_forbidden_region(addr, tools::get_type_size_8bits(fetch_type_size)))
+        if (touches_forbidden_region(addr, typesize_char))
         {
             success = false;
         }
@@ -235,8 +236,13 @@ namespace scrutiny
 #endif
                         if (output_type_size == VariableTypeSize::_16)
                     {
+#if CHAR_BIT == 8                        
                         mask.uint16 = 0x1FF;
                         for (i = 9; i < bitsize; i++)
+#else
+                        mask.uint16 = 1;
+                        for (i = 1; i < bitsize; i++)
+#endif
                         {
                             mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
                         }

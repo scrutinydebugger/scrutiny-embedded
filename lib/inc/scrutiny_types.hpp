@@ -77,7 +77,9 @@ namespace scrutiny
         // clang-format off
         SCRUTINY_ENUM(eVariableTypeSize, uint_least8_t)
         {
+#if CHAR_BIT==8            
             _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
+#endif            
             _16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_16,
             _32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_32,
             _64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_64,
