@@ -41,7 +41,7 @@ class TestDatalogControl : public ScrutinyTest
 
     unsigned char _rx_buffer[256];
     unsigned char _tx_buffer[256];
-    unsigned char dlbuffer[240];
+    unsigned char dlbuffer[239];
     LoopHandler *loops[3];
 
     FixedFrequencyLoopHandler fixed_freq_loop;
@@ -825,6 +825,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
+    ASSERT_GE(sizeof(_tx_buffer), sizeof(dlbuffer) + 17);
     static unsigned char tx_buffer[sizeof(_tx_buffer)] = { 0 };
     uint16_t n_to_read;
 
