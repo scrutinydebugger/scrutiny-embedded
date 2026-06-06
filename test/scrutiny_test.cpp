@@ -11,7 +11,85 @@
 #include "scrutiny_test.hpp"
 #include "scrutiny.hpp"
 #include <stdint.h>
-//#include <string>
+
+namespace scrutiny
+{
+    namespace protocol
+    {
+        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode::eResponseCode val)
+        {
+            switch (val)
+            {
+            case scrutiny::protocol::ResponseCode::OK:
+                out << "OK";
+                break;
+            case scrutiny::protocol::ResponseCode::Busy:
+                out << "Busy";
+                break;
+            case scrutiny::protocol::ResponseCode::FailureToProceed:
+                out << "FailureToProceed";
+                break;
+            case scrutiny::protocol::ResponseCode::Forbidden:
+                out << "Forbidden";
+                break;
+            case scrutiny::protocol::ResponseCode::InvalidRequest:
+                out << "InvalidRequest";
+                break;
+            case scrutiny::protocol::ResponseCode::NoResponseToSend:
+                out << "NoResponseToSend";
+                break;
+            case scrutiny::protocol::ResponseCode::Overflow:
+                out << "Overflow";
+                break;
+            case scrutiny::protocol::ResponseCode::ProcessAgain:
+                out << "ProcessAgain";
+                break;
+            case scrutiny::protocol::ResponseCode::UnsupportedFeature:
+                out << "UnsupportedFeature";
+                break;
+            default:
+                out << "Unknown";
+                break;
+            }
+
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    } // namespace protocol
+} // namespace scrutiny
+
+#if SCRUTINY_ENABLE_DATALOGGING
+namespace scrutiny
+{
+    namespace datalogging
+    {
+        std::ostream &operator<<(std::ostream &out, DataLogger::State::eState val)
+        {
+            switch (val)
+            {
+            case DataLogger::State::Idle:
+                out << "Idle";
+                break;
+            case DataLogger::State::Armed:
+                out << "Armed";
+                break;
+            case DataLogger::State::Configured:
+                out << "Configured";
+                break;
+            case DataLogger::State::AcquisitionCompleted:
+                out << "AcquisitionCompleted";
+                break;
+            case DataLogger::State::Error:
+                out << "Error";
+                break;
+            default:
+                out << "UNKNOWN";
+            }
+
+            return out << " (" << static_cast<uint32_t>(val) << ")";
+        }
+    } // namespace datalogging
+} // namespace scrutiny
+#endif
 
 void ScrutinyTest::add_crc(unsigned char *data, uint16_t data_len)
 {
@@ -59,12 +137,12 @@ bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
         SCRUTINYTEST_FAIL << "Wrong Subfunction. Got " << static_cast<uint32_t>(buffer[1]) << " but expected " << static_cast<uint32_t>(subfunction);
     }
 
-    if ((buffer[2] & 0xFF) != (static_cast<uint_least8_t>(code) & 0xFF))
+    if ((buffer[2] & 0xFF) != (static_cast<unsigned char>(code) & 0xFF))
     {
         SCRUTINYTEST_FAIL << "Wrong response code. Got " << static_cast<scrutiny::protocol::ResponseCode::eResponseCode>(buffer[2])
                           << " but expected " << code;
     }
-    uint16_t length = (static_cast<uint16_t>(buffer[3]) << 8) | (static_cast<uint16_t>(buffer[4]) & 0xFFu);
+    uint16_t length = (static_cast<uint16_t>(buffer[3] & 0xFF) << 8) | (static_cast<uint16_t>(buffer[4]) & 0xFFu);
     if (code != scrutiny::protocol::ResponseCode::OK && length != 0)
     {
         SCRUTINYTEST_FAIL << "Wrong command length. Got " << static_cast<uint32_t>(length) << " but expected 0";
@@ -113,83 +191,4 @@ unsigned int ScrutinyTest::encode_addr(unsigned char *buffer, void *addr)
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
-#endif
-
-namespace scrutiny
-{
-    namespace protocol
-    {
-        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, scrutiny::protocol::ResponseCode::eResponseCode val)
-        {
-            switch (val)
-            {
-            case scrutiny::protocol::ResponseCode::OK:
-                out << "OK";
-                break;
-            case scrutiny::protocol::ResponseCode::Busy:
-                out << "Busy";
-                break;
-            case scrutiny::protocol::ResponseCode::FailureToProceed:
-                out << "FailureToProceed";
-                break;
-            case scrutiny::protocol::ResponseCode::Forbidden:
-                out << "Forbidden";
-                break;
-            case scrutiny::protocol::ResponseCode::InvalidRequest:
-                out << "InvalidRequest";
-                break;
-            case scrutiny::protocol::ResponseCode::NoResponseToSend:
-                out << "NoResponseToSend";
-                break;
-            case scrutiny::protocol::ResponseCode::Overflow:
-                out << "Overflow";
-                break;
-            case scrutiny::protocol::ResponseCode::ProcessAgain:
-                out << "ProcessAgain";
-                break;
-            case scrutiny::protocol::ResponseCode::UnsupportedFeature:
-                out << "UnsupportedFeature";
-                break;
-            default:
-                out << "Unknown";
-                break;
-            }
-
-            return out << " (" << static_cast<uint32_t>(val) << ")";
-        }
-    } // namespace protocol
-} // namespace scrutiny
-
-#if SCRUTINY_ENABLE_DATALOGGING
-namespace scrutiny
-{
-    namespace datalogging
-    {
-        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, DataLogger::State::eState val)
-        {
-            switch (val)
-            {
-            case DataLogger::State::Idle:
-                out << "Idle";
-                break;
-            case DataLogger::State::Armed:
-                out << "Armed";
-                break;
-            case DataLogger::State::Configured:
-                out << "Configured";
-                break;
-            case DataLogger::State::AcquisitionCompleted:
-                out << "AcquisitionCompleted";
-                break;
-            case DataLogger::State::Error:
-                out << "Error";
-                break;
-            default:
-                out << "UNKNOWN";
-            }
-
-            return out << " (" << static_cast<uint32_t>(val) << ")";
-        }
-    } // namespace datalogging
-} // namespace scrutiny
 #endif

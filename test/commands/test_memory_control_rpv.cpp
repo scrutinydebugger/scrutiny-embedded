@@ -304,10 +304,10 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     unsigned char tx_buffer[128];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
-#if CHAR_BIT == 8           
+#if CHAR_BIT == 8
         { 0x9000, scrutiny::VariableType::uint8 },
         { 0x9004, scrutiny::VariableType::sint8 },
-#endif        
+#endif
         { 0x9001, scrutiny::VariableType::uint16 },
         { 0x9002, scrutiny::VariableType::uint32 },
         { 0x9005, scrutiny::VariableType::sint16 },
@@ -322,10 +322,10 @@ TEST_F(TestMemoryControlRPV, TestReadMultipleRPVEachType)
     typedef std::map<uint16_t, std::vector<unsigned char> > map_t;
     typedef std::pair<uint16_t, std::vector<unsigned char> > map_value_t;
     map_t expected_encoding;
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     expected_encoding.insert(map_value_t(0x9000, make_payload_1(0x99)));
-    expected_encoding.insert(map_value_t(0x9004, make_payload_1(0xC0)));                   // -64
-#endif    
+    expected_encoding.insert(map_value_t(0x9004, make_payload_1(0xC0))); // -64
+#endif
     expected_encoding.insert(map_value_t(0x9001, make_payload_2(0xA5, 0xA5)));
     expected_encoding.insert(map_value_t(0x9002, make_payload_4(0x99, 0x88, 0x77, 0x66)));
     expected_encoding.insert(map_value_t(0x9005, make_payload_2(0x8A, 0xD0)));             // -30000
@@ -635,10 +635,10 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     dest_buffer_for_rpv_write.clear();
 
     scrutiny::RuntimePublishedValue rpvs[] = {
-#if CHAR_BIT == 8        
+#if CHAR_BIT == 8
         { 0x1000, scrutiny::VariableType::uint8 },
         { 0x1004, scrutiny::VariableType::sint8 },
-#endif 
+#endif
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
         { 0x1005, scrutiny::VariableType::sint16 },
@@ -653,9 +653,9 @@ TEST_F(TestMemoryControlRPV, TestWriteAllTypes)
     std::vector<TestEntry> vals_and_payload;
 
 #if CHAR_BIT == 8
-    vals_and_payload.push_back(TestEntry::make(0x1000, scrutiny::VariableType::uint8, make_payload_1(0x55)));                    // 4-6
-    vals_and_payload.push_back(TestEntry::make(0x1004, scrutiny::VariableType::sint8, make_payload_1(0xC0)));                    // 25-27
-#endif    
+    vals_and_payload.push_back(TestEntry::make(0x1000, scrutiny::VariableType::uint8, make_payload_1(0x55))); // 4-6
+    vals_and_payload.push_back(TestEntry::make(0x1004, scrutiny::VariableType::sint8, make_payload_1(0xC0))); // 25-27
+#endif
     vals_and_payload.push_back(TestEntry::make(0x1001, scrutiny::VariableType::uint16, make_payload_2(0xAB, 0xCD)));             // 7-10
     vals_and_payload.push_back(TestEntry::make(0x1002, scrutiny::VariableType::uint32, make_payload_4(0x12, 0x34, 0x56, 0x78))); // 11-16
 #if SCRUTINY_SUPPORT_64BITS
@@ -764,10 +764,10 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVBadRequest)
     unsigned char tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
-#if CHAR_BIT==8        
+#if CHAR_BIT == 8
         { 0x1000, scrutiny::VariableType::uint8 },
         { 0x1004, scrutiny::VariableType::sint8 },
-#endif        
+#endif
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
         { 0x1005, scrutiny::VariableType::sint16 },
@@ -823,7 +823,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
 
     SCRUTINY_CONSTEXPR uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
     SCRUTINY_CONSTEXPR uint16_t nb_write = buffersize_min_mod3 / 3 + 1; // 16bits ID + 16bits data
-    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 3;            // 16bits ID + 8bits data
+    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 4;            // 16bits ID + 16bits data
     SCRUTINY_CONSTEXPR uint16_t tx_data_size = (nb_write - 1) * 3;      // 16bits ID + 8bits length.  -1 to cause overflow
     SCRUTINY_CONSTEXPR uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
 
@@ -834,7 +834,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     unsigned char internal_rx_buffer[rx_data_size];
     unsigned char internal_tx_buffer[tx_data_size];
 
-    scrutiny::RuntimePublishedValue rpvs[] = { { 0x1000, scrutiny::VariableType::uint8 } };
+    scrutiny::RuntimePublishedValue rpvs[] = { { 0x1001, scrutiny::VariableType::uint16 } };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
@@ -849,8 +849,9 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseOverflow)
     for (uint16_t i = 0; i < nb_write; i++)
     {
         request_data[index++] = 0x10;
-        request_data[index++] = 0x00;
+        request_data[index++] = 0x01;
         request_data[index++] = 0xAA;
+        request_data[index++] = 0xBB;
     }
 
     add_crc(request_data, request_size - 4);
