@@ -84,11 +84,7 @@ typedef enum
     SCRUTINY_C_VARIABLE_TYPE_cfloat32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
 
 #ifdef __cplusplus
-#if CHAR_BIT == 8
-    SCRUTINY_C_VARIABLE_TYPE_boolean8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
-#endif    
-    SCRUTINY_C_VARIABLE_TYPE_boolean16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_boolean32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_undef, // cppcheck-suppress[badBitmaskCheck]
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
@@ -128,12 +124,15 @@ typedef union
 /// @brief The fast version of AnyType
 typedef union
 {
+#if CHAR_BIT == 8    
     uint_fast8_t uint8;
-    uint_fast16_t uint16;
-    uint_fast32_t uint32;
-
     int_fast8_t sint8;
+#endif    
+    
+    uint_fast16_t uint16;
     int_fast16_t sint16;
+    
+    uint_fast32_t uint32;
     int_fast32_t sint32;
 
     float float32;
