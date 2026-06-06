@@ -11,17 +11,21 @@
 #include "scrutiny_tools.hpp"
 #include <limits.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127) // Condition always true
 #endif
+
+#define SIZEOF_8BITS(T) ( static_cast<size_t>(sizeof(T) * (CHAR_BIT/8)) )
+
 namespace scrutiny
 {
     namespace codecs
     {
         uint_least8_t decode_address_big_endian(unsigned char const *const buf, uintptr_t *const addr)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
 
             uintptr_t computed_addr = 0;
@@ -63,7 +67,7 @@ namespace scrutiny
 
         uint_least8_t encode_address_big_endian(uintptr_t const addr, unsigned char *const buf)
         {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(void *);
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
 
             unsigned int i = addr_size - 1;

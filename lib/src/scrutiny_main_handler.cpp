@@ -14,6 +14,8 @@
 #include <limits.h>
 #include <string.h>
 
+#define SIZEOF_8BITS(T) ( static_cast<size_t>(sizeof(T) * (CHAR_BIT/8)) )
+
 namespace scrutiny
 {
     MainHandler::MainHandler(void) :
@@ -944,7 +946,7 @@ namespace scrutiny
             stack.get_params.response_data.max_bitrate = m_config.max_bitrate;
             stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
             stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US;
-            stack.get_params.response_data.address_size = sizeof(void *);
+            stack.get_params.response_data.address_size = SIZEOF_8BITS(void *);
             code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
             break;
         }

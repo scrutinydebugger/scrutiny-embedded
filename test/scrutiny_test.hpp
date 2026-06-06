@@ -10,9 +10,14 @@
 
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstdlib>
-#include <ostream>
+#include <cstring>
+#include <cstddef>
 #include <stdint.h>
 #include <vector>
+#if !SCRUTINYTEST_NO_OUTPUT
+#include <string>
+#include <sstream>
+#endif
 
 #include "scrutiny.hpp"
 
@@ -32,9 +37,24 @@
 #define GET_VEC_DATA(v) (&v[0])
 #endif
 
+#define SIZEOF_8BITS(x) (static_cast<size_t>(sizeof(x) * (CHAR_BIT/8)))
+
 class ScrutinyTest : public scrutinytest::TestCase
 {
   protected:
+    inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+    {
+#if CHAR_BIT == 8
+        memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+        for (size_t i = 0; i < (nb_8bits >> 1); i++)
+        {
+            static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+            static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+        }
+#endif
+    }
+
     inline std::vector<unsigned char> make_payload_1(unsigned char v0)
     {
         std::vector<unsigned char> o;
@@ -85,7 +105,8 @@ class ScrutinyTest : public scrutinytest::TestCase
         o[7] = v7;
         return o;
     }
-
+    
+#if !SCRUTINYTEST_NO_OUTPUT
     template <typename T> std::string NumberToString(T Number)
     {
         std::ostringstream ss;
@@ -100,6 +121,7 @@ class ScrutinyTest : public scrutinytest::TestCase
 
         return ss.str();
     }
+#endif
 
     inline float round(float const v)
     {
@@ -123,7 +145,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        std::ostream &operator<<(std::ostream &out, ResponseCode val);
+        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, ResponseCode val);
     }
 } // namespace scrutiny
 
@@ -132,7 +154,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State val);
+        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, DataLogger::State val);
     }
 } // namespace scrutiny
 

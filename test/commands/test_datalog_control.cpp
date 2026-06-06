@@ -39,8 +39,8 @@ class TestDatalogControl : public ScrutinyTest
     MainHandler scrutiny_handler;
     Config config;
 
-    unsigned char _rx_buffer[1024];
-    unsigned char _tx_buffer[1024];
+    unsigned char _rx_buffer[256];
+    unsigned char _tx_buffer[256];
     unsigned char dlbuffer[256];
     LoopHandler *loops[3];
 
@@ -64,7 +64,7 @@ class TestDatalogControl : public ScrutinyTest
         datalogging::Configuration refconfig,
         protocol::ResponseCode::eResponseCode expected_code,
         bool check_response = true,
-        std::string error_msg = "");
+        char const* error_msg = "");
     void check_get_status(datalogging::DataLogger::State::eState expected_state, uint32_t expected_remaining_bytes, uint32_t expected_counter);
 
     float m_some_var_operand1;
@@ -183,7 +183,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
                 return 0;
             }
             codecs::encode_float_big_endian(dlconfig->trigger.operands[i].data.literal.val, &buffer[cursor]);
-            cursor += sizeof(float);
+            cursor += 4;
             break;
         case datalogging::OperandType::Rpv:
             if (cursor + 2 > max_size)
@@ -191,10 +191,10 @@ uint16_t TestDatalogControl::encode_datalogger_config(
                 return 0;
             }
             codecs::encode_16_bits_big_endian(dlconfig->trigger.operands[i].data.rpv.id, &buffer[cursor]);
-            cursor += sizeof(uint16_t);
+            cursor += 2;
             break;
         case datalogging::OperandType::Var:
-            if (cursor + 1 + sizeof(void *) > max_size)
+            if (cursor + 1 + SIZEOF_8BITS(void *) > max_size)
             {
                 return 0;
             }
@@ -203,7 +203,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             break;
 
         case datalogging::OperandType::VarBit:
-            if (cursor + 1 + 1 + 1 + sizeof(void *) > max_size)
+            if (cursor + 1 + 1 + 1 + SIZEOF_8BITS(void *) > max_size)
             {
                 return 0;
             }
@@ -232,7 +232,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         case datalogging::LoggableType::Time:
             break;
         case datalogging::LoggableType::Memory:
-            if (cursor + 1 + sizeof(void *) > max_size)
+            if (cursor + 1 + SIZEOF_8BITS(void *) > max_size)
             {
                 return 0;
             }
@@ -294,9 +294,9 @@ void TestDatalogControl::test_configure(
     datalogging::Configuration refconfig,
     protocol::ResponseCode::eResponseCode expected_code,
     bool check_response,
-    std::string error_msg)
+    char const* error_msg)
 {
-    unsigned char request_data[1024] = { 5, 2 };
+    static unsigned char request_data[256] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
     ASSERT_GT(sizeof(request_data), (size_t)payload_size + 8) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
@@ -412,6 +412,7 @@ TEST_F(TestDatalogControl, TestConfigureItemCountOverflow)
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
     refconfig.items_count = SCRUTINY_DATALOGGING_MAX_SIGNAL + 1;
+    
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Overflow);
 }
 
@@ -442,7 +443,12 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     for (unsigned int i = 0; i < sizeof(bad_values) / sizeof(float); i++)
     {
-        std::string error_msg = std::string("i=") + NumberToString(i);
+#if SCRUTINYTEST_NO_OUTPUT
+        const char* error_msg="";
+#else    
+        std::string s = std::string("i=") + NumberToString(i
+        char const* error_msg = s.c_str();
+#endif        
         datalogging::Configuration refconfig = get_valid_reference_configuration();
         refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
         refconfig.trigger.operands[0].data.literal.val = bad_values[i];
@@ -819,7 +825,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    unsigned char tx_buffer[1024] = { 0 };
+    static unsigned char tx_buffer[sizeof(dlbuffer) + 32] = { 0 };
     uint16_t n_to_read;
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
@@ -934,7 +940,11 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         bool finished = false;
         for (uint16_t i = 0; i < maximum_transfer_count && !finished; i++)
         {
+#if SCRUTINYTEST_NO_OUTPUT
+            const char* error_msg="";
+#else
             std::string error_msg = std::string("iteration=") + NumberToString(iteration) + std::string(", i=") + NumberToString(i);
+#endif            
             unsigned char validation_txbuffer[128];
 
             unsigned char request_data_after[8] = { 5, 7, 0, 0 };

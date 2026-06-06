@@ -11,7 +11,7 @@
 #include "scrutiny_test.hpp"
 #include "scrutiny.hpp"
 #include <stdint.h>
-#include <string>
+//#include <string>
 
 void ScrutinyTest::add_crc(unsigned char *data, uint16_t data_len)
 {
@@ -119,7 +119,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        std::ostream &operator<<(std::ostream &out, scrutiny::protocol::ResponseCode::eResponseCode val)
+        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, scrutiny::protocol::ResponseCode::eResponseCode val)
         {
             switch (val)
             {
@@ -165,7 +165,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        std::ostream &operator<<(std::ostream &out, DataLogger::State::eState val)
+        scrutinytest::ostream &operator<<(scrutinytest::ostream &out, DataLogger::State::eState val)
         {
             switch (val)
             {

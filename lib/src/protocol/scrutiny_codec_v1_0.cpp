@@ -33,10 +33,10 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-            for (int_fast8_t i = 0; i < (nb_8bits >> 1); i++)
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
-                static_cast<unsigned char *>(dst)[2 * i] = (src[i] >> 8) & 0xFF;
-                static_cast<unsigned char *>(dst)[2 * i + 1] = (src[i] & 0xFF);
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
             }
 #endif
         }

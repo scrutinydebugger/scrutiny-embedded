@@ -162,7 +162,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     unsigned char tx_buffer[32];
     unsigned char *buf[4];
 
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
     uint64_t start = reinterpret_cast<uint64_t>(buf);
     uint64_t end = start + 4;
     scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),

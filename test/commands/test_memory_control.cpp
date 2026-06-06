@@ -152,7 +152,7 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
 */
 TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
 {
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
     const scrutiny::protocol::ResponseCode::eResponseCode code = scrutiny::protocol::ResponseCode::InvalidRequest;
@@ -197,7 +197,7 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
 
 TEST_F(TestMemoryControl, TestReadAddressOverflow)
 {
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
     const scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
@@ -270,7 +270,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR unsigned char datalen = sizeof(void *) + 2;
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2;
     unsigned char request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
     unsigned int index = 0;
@@ -323,7 +323,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR unsigned char datalen = sizeof(void *) + 2;
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2;
     unsigned char request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
     unsigned int index = 0;
@@ -660,7 +660,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     scrutiny_handler.comm()->connect();
 
     SCRUTINY_CONSTEXPR uint16_t window_size = 4;
-    SCRUTINY_CONSTEXPR unsigned char datalen = sizeof(void *) + 2 + window_size;
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
@@ -715,7 +715,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     scrutiny_handler.comm()->connect();
 
     SCRUTINY_CONSTEXPR uint16_t window_size = 4;
-    SCRUTINY_CONSTEXPR unsigned char datalen = sizeof(void *) + 2 + window_size;
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
@@ -758,7 +758,7 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
     uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Write);
     const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(void *);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
     SCRUTINY_CONSTEXPR uint16_t data_to_write_length = 3;
     SCRUTINY_CONSTEXPR uint32_t datalen = (addr_size + 2 + data_to_write_length) * 2;
     unsigned char tx_buffer[64];
