@@ -80,7 +80,7 @@ bool ScrutinyTest::TEST_IS_PROTOCOL_RESPONSE(
 unsigned int ScrutinyTest::encode_addr(unsigned char *buffer, void *addr)
 {
     uintptr_t ptr = reinterpret_cast<uintptr_t>(addr);
-    SCRUTINY_CONSTEXPR unsigned int addr_size = sizeof(ptr);
+    SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(ptr);
 
     unsigned int i = addr_size - 1;
 
