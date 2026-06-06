@@ -877,7 +877,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
 {
     SCRUTINY_CONSTEXPR uint16_t buffersize_min_mod3 = ((scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE + 2) / 3) * 3;
     SCRUTINY_CONSTEXPR uint16_t nb_write = buffersize_min_mod3 / 3; // 16bits ID + 16bits data
-    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 3;        // 16bits ID + 8bits data
+    SCRUTINY_CONSTEXPR uint16_t rx_data_size = nb_write * 4;        // 16bits ID + 16bits data
     SCRUTINY_CONSTEXPR uint16_t tx_data_size = nb_write * 3;        // 16bits ID + 8bits length.
     SCRUTINY_CONSTEXPR uint16_t request_size = rx_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
     SCRUTINY_CONSTEXPR uint16_t response_size = tx_data_size + scrutiny::protocol::RESPONSE_OVERHEAD;
@@ -889,7 +889,7 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     unsigned char internal_rx_buffer[rx_data_size];
     unsigned char internal_tx_buffer[tx_data_size];
 
-    scrutiny::RuntimePublishedValue rpvs[] = { { 0x1000, scrutiny::VariableType::uint8 } };
+    scrutiny::RuntimePublishedValue rpvs[] = { { 0x1001, scrutiny::VariableType::uint16 } };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), SCRUTINY_NULL, rpv_write_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
@@ -904,12 +904,13 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVResponseFullNoOverflow)
     for (uint16_t i = 0; i < nb_write; i++)
     {
         request_data[rx_index++] = 0x10; // ID
-        request_data[rx_index++] = 0x00; // ID
+        request_data[rx_index++] = 0x01; // ID
         request_data[rx_index++] = 0xAA; // Data
+        request_data[rx_index++] = 0xBB; // Data
 
         expected_response[tx_index++] = 0x10; // ID
-        expected_response[tx_index++] = 0x00; // ID
-        expected_response[tx_index++] = 1;    // length
+        expected_response[tx_index++] = 0x01; // ID
+        expected_response[tx_index++] = 2;    // length
     }
 
     add_crc(request_data, request_size - 4);

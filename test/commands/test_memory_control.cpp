@@ -47,7 +47,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
 {
     // Building request
     unsigned char data_buf[] = { 0x11, 0x22, 0x33 };
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = sizeof(data_buf);
     unsigned char request_data[8 + addr_size + 2] = { 3, 1, 0, addr_size + 2 };
     unsigned int index = 4;
@@ -91,7 +91,7 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     unsigned char data_buf2[] = { 0x44, 0x55, 0x66, 0x77 };
     unsigned char data_buf3[] = { 0x88, 0x99 };
     unsigned char tx_buffer[64];
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size1 = sizeof(data_buf1);
     SCRUTINY_CONSTEXPR uint16_t data_size2 = sizeof(data_buf2);
     SCRUTINY_CONSTEXPR uint16_t data_size3 = sizeof(data_buf3);
@@ -362,7 +362,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write);
     unsigned char request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
@@ -410,7 +410,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     unsigned char expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write) * 2;
     unsigned char request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
@@ -460,7 +460,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x09, 0x0a };
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 2 + sizeof(data_to_write1) + sizeof(data_to_write2);
     unsigned char request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
@@ -519,7 +519,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     unsigned char expected_output_buffer[] = { 0x11, 0x55, 0x35, 0x54, 0x5A, 0xFF, 0x55, 0x55, 0x05, 0x99 };
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 2 + sizeof(data_to_write1) * 2 + sizeof(data_to_write2) * 2;
     unsigned char request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
@@ -579,7 +579,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
     unsigned char tx_buffer[32];
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = 10;
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + data_size;
     unsigned char request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
@@ -613,7 +613,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     unsigned char tx_buffer[32];
 
     // Building request
-    SCRUTINY_CONSTEXPR uint32_t addr_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size = 10;
     SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + data_size;
     unsigned char request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
