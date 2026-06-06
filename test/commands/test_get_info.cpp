@@ -319,20 +319,24 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
 {
     unsigned char tx_buffer[64];
 
-    scrutiny::RuntimePublishedValue rpvs[3] = { { 0x1122, scrutiny::VariableType::uint32 },
-                                                { 0x3344, scrutiny::VariableType::float32 },
-                                                { 0x5566, scrutiny::VariableType::uint16 } };
+    scrutiny::RuntimePublishedValue rpvs[4] = {
+        { 0x1122, scrutiny::VariableType::uint32 },
+        { 0x3344, scrutiny::VariableType::float32 },
+        { 0x5566, scrutiny::VariableType::uint16 },
+        // Type "boolean" has no size encoded, expect the library to encode the paltform size to give to the server.
+        { 0x7788, scrutiny::VariableType::boolean }
+    };
 
-    config.set_published_values(rpvs, 3, rpv_read_callback, rpv_write_callback);
+    config.set_published_values(rpvs, 4, rpv_read_callback, rpv_write_callback);
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
     // Make request
-    unsigned char request_data[8 + 4] = { 1, 7, 0, 4, 0, 1, 0, 2 }; // start=1, count =2
+    unsigned char request_data[8 + 4] = { 1, 7, 0, 4, 0, 1, 0, 3 }; // start=1, count =3
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    unsigned char expected_response[9 + 3 * 2] = { 0x81, 7, 0, 0, 3 * 2 };
+    unsigned char expected_response[9 + 3 * 3] = { 0x81, 7, 0, 0, 3 * 3 };
     unsigned int index = 5;
     expected_response[index++] = 0x33;
     expected_response[index++] = 0x44;
@@ -341,6 +345,11 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
     expected_response[index++] = 0x55;
     expected_response[index++] = 0x66;
     expected_response[index++] = static_cast<unsigned char>(scrutiny::VariableType::uint16);
+
+    expected_response[index++] = 0x77;
+    expected_response[index++] = 0x88;
+    // boolean magically becomes boolean8 or boolean16. Tells the server how to write the RPV
+    expected_response[index++] = static_cast<unsigned char>(scrutiny::tools::get_platform_boolean());
 
     add_crc(expected_response, sizeof(expected_response) - 4);
 

@@ -312,9 +312,17 @@ namespace scrutiny
                 m_overflow = true;
                 return;
             }
-
+            VariableType::eVariableType vtype = rpv->type;
+            if (rpv->type == VariableType::boolean)
+            {
+                // The embedded lib suer may use "boolean" which has no size.
+                // We need to tell the server the real size of it so it can encode data
+                // while writing. Convert to boolean8, boolean16 or boolean32
+                // bool size is compiler specific. can be 8bits or int.
+                vtype = tools::get_platform_boolean();
+            }
             m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits(static_cast<uint_least8_t>(rpv->type), &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits(static_cast<uint_least8_t>(vtype), &m_buffer[m_cursor]);
             m_response->data_length = m_cursor;
         }
 

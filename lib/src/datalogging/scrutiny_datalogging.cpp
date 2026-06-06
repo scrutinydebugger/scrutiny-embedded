@@ -42,6 +42,9 @@ namespace scrutiny
 #endif
             case VariableType::boolean16:
             case VariableType::boolean32:
+#if SCRUTINY_SUPPORT_64BITS
+            case VariableType::boolean64:
+#endif
             case VariableType::boolean: // No size encoded
             {
                 *vtype = BiggestUint;
