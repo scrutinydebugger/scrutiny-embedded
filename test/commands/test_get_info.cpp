@@ -83,21 +83,21 @@ TEST_F(TestGetInfo, TestReadprotocolVersion)
 TEST_F(TestGetInfo, TestReadSoftwareId)
 {
     EXPECT_EQ(sizeof(scrutiny::software_id), SCRUTINY_SOFTWARE_ID_LENGTH);
-    unsigned char tx_buffer[SCRUTINY_SOFTWARE_ID_LENGTH + 32];
+    unsigned char tx_buffer[ SIZEOF_8BITS(scrutiny::software_id) + 32];
 
     // Make request
-    unsigned char request_data[8 + SCRUTINY_SOFTWARE_ID_LENGTH] = { 1, 2, 0, 0 };
-    request_data[2] = (SCRUTINY_SOFTWARE_ID_LENGTH >> 8) & 0xFF;
-    request_data[3] = SCRUTINY_SOFTWARE_ID_LENGTH & 0xFF;
-    std::memcpy(&request_data[4], scrutiny::software_id, SCRUTINY_SOFTWARE_ID_LENGTH);
+    unsigned char request_data[8 + SIZEOF_8BITS(scrutiny::software_id)] = { 1, 2, 0, 0 };
+    request_data[2] = (SIZEOF_8BITS(scrutiny::software_id) >> 8) & 0xFF;
+    request_data[3] = SIZEOF_8BITS(scrutiny::software_id) & 0xFF;
+    std::memcpy(&request_data[4], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Make expected response
-    unsigned char expected_response[9 + SCRUTINY_SOFTWARE_ID_LENGTH] = { 0x81, 2, 0 };
-    expected_response[3] = (SCRUTINY_SOFTWARE_ID_LENGTH >> 8) & 0xFF;
-    expected_response[4] = SCRUTINY_SOFTWARE_ID_LENGTH & 0xFF;
-    std::memcpy(&expected_response[5], scrutiny::software_id, SCRUTINY_SOFTWARE_ID_LENGTH);
-    add_crc(expected_response, 5 + SCRUTINY_SOFTWARE_ID_LENGTH);
+    unsigned char expected_response[9 + SIZEOF_8BITS(scrutiny::software_id)] = { 0x81, 2, 0 };
+    expected_response[3] = (SIZEOF_8BITS(scrutiny::software_id) >> 8) & 0xFF;
+    expected_response[4] = SIZEOF_8BITS(scrutiny::software_id) & 0xFF;
+    memcpy_dilate_8bits(&expected_response[5], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
+    add_crc(expected_response, 5 + SIZEOF_8BITS(scrutiny::software_id));
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
     scrutiny_handler.process(0);
@@ -163,8 +163,8 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation)
     unsigned char *buf[4];
 
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
-    uint64_t start = reinterpret_cast<uint64_t>(buf);
-    uint64_t end = start + 4;
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf);
+    uintptr_t end = start + 4;
     scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end),
                                                  scrutiny::tools::make_address_range(start + 1, end + 1) };
 
@@ -518,7 +518,7 @@ TEST_F(TestGetInfo, TestGetLoopCountNoLoopSet)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 {
-    std::string loop_name = "Loop1";
+    const char* loop_name = "Loop1";
     unsigned char tx_buffer[32];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 0 };
@@ -543,8 +543,8 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
     expected_response[7] = 0;
 #endif
     scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, &expected_response[8]);
-    expected_response[12] = static_cast<unsigned char>(loop_name.length());
-    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name.c_str(), loop_name.size() + 1);
+    expected_response[12] = static_cast<unsigned char>(strlen(loop_name));
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name, strlen(loop_name) + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -560,7 +560,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
 {
-    std::string loop_name = "Loop3";
+    const char* loop_name = "Loop3";
     unsigned char tx_buffer[64];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 2 }; // Read loop 2
@@ -581,8 +581,8 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
     expected_response[6] = static_cast<unsigned char>(scrutiny::LoopType::FIXED_FREQ);
     expected_response[7] = 0;
     scrutiny::codecs::encode_32_bits_big_endian(100u, &expected_response[8]);
-    expected_response[12] = static_cast<unsigned char>(loop_name.length());
-    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name.c_str(), loop_name.size() + 1);
+    expected_response[12] = static_cast<unsigned char>(strlen(loop_name));
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name, strlen(loop_name) + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -598,7 +598,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
 
 TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
 {
-    std::string loop_name = "Loop2";
+    const char* loop_name = "Loop2";
     unsigned char tx_buffer[32];
 
     unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 1 };
@@ -621,9 +621,9 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
 #else
     expected_response[7] = 0;
 #endif
-    expected_response[8] = static_cast<unsigned char>(loop_name.length());
+    expected_response[8] = static_cast<unsigned char>(strlen(loop_name));
 
-    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[9]), loop_name.c_str(), loop_name.size() + 1);
+    scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[9]), loop_name, strlen(loop_name) + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
