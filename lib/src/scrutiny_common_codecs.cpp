@@ -23,7 +23,7 @@ namespace scrutiny
 {
     namespace codecs
     {
-        uint_least8_t decode_address_big_endian(unsigned char const *const buf, uintptr_t *const addr)
+        uint_least8_t decode_address_big_endian_8bits(unsigned char const *const buf, uintptr_t *const addr)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -60,12 +60,12 @@ namespace scrutiny
             return static_cast<uint_least8_t>(addr_size);
         }
 
-        uint_least8_t encode_address_big_endian(void const *const addr, unsigned char *const buf)
+        uint_least8_t encode_address_big_endian_8bits(void const *const addr, unsigned char *const buf)
         {
-            return encode_address_big_endian(reinterpret_cast<uintptr_t>(addr), buf);
+            return encode_address_big_endian_8bits(reinterpret_cast<uintptr_t>(addr), buf);
         }
 
-        uint_least8_t encode_address_big_endian(uintptr_t const addr, unsigned char *const buf)
+        uint_least8_t encode_address_big_endian_8bits(uintptr_t const addr, unsigned char *const buf)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             SCRUTINY_STATIC_ASSERT(addr_size == 1 || addr_size == 2 || addr_size == 4 || addr_size == 8, "Unsupported address size");
@@ -99,13 +99,16 @@ namespace scrutiny
             return static_cast<uint_least8_t>(addr_size);
         }
 
-        uint_least8_t encode_anytype_big_endian(AnyType const *const val, VariableType::eVariableType const vartype, unsigned char *const buffer)
+        uint_least8_t encode_anytype_big_endian_8bits(
+            AnyType const *const val,
+            VariableType::eVariableType const vartype,
+            unsigned char *const buffer)
         {
             uint_least8_t const typesize = tools::get_type_size_8bits(vartype);
-            return encode_anytype_big_endian(val, typesize, buffer);
+            return encode_anytype_big_endian_8bits(val, typesize, buffer);
         }
 
-        uint_least8_t encode_anytype_big_endian(AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer)
+        uint_least8_t encode_anytype_big_endian_8bits(AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer)
         {
 
             switch (typesize)
@@ -116,14 +119,14 @@ namespace scrutiny
                 break;
 #endif
             case 2:
-                codecs::encode_16_bits_big_endian(val->uint16, buffer);
+                codecs::encode_16_bits_big_endian_8bits(val->uint16, buffer);
                 break;
             case 4:
-                codecs::encode_32_bits_big_endian(val->uint32, buffer);
+                codecs::encode_32_bits_big_endian_8bits(val->uint32, buffer);
                 break;
 #if SCRUTINY_SUPPORT_64BITS
             case 8:
-                codecs::encode_64_bits_big_endian(val->uint64, buffer);
+                codecs::encode_64_bits_big_endian_8bits(val->uint64, buffer);
                 break;
 #endif
             default:

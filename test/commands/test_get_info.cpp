@@ -551,7 +551,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreq)
 #else
     expected_response[7] = 0;
 #endif
-    scrutiny::codecs::encode_32_bits_big_endian(0x12345678u, &expected_response[8]);
+    scrutiny::codecs::encode_32_bits_big_endian_8bits(0x12345678u, &expected_response[8]);
     expected_response[12] = static_cast<unsigned char>(strlen(loop_name));
     scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name, strlen(loop_name) + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -589,7 +589,7 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionFixedFreqNoDatalogging)
     expected_response[5] = 2; // loop ID
     expected_response[6] = static_cast<unsigned char>(scrutiny::LoopType::FIXED_FREQ);
     expected_response[7] = 0;
-    scrutiny::codecs::encode_32_bits_big_endian(100u, &expected_response[8]);
+    scrutiny::codecs::encode_32_bits_big_endian_8bits(100u, &expected_response[8]);
     expected_response[12] = static_cast<unsigned char>(strlen(loop_name));
     scrutiny::tools::strncpy(reinterpret_cast<char *>(&expected_response[13]), loop_name, strlen(loop_name) + 1);
     add_crc(expected_response, sizeof(expected_response) - 4);

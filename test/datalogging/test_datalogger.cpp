@@ -394,7 +394,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         while (!reader->finished())
         {
             ASSERT_FALSE(reader->error()) << error_msg;
-            copied_count += reader->read(&output_buffer[copied_count], 10);
+            copied_count += reader->read_dilate_8bits(&output_buffer[copied_count], 10);
             ASSERT_LE(copied_count, sizeof(output_buffer)) << error_msg;
         }
 
@@ -426,11 +426,11 @@ TEST_F(TestDatalogger, ComplexAcquisition)
                 int32_t check_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(entry[1]));
                 int32_t check_last_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(last_entry[1]));
 
-                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[2]));
-                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[2]));
+                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[2]));
+                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[2]));
 
-                uint32_t check_time = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[3]));
-                uint32_t check_last_time = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[3]));
+                uint32_t check_time = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[3]));
+                uint32_t check_last_time = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[3]));
 
                 EXPECT_EQ(check_var1 - check_last_var1, 2.0f) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_var2 - check_last_var2, -2) << "i=" << i << "," << error_msg;
@@ -448,7 +448,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
         float mid_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(data[trigger_location][0]));
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(data[trigger_location][1]));
-        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian(GET_VEC_DATA(data[trigger_location][2]));
+        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(data[trigger_location][2]));
 
         // Validate position of trigger and end of graph. Allow a margin of 3 (1.5 entry because decimation=2)
         EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
@@ -560,7 +560,7 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 #endif
     unsigned char output_buffer[output_buffer_required_size] = { 0 };
     datalogger.get_reader()->reset();
-    datalogger.get_reader()->read(output_buffer, sizeof(output_buffer));
+    datalogger.get_reader()->read_dilate_8bits(output_buffer, sizeof(output_buffer));
     parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
     parser.parse(datalogger.get_reader()->get_entry_count());
     ASSERT_FALSE(parser.error());
@@ -573,11 +573,11 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
         vector<vector<unsigned char> > entry = data[i];
         ASSERT_EQ(entry.size(), 1); // 1 signal = time
 
-        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian(GET_VEC_DATA(entry[0]));
+        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[0]));
         if (i > 0)
         {
             vector<vector<unsigned char> > last_entry = data[i - 1];
-            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian(GET_VEC_DATA(last_entry[0]));
+            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[0]));
             ASSERT_EQ(timestamp - last_timestamp, 5) << "Entry #" << i;
         }
     }

@@ -165,14 +165,14 @@ uint16_t TestDatalogControl::encode_datalogger_config(
     {
         return 0;
     }
-    cursor += codecs::encode_8_bits(loop_id, &buffer[cursor]);
-    cursor += codecs::encode_16_bits_big_endian(config_id, &buffer[cursor]);
-    cursor += codecs::encode_16_bits_big_endian(dlconfig->decimation, &buffer[cursor]);
-    cursor += codecs::encode_8_bits(dlconfig->probe_location, &buffer[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(dlconfig->timeout_100ns, &buffer[cursor]);
-    cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.condition), &buffer[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(dlconfig->trigger.hold_time_100ns, &buffer[cursor]);
-    cursor += codecs::encode_8_bits(dlconfig->trigger.operand_count, &buffer[cursor]);
+    cursor += codecs::encode_8_bits_8bits(loop_id, &buffer[cursor]);
+    cursor += codecs::encode_16_bits_big_endian_8bits(config_id, &buffer[cursor]);
+    cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->decimation, &buffer[cursor]);
+    cursor += codecs::encode_8_bits_8bits(dlconfig->probe_location, &buffer[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits(dlconfig->timeout_100ns, &buffer[cursor]);
+    cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.condition), &buffer[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits(dlconfig->trigger.hold_time_100ns, &buffer[cursor]);
+    cursor += codecs::encode_8_bits_8bits(dlconfig->trigger.operand_count, &buffer[cursor]);
 
     for (uint32_t i = 0; i < dlconfig->trigger.operand_count; i++)
     {
@@ -180,7 +180,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].type), &buffer[cursor]);
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].type), &buffer[cursor]);
         switch (dlconfig->trigger.operands[i].type)
         {
         case datalogging::OperandType::Literal:
@@ -188,7 +188,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            codecs::encode_float_big_endian(dlconfig->trigger.operands[i].data.literal.val, &buffer[cursor]);
+            codecs::encode_float_big_endian_8bits(dlconfig->trigger.operands[i].data.literal.val, &buffer[cursor]);
             cursor += 4;
             break;
         case datalogging::OperandType::Rpv:
@@ -196,7 +196,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            codecs::encode_16_bits_big_endian(dlconfig->trigger.operands[i].data.rpv.id, &buffer[cursor]);
+            codecs::encode_16_bits_big_endian_8bits(dlconfig->trigger.operands[i].data.rpv.id, &buffer[cursor]);
             cursor += 2;
             break;
         case datalogging::OperandType::Var:
@@ -204,8 +204,8 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.var.datatype), &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian(dlconfig->trigger.operands[i].data.var.addr, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.var.datatype), &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[i].data.var.addr, &buffer[cursor]);
             break;
 
         case datalogging::OperandType::VarBit:
@@ -213,10 +213,10 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.datatype), &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian(dlconfig->trigger.operands[i].data.varbit.addr, &buffer[cursor]);
-            cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitoffset), &buffer[cursor]);
-            cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitsize), &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.datatype), &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[i].data.varbit.addr, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitoffset), &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitsize), &buffer[cursor]);
             break;
         }
     }
@@ -225,14 +225,14 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         return 0;
     }
 
-    cursor += codecs::encode_8_bits(dlconfig->items_count, &buffer[cursor]);
+    cursor += codecs::encode_8_bits_8bits(dlconfig->items_count, &buffer[cursor]);
     for (uint32_t i = 0; i < dlconfig->items_count; i++)
     {
         if (cursor + 1 > max_size)
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits(static_cast<unsigned char>(dlconfig->items_to_log[i].type), &buffer[cursor]);
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[i].type), &buffer[cursor]);
         switch (dlconfig->items_to_log[i].type)
         {
         case datalogging::LoggableType::Time:
@@ -242,15 +242,15 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_address_big_endian(dlconfig->items_to_log[i].data.memory.address, &buffer[cursor]);
-            cursor += codecs::encode_8_bits(dlconfig->items_to_log[i].data.memory.size, &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[i].data.memory.address, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[i].data.memory.size, &buffer[cursor]);
             break;
         case datalogging::LoggableType::Rpv:
             if (cursor + 2 > max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_16_bits_big_endian(dlconfig->items_to_log[i].data.rpv.id, &buffer[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[i].data.rpv.id, &buffer[cursor]);
             break;
         }
     }
@@ -346,7 +346,7 @@ TEST_F(TestDatalogControl, TestGetSetup)
 
     // Make expected response
     unsigned char expected_response[9 + 4 + 1 + 1] = { 0x85, 1, 0, 0, 6 };
-    codecs::encode_32_bits_big_endian(buffer_size, &expected_response[5]);
+    codecs::encode_32_bits_big_endian_8bits(buffer_size, &expected_response[5]);
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
     expected_response[9] = static_cast<unsigned char>(datalogging::EncodingType::RAW);
 #else
@@ -648,9 +648,9 @@ void TestDatalogControl::check_get_status(
     add_crc(request_data, sizeof(request_data) - 4);
     unsigned char expected_response[9 + 1 + 4 + 4] = { 0x85, 5, 0, 0, 1 + 4 + 4 };
     uint16_t cursor = 5;
-    cursor += codecs::encode_8_bits(static_cast<uint_least8_t>(expected_state), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(expected_remaining_bytes, &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian(expected_counter, &expected_response[cursor]);
+    cursor += codecs::encode_8_bits_8bits(static_cast<uint_least8_t>(expected_state), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits(expected_remaining_bytes, &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits(expected_counter, &expected_response[cursor]);
 
     add_crc(expected_response, sizeof(expected_response) - 4);
     scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -667,8 +667,8 @@ void TestDatalogControl::check_get_status(
         protocol::ResponseCode::OK);
 
     datalogging::DataLogger::State::eState gotten_state = static_cast<datalogging::DataLogger::State::eState>(tx_buffer[5]);
-    uint32_t gotten_remaining_bytes = codecs::decode_32_bits_big_endian(&tx_buffer[6]);
-    uint32_t gotten_byte_counter = codecs::decode_32_bits_big_endian(&tx_buffer[10]);
+    uint32_t gotten_remaining_bytes = codecs::decode_32_bits_big_endian_8bits(&tx_buffer[6]);
+    uint32_t gotten_byte_counter = codecs::decode_32_bits_big_endian_8bits(&tx_buffer[10]);
     EXPECT_EQ(gotten_state, expected_state);
     EXPECT_EQ(gotten_remaining_bytes, expected_remaining_bytes);
     EXPECT_EQ(gotten_byte_counter, expected_counter);
@@ -799,11 +799,12 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
 
     unsigned char expected_response[9 + 2 + 2 + 4 + 4 + 4] = { 0x85, 6, 0, 0, 16 };
     uint16_t cursor = 5;
-    cursor += codecs::encode_16_bits_big_endian(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
-    cursor += codecs::encode_16_bits_big_endian((uint16_t)0xabcd, &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian((uint32_t)reader->get_entry_count(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian((uint32_t)reader->get_total_size(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian((uint32_t)scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
+    cursor += codecs::encode_16_bits_big_endian_8bits(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
+    cursor += codecs::encode_16_bits_big_endian_8bits((uint16_t)0xabcd, &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_entry_count(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_total_size(), &expected_response[cursor]);
+    cursor +=
+        codecs::encode_32_bits_big_endian_8bits((uint32_t)scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
@@ -874,13 +875,13 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
     EXPECT_EQ(tx_buffer[5], 1); // finished
     EXPECT_EQ(tx_buffer[6], 0); // Rolling counter;
-    EXPECT_EQ(codecs::decode_16_bits_big_endian(&tx_buffer[7]), scrutiny_handler.datalogger()->get_acquisition_id());
-    uint32_t payload_length = codecs::decode_16_bits_big_endian(&tx_buffer[3]);
+    EXPECT_EQ(codecs::decode_16_bits_big_endian_8bits(&tx_buffer[7]), scrutiny_handler.datalogger()->get_acquisition_id());
+    uint32_t payload_length = codecs::decode_16_bits_big_endian_8bits(&tx_buffer[3]);
     EXPECT_TRUE(reader->finished());
     reader->reset();
 
     unsigned char raw_data[sizeof(dlbuffer)];
-    uint32_t data_count = reader->read(raw_data, sizeof(raw_data));
+    uint32_t data_count = reader->read_dilate_8bits(raw_data, sizeof(raw_data));
     EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.9f);
     ASSERT_EQ(data_count, reader->get_total_size());
     ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
@@ -888,7 +889,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     EXPECT_BUF_EQ(&tx_buffer[9], raw_data, data_count);
 
     uint32_t expected_crc = tools::crc32(raw_data, data_count);
-    uint32_t gotten_crc = codecs::decode_32_bits_big_endian(&tx_buffer[n_to_read - 8]);
+    uint32_t gotten_crc = codecs::decode_32_bits_big_endian_8bits(&tx_buffer[n_to_read - 8]);
     EXPECT_EQ(gotten_crc, expected_crc);
 }
 
@@ -940,7 +941,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
         // rearm)
         datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
         reader->reset();
-        uint32_t const total_data_length = reader->read(reference_data, sizeof(reference_data));
+        uint32_t const total_data_length = reader->read_dilate_8bits(reference_data, sizeof(reference_data));
         ASSERT_GT(total_data_length, 0.95f * sizeof(big_dlbuffer));
         uint32_t expected_crc = tools::crc32(reference_data, total_data_length);
         ASSERT_TRUE(reader->finished()) << "iteration=" << iteration;
@@ -969,16 +970,16 @@ TEST_F(TestDatalogControl, TestReadAcquisitionMultipleTransfer)
             ASSERT_IS_PROTOCOL_RESPONSE(validation_txbuffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK) << error_msg;
             finished = static_cast<bool>(validation_txbuffer[5]);
             EXPECT_EQ(validation_txbuffer[6], i % 0x100) << error_msg; // Rolling counter;
-            EXPECT_EQ(codecs::decode_16_bits_big_endian(&validation_txbuffer[7]), expected_acquisition_id) << error_msg;
+            EXPECT_EQ(codecs::decode_16_bits_big_endian_8bits(&validation_txbuffer[7]), expected_acquisition_id) << error_msg;
 
-            uint16_t payload_length = codecs::decode_16_bits_big_endian(&validation_txbuffer[3]);
+            uint16_t payload_length = codecs::decode_16_bits_big_endian_8bits(&validation_txbuffer[3]);
             ASSERT_GE(payload_length, 8);
 
             uint16_t qty_to_read;
             if (finished)
             {
                 qty_to_read = payload_length - 4 - 4; // Last block has CRC;
-                uint32_t read_crc = codecs::decode_32_bits_big_endian(&validation_txbuffer[9 + qty_to_read]);
+                uint32_t read_crc = codecs::decode_32_bits_big_endian_8bits(&validation_txbuffer[9 + qty_to_read]);
                 EXPECT_EQ(read_crc, expected_crc) << error_msg;
             }
             else

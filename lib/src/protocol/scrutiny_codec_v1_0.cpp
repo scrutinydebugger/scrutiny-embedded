@@ -29,7 +29,6 @@ namespace scrutiny
     namespace protocol
     {
 
-
         //==============================================================
         void ReadMemoryBlocksRequestParser::validate(void)
         {
@@ -46,7 +45,7 @@ namespace scrutiny
                 }
 
                 cursor += addr_size;
-                length = codecs::decode_16_bits_big_endian(&m_buffer[cursor]);
+                length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
                 cursor += 2;
 
                 m_required_tx_buffer_size += addr_size + 2 + length;
@@ -83,9 +82,9 @@ namespace scrutiny
                 return;
             }
 
-            codecs::decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
+            codecs::decode_address_big_endian_8bits(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
-            length = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             memblock->start_address = reinterpret_cast<unsigned char *>(addr);
@@ -131,7 +130,7 @@ namespace scrutiny
                 }
 
                 cursor += addr_size;
-                length = codecs::decode_16_bits_big_endian(&m_buffer[cursor]);
+                length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
                 cursor += 2;
                 cursor += length;
                 if (m_masked_write)
@@ -171,9 +170,9 @@ namespace scrutiny
                 return;
             }
 
-            codecs::decode_address_big_endian(&m_buffer[m_bytes_read], &addr);
+            codecs::decode_address_big_endian_8bits(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
-            length = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             if ((length > static_cast<uint16_t>(m_size_limit - m_bytes_read)) ||
@@ -238,8 +237,8 @@ namespace scrutiny
                 return;
             }
 
-            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock->length, &m_buffer[m_cursor]);
             memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
@@ -272,8 +271,8 @@ namespace scrutiny
                 return;
             }
 
-            m_cursor += codecs::encode_address_big_endian(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian(memblock->length, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock->length, &m_buffer[m_cursor]);
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
 
@@ -310,8 +309,8 @@ namespace scrutiny
                 // bool size is compiler specific. can be 8bits or int.
                 vtype = tools::get_platform_boolean();
             }
-            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits(static_cast<uint_least8_t>(vtype), &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits_8bits(static_cast<uint_least8_t>(vtype), &m_buffer[m_cursor]);
             m_response->data_length = m_cursor;
         }
 
@@ -347,8 +346,8 @@ namespace scrutiny
 #endif
             )
             {
-                m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-                m_cursor += codecs::encode_anytype_big_endian(&v, typesize, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_anytype_big_endian_8bits(&v, typesize, &m_buffer[m_cursor]);
                 m_response->data_length = m_cursor;
             }
         }
@@ -379,8 +378,8 @@ namespace scrutiny
                 return;
             }
 
-            m_cursor += codecs::encode_16_bits_big_endian(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits(typesize, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits_8bits(typesize, &m_buffer[m_cursor]);
 
             m_response->data_length = m_cursor;
         }
@@ -424,7 +423,7 @@ namespace scrutiny
                 return false;
             }
 
-            *id = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            *id = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             if (m_bytes_read == m_request_len)
@@ -467,7 +466,7 @@ namespace scrutiny
                 return false;
             }
 
-            uint16_t const id = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+            uint16_t const id = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
             bool const found = m_main_handler->get_rpv(id, rpv);
@@ -496,14 +495,14 @@ namespace scrutiny
                 break;
 #endif
             case 2:
-                v->uint16 = codecs::decode_16_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint16 = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
                 break;
             case 4:
-                v->uint32 = codecs::decode_32_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint32 = codecs::decode_32_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
                 break;
 #if SCRUTINY_SUPPORT_64BITS
             case 8:
-                v->uint64 = codecs::decode_64_bits_big_endian(&m_buffer[m_bytes_read]);
+                v->uint64 = codecs::decode_64_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
                 break;
 #endif
             default:
@@ -598,8 +597,8 @@ namespace scrutiny
 
             response->data[0] = static_cast<uint_least8_t>(response_data->region_type) & 0xFF;
             response->data[1] = response_data->region_index & 0xFF;
-            codecs::encode_address_big_endian(response_data->start, &response->data[2]);
-            codecs::encode_address_big_endian(response_data->end, &response->data[2 + addr_size]);
+            codecs::encode_address_big_endian_8bits(response_data->start, &response->data[2]);
+            codecs::encode_address_big_endian_8bits(response_data->end, &response->data[2 + addr_size]);
             response->data_length = 1 + 1 + addr_size + addr_size;
 
             return ResponseCode::OK;
@@ -658,8 +657,8 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->start_index = codecs::decode_16_bits_big_endian(&request->data[start_index_pos]);
-            request_data->count = codecs::decode_16_bits_big_endian(&request->data[count_pos]);
+            request_data->start_index = codecs::decode_16_bits_big_endian_8bits(&request->data[start_index_pos]);
+            request_data->count = codecs::decode_16_bits_big_endian_8bits(&request->data[count_pos]);
             return ResponseCode::OK;
         }
 
@@ -714,7 +713,8 @@ namespace scrutiny
                 {
                     return ResponseCode::Overflow;
                 }
-                cursor += codecs::encode_32_bits_big_endian(response_data->loop_type_specific.fixed_freq.timestep_100ns, &response->data[cursor]);
+                cursor +=
+                    codecs::encode_32_bits_big_endian_8bits(response_data->loop_type_specific.fixed_freq.timestep_100ns, &response->data[cursor]);
                 break;
             case scrutiny::LoopType::VARIABLE_FREQ:
                 break;
@@ -750,7 +750,7 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            codecs::encode_16_bits_big_endian(response_data->count, &response->data[0]);
+            codecs::encode_16_bits_big_endian_8bits(response_data->count, &response->data[0]);
             response->data_length = datalen;
             return ResponseCode::OK;
         }
@@ -766,7 +766,7 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            codecs::encode_8_bits(response_data->count, &response->data[0]);
+            codecs::encode_8_bits_8bits(response_data->count, &response->data[0]);
             response->data_length = datalen;
             return ResponseCode::OK;
         }
@@ -821,8 +821,8 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[0]);
-            codecs::encode_16_bits_big_endian(response_data->challenge_response, &response->data[4]);
+            codecs::encode_32_bits_big_endian_8bits(response_data->session_id, &response->data[0]);
+            codecs::encode_16_bits_big_endian_8bits(response_data->challenge_response, &response->data[4]);
 
             return ResponseCode::OK;
         }
@@ -854,11 +854,11 @@ namespace scrutiny
 
             response->data_length = datalen;
 
-            codecs::encode_16_bits_big_endian(response_data->data_rx_buffer_size, &response->data[rx_buffer_size_pos]);
-            codecs::encode_16_bits_big_endian(response_data->data_tx_buffer_size, &response->data[tx_buffer_size_pos]);
-            codecs::encode_32_bits_big_endian(response_data->max_bitrate, &response->data[max_bitrate_pos]);
-            codecs::encode_32_bits_big_endian(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
-            codecs::encode_32_bits_big_endian(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
+            codecs::encode_16_bits_big_endian_8bits(response_data->data_rx_buffer_size, &response->data[rx_buffer_size_pos]);
+            codecs::encode_16_bits_big_endian_8bits(response_data->data_tx_buffer_size, &response->data[tx_buffer_size_pos]);
+            codecs::encode_32_bits_big_endian_8bits(response_data->max_bitrate, &response->data[max_bitrate_pos]);
+            codecs::encode_32_bits_big_endian_8bits(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
+            codecs::encode_32_bits_big_endian_8bits(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
             response->data[address_size_pos] = response_data->address_size; // Size in 8bits
 
             return ResponseCode::OK;
@@ -882,7 +882,7 @@ namespace scrutiny
 
             response->data_length = datalen;
             memcpy(&response->data[0], response_data->magic, magic_size); // No need to dilate, array not packed
-            codecs::encode_32_bits_big_endian(response_data->session_id, &response->data[magic_size]);
+            codecs::encode_32_bits_big_endian_8bits(response_data->session_id, &response->data[magic_size]);
 
             return ResponseCode::OK;
         }
@@ -922,8 +922,8 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->session_id = codecs::decode_32_bits_big_endian(&request->data[0]);
-            request_data->challenge = codecs::decode_16_bits_big_endian(&request->data[4]);
+            request_data->session_id = codecs::decode_32_bits_big_endian_8bits(&request->data[0]);
+            request_data->challenge = codecs::decode_16_bits_big_endian_8bits(&request->data[4]);
 
             return ResponseCode::OK;
         }
@@ -957,7 +957,7 @@ namespace scrutiny
                 return ResponseCode::InvalidRequest;
             }
 
-            request_data->session_id = codecs::decode_32_bits_big_endian(&request->data[0]);
+            request_data->session_id = codecs::decode_32_bits_big_endian_8bits(&request->data[0]);
             return ResponseCode::OK;
         }
 
@@ -1033,9 +1033,9 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
             uint16_t cursor = 0;
-            cursor += codecs::encode_32_bits_big_endian(response_data->buffer_size, &response->data[cursor]);
-            cursor += codecs::encode_8_bits(response_data->data_encoding, &response->data[cursor]);
-            cursor += codecs::encode_8_bits(response_data->max_signal_count, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->buffer_size, &response->data[cursor]);
+            cursor += codecs::encode_8_bits_8bits(response_data->data_encoding, &response->data[cursor]);
+            cursor += codecs::encode_8_bits_8bits(response_data->max_signal_count, &response->data[cursor]);
             response->data_length = cursor;
 
             return ResponseCode::OK;
@@ -1057,9 +1057,9 @@ namespace scrutiny
             }
 
             uint16_t cursor = 0;
-            cursor += codecs::encode_8_bits(response_data->state, &response->data[cursor]);
-            cursor += codecs::encode_32_bits_big_endian(response_data->bytes_to_acquire_from_trigger_to_completion, &response->data[cursor]);
-            cursor += codecs::encode_32_bits_big_endian(response_data->write_counter_since_trigger, &response->data[cursor]);
+            cursor += codecs::encode_8_bits_8bits(response_data->state, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->bytes_to_acquire_from_trigger_to_completion, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->write_counter_since_trigger, &response->data[cursor]);
             response->data_length = cursor;
 
             return ResponseCode::OK;
@@ -1084,11 +1084,11 @@ namespace scrutiny
             }
 
             uint16_t cursor = 0;
-            cursor += codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[cursor]);
-            cursor += codecs::encode_16_bits_big_endian(response_data->config_id, &response->data[cursor]);
-            cursor += codecs::encode_32_bits_big_endian(response_data->number_of_points, &response->data[cursor]);
-            cursor += codecs::encode_32_bits_big_endian(response_data->data_size, &response->data[cursor]);
-            cursor += codecs::encode_32_bits_big_endian(response_data->points_after_trigger, &response->data[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(response_data->acquisition_id, &response->data[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(response_data->config_id, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->number_of_points, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->data_size, &response->data[cursor]);
+            cursor += codecs::encode_32_bits_big_endian_8bits(response_data->points_after_trigger, &response->data[cursor]);
             response->data_length = cursor;
 
             return ResponseCode::OK;
@@ -1106,8 +1106,8 @@ namespace scrutiny
             }
             *finished = false;
             // [0] is set at the end.
-            codecs::encode_8_bits(response_data->rolling_counter, &response->data[1]);
-            codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
+            codecs::encode_8_bits_8bits(response_data->rolling_counter, &response->data[1]);
+            codecs::encode_16_bits_big_endian_8bits(response_data->acquisition_id, &response->data[2]);
 
             uint32_t const nread = response_data->reader->read_dilate_8bits(&response->data[4], response->data_max_length - 4);
             response->data_length = static_cast<uint16_t>(nread + 4);
@@ -1115,12 +1115,12 @@ namespace scrutiny
 
             if (response_data->reader->finished() && response->data_length <= response->data_max_length - 4)
             {
-                codecs::encode_32_bits_big_endian(*response_data->crc, &response->data[response->data_length]);
+                codecs::encode_32_bits_big_endian_8bits(*response_data->crc, &response->data[response->data_length]);
                 response->data_length += 4;
                 *finished = true;
             }
 
-            codecs::encode_8_bits(static_cast<uint_least8_t>((*finished) ? 1 : 0), &response->data[0]);
+            codecs::encode_8_bits_8bits(static_cast<uint_least8_t>((*finished) ? 1 : 0), &response->data[0]);
 
             return protocol::ResponseCode::OK;
         }
@@ -1136,13 +1136,13 @@ namespace scrutiny
             }
 
             request_data->loop_id = request->data[0] & 0xFF;
-            request_data->config_id = codecs::decode_16_bits_big_endian(&request->data[1]);
+            request_data->config_id = codecs::decode_16_bits_big_endian_8bits(&request->data[1]);
 
-            config->decimation = codecs::decode_16_bits_big_endian(&request->data[3]);
+            config->decimation = codecs::decode_16_bits_big_endian_8bits(&request->data[3]);
             config->probe_location = request->data[5] & 0xFF;
-            config->timeout_100ns = codecs::decode_32_bits_big_endian(&request->data[6]);
+            config->timeout_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[6]);
             config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(request->data[10]);
-            config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian(&request->data[11]);
+            config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[11]);
             config->trigger.operand_count = request->data[15] & 0xFF;
 
             if (config->trigger.operand_count > datalogging::MAX_OPERANDS)
@@ -1170,7 +1170,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian(&request->data[cursor]);
+                    config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(float);
                     break;
                 }
@@ -1180,7 +1180,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }
@@ -1191,7 +1191,7 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
-                    cursor += codecs::decode_address_big_endian(
+                    cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
                     break;
@@ -1204,7 +1204,7 @@ namespace scrutiny
                     }
 
                     config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
-                    cursor += codecs::decode_address_big_endian(
+                    cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
                     config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++] & 0xFF;
@@ -1247,7 +1247,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    cursor += codecs::decode_address_big_endian(
+                    cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
                     config->items_to_log[i].data.memory.size = request->data[cursor++];
@@ -1260,7 +1260,7 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
 
-                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian(&request->data[cursor]);
+                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }

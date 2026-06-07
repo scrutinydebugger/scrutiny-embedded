@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
@@ -315,7 +316,7 @@ namespace scrutiny
                 static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
             }
 #else
-#error            
+#error
 #endif
         }
 

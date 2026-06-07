@@ -30,7 +30,7 @@ namespace scrutiny
         /// @return Number of bytes written
         datalogging::buffer_size_t RawFormatReader::read_dilate_8bits(unsigned char *const buffer_8bits, datalogging::buffer_size_t max_size_8bits)
         {
-// Make sure we do not read half a char. We don't have a state variable to remember that. Would be innefficient.           
+// Make sure we do not read half a char. We don't have a state variable to remember that. Would be innefficient.
 #if CHAR_BIT == 8
 #elif CHAR_BIT == 16
             max_size_8bits &= static_cast<datalogging::buffer_size_t>(-2);
@@ -62,10 +62,10 @@ namespace scrutiny
                 datalogging::buffer_size_t transfer_size_8bits;
                 datalogging::buffer_size_t const new_max_8bits = max_size_8bits - output_cursor_8bits;
                 datalogging::buffer_size_t const right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
-                transfer_size_8bits = (right_hand_start_point - m_read_cursor) * (CHAR_BIT/8);
+                transfer_size_8bits = (right_hand_start_point - m_read_cursor) * (CHAR_BIT / 8);
                 transfer_size_8bits = SCRUTINY_MIN(transfer_size_8bits, new_max_8bits);
                 tools::memcpy_dilate_8bits(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
-                m_read_cursor += transfer_size_8bits / (CHAR_BIT/8);
+                m_read_cursor += transfer_size_8bits / (CHAR_BIT / 8);
                 m_read_started = true;
                 output_cursor_8bits += transfer_size_8bits;
                 if (m_read_cursor > write_cursor)
@@ -162,14 +162,14 @@ namespace scrutiny
                         rpv,
                         &outval,
                         caller); // We assume that this is not nullptr. We rely on datalogger::configure
-                    codecs::encode_anytype_big_endian(&outval, typesize, &m_buffer[cursor]);
+                    codecs::encode_anytype_big_endian_8bits(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    codecs::encode_32_bits_big_endian(m_timebase->get_timestamp(), &m_buffer[cursor]);
+                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor]);
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }

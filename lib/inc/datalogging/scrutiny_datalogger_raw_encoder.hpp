@@ -13,8 +13,8 @@
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
 #error "Not enabled"
@@ -44,10 +44,7 @@ namespace scrutiny
             inline datalogging::buffer_size_t get_entry_count(void) const;
             datalogging::buffer_size_t get_total_size(void) const;
             /// @brief Returns the total number of 8bits byte that the reader will read
-            inline datalogging::buffer_size_t get_total_size_8bits(void) const
-            {
-                return get_total_size() * (CHAR_BIT/8);
-            }
+            inline datalogging::buffer_size_t get_total_size_8bits(void) const { return get_total_size() * (CHAR_BIT / 8); }
             inline datalogging::EncodingType::eEncodingType get_encoding(void) const;
 
           protected:
