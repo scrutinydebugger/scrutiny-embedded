@@ -166,8 +166,8 @@ namespace scrutiny
         bool success = true;
         uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
         uint_fast8_t const output_required_size = ((bitsize - 1) >> 3) + 1;
-        VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size(fetch_required_size);
-        VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
+        VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size_8bits(fetch_required_size);
+        VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size_8bits(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
         uint_least8_t const typesize_char = tools::get_type_size_8bits(fetch_variable_type) / (CHAR_BIT / 8);

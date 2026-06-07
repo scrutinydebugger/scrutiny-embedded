@@ -134,5 +134,32 @@ namespace scrutiny
             }
             return typesize;
         }
+
+        uint_least8_t encode_anytype_big_endian_char(AnyType const *const val, VariableType::eVariableType const vartype, unsigned char *const buffer)
+        {
+            uint_least8_t const typesize = tools::get_type_size_char(vartype);
+            switch (typesize)
+            {
+#if CHAR_BIT == 8
+            case sizeof(uint8_t):
+                *buffer = val->uint8;
+                break;
+#endif
+            case sizeof(uint16_t):
+                codecs::encode_16_bits_big_endian_char(val->uint16, buffer);
+                break;
+            case sizeof(uint32_t):
+                codecs::encode_32_bits_big_endian_char(val->uint32, buffer);
+                break;
+#if SCRUTINY_SUPPORT_64BITS
+            case sizeof(uint64_t):
+                codecs::encode_64_bits_big_endian_char(val->uint64, buffer);
+                break;
+#endif
+            default:
+                return 0;
+            }
+            return typesize;
+        }
     } // namespace codecs
 } // namespace scrutiny

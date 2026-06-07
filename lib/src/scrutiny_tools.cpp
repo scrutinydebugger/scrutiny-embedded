@@ -16,7 +16,7 @@ namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size)
+        VariableTypeSize::eVariableTypeSize get_required_type_size_8bits(uint_fast8_t const size)
         {
 #if CHAR_BIT == 8
             if (size <= 1)
@@ -51,6 +51,41 @@ namespace scrutiny
             }
         }
 
+        VariableTypeSize::eVariableTypeSize get_required_type_size_char(uint_fast8_t const size)
+        {
+#if CHAR_BIT == 8
+            if (size <= sizeof(uint8_t))
+            {
+                return VariableTypeSize::_8;
+            }
+            else
+#endif
+                if (size <= 2 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_16;
+            }
+            else if (size <= 4 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_32;
+            }
+            else if (size <= 8 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_64;
+            }
+            else if (size <= 16 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_128;
+            }
+            else if (size <= 32 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_256;
+            }
+            else
+            {
+                return VariableTypeSize::_undef;
+            }
+        }
+
         bool is_supported_type(VariableType::eVariableType const vt)
         {
             VariableTypeType::eVariableTypeType tt = get_var_type_type(vt);
@@ -74,6 +109,13 @@ namespace scrutiny
             }
 #else
             if (ts > 4)
+            {
+                return false;
+            }
+#endif
+
+#if CHAR_BIT != 8
+            if (ts == 8)
             {
                 return false;
             }

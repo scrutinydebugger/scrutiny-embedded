@@ -431,6 +431,7 @@ namespace scrutiny
             VariableType::eVariableType const vartype,
             unsigned char *const buffer);
         uint_least8_t encode_anytype_big_endian_8bits(scrutiny::AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer);
+        uint_least8_t encode_anytype_big_endian_char(scrutiny::AnyType const *const val, uint_least8_t const typesize, unsigned char *const buffer);
 
 #if SCRUTINY_HAS_CPP11
         template <class T> inline uint_least8_t encode_8_bits_8bits(T const value, unsigned char *const buff) = delete;

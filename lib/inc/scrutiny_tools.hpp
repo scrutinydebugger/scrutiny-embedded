@@ -30,10 +30,15 @@ namespace scrutiny
         /// @brief Returns true if the type is supported by scrutiny
         bool is_supported_type(VariableType::eVariableType const vt);
 
-        /// @brief Returns which variable type to use to store a given size
+        /// @brief Returns which variable type to use to store a given size in multiple of 8bits
         /// @param size Given size in bytes
         /// @return The size to use.
-        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size);
+        VariableTypeSize::eVariableTypeSize get_required_type_size_8bits(uint_fast8_t const size);
+
+        /// @brief Returns which variable type to use to store a given size in multiple of char
+        /// @param size Given size in bytes
+        /// @return The size to use.
+        VariableTypeSize::eVariableTypeSize get_required_type_size_char(uint_fast8_t const size);
 
         /// @brief Computes a standard CRC32
         /// @param data Input data
@@ -114,7 +119,7 @@ namespace scrutiny
         /// @brief Return the size of a native bool (compiler specific)
         inline VariableTypeSize::eVariableTypeSize get_platform_boolean_size()
         {
-            return get_required_type_size(get_platform_boolean_size_8bits());
+            return get_required_type_size_8bits(get_platform_boolean_size_8bits());
         }
 
         /// @brief Return the bool variablt type that matches the paltform ``bool`` size. Compiler specific.
@@ -154,8 +159,16 @@ namespace scrutiny
             return 1 << (static_cast<unsigned int>(vt) & 0xF);
         }
 
+        /// @brief Returns the size of a given type in multiple of char
+        /// @param vt The VariableType object
+        /// @return Size in multiple of char
+        inline uint_least8_t get_type_size_char(VariableType::eVariableType const vt)
+        {
+            return get_type_size_8bits(vt) / (CHAR_BIT / 8);
+        }
+
         /// @brief Returns the Type Type of a given data type.
-        /// @param vt The VariableTypeSize object
+        /// @param vt The VariableType object
         /// @return The VariableTypeType enum object
         inline VariableTypeType::eVariableTypeType get_var_type_type(VariableType::eVariableType const vt)
         {

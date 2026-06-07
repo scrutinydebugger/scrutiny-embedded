@@ -162,14 +162,14 @@ namespace scrutiny
                         rpv,
                         &outval,
                         caller); // We assume that this is not nullptr. We rely on datalogger::configure
-                    codecs::encode_anytype_big_endian_8bits(&outval, typesize, &m_buffer[cursor]);
+                    codecs::encode_anytype_big_endian_char(&outval, typesize, &m_buffer[cursor]);
                     cursor += typesize;
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor]);
+                    codecs::encode_32_bits_big_endian_char(m_timebase->get_timestamp(), &m_buffer[cursor]);
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }
@@ -229,7 +229,7 @@ namespace scrutiny
                 uint_fast8_t elem_size = 0;
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
-                    elem_size = m_config->items_to_log[i].data.memory.size;
+                    elem_size = m_config->items_to_log[i].data.memory.size; // Size if char
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
@@ -241,12 +241,12 @@ namespace scrutiny
                     }
                     else
                     {
-                        elem_size = tools::get_type_size_8bits(rpv.type);
+                        elem_size = tools::get_type_size_char(rpv.type); // Size if char
                     }
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
-                    elem_size = sizeof(scrutiny::timestamp_t);
+                    elem_size = sizeof(scrutiny::timestamp_t); // Size if char
                 }
 
                 if (elem_size == 0 && !m_error)
