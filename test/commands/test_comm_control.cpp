@@ -176,7 +176,7 @@ TEST_F(TestCommControl, TestGetParams)
 {
     unsigned char tx_buffer[32];
     unsigned char request_data[8] = { 2, 3, 0, 0 };
-    SCRUTINY_CONSTEXPR unsigned char address_size = sizeof(uintptr_t);
+    SCRUTINY_CONSTEXPR unsigned char address_size = SIZEOF_8BITS(uintptr_t);
     add_crc(request_data, sizeof(request_data) - 4);
     SCRUTINY_CONSTEXPR uint16_t datalen = 2 + 2 + 4 + 4 + 4 + 1;
 

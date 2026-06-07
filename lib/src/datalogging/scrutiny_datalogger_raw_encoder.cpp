@@ -24,13 +24,23 @@ namespace scrutiny
         {
         }
 
-        /// @brief Reads a chunk of data from the datalogger buffer and copy it to the output buffer
+        /// @brief Reads a chunk of data from the datalogger buffer and copy it to the output buffer making sure there is 8bits per char
         /// @param buffer Output buffer
-        /// @param max_size Maximum size to copy
+        /// @param max_size Maximum size to copy, in multiple of 8bits
         /// @return Number of bytes written
-        datalogging::buffer_size_t RawFormatReader::read(unsigned char *const buffer, datalogging::buffer_size_t const max_size)
+        datalogging::buffer_size_t RawFormatReader::read_dilate_8bits(unsigned char *const buffer_8bits, datalogging::buffer_size_t max_size_8bits)
         {
-            datalogging::buffer_size_t output_size = 0;
+// Make sure we do not read half a char. We don't have a state variable to remember that. Would be innefficient.           
+#if CHAR_BIT == 8
+#elif CHAR_BIT == 16
+            max_size_8bits &= static_cast<datalogging::buffer_size_t>(-2);
+#elif CHAR_BIT == 32
+            max_size_8bits &= static_cast<datalogging::buffer_size_t>(-4);
+#else
+#error
+#endif
+
+            datalogging::buffer_size_t output_cursor_8bits = 0;
             if (error())
             {
                 return 0;
@@ -47,17 +57,17 @@ namespace scrutiny
             // Will do a maximum of 2 loops only if there is a wrap in the buffer.
             // This will cause 2 memcpy   start to buffer_end & buffer start to end
             // Otherwise a 1 loop and 1 memcpy
-            while (output_size < max_size)
+            while (output_cursor_8bits < max_size_8bits)
             {
-                datalogging::buffer_size_t transfer_size;
-                datalogging::buffer_size_t const new_max = max_size - output_size;
+                datalogging::buffer_size_t transfer_size_8bits;
+                datalogging::buffer_size_t const new_max_8bits = max_size_8bits - output_cursor_8bits;
                 datalogging::buffer_size_t const right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
-                transfer_size = right_hand_start_point - m_read_cursor;
-                transfer_size = SCRUTINY_MIN(transfer_size, new_max);
-                memcpy(&buffer[output_size], &m_encoder->m_buffer[m_read_cursor], transfer_size);
-                m_read_cursor += transfer_size;
+                transfer_size_8bits = (right_hand_start_point - m_read_cursor) * (CHAR_BIT/8);
+                transfer_size_8bits = SCRUTINY_MIN(transfer_size_8bits, new_max_8bits);
+                tools::memcpy_dilate_8bits(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
+                m_read_cursor += transfer_size_8bits / (CHAR_BIT/8);
                 m_read_started = true;
-                output_size += transfer_size;
+                output_cursor_8bits += transfer_size_8bits;
                 if (m_read_cursor > write_cursor)
                 {
                     if (m_read_cursor >= buffer_end)
@@ -73,7 +83,7 @@ namespace scrutiny
                 }
             }
 
-            return output_size;
+            return output_cursor_8bits;
         }
 
         /// @brief Returns the total number of bytes that the reader will read

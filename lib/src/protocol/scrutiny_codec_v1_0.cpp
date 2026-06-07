@@ -28,18 +28,7 @@ namespace scrutiny
 {
     namespace protocol
     {
-        inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
-        {
-#if CHAR_BIT == 8
-            memcpy(dst, src, nb_8bits);
-#elif CHAR_BIT == 16
-            for (size_t i = 0; i < (nb_8bits >> 1); i++)
-            {
-                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
-                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
-            }
-#endif
-        }
+
 
         //==============================================================
         void ReadMemoryBlocksRequestParser::validate(void)
@@ -572,7 +561,7 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            memcpy_dilate_8bits(response->data, scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
+            tools::memcpy_dilate_8bits(response->data, scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
             return ResponseCode::OK;
         }
 
@@ -812,7 +801,7 @@ namespace scrutiny
             response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-            memcpy_dilate_8bits(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
+            tools::memcpy_dilate_8bits(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
             response->data[display_name_length_pos] = static_cast<unsigned char>(display_name_length & 0xFF);
             memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length);
             return ResponseCode::OK;
@@ -1120,7 +1109,7 @@ namespace scrutiny
             codecs::encode_8_bits(response_data->rolling_counter, &response->data[1]);
             codecs::encode_16_bits_big_endian(response_data->acquisition_id, &response->data[2]);
 
-            uint32_t const nread = response_data->reader->read(&response->data[4], response->data_max_length - 4);
+            uint32_t const nread = response_data->reader->read_dilate_8bits(&response->data[4], response->data_max_length - 4);
             response->data_length = static_cast<uint16_t>(nread + 4);
             *response_data->crc = tools::crc32(&response->data[4], nread, *response_data->crc);
 

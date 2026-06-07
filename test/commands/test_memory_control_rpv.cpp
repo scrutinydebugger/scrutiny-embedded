@@ -521,10 +521,12 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
     unsigned char tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
+#if CHAR_BIT == 8        
         { 0x1000, scrutiny::VariableType::uint8 },
+        { 0x1004, scrutiny::VariableType::sint8 },
+#endif        
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
-        { 0x1004, scrutiny::VariableType::sint8 },
         { 0x1005, scrutiny::VariableType::sint16 },
         { 0x1006, scrutiny::VariableType::sint32 },
         { 0x1008, scrutiny::VariableType::float32 },
@@ -570,10 +572,12 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
     unsigned char tx_buffer[32];
 
     scrutiny::RuntimePublishedValue rpvs[] = {
+#if CHAR_BIT == 8        
         { 0x1000, scrutiny::VariableType::uint8 },
+        { 0x1004, scrutiny::VariableType::sint8 },
+#endif        
         { 0x1001, scrutiny::VariableType::uint16 },
         { 0x1002, scrutiny::VariableType::uint32 },
-        { 0x1004, scrutiny::VariableType::sint8 },
         { 0x1005, scrutiny::VariableType::sint16 },
         { 0x1006, scrutiny::VariableType::sint32 },
         { 0x1008, scrutiny::VariableType::float32 },

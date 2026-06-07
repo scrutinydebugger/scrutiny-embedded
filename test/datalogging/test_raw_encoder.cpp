@@ -108,8 +108,10 @@ TEST_F(TestRawEncoder, BasicEncoding)
     datalogging::RawFormatReader *reader = encoder.get_reader();
     reader->reset();
 
+    SCRUTINY_CONSTEXPR size_t single_entry_size = sizeof(var1) + sizeof(var2) + sizeof(scrutiny::timestamp_t);
     EXPECT_EQ(reader->get_entry_count(), 3u);
-    EXPECT_EQ(reader->get_total_size(), (sizeof(var1) + sizeof(var2) + 4u) * 3u); // entry_size*entry_count
+    EXPECT_EQ(reader->get_total_size(), single_entry_size * 3u); // entry_size*entry_count
+    EXPECT_EQ(reader->get_total_size_8bits(), single_entry_size * 3u * CHAR_BIT/8);
 
     uint32_t expected_time;
 
@@ -117,30 +119,31 @@ TEST_F(TestRawEncoder, BasicEncoding)
     var1 = 1.0f;
     var2 = 0x1111;
     expected_time = 0;
-    memcpy(&compare_buf[0], &var1, 4);
-    memcpy(&compare_buf[4], &var2, 4);
+    
+    memcpy_dilate_8bits(&compare_buf[0], &var1, 4);
+    memcpy_dilate_8bits(&compare_buf[4], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[8]);
 
     var1 = 2.0f;
     var2 = 0x2222;
     expected_time = 100;
-    memcpy(&compare_buf[12], &var1, 4);
-    memcpy(&compare_buf[16], &var2, 4);
+    memcpy_dilate_8bits(&compare_buf[12], &var1, 4);
+    memcpy_dilate_8bits(&compare_buf[16], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[20]);
 
     var1 = 3.0f;
     var2 = 0x3333;
     expected_time = 200u;
-    memcpy(&compare_buf[24], &var1, 4);
-    memcpy(&compare_buf[28], &var2, 4);
+    memcpy_dilate_8bits(&compare_buf[24], &var1, 4);
+    memcpy_dilate_8bits(&compare_buf[28], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian(expected_time, &compare_buf[32]);
 
-    unsigned char const chunk_size = sizeof(dst_buffer);
-    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size()) / chunk_size + 0.5f);
+    unsigned char const chunk_size = sizeof( dst_buffer );
+    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size_8bits()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
     for (unsigned char i = 0; i < nbchunk; i++)
     {
-        uint32_t nread = reader->read(dst_buffer, chunk_size);
+        uint32_t nread = reader->read_dilate_8bits(dst_buffer, chunk_size);
         total_read += nread;
         if (reader->finished())
         {
