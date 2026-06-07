@@ -161,7 +161,7 @@ namespace scrutiny
                         rpv,
                         &outval,
                         caller); // We assume that this is not nullptr. We rely on datalogger::configure
-                    
+
                     cursor += codecs::encode_anytype_big_endian_char(&outval, rpv.type, &m_buffer[cursor]);
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
