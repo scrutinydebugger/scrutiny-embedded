@@ -156,7 +156,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
         }
     }
 
-    EXPECT_EQ(total_read, reader->get_total_size());
+    EXPECT_EQ(total_read, reader->get_total_size_8bits());
 }
 
 #endif

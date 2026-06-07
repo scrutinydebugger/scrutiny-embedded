@@ -157,13 +157,12 @@ namespace scrutiny
                     AnyType outval;
                     uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv);
-                    uint_least8_t const typesize = tools::get_type_size_8bits(rpv.type); // Should be supported. We rely on datalogger::configure
                     m_main_handler->get_rpv_read_callback()(
                         rpv,
                         &outval,
                         caller); // We assume that this is not nullptr. We rely on datalogger::configure
-                    codecs::encode_anytype_big_endian_char(&outval, typesize, &m_buffer[cursor]);
-                    cursor += typesize;
+                    
+                    cursor += codecs::encode_anytype_big_endian_char(&outval, rpv.type, &m_buffer[cursor]);
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
