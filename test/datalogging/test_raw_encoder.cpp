@@ -15,16 +15,15 @@
 
 using namespace scrutiny;
 
-
 static unsigned char _rx_buffer[128];
 static unsigned char _tx_buffer[128];
 
-static struct {
+static struct
+{
     unsigned char canary1[128];
     unsigned char data[128];
     unsigned char canary2[128];
-}dlbuffer;
-
+} dlbuffer;
 
 class TestRawEncoder : public ScrutinyTest
 {

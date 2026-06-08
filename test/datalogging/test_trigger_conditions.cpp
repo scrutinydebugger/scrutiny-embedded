@@ -31,7 +31,6 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
-
 static unsigned char _rx_buffer[128];
 static unsigned char _tx_buffer[128];
 

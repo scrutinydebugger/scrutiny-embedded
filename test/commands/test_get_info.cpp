@@ -12,6 +12,9 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[128];
+
 class TestGetInfo : public ScrutinyTest
 {
 
@@ -19,9 +22,6 @@ class TestGetInfo : public ScrutinyTest
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
-
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
 
     scrutiny::LoopHandler *loops[3];
 
@@ -34,8 +34,6 @@ class TestGetInfo : public ScrutinyTest
         tb(),
         scrutiny_handler(),
         config(),
-        _rx_buffer(),
-        _tx_buffer(),
         loops(),
         fixed_freq_loop(0x12345678, "Loop1"),
         variable_freq_loop("Loop2"),

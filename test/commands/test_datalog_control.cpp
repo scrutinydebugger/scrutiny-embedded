@@ -22,6 +22,10 @@
 
 using namespace scrutiny;
 
+static unsigned char _rx_buffer[256];
+static unsigned char _tx_buffer[256];
+static unsigned char dlbuffer[239];
+
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
     static_cast<void>(caller);
@@ -45,9 +49,6 @@ class TestDatalogControl : public ScrutinyTest
     MainHandler scrutiny_handler;
     Config config;
 
-    unsigned char _rx_buffer[256];
-    unsigned char _tx_buffer[256];
-    unsigned char dlbuffer[239];
     LoopHandler *loops[3];
 
     FixedFrequencyLoopHandler fixed_freq_loop;

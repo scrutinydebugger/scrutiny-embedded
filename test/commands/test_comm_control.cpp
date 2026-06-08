@@ -15,6 +15,9 @@
 #define DISPLAY_NAME "helloworld"
 #define DISPLAY_NAME_LENGTH 10
 
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[128];
+
 class TestCommControl : public ScrutinyTest
 {
   protected:
@@ -22,16 +25,11 @@ class TestCommControl : public ScrutinyTest
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
-
     TestCommControl() :
         ScrutinyTest(),
         tb(),
         scrutiny_handler(),
-        config(),
-        _rx_buffer(),
-        _tx_buffer()
+        config()
     {
     }
 
