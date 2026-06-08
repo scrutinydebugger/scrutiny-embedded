@@ -26,7 +26,10 @@ using namespace scrutiny;
 
 static unsigned char _rx_buffer[256];
 static unsigned char _tx_buffer[DATALOG_BUFFER_SIZE * (CHAR_BIT / 8) + 8 + 9]; // Enough to send the whole buffer
+
+#if SCRUTINY_ENABLE_DATALOGGING
 static unsigned char dlbuffer[DATALOG_BUFFER_SIZE];
+#endif
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
