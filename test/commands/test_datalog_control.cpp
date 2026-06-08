@@ -22,9 +22,11 @@
 
 using namespace scrutiny;
 
-static unsigned char _rx_buffer[256];
-static unsigned char _tx_buffer[256];
-static unsigned char dlbuffer[239];
+#define DATALOG_BUFFER_SIZE 128
+
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[DATALOG_BUFFER_SIZE * (CHAR_BIT/8) + 8 + 9];    // Enough to send the whole buffer
+static unsigned char dlbuffer[DATALOG_BUFFER_SIZE];
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
 {
@@ -833,8 +835,8 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    ASSERT_GE(sizeof(_tx_buffer), sizeof(dlbuffer) + 17);
-    static unsigned char tx_buffer[sizeof(_tx_buffer)] = { 0 };
+    ASSERT_GE(sizeof(_tx_buffer), sizeof(dlbuffer) * (CHAR_BIT/8) + 8 + 9);
+    static unsigned char out_buffer[sizeof(_tx_buffer)] = { 0 };
     uint16_t n_to_read;
 
     datalogging::Configuration refconfig = get_valid_reference_configuration();
@@ -868,16 +870,16 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     scrutiny_handler.process(0);
     n_to_read = scrutiny_handler.data_to_send();
     ASSERT_GT(n_to_read, 0);
-    ASSERT_LT(n_to_read, sizeof(tx_buffer));
-    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_LT(n_to_read, sizeof(out_buffer));
+    scrutiny_handler.pop_data(out_buffer, n_to_read);
 
-    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK);
+    ASSERT_IS_PROTOCOL_RESPONSE(out_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::OK);
 
     datalogging::DataReader *reader = scrutiny_handler.datalogger()->get_reader();
-    EXPECT_EQ(tx_buffer[5], 1); // finished
-    EXPECT_EQ(tx_buffer[6], 0); // Rolling counter;
-    EXPECT_EQ(codecs::decode_16_bits_big_endian_8bits(&tx_buffer[7]), scrutiny_handler.datalogger()->get_acquisition_id());
-    uint32_t payload_length = codecs::decode_16_bits_big_endian_8bits(&tx_buffer[3]);
+    EXPECT_EQ(out_buffer[5], 1); // finished
+    EXPECT_EQ(out_buffer[6], 0); // Rolling counter;
+    EXPECT_EQ(codecs::decode_16_bits_big_endian_8bits(&out_buffer[7]), scrutiny_handler.datalogger()->get_acquisition_id());
+    uint32_t payload_length = codecs::decode_16_bits_big_endian_8bits(&out_buffer[3]);
     EXPECT_TRUE(reader->finished());
     reader->reset();
 
@@ -887,10 +889,10 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     ASSERT_EQ(data_count, reader->get_total_size());
     ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
 
-    EXPECT_BUF_EQ(&tx_buffer[9], raw_data, data_count);
+    EXPECT_BUF_EQ(&out_buffer[9], raw_data, data_count);
 
     uint32_t expected_crc = tools::crc32(raw_data, data_count);
-    uint32_t gotten_crc = codecs::decode_32_bits_big_endian_8bits(&tx_buffer[n_to_read - 8]);
+    uint32_t gotten_crc = codecs::decode_32_bits_big_endian_8bits(&out_buffer[n_to_read - 8]);
     EXPECT_EQ(gotten_crc, expected_crc);
 }
 

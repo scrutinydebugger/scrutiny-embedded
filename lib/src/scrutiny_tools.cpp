@@ -114,8 +114,8 @@ namespace scrutiny
             }
 #endif
 
-#if CHAR_BIT != 8
-            if (ts == 8)
+#if CHAR_BIT > 8
+            if (ts == 1)
             {
                 return false;
             }
