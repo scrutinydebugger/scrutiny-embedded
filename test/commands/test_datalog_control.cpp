@@ -24,8 +24,8 @@ using namespace scrutiny;
 
 #define DATALOG_BUFFER_SIZE 128
 
-static unsigned char _rx_buffer[128];
-static unsigned char _tx_buffer[DATALOG_BUFFER_SIZE * (CHAR_BIT/8) + 8 + 9];    // Enough to send the whole buffer
+static unsigned char _rx_buffer[192];
+static unsigned char _tx_buffer[DATALOG_BUFFER_SIZE * (CHAR_BIT / 8) + 8 + 9]; // Enough to send the whole buffer
 static unsigned char dlbuffer[DATALOG_BUFFER_SIZE];
 
 static bool rpv_read_callback(RuntimePublishedValue rpv, AnyType *outval, LoopHandler *const caller)
@@ -835,7 +835,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
 
 TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
 {
-    ASSERT_GE(sizeof(_tx_buffer), sizeof(dlbuffer) * (CHAR_BIT/8) + 8 + 9);
+    ASSERT_GE(sizeof(_tx_buffer), sizeof(dlbuffer) * (CHAR_BIT / 8) + 8 + 9);
     static unsigned char out_buffer[sizeof(_tx_buffer)] = { 0 };
     uint16_t n_to_read;
 
