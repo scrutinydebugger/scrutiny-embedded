@@ -34,7 +34,7 @@
 #if SCRUTINY_HAS_CPP11
 #define GET_VEC_DATA(v) (v.data())
 #else
-#define GET_VEC_DATA(v) (&v[0])
+#define GET_VEC_DATA(v) (&(v[0]))
 #endif
 
 #define SIZEOF_8BITS(x) (static_cast<size_t>(sizeof(x) * (CHAR_BIT / 8)))

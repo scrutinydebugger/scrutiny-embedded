@@ -193,7 +193,7 @@ TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
     Operand operand;
     operand.type = OperandType::Var;
     operand.data.var.addr = forbidden_buffer;
-    operand.data.var.datatype = scrutiny::VariableType::uint8;
+    operand.data.var.datatype = scrutiny::VariableType::uint16;
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype, SCRUTINY_NULL);
     EXPECT_FALSE(success);
@@ -236,7 +236,7 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     Operand operand;
     operand.type = OperandType::VarBit;
     operand.data.varbit.addr = &my_struct;
-    operand.data.varbit.datatype = scrutiny::VariableType::sint8;
+    operand.data.varbit.datatype = scrutiny::VariableType::sint16;
 
     operand.data.varbit.bitoffset = 31;
     operand.data.varbit.bitsize = 1;

@@ -53,6 +53,31 @@ static void trigger_callback(void)
     g_trigger_callback_count++;
 }
 
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[128];
+
+static unsigned char forbidden_buffer[32];
+static unsigned char forbidden_buffer2[32];
+static unsigned char readonly_buffer[32];
+static unsigned char readonly_buffer2[32];
+
+static unsigned char buffer_canary_1[128];
+static unsigned char dlbuffer[128];
+static unsigned char buffer_canary_2[128];
+
+#if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
+    static RawFormatParser parser;
+    SCRUTINY_CONSTEXPR size_t dl_output_buffer_required_size = SIZEOF_8BITS(dlbuffer) + 4;
+#else
+#error "Unsupported parser"
+#endif
+    
+static FixedFrequencyLoopHandler loop_handler(100000, "testloop");
+static datalogging::Configuration dlconfig;
+static unsigned char dl_output_buffer_canary1[128];
+static unsigned char dl_output_buffer[dl_output_buffer_required_size];
+static unsigned char dl_output_buffer_canary2[128];    
+
 class TestDatalogger : public ScrutinyTest
 {
   protected:
@@ -62,37 +87,18 @@ class TestDatalogger : public ScrutinyTest
     Config config;
     datalogging::DataLogger datalogger;
 
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
 
-    unsigned char forbidden_buffer[128];
-    unsigned char forbidden_buffer2[128];
-    unsigned char readonly_buffer[128];
-    unsigned char readonly_buffer2[128];
-
+    
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
     RuntimePublishedValue rpvs[3];
-
-    unsigned char buffer_canary_1[512];
-    unsigned char dlbuffer[128];
-    unsigned char buffer_canary_2[512];
 
     TestDatalogger() :
         ScrutinyTest(),
         tb(),
         scrutiny_handler(),
         config(),
-        datalogger(),
-        _rx_buffer(),
-        _tx_buffer(),
-        forbidden_buffer(),
-        forbidden_buffer2(),
-        readonly_buffer(),
-        readonly_buffer2(),
-        buffer_canary_1(),
-        dlbuffer(),
-        buffer_canary_2()
+        datalogger()
     {
         readonly_ranges[0] = tools::make_address_range(readonly_buffer, sizeof(readonly_buffer));
         readonly_ranges[1] = tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
@@ -118,9 +124,13 @@ class TestDatalogger : public ScrutinyTest
         scrutiny_handler.init(&config);
         datalogger.init(&scrutiny_handler, dlbuffer, sizeof(dlbuffer), trigger_callback);
 
+#if CHAR_BIT == 8
         memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
         memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
-
+#elif CHAR_BIT == 16
+        memset(buffer_canary_1, 0xAAAA, sizeof(buffer_canary_1));
+        memset(buffer_canary_2, 0x5555, sizeof(buffer_canary_2));
+#endif
         g_trigger_callback_count = 0;
         g_last_rpv_callback_caller = SCRUTINY_NULL;
     }
@@ -128,8 +138,13 @@ class TestDatalogger : public ScrutinyTest
 
 void TestDatalogger::check_canaries()
 {
+#if CHAR_BIT == 8    
     ASSERT_BUF_SET(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
     ASSERT_BUF_SET(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
+#elif CHAR_BIT == 16
+    ASSERT_BUF_SET(buffer_canary_1, 0xAAAA, sizeof(buffer_canary_1));
+    ASSERT_BUF_SET(buffer_canary_2, 0x5555, sizeof(buffer_canary_2));
+#endif    
 }
 
 TEST_F(TestDatalogger, TriggerBasics)
@@ -268,15 +283,17 @@ TEST_F(TestDatalogger, BasicAcquisition)
     check_canaries();
 }
 
+
 TEST_F(TestDatalogger, ComplexAcquisition)
 {
+    // Static to spare the stack a bit
+    memset(dl_output_buffer, 0, sizeof(dl_output_buffer));
     float var1 = 0.0;
     int32_t var2 = 0;
     float trigger_val = 0.0f;
-    FixedFrequencyLoopHandler loop_handler(100000, "testloop");
+    
     datalogger.set_owner(&loop_handler);
 
-    datalogging::Configuration dlconfig;
     dlconfig.items_count = 4;
     dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
     dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
@@ -373,20 +390,13 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         ASSERT_FALSE(datalogger.get_encoder()->error()) << error_msg;
         check_canaries();
 
-#if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
-        RawFormatParser parser;
-        SCRUTINY_CONSTEXPR size_t output_buffer_required_size = sizeof(dlbuffer) + 4;
-#else
-#error "Unsupported parser"
+#if CHAR_BIT == 8
+        memset(dl_output_buffer_canary1, 0xAA, sizeof(dl_output_buffer_canary1));
+        memset(dl_output_buffer_canary2, 0x55, sizeof(dl_output_buffer_canary2));
+#elif CHAR_BIT == 16
+        memset(dl_output_buffer_canary1, 0xAAAA, sizeof(dl_output_buffer_canary1));
+        memset(dl_output_buffer_canary2, 0x5555, sizeof(dl_output_buffer_canary2));
 #endif
-
-        unsigned char output_buffer_canary1[512];
-        unsigned char output_buffer[output_buffer_required_size];
-        unsigned char output_buffer_canary2[512];
-
-        memset(output_buffer_canary1, 0xAA, sizeof(output_buffer_canary1));
-        memset(output_buffer_canary2, 0x55, sizeof(output_buffer_canary2));
-
         datalogging::DataReader *reader = datalogger.get_reader();
         reader->reset();
 
@@ -394,16 +404,19 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         while (!reader->finished())
         {
             ASSERT_FALSE(reader->error()) << error_msg;
-            copied_count += reader->read_dilate_8bits(&output_buffer[copied_count], 10);
-            ASSERT_LE(copied_count, sizeof(output_buffer)) << error_msg;
+            copied_count += reader->read_dilate_8bits(&dl_output_buffer[copied_count], 10);
+            ASSERT_LE(copied_count, sizeof(dl_output_buffer)) << error_msg;
         }
-
-        ASSERT_BUF_SET(output_buffer_canary1, 0xAA, sizeof(output_buffer_canary1)) << error_msg;
-        ASSERT_BUF_SET(output_buffer_canary2, 0x55, sizeof(output_buffer_canary2)) << error_msg;
-
+#if CHAR_BIT == 8
+        ASSERT_BUF_SET(dl_output_buffer_canary1, 0xAA, sizeof(dl_output_buffer_canary1)) << error_msg;
+        ASSERT_BUF_SET(dl_output_buffer_canary2, 0x55, sizeof(dl_output_buffer_canary2)) << error_msg;
+#elif CHAR_BIT == 16
+        ASSERT_BUF_SET(dl_output_buffer_canary1, 0xAAAA, sizeof(dl_output_buffer_canary1)) << error_msg;
+        ASSERT_BUF_SET(dl_output_buffer_canary2, 0x5555, sizeof(dl_output_buffer_canary2)) << error_msg;
+#endif
         EXPECT_GE(copied_count, 9 * sizeof(dlbuffer) / 10) << error_msg; // 90% usage at least
 
-        parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
+        parser.init(&scrutiny_handler, &dlconfig, dl_output_buffer, sizeof(dl_output_buffer));
         parser.parse(reader->get_entry_count());
 
         ASSERT_FALSE(datalogger.in_error()) << error_msg;
@@ -411,26 +424,48 @@ TEST_F(TestDatalogger, ComplexAcquisition)
 
         // Validate data now;
 
-        vector<vector<vector<unsigned char> > > data = parser.get();
+        vector<unsigned char> *data = parser.get();
+        uint32_t const entry_count = reader->get_entry_count();
 
-        for (size_t i = 0; i < data.size(); i++)
+
+        unsigned char* entry[4];
+        unsigned char* last_entry[4];
+
+        for (size_t i = 0; i < entry_count; i++)
         {
-            vector<vector<unsigned char> > entry = data[i];
-            ASSERT_EQ(entry.size(), 4); // 4 signals logged
             if (i > 0)
             {
-                vector<vector<unsigned char> > last_entry = data[i - 1];
-                float check_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(entry[0]));
-                float check_last_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(last_entry[0]));
+                 entry[0] = parser.get_parsed_data_location(i, 0);
+                 entry[1] = parser.get_parsed_data_location(i, 1);
+                 entry[2] = parser.get_parsed_data_location(i, 2);
+                 entry[3] = parser.get_parsed_data_location(i, 3);
+                 
+                 last_entry[0] = parser.get_parsed_data_location(i-1, 0);
+                 last_entry[1] = parser.get_parsed_data_location(i-1, 1);
+                 last_entry[2] = parser.get_parsed_data_location(i-1, 2);
+                 last_entry[3] = parser.get_parsed_data_location(i-1, 3);
 
-                int32_t check_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(entry[1]));
-                int32_t check_last_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(last_entry[1]));
+                // Make sure we do not misuse the vector
+                ASSERT_NE(entry[0], SCRUTINY_NULL);
+                ASSERT_NE(entry[1], SCRUTINY_NULL);
+                ASSERT_NE(entry[2], SCRUTINY_NULL);
+                ASSERT_NE(entry[3], SCRUTINY_NULL);
+                ASSERT_NE(last_entry[0], SCRUTINY_NULL);
+                ASSERT_NE(last_entry[1], SCRUTINY_NULL);
+                ASSERT_NE(last_entry[2], SCRUTINY_NULL);
+                ASSERT_NE(last_entry[3], SCRUTINY_NULL);
 
-                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[2]));
-                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[2]));
+                float check_var1 = *reinterpret_cast<float *>(entry[0]);
+                float check_last_var1 = *reinterpret_cast<float *>(last_entry[0]);
 
-                uint32_t check_time = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[3]));
-                uint32_t check_last_time = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[3]));
+                int32_t check_var2 = *reinterpret_cast<int32_t *>(entry[1]);
+                int32_t check_last_var2 = *reinterpret_cast<int32_t *>(last_entry[1]);
+
+                uint32_t check_rpv1000 = codecs::decode_32_bits_big_endian_char(entry[2]);
+                uint32_t check_last_rpv1000 = codecs::decode_32_bits_big_endian_char(last_entry[2]);
+
+                uint32_t check_time = codecs::decode_32_bits_big_endian_char(entry[3]);
+                uint32_t check_last_time = codecs::decode_32_bits_big_endian_char(last_entry[3]);
 
                 EXPECT_EQ(check_var1 - check_last_var1, 2.0f) << "i=" << i << "," << error_msg;
                 EXPECT_EQ(check_var2 - check_last_var2, -2) << "i=" << i << "," << error_msg;
@@ -440,15 +475,15 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         }
 
         uint32_t trigger_location = static_cast<uint32_t>(round(static_cast<float>(probe_location) / 255 * (reader->get_entry_count() - 1)));
-        ASSERT_GT(data.size(), trigger_location);
-        ASSERT_GT(data.size(), 0);
-        ASSERT_GE(data.size(), datalogger.log_points_after_trigger());
+        ASSERT_GT(data->size(), trigger_location * parser.get_entry_size_char());
+        ASSERT_GT(data->size(), 0);
+        ASSERT_GE(data->size(), datalogger.log_points_after_trigger() * parser.get_entry_size_char());
 
-        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(data.size() - datalogger.log_points_after_trigger()), 1u);
+        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(entry_count - datalogger.log_points_after_trigger()), 1u);
 
-        float mid_var1 = *reinterpret_cast<float *>(GET_VEC_DATA(data[trigger_location][0]));
-        int32_t mid_var2 = *reinterpret_cast<int32_t *>(GET_VEC_DATA(data[trigger_location][1]));
-        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(data[trigger_location][2]));
+        float mid_var1 = *reinterpret_cast<float *>(parser.get_parsed_data_location(trigger_location, 0));
+        int32_t mid_var2 = *reinterpret_cast<int32_t *>(parser.get_parsed_data_location(trigger_location, 1));
+        uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(trigger_location, 2));
 
         // Validate position of trigger and end of graph. Allow a margin of 3 (1.5 entry because decimation=2)
         EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
@@ -456,6 +491,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
     }
 }
+
 
 TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
 {
@@ -532,7 +568,7 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 
     datalogger.config()->copy_from(&dlconfig);
     datalogger.configure(&tb);
-    uint32_t max_loop = sizeof(dlbuffer) * 8; // don't think we can beat 1 bit per sample
+    uint32_t max_loop = sizeof(dlbuffer) * CHAR_BIT; // don't think we can beat 1 bit per sample
     uint32_t i = 0;
     while (!datalogger.get_encoder()->buffer_full() && i < max_loop)
     {
@@ -552,35 +588,28 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
     datalogger.process();
     ASSERT_EQ(datalogger.get_state(), scrutiny::datalogging::DataLogger::State::AcquisitionCompleted);
 
-#if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
-    RawFormatParser parser;
-    SCRUTINY_CONSTEXPR size_t output_buffer_required_size = sizeof(dlbuffer) + 4;
-#else
-#error "Unsupported parser"
-#endif
-    unsigned char output_buffer[output_buffer_required_size] = { 0 };
     datalogger.get_reader()->reset();
-    datalogger.get_reader()->read_dilate_8bits(output_buffer, sizeof(output_buffer));
-    parser.init(&scrutiny_handler, &dlconfig, output_buffer, sizeof(output_buffer));
-    parser.parse(datalogger.get_reader()->get_entry_count());
+    datalogger.get_reader()->read_dilate_8bits(dl_output_buffer, sizeof(dl_output_buffer));
+    parser.init(&scrutiny_handler, &dlconfig, dl_output_buffer, sizeof(dl_output_buffer));
+    uint16_t entry_count = datalogger.get_reader()->get_entry_count();
+    parser.parse(entry_count);
     ASSERT_FALSE(parser.error());
-    vector<vector<vector<unsigned char> > > data = parser.get();
+    vector<unsigned char> *data = parser.get();
     SCRUTINY_STATIC_ASSERT(sizeof(timestamp_t) == sizeof(uint32_t), "Expect timestamp to be 32 bits");
 
-    ASSERT_EQ(data.size(), datalogger.get_reader()->get_entry_count());
-    for (size_t i = 0; i < data.size(); i++)
+    uint16_t item0_size = parser.get_item_size_char(0);
+    uint16_t entry_size = parser.get_entry_size_char();
+    ASSERT_EQ(item0_size, entry_size );
+    for (size_t i = 0; i < entry_count; i++)
     {
-        vector<vector<unsigned char> > entry = data[i];
-        ASSERT_EQ(entry.size(), 1); // 1 signal = time
-
-        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(entry[0]));
+        scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(i, 0));
         if (i > 0)
         {
-            vector<vector<unsigned char> > last_entry = data[i - 1];
-            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian_8bits(GET_VEC_DATA(last_entry[0]));
+            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(i-1, 0));
             ASSERT_EQ(timestamp - last_timestamp, 5) << "Entry #" << i;
         }
     }
 
     check_canaries();
 }
+

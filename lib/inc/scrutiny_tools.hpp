@@ -333,6 +333,23 @@ namespace scrutiny
 #endif
         }
 
+        inline void memcpy_compress_from_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[i] = (
+                    ((static_cast<unsigned char const *>(src)[2 * i] & 0xFF) << 8) | 
+                    (static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF)
+                );
+            }
+#else
+#error
+#endif
+        }        
+
     } // namespace tools
 
 } // namespace scrutiny
