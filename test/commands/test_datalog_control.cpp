@@ -308,6 +308,7 @@ void TestDatalogControl::test_configure(
     static unsigned char request_data[256] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
     ASSERT_GT(sizeof(request_data), (size_t)payload_size + 8) << error_msg;
+    ASSERT_GT(sizeof(_rx_buffer), (size_t)payload_size) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
     request_data[2] = (payload_size >> 8) & 0xFF;
     request_data[3] = payload_size & 0xFF;
