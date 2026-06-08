@@ -884,7 +884,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     EXPECT_TRUE(reader->finished());
     reader->reset();
 
-    unsigned char raw_data[sizeof(dlbuffer) * (CHAR_BIT/8)];
+    unsigned char raw_data[sizeof(dlbuffer) * (CHAR_BIT / 8)];
     uint32_t data_count = reader->read_dilate_8bits(raw_data, sizeof(raw_data));
     EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.9f);
     ASSERT_EQ(data_count, reader->get_total_size_8bits());
