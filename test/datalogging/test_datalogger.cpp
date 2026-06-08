@@ -66,17 +66,17 @@ static unsigned char dlbuffer[128];
 static unsigned char buffer_canary_2[128];
 
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
-    static RawFormatParser parser;
-    SCRUTINY_CONSTEXPR size_t dl_output_buffer_required_size = SIZEOF_8BITS(dlbuffer) + 4;
+static RawFormatParser parser;
+SCRUTINY_CONSTEXPR size_t dl_output_buffer_required_size = SIZEOF_8BITS(dlbuffer) + 4;
 #else
 #error "Unsupported parser"
 #endif
-    
+
 static FixedFrequencyLoopHandler loop_handler(100000, "testloop");
 static datalogging::Configuration dlconfig;
 static unsigned char dl_output_buffer_canary1[128];
 static unsigned char dl_output_buffer[dl_output_buffer_required_size];
-static unsigned char dl_output_buffer_canary2[128];    
+static unsigned char dl_output_buffer_canary2[128];
 
 class TestDatalogger : public ScrutinyTest
 {
@@ -87,8 +87,6 @@ class TestDatalogger : public ScrutinyTest
     Config config;
     datalogging::DataLogger datalogger;
 
-
-    
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
     RuntimePublishedValue rpvs[3];
@@ -138,13 +136,13 @@ class TestDatalogger : public ScrutinyTest
 
 void TestDatalogger::check_canaries()
 {
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     ASSERT_BUF_SET(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
     ASSERT_BUF_SET(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
 #elif CHAR_BIT == 16
     ASSERT_BUF_SET(buffer_canary_1, 0xAAAA, sizeof(buffer_canary_1));
     ASSERT_BUF_SET(buffer_canary_2, 0x5555, sizeof(buffer_canary_2));
-#endif    
+#endif
 }
 
 TEST_F(TestDatalogger, TriggerBasics)
@@ -283,7 +281,6 @@ TEST_F(TestDatalogger, BasicAcquisition)
     check_canaries();
 }
 
-
 TEST_F(TestDatalogger, ComplexAcquisition)
 {
     // Static to spare the stack a bit
@@ -291,7 +288,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     float var1 = 0.0;
     int32_t var2 = 0;
     float trigger_val = 0.0f;
-    
+
     datalogger.set_owner(&loop_handler);
 
     dlconfig.items_count = 4;
@@ -427,23 +424,22 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         vector<unsigned char> *data = parser.get();
         uint32_t const entry_count = reader->get_entry_count();
 
-
-        unsigned char* entry[4];
-        unsigned char* last_entry[4];
+        unsigned char *entry[4];
+        unsigned char *last_entry[4];
 
         for (size_t i = 0; i < entry_count; i++)
         {
             if (i > 0)
             {
-                 entry[0] = parser.get_parsed_data_location(i, 0);
-                 entry[1] = parser.get_parsed_data_location(i, 1);
-                 entry[2] = parser.get_parsed_data_location(i, 2);
-                 entry[3] = parser.get_parsed_data_location(i, 3);
-                 
-                 last_entry[0] = parser.get_parsed_data_location(i-1, 0);
-                 last_entry[1] = parser.get_parsed_data_location(i-1, 1);
-                 last_entry[2] = parser.get_parsed_data_location(i-1, 2);
-                 last_entry[3] = parser.get_parsed_data_location(i-1, 3);
+                entry[0] = parser.get_parsed_data_location(i, 0);
+                entry[1] = parser.get_parsed_data_location(i, 1);
+                entry[2] = parser.get_parsed_data_location(i, 2);
+                entry[3] = parser.get_parsed_data_location(i, 3);
+
+                last_entry[0] = parser.get_parsed_data_location(i - 1, 0);
+                last_entry[1] = parser.get_parsed_data_location(i - 1, 1);
+                last_entry[2] = parser.get_parsed_data_location(i - 1, 2);
+                last_entry[3] = parser.get_parsed_data_location(i - 1, 3);
 
                 // Make sure we do not misuse the vector
                 ASSERT_NE(entry[0], SCRUTINY_NULL);
@@ -491,7 +487,6 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
     }
 }
-
 
 TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
 {
@@ -599,17 +594,16 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 
     uint16_t item0_size = parser.get_item_size_char(0);
     uint16_t entry_size = parser.get_entry_size_char();
-    ASSERT_EQ(item0_size, entry_size );
+    ASSERT_EQ(item0_size, entry_size);
     for (size_t i = 0; i < entry_count; i++)
     {
         scrutiny::timestamp_t timestamp = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(i, 0));
         if (i > 0)
         {
-            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(i-1, 0));
+            scrutiny::timestamp_t last_timestamp = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(i - 1, 0));
             ASSERT_EQ(timestamp - last_timestamp, 5) << "Entry #" << i;
         }
     }
 
     check_canaries();
 }
-
