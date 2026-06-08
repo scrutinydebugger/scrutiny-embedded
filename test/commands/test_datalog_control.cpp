@@ -884,10 +884,10 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     EXPECT_TRUE(reader->finished());
     reader->reset();
 
-    unsigned char raw_data[sizeof(dlbuffer)];
+    unsigned char raw_data[sizeof(dlbuffer) * (CHAR_BIT/8)];
     uint32_t data_count = reader->read_dilate_8bits(raw_data, sizeof(raw_data));
     EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.9f);
-    ASSERT_EQ(data_count, reader->get_total_size());
+    ASSERT_EQ(data_count, reader->get_total_size_8bits());
     ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
 
     EXPECT_BUF_EQ(&out_buffer[9], raw_data, data_count);
