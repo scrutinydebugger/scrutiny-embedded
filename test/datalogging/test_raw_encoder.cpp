@@ -15,6 +15,17 @@
 
 using namespace scrutiny;
 
+
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[128];
+
+static struct {
+    unsigned char canary1[128];
+    unsigned char data[128];
+    unsigned char canary2[128];
+}dlbuffer;
+
+
 class TestRawEncoder : public ScrutinyTest
 {
   protected:
@@ -25,24 +36,12 @@ class TestRawEncoder : public ScrutinyTest
     datalogging::Configuration dlconfig;
     datalogging::RawFormatEncoder encoder;
 
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
-
-    unsigned char buffer_canary_1[512];
-    unsigned char dlbuffer[128];
-    unsigned char buffer_canary_2[512];
-
     TestRawEncoder() :
         ScrutinyTest(),
         scrutiny_handler(),
         config(),
         dlconfig(),
-        encoder(),
-        _rx_buffer(),
-        _tx_buffer(),
-        buffer_canary_1(),
-        dlbuffer(),
-        buffer_canary_2()
+        encoder()
     {
     }
 
@@ -51,23 +50,34 @@ class TestRawEncoder : public ScrutinyTest
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
         scrutiny_handler.init(&config);
 
-        memset(buffer_canary_1, 0xAA, sizeof(buffer_canary_1));
-        memset(buffer_canary_2, 0x55, sizeof(buffer_canary_2));
+#if CHAR_BIT == 8
+        memset(dlbuffer.canary1, 0xAA, sizeof(dlbuffer.canary1));
+        memset(dlbuffer.canary2, 0x55, sizeof(dlbuffer.canary2));
+        memset(dlbuffer.data, 0xFF, sizeof(dlbuffer.data));
+#elif CHAR_BIT == 16
+        memset(dlbuffer.canary1, 0xAAAA, sizeof(dlbuffer.canary1));
+        memset(dlbuffer.canary2, 0x5555, sizeof(dlbuffer.canary2));
+        memset(dlbuffer.data, 0xFFFF, sizeof(dlbuffer.data));
+#endif
     }
 };
 
-void TestRawEncoder::check_canaries()
-{
-    for (size_t i = 0; i < sizeof(buffer_canary_1); i++)
-    {
-        ASSERT_EQ(buffer_canary_1[i], 0xAA) << "Overflow before buffer at i=" << i;
-    }
+#if CHAR_BIT == 8
+#define CHECK_CANARIES                                                                                                                               \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        ASSERT_BUF_SET(dlbuffer.canary1, 0xAA, sizeof(dlbuffer.canary1)) << "dlbuffer canary died!";                                                 \
+        ASSERT_BUF_SET(dlbuffer.canary2, 0x55, sizeof(dlbuffer.canary2)) << "dlbuffer canary died!";                                                 \
+    } while (0)
 
-    for (size_t i = 0; i < sizeof(buffer_canary_2); i++)
-    {
-        ASSERT_EQ(buffer_canary_2[i], 0x55) << "Overflow after buffer at i=" << i;
-    }
-}
+#elif CHAR_BIT == 16
+#define CHECK_CANARIES                                                                                                                               \
+    do                                                                                                                                               \
+    {                                                                                                                                                \
+        ASSERT_BUF_SET(dlbuffer.canary1, 0xAAAA, sizeof(dlbuffer.canary1)) << "dlbuffer canary died!";                                               \
+        ASSERT_BUF_SET(dlbuffer.canary2, 0x5555, sizeof(dlbuffer.canary2)) << "dlbuffer canary died!";                                               \
+    } while (0)
+#endif
 
 TEST_F(TestRawEncoder, BasicEncoding)
 {
@@ -89,7 +99,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     dlconfig.items_to_log[2].type = datalogging::LoggableType::Time;
 
-    encoder.init(&scrutiny_handler, &dlconfig, dlbuffer, sizeof(dlbuffer));
+    encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(dlbuffer.data));
     encoder.set_timebase(&timebase);
     timebase.reset();
 
@@ -157,6 +167,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
     }
 
     EXPECT_EQ(total_read, reader->get_total_size_8bits());
+    CHECK_CANARIES;
 }
 
 #endif

@@ -31,20 +31,21 @@ static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::Any
     return true;
 }
 
+
+static unsigned char _rx_buffer[128];
+static unsigned char _tx_buffer[128];
+
+static unsigned char forbidden_buffer[32];
+static unsigned char forbidden_buffer2[32];
+static unsigned char readonly_buffer[32];
+static unsigned char readonly_buffer2[32];
+
 class TestTriggerConditions : public ScrutinyTest
 {
   protected:
     scrutiny::Timebase tb;
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
-
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
-
-    unsigned char forbidden_buffer[128];
-    unsigned char forbidden_buffer2[128];
-    unsigned char readonly_buffer[128];
-    unsigned char readonly_buffer2[128];
 
     scrutiny::AddressRange readonly_ranges[2];
     scrutiny::AddressRange forbidden_ranges[2];
@@ -54,19 +55,13 @@ class TestTriggerConditions : public ScrutinyTest
         ScrutinyTest(),
         tb(),
         scrutiny_handler(),
-        config(),
-        _rx_buffer(),
-        _tx_buffer(),
-        forbidden_buffer(),
-        forbidden_buffer2(),
-        readonly_buffer(),
-        readonly_buffer2()
+        config()
     {
         readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
         readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
 
         forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
-        forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer2));
+        forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2));
 
         rpvs[0].id = 0x1234;
         rpvs[0].type = scrutiny::VariableType::uint32;
