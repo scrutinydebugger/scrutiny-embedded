@@ -24,7 +24,7 @@ using namespace scrutiny;
 
 #define DATALOG_BUFFER_SIZE 128
 
-static unsigned char _rx_buffer[192];
+static unsigned char _rx_buffer[256];
 static unsigned char _tx_buffer[DATALOG_BUFFER_SIZE * (CHAR_BIT / 8) + 8 + 9]; // Enough to send the whole buffer
 static unsigned char dlbuffer[DATALOG_BUFFER_SIZE];
 
