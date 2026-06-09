@@ -13,6 +13,7 @@
 #include "scrutiny_loop_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
+#include "stdlib.h"
 
 namespace scrutiny
 {
