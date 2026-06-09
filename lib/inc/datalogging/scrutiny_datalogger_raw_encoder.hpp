@@ -13,6 +13,7 @@
 #include "datalogging/scrutiny_datalogging_types.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_timebase.hpp"
+#include <limits.h>
 #include <stdint.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -36,12 +37,14 @@ namespace scrutiny
         {
           public:
             explicit RawFormatReader(RawFormatEncoder const *const encoder);
-            datalogging::buffer_size_t read(uint8_t *const buffer, datalogging::buffer_size_t const max_size);
+            datalogging::buffer_size_t read_dilate_8bits(unsigned char *const buffer, datalogging::buffer_size_t const max_size_8bits);
             inline bool finished(void) const { return m_finished; }
             void reset(void);
             inline bool error(void) const;
             inline datalogging::buffer_size_t get_entry_count(void) const;
             datalogging::buffer_size_t get_total_size(void) const;
+            /// @brief Returns the total number of 8bits byte that the reader will read
+            inline datalogging::buffer_size_t get_total_size_8bits(void) const { return get_total_size() * (CHAR_BIT / 8); }
             inline datalogging::EncodingType::eEncodingType get_encoding(void) const;
 
           protected:
@@ -62,7 +65,7 @@ namespace scrutiny
             void init(
                 MainHandler const *const main_handler,
                 datalogging::Configuration const *const config,
-                uint8_t *const buffer,
+                unsigned char *const buffer,
                 datalogging::buffer_size_t const buffer_size);
             void encode_next_entry(LoopHandler *const caller);
             void reset(void);
@@ -82,7 +85,7 @@ namespace scrutiny
             RawFormatReader *get_reader(void) { return &m_reader; };
 
           protected:
-            uint8_t *m_buffer;
+            unsigned char *m_buffer;
             datalogging::buffer_size_t m_buffer_size;
             datalogging::Configuration const *m_config;
             RawFormatReader m_reader;

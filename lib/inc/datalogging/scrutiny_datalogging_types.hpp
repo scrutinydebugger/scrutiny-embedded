@@ -67,10 +67,10 @@ namespace scrutiny
             // clang-format off
             SCRUTINY_ENUM(eOperandType, uint_least8_t)
             {
-                LITERAL = 0,
-                VAR = 1,
-                VARBIT = 2,
-                RPV = 3
+                Literal = 0,
+                Var = 1,
+                VarBit = 2,
+                Rpv = 3
             };
             // clang-format on
         };
@@ -90,8 +90,8 @@ namespace scrutiny
             {
                 void *addr;
                 VariableType::eVariableType datatype;
-                uint8_t bitoffset;
-                uint8_t bitsize;
+                uint_least8_t bitoffset;
+                uint_least8_t bitsize;
             } varbit;
             struct
             {
@@ -128,7 +128,7 @@ namespace scrutiny
         {
             /// @brief Reads a configuration and make a copy of it
             /// @param other The configuration to copy
-            void copy_from(TriggerConfig const * const other)
+            void copy_from(TriggerConfig const *const other)
             {
                 for (unsigned int i = 0; i < MAX_OPERANDS; i++)
                 {
@@ -141,7 +141,7 @@ namespace scrutiny
             }
 
             SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
-            uint8_t operand_count;                                             // Number of given operands
+            uint_least8_t operand_count;                                       // Number of given operands
             uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
             Operand operands[MAX_OPERANDS];                                    // The operand definitions
         };
@@ -152,9 +152,9 @@ namespace scrutiny
             // clang-format off
             SCRUTINY_ENUM(eLoggableType, uint_least8_t)
             {
-                MEMORY = 0,
-                RPV = 1,
-                TIME = 2
+                Memory = 0,
+                Rpv = 1,
+                Time = 2
             };
             // clang-format on
         };
@@ -166,7 +166,7 @@ namespace scrutiny
                 struct
                 {
                     void *address;
-                    uint8_t size;
+                    uint_least8_t size;
                 } memory;
                 struct
                 {
@@ -200,10 +200,10 @@ namespace scrutiny
 
             LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
 
-            uint8_t items_count; // Number of items to logs
-            uint16_t decimation; // Decimation of the acquisition. Effectively reduce the sampling rate
+            uint_least8_t items_count; // Number of items to logs
+            uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
-            uint8_t probe_location;
+            uint_least8_t probe_location;
             uint32_t timeout_100ns; // Time after which an acquisition is considered complete even if the buffer is not full
             TriggerConfig trigger;  // The trigger configuration
         };

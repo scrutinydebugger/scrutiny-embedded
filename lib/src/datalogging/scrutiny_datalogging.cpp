@@ -10,6 +10,7 @@
 #include "scrutiny_main_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_tools.hpp"
+#include <limits.h>
 #include <string.h>
 
 #if SCRUTINY_ENABLE_DATALOGGING == 0
@@ -36,20 +37,28 @@ namespace scrutiny
                 break;
             }
 #endif
-            case VariableType::boolean:
+#if CHAR_BIT == 8
+            case VariableType::boolean8:
+#endif
+            case VariableType::boolean16:
+            case VariableType::boolean32:
+#if SCRUTINY_SUPPORT_64BITS
+            case VariableType::boolean64:
+#endif
+            case VariableType::boolean: // No size encoded
             {
                 *vtype = BiggestUint;
                 tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->boolean));
                 break;
             }
-
+#if CHAR_BIT == 8
             case VariableType::sint8:
             {
                 *vtype = BiggestSint;
                 tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint8));
                 break;
             }
-
+#endif
             case VariableType::sint16:
             {
                 *vtype = BiggestSint;
@@ -63,14 +72,14 @@ namespace scrutiny
                 tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint32));
                 break;
             }
-
+#if CHAR_BIT == 8
             case VariableType::uint8:
             {
                 *vtype = BiggestUint;
                 tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->uint8));
                 break;
             }
-
+#endif
             case VariableType::uint16:
             {
                 *vtype = BiggestUint;
@@ -104,24 +113,24 @@ namespace scrutiny
             LoopHandler *const caller)
         {
             bool success = true;
-            if (operand->type == OperandType::LITERAL)
+            if (operand->type == OperandType::Literal)
             {
                 val->float32 = operand->data.literal.val;
                 *variable_type = VariableType::float32;
             }
-            else if (operand->type == OperandType::RPV)
+            else if (operand->type == OperandType::Rpv)
             {
                 RuntimePublishedValue rpv;
                 main_handler->get_rpv(operand->data.rpv.id, &rpv);
                 success = main_handler->get_rpv_read_callback()(rpv, val, caller);
                 *variable_type = rpv.type;
             }
-            else if (operand->type == OperandType::VAR)
+            else if (operand->type == OperandType::Var)
             {
                 success = main_handler->fetch_variable(operand->data.var.addr, operand->data.var.datatype, val);
                 *variable_type = operand->data.var.datatype;
             }
-            else if (operand->type == OperandType::VARBIT)
+            else if (operand->type == OperandType::VarBit)
             {
                 success = main_handler->fetch_variable_bitfield(
                     operand->data.var.addr,

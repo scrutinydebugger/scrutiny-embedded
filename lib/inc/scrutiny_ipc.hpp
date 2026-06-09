@@ -16,6 +16,8 @@
 #include "ipc/scrutiny_ipc_x86.hpp"
 #elif SCRUTINY_BUILD_TRICORE
 #include "ipc/scrutiny_ipc_tricore.hpp"
+#elif SCRUTINY_BUILD_TI_C28
+#include "ipc/scrutiny_ipc_ti_c28.hpp"
 #else
 #error "No IPC capabilities"
 #endif

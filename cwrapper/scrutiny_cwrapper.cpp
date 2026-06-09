@@ -76,20 +76,26 @@ extern "C"
 
     void scrutiny_c_config_set_buffers(
         scrutiny_c_config_t *config,
-        uint8_t *rx_buffer,
+        unsigned char *rx_buffer,
         uint16_t const rx_buffer_size,
-        uint8_t *tx_buffer,
+        unsigned char *tx_buffer,
         uint16_t const tx_buffer_size)
     {
         get_config(config)->set_buffers(rx_buffer, rx_buffer_size, tx_buffer, tx_buffer_size);
     }
 
-    void scrutiny_c_config_set_forbidden_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint8_t const count)
+    void scrutiny_c_config_set_forbidden_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count)
     {
         get_config(config)->set_forbidden_address_range(reinterpret_cast<scrutiny::AddressRange const *>(ranges), count);
     }
 
-    void scrutiny_c_config_set_readonly_address_range(scrutiny_c_config_t *config, scrutiny_c_address_range_t const *ranges, uint8_t const count)
+    void scrutiny_c_config_set_readonly_address_range(
+        scrutiny_c_config_t *config,
+        scrutiny_c_address_range_t const *ranges,
+        uint_least8_t const count)
     {
         get_config(config)->set_readonly_address_range(reinterpret_cast<scrutiny::AddressRange const *>(ranges), count);
     }
@@ -108,7 +114,7 @@ extern "C"
             reinterpret_cast<scrutiny::RpvWriteCallback>(wr_cb)); // Expect signature to match
     }
 
-    void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint8_t const loop_count)
+    void scrutiny_c_config_set_loops(scrutiny_c_config_t *config, scrutiny_c_loop_handler_t **loops, uint_least8_t const loop_count)
     {
         get_config(config)->set_loops(reinterpret_cast<scrutiny::LoopHandler **>(loops), loop_count);
     }
@@ -119,7 +125,7 @@ extern "C"
     }
 
 #if SCRUTINY_ENABLE_DATALOGGING == 1
-    void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, uint8_t *buffer, scrutiny_c_datalogging_buffer_size_t size)
+    void scrutiny_c_config_set_datalogging_buffers(scrutiny_c_config_t *config, unsigned char *buffer, scrutiny_c_datalogging_buffer_size_t size)
     {
         get_config(config)->set_datalogging_buffers(buffer, size);
     }
@@ -150,12 +156,12 @@ extern "C"
         get_config(config)->memory_write_enable = static_cast<bool>(val);
     }
 
-    void scrutiny_c_main_handler_receive_data(scrutiny_c_main_handler_t *mh, uint8_t const *data, uint16_t const len)
+    void scrutiny_c_main_handler_receive_data(scrutiny_c_main_handler_t *mh, unsigned char const *data, uint16_t const len)
     {
         get_main_handler(mh)->receive_data(data, len);
     }
 
-    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *mh, uint8_t *buffer, uint16_t const len)
+    uint16_t scrutiny_c_main_handler_pop_data(scrutiny_c_main_handler_t *mh, unsigned char *buffer, uint16_t const len)
     {
         return get_main_handler(mh)->pop_data(buffer, len);
     }

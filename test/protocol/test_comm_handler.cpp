@@ -17,11 +17,11 @@ class TestCommHandler : public ScrutinyTest
   protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
-    uint8_t response_buffer[256];
+    unsigned char response_buffer[256];
     scrutiny::protocol::Response response;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
     virtual void SetUp()
     {
@@ -32,7 +32,7 @@ class TestCommHandler : public ScrutinyTest
 
 TEST_F(TestCommHandler, TestConsecutiveSend)
 {
-    uint8_t buf[256];
+    unsigned char buf[256];
 
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
@@ -43,7 +43,7 @@ TEST_F(TestCommHandler, TestConsecutiveSend)
     response.data[2] = 0x33;
 
     add_crc(&response);
-    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
+    unsigned char expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     bool success;
@@ -115,7 +115,7 @@ TEST_F(TestCommHandler, TestConnectDisconnectBehaviour)
     comm.connect();
     ASSERT_NE(comm.get_session_id(), session_id);
 
-    uint8_t dummy_request[8] = { 1, 1, 0, 0 };
+    unsigned char dummy_request[8] = { 1, 1, 0, 0 };
     add_crc(dummy_request, sizeof(dummy_request) - 4);
 
     EXPECT_FALSE(comm.request_received());

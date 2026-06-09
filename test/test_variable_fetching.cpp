@@ -9,6 +9,7 @@
 #include "scrutiny.hpp"
 #include "scrutiny_test.hpp"
 #include "scrutinytest/scrutinytest.hpp"
+#include <climits>
 #include <cstddef>
 
 class TestVariableFetching : public ScrutinyTest
@@ -18,13 +19,13 @@ class TestVariableFetching : public ScrutinyTest
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
-    uint8_t forbidden_buffer[128];
-    uint8_t forbidden_buffer2[128];
-    uint8_t readonly_buffer[128];
-    uint8_t readonly_buffer2[128];
+    unsigned char forbidden_buffer[128];
+    unsigned char forbidden_buffer2[128];
+    unsigned char readonly_buffer[128];
+    unsigned char readonly_buffer2[128];
 
     scrutiny::AddressRange readonly_ranges[2];
     scrutiny::AddressRange forbidden_ranges[2];
@@ -61,35 +62,40 @@ class TestVariableFetching : public ScrutinyTest
 
 TEST_F(TestVariableFetching, RandomFetch)
 {
-    uint8_t some_buffer[32];
+    unsigned char some_buffer[32];
 
     float f32 = 1.2345f;
     double f64 = 3.1415926;
     uint16_t u16 = 0x1234;
     bool b = true;
 
-    memcpy(&some_buffer[0], &f32, sizeof(f32));
-    memcpy(&some_buffer[4], &f64, sizeof(f64));
-    memcpy(&some_buffer[4 + 8], &u16, sizeof(u16));
-    memcpy(&some_buffer[4 + 8 + 2], &b, sizeof(b));
+    SCRUTINY_CONSTEXPR size_t f32_offset = 0;
+    SCRUTINY_CONSTEXPR size_t f64_offset = f32_offset + sizeof(f32);
+    SCRUTINY_CONSTEXPR size_t u16_offset = f64_offset + sizeof(f64);
+    SCRUTINY_CONSTEXPR size_t bool_offset = u16_offset + sizeof(u16);
+
+    memcpy(&some_buffer[f32_offset], &f32, sizeof(f32));
+    memcpy(&some_buffer[f64_offset], &f64, sizeof(f64));
+    memcpy(&some_buffer[u16_offset], &u16, sizeof(u16));
+    memcpy(&some_buffer[bool_offset], &b, sizeof(b));
 
     scrutiny::AnyType outval;
     bool success;
-    success = scrutiny_handler.fetch_variable(&some_buffer[0], scrutiny::VariableType::float32, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[f32_offset], scrutiny::VariableType::float32, &outval);
     EXPECT_EQ(outval.float32, f32);
     EXPECT_TRUE(success);
 
 #if SCRUTINY_SUPPORT_64BITS
-    success = scrutiny_handler.fetch_variable(&some_buffer[4], scrutiny::VariableType::float64, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[f64_offset], scrutiny::VariableType::float64, &outval);
     EXPECT_EQ(outval.float64, f64);
     EXPECT_TRUE(success);
 #endif
 
-    success = scrutiny_handler.fetch_variable(&some_buffer[4 + 8], scrutiny::VariableType::uint16, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[u16_offset], scrutiny::VariableType::uint16, &outval);
     EXPECT_EQ(outval.uint16, u16);
     EXPECT_TRUE(success);
 
-    success = scrutiny_handler.fetch_variable(&some_buffer[4 + 8 + 2], scrutiny::VariableType::boolean, &outval);
+    success = scrutiny_handler.fetch_variable(&some_buffer[bool_offset], scrutiny::VariableType::boolean, &outval);
     EXPECT_EQ(outval.boolean, b);
     EXPECT_TRUE(success);
 }
@@ -113,14 +119,15 @@ TEST_F(TestVariableFetching, NoAccess)
 
 TEST_F(TestVariableFetching, Bitfield)
 {
-    uint8_t some_buffer[32];
+    unsigned char some_buffer[32];
     memset(some_buffer, 0xFF, sizeof(some_buffer));
 
 #pragma pack(push, 1)
+#if CHAR_BIT == 8
     struct
     {
-        uint8_t pad : 2;
-        uint8_t val : 3;
+        unsigned char pad : 2;
+        unsigned char val : 3;
     } data_u8;
 
     struct
@@ -128,7 +135,7 @@ TEST_F(TestVariableFetching, Bitfield)
         int8_t pad : 2;
         int8_t val : 5;
     } data_s8;
-
+#endif
     struct
     {
         uint16_t pad : 4;
@@ -155,9 +162,9 @@ TEST_F(TestVariableFetching, Bitfield)
 
     struct
     {
-        uint8_t pad : 2;
+        uint16_t pad : 2;
         bool b1 : 1;
-        uint8_t pad2 : 2;
+        uint16_t pad2 : 2;
         bool b2 : 1;
     } data_bool;
 
@@ -177,8 +184,10 @@ TEST_F(TestVariableFetching, Bitfield)
 
 #pragma pack(pop)
 
+#if CHAR_BIT == 8
     data_u8.val = 6;
     data_s8.val = -15;
+#endif
     data_u16.val = 300;
     data_s16.val = -400;
     data_u32.val = 100000;
@@ -190,8 +199,11 @@ TEST_F(TestVariableFetching, Bitfield)
     data_bool.b1 = true;
     data_bool.b2 = static_cast<bool>(123);
 
+#if CHAR_BIT == 8
+    // Fixme
     memcpy(&some_buffer[0], &data_u8, sizeof(data_u8));
     memcpy(&some_buffer[1], &data_s8, sizeof(data_s8));
+#endif
     memcpy(&some_buffer[2], &data_u16, sizeof(data_u16));
     memcpy(&some_buffer[4], &data_s16, sizeof(data_s16));
     memcpy(&some_buffer[6], &data_u32, sizeof(data_u32));
@@ -203,9 +215,10 @@ TEST_F(TestVariableFetching, Bitfield)
     memcpy(&some_buffer[23], &data_s64, sizeof(data_s64));
 #endif
 
+    bool success;
     scrutiny::AnyType outval;
     scrutiny::VariableType::eVariableType outtype;
-    bool success;
+#if CHAR_BIT == 8
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[0], scrutiny::VariableTypeType::_uint, 2, 3, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint8, data_u8.val);
@@ -215,7 +228,7 @@ TEST_F(TestVariableFetching, Bitfield)
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.sint8, data_s8.val);
     EXPECT_EQ(outtype, scrutiny::VariableType::sint8);
-
+#endif
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[2], scrutiny::VariableTypeType::_uint, 4, 10, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.uint16, data_u16.val);
@@ -239,12 +252,12 @@ TEST_F(TestVariableFetching, Bitfield)
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[14], scrutiny::VariableTypeType::_boolean, 2, 1, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.boolean, data_bool.b1);
-    EXPECT_EQ(outtype, scrutiny::VariableType::boolean);
+    EXPECT_EQ(outtype, scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::tools::get_required_type_size_8bits(CHAR_BIT / 8)));
 
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[14], scrutiny::VariableTypeType::_boolean, 2, 1, &outval, &outtype);
     EXPECT_TRUE(success);
     EXPECT_EQ(outval.boolean, data_bool.b2);
-    EXPECT_EQ(outtype, scrutiny::VariableType::boolean);
+    EXPECT_EQ(outtype, scrutiny::tools::make_type(scrutiny::VariableTypeType::_boolean, scrutiny::tools::get_required_type_size_8bits(CHAR_BIT / 8)));
 
 #if SCRUTINY_SUPPORT_64BITS
     success = scrutiny_handler.fetch_variable_bitfield(&some_buffer[15], scrutiny::VariableTypeType::_uint, 7, 37, &outval, &outtype);

@@ -10,20 +10,29 @@
 #define ___SCRUTINY_SOFTWARE_ID_H___
 
 #include "scrutiny_setup.hpp"
-#include <stdint.h>
+#include <limits.h>
 
-#define SCRUTINY_SOFTWARE_ID_LENGTH 16u
+#define SCRUTINY_SOFTWARE_ID_LENGTH 16u / (CHAR_BIT / 8)
 
 // Randomly generated
+#if CHAR_BIT == 8
 #define SCRUTINY_SOFTWARE_ID_PLACEHOLDER                                                                                                             \
     {                                                                                                                                                \
         0xA9, 0xDC, 0xC0, 0x65, 0x28, 0xFD, 0x41, 0xFA, 0x7C, 0xE8, 0x63, 0xD6, 0xAA, 0x94, 0xA7, 0x08                                               \
     }
+#elif CHAR_BIT == 16
+#define SCRUTINY_SOFTWARE_ID_PLACEHOLDER                                                                                                             \
+    {                                                                                                                                                \
+        0xA9DC, 0xC065, 0x28FD, 0x41FA, 0x7CE8, 0x63D6, 0xAA94, 0xA708                                                                               \
+    }
+#else
+#error
+#endif
 
 namespace scrutiny
 {
     /// @brief The Scrutiny software ID used to identify the firmware with a unique hash.
     /// The offline toolchain will generate and inject its value after the binary has been produced.
-    extern uint8_t const software_id[SCRUTINY_SOFTWARE_ID_LENGTH];
+    extern unsigned char const software_id[SCRUTINY_SOFTWARE_ID_LENGTH];
 } // namespace scrutiny
 #endif // ___SCRUTINY_SOFTWARE_ID_H___

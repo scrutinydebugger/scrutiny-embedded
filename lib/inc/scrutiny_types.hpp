@@ -77,7 +77,9 @@ namespace scrutiny
         // clang-format off
         SCRUTINY_ENUM(eVariableTypeSize, uint_least8_t)
         {
+#if CHAR_BIT==8            
             _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
+#endif            
             _16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_16,
             _32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_32,
             _64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_64,
@@ -95,25 +97,32 @@ namespace scrutiny
         // clang-format off
         SCRUTINY_ENUM(eVariableType, uint_least8_t)
         {
+#if CHAR_BIT == 8
             sint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint8,
+            uint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint8,
+            float8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float8,
+            cfloat8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat8,
+            boolean8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean8,
+#endif
             sint16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint16,
             sint32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint32,
-            uint8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint8,
             uint16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint16,
             uint32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint32,
-            float8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float8,
             float16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float16,
             float32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float32,
-            cfloat8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat8,
             cfloat16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat16,
             cfloat32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat32,
-            boolean = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean,
+            boolean16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean16,
+            boolean32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean32,
+
+            boolean = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean, // No size = platform default
 
 #if SCRUTINY_SUPPORT_64BITS
             uint64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_uint64,
             sint64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_sint64,
             float64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_float64,
             cfloat64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_cfloat64,
+            boolean64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_boolean64,
 #endif
             unknown = ctypes::SCRUTINY_C_VARIABLE_TYPE_unknown
         };
@@ -166,10 +175,10 @@ namespace scrutiny
     /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
     struct MemoryBlock
     {
-        uint8_t *start_address;
+        unsigned char *start_address;
         uint16_t length;
-        uint8_t *source_data;
-        uint8_t *mask;
+        unsigned char *source_data;
+        unsigned char *mask;
     };
 } // namespace scrutiny
 

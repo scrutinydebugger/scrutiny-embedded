@@ -11,12 +11,25 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#if __unix__
+#include <unistd.h>
+#endif
+
+#if SCRUTINY_HAS_CPP11 && defined(__STDCPP_THREADS__) && __STDCPP_THREADS__
+#include <thread>
+#define TEST_IPC_CPPTHREAD
+#elif defined(_POSIX_THREADS) || defined(_REENTRANT)
+#include <pthread.h>
+#define TEST_IPC_POSIX_THREAD
+#else
+// Win32 with c++98 ???
+#error "Test require an OS with thread capabilities."
+#endif
+
 #if SCRUTINY_HAS_CPP11
 #include <chrono>
-#include <thread>
 #else
-#include <ctime>
-#include <pthread.h>
+#include <time.h>
 #endif
 
 class SomeEnum
@@ -121,14 +134,23 @@ TEST(TestIPC, CheckWithThread)
 
     uint32_t my_value = 0;
     uint32_t expected_thread_value = 0;
-#if SCRUTINY_HAS_CPP11
+
+#if defined(TEST_IPC_CPPTHREAD)
     std::thread thread(thread_func);
+#elif defined(TEST_IPC_POSIX_THREAD)
+    pthread_t thread;
+    ASSERT_EQ(pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
+#else
+#error
+#endif
+
+#if SCRUTINY_HAS_CPP11
     auto t1 = std::chrono::high_resolution_clock::now();
 #else
-    pthread_t thread;
-    std::clock_t t1 = std::clock();
-    ASSERT_EQ(pthread_create(&thread, NULL, thread_func_pthread, NULL), 0);
+    struct timespec t1;
+    clock_gettime(CLOCK_MONOTONIC, &t1);
 #endif
+
     while (!thread_data.thread_exit)
     {
         if (thread_data.msg_from_thread.has_content())
@@ -160,8 +182,9 @@ TEST(TestIPC, CheckWithThread)
             thread_data.thread_exit = true;
         }
 #else
-        std::clock_t t2 = std::clock();
-        double elapsed_secs = double(t2 - t1) / CLOCKS_PER_SEC;
+        struct timespec t2;
+        clock_gettime(CLOCK_MONOTONIC, &t2);
+        double elapsed_secs = double(t2.tv_sec - t1.tv_sec) + double(t2.tv_nsec - t1.tv_nsec) / 1e9;
         if (elapsed_secs > TIMEOUT_SEC)
         {
             thread_data.thread_exit = true;
@@ -169,10 +192,13 @@ TEST(TestIPC, CheckWithThread)
 #endif
     }
 
-#if SCRUTINY_HAS_CPP11
+#if defined(TEST_IPC_CPPTHREAD)
+    ASSERT_TRUE(thread.joinable());
     thread.join();
-#else
+#elif defined(TEST_IPC_POSIX_THREAD)
     ASSERT_EQ(pthread_join(thread, NULL), 0);
+#else
+#error
 #endif
 
     EXPECT_FALSE(thread_data.error_found_in_main) << "At Iteration #" << thread_data.error_at_iter;

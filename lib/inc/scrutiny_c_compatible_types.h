@@ -8,13 +8,14 @@
 //    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_setup.hpp"
+#include <limits.h>
 #include <stdint.h>
 
 typedef void (*scrutiny_c_user_command_callback_t)(
-    uint8_t const subfunction,
-    uint8_t const *request_data,
+    uint_least8_t const subfunction,
+    unsigned char const *request_data,
     uint16_t const request_data_length,
-    uint8_t *response_data,
+    unsigned char *response_data,
     uint16_t *response_data_length,
     uint16_t const response_max_data_length);
 
@@ -51,7 +52,9 @@ typedef enum
 /// @brief Represent a type size
 typedef enum
 {
+#if CHAR_BIT == 8
     SCRUTINY_C_VARIABLE_TYPE_SIZE_8 = 0,
+#endif
     SCRUTINY_C_VARIABLE_TYPE_SIZE_16 = 1,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_32 = 2,
     SCRUTINY_C_VARIABLE_TYPE_SIZE_64 = 3,
@@ -63,20 +66,32 @@ typedef enum
 /// @brief  Represent a datatype. Must match the python core module enum
 typedef enum
 {
-    SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
+#if CHAR_BIT == 8
+    SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+#endif
+
     SCRUTINY_C_VARIABLE_TYPE_sint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_sint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,       // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_uint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_float16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+
+    SCRUTINY_C_VARIABLE_TYPE_sint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_uint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_float32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
+
 #ifdef __cplusplus
-    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_undef,
+#if CHAR_BIT == 8
+    SCRUTINY_C_VARIABLE_TYPE_boolean8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+#endif
+    SCRUTINY_C_VARIABLE_TYPE_boolean16 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean32 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
@@ -84,17 +99,23 @@ typedef enum
     SCRUTINY_C_VARIABLE_TYPE_uint64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,     // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_float64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,   // cppcheck-suppress[badBitmaskCheck]
     SCRUTINY_C_VARIABLE_TYPE_cfloat64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean64 =
+        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
 #endif
     SCRUTINY_C_VARIABLE_TYPE_unknown = 0xFF
 } scrutiny_c_variable_type_e;
 
 typedef union
 {
+#if CHAR_BIT == 8
     uint8_t uint8;
+#endif
     uint16_t uint16;
     uint32_t uint32;
 
+#if CHAR_BIT == 8
     int8_t sint8;
+#endif
     int16_t sint16;
     int32_t sint32;
 
@@ -112,12 +133,15 @@ typedef union
 /// @brief The fast version of AnyType
 typedef union
 {
+#if CHAR_BIT == 8
     uint_fast8_t uint8;
-    uint_fast16_t uint16;
-    uint_fast32_t uint32;
-
     int_fast8_t sint8;
+#endif
+
+    uint_fast16_t uint16;
     int_fast16_t sint16;
+
+    uint_fast32_t uint32;
     int_fast32_t sint32;
 
     float float32;
@@ -136,7 +160,7 @@ typedef union
 typedef struct
 {
     uint16_t id;
-    uint8_t type;
+    uint_least8_t type;
 } scrutiny_c_runtime_published_value_t;
 
 /// @brief Callback called on Runtime Published Value read

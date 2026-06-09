@@ -9,8 +9,10 @@
 #ifndef __SCRUTINY_TOOLS_H__
 #define __SCRUTINY_TOOLS_H__
 
+#include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
@@ -25,6 +27,26 @@ namespace scrutiny
 {
     namespace tools
     {
+        /// @brief Returns true if the type is supported by scrutiny
+        bool is_supported_type(VariableType::eVariableType const vt);
+
+        /// @brief Returns which variable type to use to store a given size in multiple of 8bits
+        /// @param size Given size in bytes
+        /// @return The size to use.
+        VariableTypeSize::eVariableTypeSize get_required_type_size_8bits(uint_fast8_t const size);
+
+        /// @brief Returns which variable type to use to store a given size in multiple of char
+        /// @param size Given size in bytes
+        /// @return The size to use.
+        VariableTypeSize::eVariableTypeSize get_required_type_size_char(uint_fast8_t const size);
+
+        /// @brief Computes a standard CRC32
+        /// @param data Input data
+        /// @param size Size of data in bytes
+        /// @param start_value Start value of CRC. This value can be used to chain CRC calculation.
+        /// @return The CRC32 value of the data
+        uint32_t crc32(unsigned char const *data, uint32_t const size, uint32_t const start_value = 0);
+
         /// @brief Makes an address range (start/end address)
         /// @param start Start address
         /// @param end End address
@@ -74,24 +96,42 @@ namespace scrutiny
             return range;
 #endif
         }
-
-        /// @brief Returns the size of a given type in bytes
-        /// @param vt The VariableType object
-        /// @return Size in bytes
-        inline uint8_t get_type_size(VariableType::eVariableType const vt)
+        /// @brief Creates a VariableType from a TypeType and a size.
+        /// @param tt The type type (uint, int, float, etc)
+        /// @param ts The type size (8,16, 32)
+        /// @return The VariableType enum object
+        inline VariableType::eVariableType make_type(VariableTypeType::eVariableTypeType const tt, VariableTypeSize::eVariableTypeSize const ts)
         {
-            if (vt == VariableType::unknown)
+            if (tt == VariableTypeType::_undef || ts == VariableTypeSize::_undef)
             {
-                return 0;
+                return VariableType::unknown;
             }
 
-            return 1 << (static_cast<unsigned int>(vt) & 0xF);
+            return static_cast<VariableType::eVariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 
-        /// @brief Returns the size of a given TypeSize in bytes
+        /// @brief Return the size of a native bool (compiler specific)
+        inline uint_least8_t get_platform_boolean_size_8bits()
+        {
+            return (sizeof(bool) * (CHAR_BIT / 8));
+        }
+
+        /// @brief Return the size of a native bool (compiler specific)
+        inline VariableTypeSize::eVariableTypeSize get_platform_boolean_size()
+        {
+            return get_required_type_size_8bits(get_platform_boolean_size_8bits());
+        }
+
+        /// @brief Return the bool variablt type that matches the paltform ``bool`` size. Compiler specific.
+        inline VariableType::eVariableType get_platform_boolean()
+        {
+            return make_type(VariableTypeType::_boolean, get_platform_boolean_size());
+        }
+
+        /// @brief Returns the size of a given TypeSize in multiple of 8bits
         /// @param ts The VariableTypeSize object
-        /// @return Size in bytes
-        inline uint8_t get_type_size(VariableTypeSize::eVariableTypeSize const ts)
+        /// @return Size in multiple of 8bits
+        inline uint_least8_t get_type_size_8bits(VariableTypeSize::eVariableTypeSize const ts)
         {
             if (ts == VariableTypeSize::_undef)
             {
@@ -101,30 +141,38 @@ namespace scrutiny
             return 1 << (static_cast<unsigned int>(ts) & 0xF);
         }
 
+        /// @brief Returns the size of a given type in multiple of 8bits
+        /// @param vt The VariableType object
+        /// @return Size in multiple of 8bits
+        inline uint_least8_t get_type_size_8bits(VariableType::eVariableType const vt)
+        {
+            if (vt == VariableType::unknown)
+            {
+                return 0;
+            }
+
+            if (vt == VariableType::boolean) // No size encoded in this type. Size is undef
+            {
+                return get_platform_boolean_size_8bits();
+            }
+
+            return 1 << (static_cast<unsigned int>(vt) & 0xF);
+        }
+
+        /// @brief Returns the size of a given type in multiple of char
+        /// @param vt The VariableType object
+        /// @return Size in multiple of char
+        inline uint_least8_t get_type_size_char(VariableType::eVariableType const vt)
+        {
+            return get_type_size_8bits(vt) / (CHAR_BIT / 8);
+        }
+
         /// @brief Returns the Type Type of a given data type.
-        /// @param vt The VariableTypeSize object
+        /// @param vt The VariableType object
         /// @return The VariableTypeType enum object
         inline VariableTypeType::eVariableTypeType get_var_type_type(VariableType::eVariableType const vt)
         {
             return static_cast<VariableTypeType::eVariableTypeType>(static_cast<unsigned int>(vt) & 0xF0);
-        }
-
-        /// @brief Creates a VariableType from a TypeType and a size.
-        /// @param tt The type type (uint, int, float, etc)
-        /// @param ts The type size (8,16, 32)
-        /// @return The VariableType enum object
-        inline VariableType::eVariableType make_type(VariableTypeType::eVariableTypeType const tt, VariableTypeSize::eVariableTypeSize const ts)
-        {
-            if (tt == VariableTypeType::_boolean)
-            {
-                return (ts == VariableTypeSize::_8) ? VariableType::boolean : VariableType::unknown;
-            }
-            if (tt == VariableTypeType::_undef || ts == VariableTypeSize::_undef)
-            {
-                return VariableType::unknown;
-            }
-
-            return static_cast<VariableType::eVariableType>(static_cast<unsigned int>(tt) | static_cast<unsigned int>(ts));
         }
 
         /// @brief Returns true if given Variable Type is a floating point type, regardless of its size
@@ -259,7 +307,7 @@ namespace scrutiny
         /// @return true if finite value
         inline bool is_float_finite(float const val)
         {
-#if SCRUTINY_BUILD_AVR_GCC
+#if SCRUTINY_BUILD_AVR_GCC || SCRUTINY_BUILD_TI_C28
             SCRUTINY_STATIC_ASSERT(sizeof(float) == 4, "Expect float to be 32 bits");
             uint32_t uv;
             memcpy(&uv, &val, 4);
@@ -270,20 +318,36 @@ namespace scrutiny
 #endif
         }
 
-        /// @brief Returns true if the type is supported by scrutiny
-        bool is_supported_type(VariableType::eVariableType const vt);
+        inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+            }
+#else
+#error
+#endif
+        }
 
-        /// @brief Returns which variable type to use to store a given size
-        /// @param size Given size in bytes
-        /// @return The size to use.
-        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size);
+        inline void memcpy_compress_from_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[i] =
+                    (((static_cast<unsigned char const *>(src)[2 * i] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF));
+            }
+#else
+#error
+#endif
+        }
 
-        /// @brief Computes a standard CRC32
-        /// @param data Input data
-        /// @param size Size of data in bytes
-        /// @param start_value Start value of CRC. This value can be used to chain CRC calculation.
-        /// @return The CRC32 value of the data
-        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value = 0);
     } // namespace tools
 
 } // namespace scrutiny

@@ -11,7 +11,10 @@
 #include "scrutiny_loop_handler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_software_id.hpp"
+#include <limits.h>
 #include <string.h>
+
+#define SIZEOF_8BITS(T) (static_cast<size_t>(sizeof(T) * (CHAR_BIT / 8)))
 
 namespace scrutiny
 {
@@ -138,13 +141,13 @@ namespace scrutiny
 
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
-        uint8_t typesize = tools::get_type_size(variable_type);
-        if (typesize == 0 || typesize > sizeof(AnyType))
+        uint_least8_t typesize_char = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
+        if (typesize_char == 0 || typesize_char > sizeof(AnyType))
         {
             return false;
         }
 
-        if (read_memory(val, addr, typesize) == false)
+        if (read_memory(val, addr, typesize_char) == false)
         {
             memset(val, 0, sizeof(AnyType));
             return false;
@@ -163,12 +166,13 @@ namespace scrutiny
         bool success = true;
         uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
         uint_fast8_t const output_required_size = ((bitsize - 1) >> 3) + 1;
-        VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size(fetch_required_size);
-        VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size(output_required_size);
+        VariableTypeSize::eVariableTypeSize const fetch_type_size = tools::get_required_type_size_8bits(fetch_required_size);
+        VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size_8bits(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
+        uint_least8_t const typesize_char = tools::get_type_size_8bits(fetch_variable_type) / (CHAR_BIT / 8);
 
-        if (touches_forbidden_region(addr, tools::get_type_size(fetch_type_size)))
+        if (touches_forbidden_region(addr, typesize_char))
         {
             success = false;
         }
@@ -181,11 +185,14 @@ namespace scrutiny
             success = fetch_variable(addr, fetch_variable_type, val);
             if (success)
             {
+#if CHAR_BIT == 8
                 if (fetch_type_size == VariableTypeSize::_8)
                 {
                     val->uint8 >>= bitoffset;
                 }
-                else if (fetch_type_size == VariableTypeSize::_16)
+                else
+#endif
+                    if (fetch_type_size == VariableTypeSize::_16)
                 {
                     val->uint16 >>= bitoffset;
                 }
@@ -208,6 +215,7 @@ namespace scrutiny
                 {
                     AnyTypeFast mask;
                     uint_fast8_t i;
+#if CHAR_BIT == 8
                     if (output_type_size == VariableTypeSize::_8)
                     {
                         mask.uint8 = 1;
@@ -224,10 +232,17 @@ namespace scrutiny
                             }
                         }
                     }
-                    else if (output_type_size == VariableTypeSize::_16)
+                    else
+#endif
+                        if (output_type_size == VariableTypeSize::_16)
                     {
+#if CHAR_BIT == 8
                         mask.uint16 = 0x1FF;
                         for (i = 9; i < bitsize; i++)
+#else
+                        mask.uint16 = 1;
+                        for (i = 1; i < bitsize; i++)
+#endif
                         {
                             mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
                         }
@@ -326,7 +341,7 @@ namespace scrutiny
             m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion =
                 msg->data.datalogger_status_update.bytes_to_acquire_from_trigger_to_completion;
             m_datalogging.threadsafe_data.write_counter_since_trigger = msg->data.datalogger_status_update.write_counter_since_trigger;
-            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::ACQUISITION_COMPLETED)
+            if (m_datalogging.threadsafe_data.datalogger_state != datalogging::DataLogger::State::AcquisitionCompleted)
             {
                 m_datalogging.reading_in_progress = false;
             }
@@ -452,7 +467,7 @@ namespace scrutiny
                     if (m_timebase.has_expired(m_process_again_timestamp, SCRUTINY_REQUEST_MAX_PROCESS_TIME_US * 10))
                     {
                         // Set only response code. All other fields are set in process_request()
-                        response->response_code = static_cast<uint8_t>(protocol::ResponseCode::FailureToProceed);
+                        response->response_code = static_cast<uint_least8_t>(protocol::ResponseCode::FailureToProceed);
                         m_comm_handler.send_response(response);
                         m_processing_request = true;
                     }
@@ -582,7 +597,7 @@ namespace scrutiny
             break;
         }
 
-        response->response_code = static_cast<uint8_t>(code);
+        response->response_code = static_cast<uint_least8_t>(code);
         if (code != protocol::ResponseCode::OK)
         {
             response->data_length = 0;
@@ -712,7 +727,7 @@ namespace scrutiny
                     break;
                 }
 
-                uint8_t const index = stack.get_special_memory_region_location.request_data.region_index;
+                uint_least8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
@@ -732,7 +747,7 @@ namespace scrutiny
                     break;
                 }
 
-                uint8_t const index = stack.get_special_memory_region_location.request_data.region_index;
+                uint_least8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
@@ -807,7 +822,7 @@ namespace scrutiny
         case protocol::GetInfo::Subfunction::GetLoopDefinition:
         {
             m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
-            uint8_t const loop_id = stack.get_loop_def.request_data.loop_id;
+            uint_least8_t const loop_id = stack.get_loop_def.request_data.loop_id;
             if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
             {
                 code = protocol::ResponseCode::FailureToProceed;
@@ -816,7 +831,7 @@ namespace scrutiny
 
             const LoopType::eLoopType loop_type = m_config.m_loops[loop_id]->loop_type();
             stack.get_loop_def.response_data.loop_id = loop_id;
-            stack.get_loop_def.response_data.loop_type = static_cast<uint8_t>(loop_type);
+            stack.get_loop_def.response_data.loop_type = static_cast<uint_least8_t>(loop_type);
 #if SCRUTINY_ENABLE_DATALOGGING
             stack.get_loop_def.response_data.support_datalogging = m_config.m_loops[loop_id]->datalogging_allowed();
 #else
@@ -828,7 +843,7 @@ namespace scrutiny
             }
 
             char const *const loop_name = m_config.m_loops[loop_id]->get_name();
-            uint8_t const loop_name_length = static_cast<uint8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
+            uint_least8_t const loop_name_length = static_cast<uint_least8_t>(tools::strnlen(loop_name, protocol::MAX_LOOP_NAME_LENGTH));
             stack.get_loop_def.response_data.loop_name_length = loop_name_length;
             stack.get_loop_def.response_data.loop_name = loop_name;
 
@@ -896,7 +911,7 @@ namespace scrutiny
             // Magic validation is done by the codec.
             stack.discover.response_data.display_name = m_config.display_name;
             stack.discover.response_data.display_name_length =
-                static_cast<uint8_t>(tools::strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
+                static_cast<uint_least8_t>(tools::strnlen(m_config.display_name, scrutiny::protocol::MAX_DISPLAY_NAME_LENGTH));
 
             code = m_codec.encode_response_comm_discover(&stack.discover.response_data, response);
             break;
@@ -937,7 +952,7 @@ namespace scrutiny
             stack.get_params.response_data.max_bitrate = m_config.max_bitrate;
             stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
             stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US;
-            stack.get_params.response_data.address_size = sizeof(void *);
+            stack.get_params.response_data.address_size = SIZEOF_8BITS(void *);
             code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
             break;
         }
@@ -1158,7 +1173,7 @@ namespace scrutiny
                 {
                     for (uint16_t i = 0; i < stack.write_mem.block.length; i++)
                     {
-                        uint8_t temp;
+                        unsigned char temp;
                         temp = stack.write_mem.block.start_address[i];
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
                         temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
@@ -1437,7 +1452,7 @@ namespace scrutiny
                 "Data won't fit in protocol");
 
             stack.get_setup.response_data.buffer_size = static_cast<uint32_t>(m_config.m_datalogger_buffer_size);
-            stack.get_setup.response_data.data_encoding = static_cast<uint8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
+            stack.get_setup.response_data.data_encoding = static_cast<uint_least8_t>(m_datalogging.datalogger.get_encoder()->get_encoding());
             stack.get_setup.response_data.max_signal_count = SCRUTINY_DATALOGGING_MAX_SIGNAL;
             code = m_codec.encode_response_datalogging_get_setup(&stack.get_setup.response_data, response);
             break;
@@ -1479,17 +1494,17 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->trigger.operand_count; i++)
             {
-                if (config->trigger.operands[i].type == datalogging::OperandType::VAR)
+                if (config->trigger.operands[i].type == datalogging::OperandType::Var)
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
-                            tools::get_type_size(config->trigger.operands[i].data.var.datatype)))
+                            tools::get_type_size_8bits(config->trigger.operands[i].data.var.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
                 }
-                else if (config->trigger.operands[i].type == datalogging::OperandType::VARBIT)
+                else if (config->trigger.operands[i].type == datalogging::OperandType::VarBit)
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.varbit.addr,
@@ -1499,7 +1514,7 @@ namespace scrutiny
                         break;
                     }
                 }
-                else if (config->trigger.operands[i].type == datalogging::OperandType::RPV)
+                else if (config->trigger.operands[i].type == datalogging::OperandType::Rpv)
                 {
 
                     if (!m_config.is_read_published_values_configured() || !rpv_exists(config->trigger.operands[i].data.rpv.id))
@@ -1512,7 +1527,7 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->items_count; i++)
             {
-                if (config->items_to_log[i].type == datalogging::LoggableType::MEMORY)
+                if (config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
                     if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
                     {
@@ -1520,7 +1535,7 @@ namespace scrutiny
                         break;
                     }
                 }
-                else if (config->items_to_log[i].type == datalogging::LoggableType::RPV)
+                else if (config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
                     if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].data.rpv.id))
                     {
@@ -1592,7 +1607,7 @@ namespace scrutiny
                     sizeof(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion),
                 "Data cannot fit in protocol");
 
-            stack.get_status.response_data.state = static_cast<uint8_t>(m_datalogging.threadsafe_data.datalogger_state);
+            stack.get_status.response_data.state = static_cast<uint_least8_t>(m_datalogging.threadsafe_data.datalogger_state);
             stack.get_status.response_data.bytes_to_acquire_from_trigger_to_completion =
                 static_cast<uint32_t>(m_datalogging.threadsafe_data.bytes_to_acquire_from_trigger_to_completion);
             stack.get_status.response_data.write_counter_since_trigger =
@@ -1653,7 +1668,7 @@ namespace scrutiny
 
                 bool finished = false;
                 code = m_codec.encode_response_datalogging_read_acquisition(&stack.read_acquisition.response_data, response, &finished);
-                m_datalogging.read_acquisition_rolling_counter++;
+                m_datalogging.read_acquisition_rolling_counter = (m_datalogging.read_acquisition_rolling_counter + 1) & 0xFF;
 
                 if (code != protocol::ResponseCode::OK)
                 {
@@ -1665,14 +1680,11 @@ namespace scrutiny
                 {
                     m_datalogging.reading_in_progress = false;
                 }
-
-                break;
             }
             else
             {
                 code = protocol::ResponseCode::FailureToProceed;
                 m_datalogging.reading_in_progress = false;
-                break;
             }
             break;
         }

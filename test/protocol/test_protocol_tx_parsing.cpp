@@ -27,11 +27,11 @@ class TestTxParsing : public ScrutinyTest
   protected:
     scrutiny::Timebase tb;
     scrutiny::protocol::CommHandler comm;
-    uint8_t response_buffer[256];
+    unsigned char response_buffer[256];
     scrutiny::protocol::Response response;
 
-    uint8_t _rx_buffer[128];
-    uint8_t _tx_buffer[128];
+    unsigned char _rx_buffer[128];
+    unsigned char _tx_buffer[128];
 
     virtual void SetUp()
     {
@@ -43,7 +43,7 @@ class TestTxParsing : public ScrutinyTest
 
 TEST_F(TestTxParsing, TestReadAllData)
 {
-    uint8_t buf[256];
+    unsigned char buf[256];
 
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
@@ -56,7 +56,7 @@ TEST_F(TestTxParsing, TestReadAllData)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
+    unsigned char expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -72,7 +72,7 @@ TEST_F(TestTxParsing, TestReadAllData)
 
 TEST_F(TestTxParsing, TestReadBytePerByte)
 {
-    uint8_t buf[256];
+    unsigned char buf[256];
 
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
@@ -85,7 +85,7 @@ TEST_F(TestTxParsing, TestReadBytePerByte)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
+    unsigned char expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -105,7 +105,7 @@ TEST_F(TestTxParsing, TestReadBytePerByte)
 
 TEST_F(TestTxParsing, TestReadByChunk)
 {
-    uint8_t buf[256];
+    unsigned char buf[256];
 
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
@@ -118,16 +118,16 @@ TEST_F(TestTxParsing, TestReadByChunk)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
+    unsigned char expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
-    uint8_t chunks[3] = { 3, 6, 3 };
+    uint_least8_t chunks[3] = { 3, 6, 3 };
     ASSERT_EQ(n_to_read, 12u);
 
     uint16_t nread;
-    uint8_t index = 0;
-    for (uint32_t i = 0; i < sizeof(chunks); i++)
+    unsigned char index = 0;
+    for (uint32_t i = 0; i < sizeof(chunks) / sizeof(chunks[0]); i++)
     {
         nread = comm.pop_data(&buf[index], chunks[i]);
         EXPECT_EQ(nread, static_cast<uint32_t>(chunks[i]));
@@ -139,7 +139,7 @@ TEST_F(TestTxParsing, TestReadByChunk)
 
 TEST_F(TestTxParsing, TestReadMoreThanAvailable)
 {
-    uint8_t buf[256];
+    unsigned char buf[256];
 
     response.command_id = 0x81;
     response.subfunction_id = 0x02;
@@ -152,7 +152,7 @@ TEST_F(TestTxParsing, TestReadMoreThanAvailable)
 
     comm.send_response(&response);
 
-    uint8_t expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
+    unsigned char expected_data[12] = { 0x81, 2, 3, 0, 3, 0x11, 0x22, 0x33 };
     add_crc(expected_data, 8);
 
     uint16_t n_to_read = comm.data_to_send();
@@ -184,7 +184,7 @@ TEST_F(TestTxParsing, TestSendsOverflow)
 
 TEST_F(TestTxParsing, TestSendsFullBuffer)
 {
-    uint8_t buf[sizeof(_tx_buffer) + scrutiny::protocol::RESPONSE_OVERHEAD];
+    unsigned char buf[sizeof(_tx_buffer) + scrutiny::protocol::RESPONSE_OVERHEAD];
     SCRUTINY_STATIC_ASSERT(sizeof(_tx_buffer) < 0xFFFF, "buffer too big");
 
     SCRUTINY_CONSTEXPR uint16_t datalen = sizeof(_tx_buffer);
@@ -193,7 +193,7 @@ TEST_F(TestTxParsing, TestSendsFullBuffer)
     response.response_code = 0x03;
     response.data_length = datalen;
     uint16_t i = 0;
-    uint8_t n = 0;
+    uint16_t n = 0;
     for (n = 0, i = 0; i < datalen; i++, n++)
     {
         response.data[i] = n;

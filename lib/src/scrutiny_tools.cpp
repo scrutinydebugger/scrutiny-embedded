@@ -9,19 +9,23 @@
 #include "scrutiny_tools.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
+#include <limits.h>
 #include <stdint.h>
 
 namespace scrutiny
 {
     namespace tools
     {
-        VariableTypeSize::eVariableTypeSize get_required_type_size(uint_fast8_t const size)
+        VariableTypeSize::eVariableTypeSize get_required_type_size_8bits(uint_fast8_t const size)
         {
+#if CHAR_BIT == 8
             if (size <= 1)
             {
                 return VariableTypeSize::_8;
             }
-            else if (size <= 2)
+            else
+#endif
+                if (size <= 2)
             {
                 return VariableTypeSize::_16;
             }
@@ -47,10 +51,50 @@ namespace scrutiny
             }
         }
 
+        VariableTypeSize::eVariableTypeSize get_required_type_size_char(uint_fast8_t const size)
+        {
+#if CHAR_BIT == 8
+            if (size <= sizeof(uint8_t))
+            {
+                return VariableTypeSize::_8;
+            }
+            else
+#endif
+                if (size <= 2 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_16;
+            }
+            else if (size <= 4 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_32;
+            }
+            else if (size <= 8 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_64;
+            }
+            else if (size <= 16 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_128;
+            }
+            else if (size <= 32 / (CHAR_BIT / 8))
+            {
+                return VariableTypeSize::_256;
+            }
+            else
+            {
+                return VariableTypeSize::_undef;
+            }
+        }
+
         bool is_supported_type(VariableType::eVariableType const vt)
         {
             VariableTypeType::eVariableTypeType tt = get_var_type_type(vt);
-            uint8_t ts = get_type_size(vt);
+            uint_least8_t ts = get_type_size_8bits(vt);
+
+            if (vt == VariableType::boolean) // Native bool. Unknown size.
+            {
+                return true;
+            }
 
             if (ts == 0)
             {
@@ -70,9 +114,16 @@ namespace scrutiny
             }
 #endif
 
+#if CHAR_BIT > 8
+            if (ts == 1)
+            {
+                return false;
+            }
+#endif
+
             if (tt == VariableTypeType::_boolean)
             {
-                return (ts == 1);
+                return (ts == tools::get_platform_boolean_size_8bits()); // We can only read native bool
             }
             else if (tt == VariableTypeType::_float)
             {
@@ -88,13 +139,13 @@ namespace scrutiny
             }
         }
 
-        uint32_t crc32(uint8_t const *data, uint32_t const size, uint32_t const start_value)
+        uint32_t crc32(unsigned char const *data, uint32_t const size, uint32_t const start_value)
         {
             uint32_t crc = ~start_value;
 
             for (uint32_t i = 0; i < size; i++)
             {
-                uint8_t byte = data[i];
+                unsigned char byte = data[i] & 0xFF;
                 for (unsigned int j = 0; j < 8; j++)
                 {
                     const unsigned int lsb = (byte ^ crc) & 1;
