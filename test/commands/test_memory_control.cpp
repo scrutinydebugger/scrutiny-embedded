@@ -243,6 +243,38 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
     }
 }
 
+TEST_F(TestMemoryControl, TestReadLengthCauseInternalOverflow)
+{
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(void *);
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid_request = scrutiny::protocol::ResponseCode::InvalidRequest;
+
+    unsigned char tx_buffer[16] = { 0 };
+    unsigned char some_buffer[16] = { 0 };
+    uint16_t buf1_size = 0xFFFF;
+
+    // Building request
+    unsigned char request_data[64] = { static_cast<unsigned char>(cmd), subfn, 0, (addr_size + 2) };
+    unsigned int index = 4;
+    index += encode_addr(&request_data[index], &some_buffer);
+    request_data[index++] = static_cast<unsigned char>(buf1_size >> 8);
+    request_data[index++] = static_cast<unsigned char>(buf1_size >> 0);
+
+    uint16_t length_to_receive = 8 + (addr_size + 2);
+    add_crc(request_data, length_to_receive - 4);
+
+    scrutiny_handler.receive_data(request_data, length_to_receive);
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid_request);
+}
+
 /*
 We try to read a forbidden memory region and expects to be responded with a "Forbidden" response code.
 We define a buffer of 16 bytes. We forbid access to 4 bytes in the middle then try to read a window

@@ -261,6 +261,7 @@ namespace scrutiny
                     m_entry_size += elem_size;
                 }
             }
+
             if (m_entry_size > 0)
             {
                 m_max_entries = m_buffer_size / m_entry_size;

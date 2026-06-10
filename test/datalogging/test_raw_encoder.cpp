@@ -25,6 +25,14 @@ static struct
     unsigned char canary2[128];
 } dlbuffer;
 
+static bool rpv_read_callback_always_fail(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval, scrutiny::LoopHandler *const caller)
+{
+    static_cast<void>(rpv);
+    static_cast<void>(outval);
+    static_cast<void>(caller);
+    return false;
+}
+
 class TestRawEncoder : public ScrutinyTest
 {
   protected:
@@ -120,7 +128,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
     SCRUTINY_CONSTEXPR size_t single_entry_size = sizeof(var1) + sizeof(var2) + sizeof(scrutiny::timestamp_t);
     EXPECT_EQ(reader->get_entry_count(), 3u);
     EXPECT_EQ(reader->get_total_size_char(), single_entry_size * 3u); // entry_size*entry_count
-    EXPECT_EQ(reader->get_total_size_char_8bits(), single_entry_size * 3u * CHAR_BIT / 8);
+    EXPECT_EQ(reader->get_total_size_8bits(), single_entry_size * 3u * CHAR_BIT / 8);
 
     uint32_t expected_time;
 
@@ -148,7 +156,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
     scrutiny::codecs::encode_32_bits_big_endian_8bits(expected_time, &compare_buf[32]);
 
     unsigned char const chunk_size = sizeof(dst_buffer);
-    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size_char_8bits()) / chunk_size + 0.5f);
+    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size_8bits()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
     for (unsigned char i = 0; i < nbchunk; i++)
     {
@@ -165,8 +173,55 @@ TEST_F(TestRawEncoder, BasicEncoding)
         }
     }
 
-    EXPECT_EQ(total_read, reader->get_total_size_char_8bits());
+    EXPECT_EQ(total_read, reader->get_total_size_8bits());
     CHECK_CANARIES;
+}
+
+TEST_F(TestRawEncoder, RpvCallbackFailureZerosEntry)
+{
+    Timebase timebase;
+    RuntimePublishedValue rpvs[1];
+    rpvs[0].id = 0x1234;
+    rpvs[0].type = VariableType::uint32;
+
+    // Re-initialize handler with one RPV and a callback that always returns false.
+    config.set_published_values(rpvs, 1, rpv_read_callback_always_fail);
+    scrutiny_handler.init(&config);
+
+    dlconfig.items_count = 1;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::Rpv;
+    dlconfig.items_to_log[0].data.rpv.id = 0x1234;
+
+    // dlbuffer.data is pre-filled with 0xFF by SetUp() — any non-zero residue would be visible.
+    encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(dlbuffer.data));
+    encoder.set_timebase(&timebase);
+    ASSERT_FALSE(encoder.error());
+
+    encoder.encode_next_entry(SCRUTINY_NULL);
+
+    // Entry is sizeof(uint32_t) native chars. Callback failure must zero those bytes.
+    EXPECT_BUF_SET(dlbuffer.data, 0, sizeof(uint32_t));
+    CHECK_CANARIES;
+}
+
+TEST_F(TestRawEncoder, BufferTooSmallForSingleEntry)
+{
+    uint32_t var1 = 0x12345678;
+    uint32_t var2 = 0x9abcdef0;
+
+    // Two memory items: entry_size = 2 * sizeof(uint32_t) on any platform.
+    dlconfig.items_count = 2;
+    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].data.memory.address = &var1;
+    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].data.memory.address = &var2;
+
+    // Buffer holds only half an entry: m_max_entries = 0, encoder must report error.
+    encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(var1));
+
+    EXPECT_TRUE(encoder.error());
 }
 
 #endif
