@@ -86,8 +86,8 @@ namespace scrutiny
             return output_cursor_8bits;
         }
 
-        /// @brief Returns the total number of bytes that the reader will read
-        datalogging::buffer_size_t RawFormatReader::get_total_size(void) const
+        /// @brief Returns the total number of bytes that the reader will read in char
+        datalogging::buffer_size_t RawFormatReader::get_total_size_char(void) const
         {
             if (error())
             {
@@ -156,12 +156,16 @@ namespace scrutiny
                     RuntimePublishedValue rpv;
                     AnyType outval;
                     uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
-                    m_main_handler->get_rpv(rpv_id, &rpv);
-                    m_main_handler->get_rpv_read_callback()(
+                    m_main_handler->get_rpv(rpv_id, &rpv); // assumed valid because of config validation
+                    bool const success = m_main_handler->get_rpv_read_callback()(
                         rpv,
                         &outval,
                         caller); // We assume that this is not nullptr. We rely on datalogger::configure
 
+                    if (!success)
+                    {
+                        tools::set_biggest_uint(outval, 0);
+                    }
                     cursor += codecs::encode_anytype_big_endian_char(&outval, rpv.type, &m_buffer[cursor]);
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
@@ -266,6 +270,10 @@ namespace scrutiny
                 m_error = true;
             }
 
+            if (m_max_entries == 0)
+            {
+                m_error = true;
+            }
             m_reader.reset();
         }
 

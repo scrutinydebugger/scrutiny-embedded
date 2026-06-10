@@ -273,8 +273,8 @@ namespace scrutiny
                     uint16_t data_rx_buffer_size;
                     uint16_t data_tx_buffer_size;
                     uint32_t max_bitrate;
-                    uint32_t comm_rx_timeout;
                     uint32_t heartbeat_timeout;
+                    uint32_t comm_rx_timeout;
                     uint_least8_t address_size;
                 };
                 struct Connect

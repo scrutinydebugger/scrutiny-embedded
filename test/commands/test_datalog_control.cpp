@@ -809,7 +809,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     cursor += codecs::encode_16_bits_big_endian_8bits(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
     cursor += codecs::encode_16_bits_big_endian_8bits((uint16_t)0xabcd, &expected_response[cursor]);
     cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_entry_count(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_total_size(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_total_size_char(), &expected_response[cursor]);
     cursor +=
         codecs::encode_32_bits_big_endian_8bits((uint32_t)scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -890,7 +890,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionOneTransfer)
     unsigned char raw_data[sizeof(dlbuffer) * (CHAR_BIT / 8)];
     uint32_t data_count = reader->read_dilate_8bits(raw_data, sizeof(raw_data));
     EXPECT_GT(data_count, static_cast<float>(sizeof(dlbuffer)) * 0.9f);
-    ASSERT_EQ(data_count, reader->get_total_size_8bits());
+    ASSERT_EQ(data_count, reader->get_total_size_char_8bits());
     ASSERT_EQ(data_count, payload_length - 8); // header=4. Crc=4
 
     EXPECT_BUF_EQ(&out_buffer[9], raw_data, data_count);

@@ -119,8 +119,8 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     SCRUTINY_CONSTEXPR size_t single_entry_size = sizeof(var1) + sizeof(var2) + sizeof(scrutiny::timestamp_t);
     EXPECT_EQ(reader->get_entry_count(), 3u);
-    EXPECT_EQ(reader->get_total_size(), single_entry_size * 3u); // entry_size*entry_count
-    EXPECT_EQ(reader->get_total_size_8bits(), single_entry_size * 3u * CHAR_BIT / 8);
+    EXPECT_EQ(reader->get_total_size_char(), single_entry_size * 3u); // entry_size*entry_count
+    EXPECT_EQ(reader->get_total_size_char_8bits(), single_entry_size * 3u * CHAR_BIT / 8);
 
     uint32_t expected_time;
 
@@ -148,7 +148,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
     scrutiny::codecs::encode_32_bits_big_endian_8bits(expected_time, &compare_buf[32]);
 
     unsigned char const chunk_size = sizeof(dst_buffer);
-    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size_8bits()) / chunk_size + 0.5f);
+    unsigned char const nbchunk = static_cast<unsigned char>(static_cast<float>(reader->get_total_size_char_8bits()) / chunk_size + 0.5f);
     uint32_t total_read = 0;
     for (unsigned char i = 0; i < nbchunk; i++)
     {
@@ -165,7 +165,7 @@ TEST_F(TestRawEncoder, BasicEncoding)
         }
     }
 
-    EXPECT_EQ(total_read, reader->get_total_size_8bits());
+    EXPECT_EQ(total_read, reader->get_total_size_char_8bits());
     CHECK_CANARIES;
 }
 

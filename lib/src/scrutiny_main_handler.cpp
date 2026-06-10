@@ -1637,7 +1637,7 @@ namespace scrutiny
             stack.get_acq_metadata.response_data.acquisition_id = m_datalogging.datalogger.get_acquisition_id();
             stack.get_acq_metadata.response_data.config_id = m_datalogging.datalogger.get_config_id();
             stack.get_acq_metadata.response_data.number_of_points = reader->get_entry_count();
-            stack.get_acq_metadata.response_data.data_size = reader->get_total_size();
+            stack.get_acq_metadata.response_data.data_size = reader->get_total_size_char();
             stack.get_acq_metadata.response_data.points_after_trigger = m_datalogging.datalogger.log_points_after_trigger();
             code = m_codec.encode_response_datalogging_get_acquisition_metadata(&stack.get_acq_metadata.response_data, response);
             break;
