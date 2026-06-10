@@ -44,25 +44,42 @@ class TestMemoryControl : public ScrutinyTest
 TEST_F(TestMemoryControl, TestReadSingleAddress)
 {
     // Building request
+    #if CHAR_BIT == 8
     unsigned char data_buf[] = { 0x11, 0x22, 0x33 };
+    #elif CHAR_BIT == 16
+    unsigned char data_buf[] = { 0x1122, 0x3344, 0x5566 };
+    #endif
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
-    SCRUTINY_CONSTEXPR uint16_t data_size = sizeof(data_buf);
+    SCRUTINY_CONSTEXPR uint16_t data_size_8bits = SIZEOF_8BITS(data_buf);
     unsigned char request_data[8 + addr_size + 2] = { 3, 1, 0, addr_size + 2 };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], data_buf);
-    request_data[index++] = (data_size >> 8) & 0xFF;
-    request_data[index++] = (data_size >> 0) & 0xFF;
+    request_data[index++] = (data_size_8bits >> 8) & 0xFF;
+    request_data[index++] = (data_size_8bits >> 0) & 0xFF;
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Building expected response
     unsigned char tx_buffer[32];
-    SCRUTINY_CONSTEXPR uint16_t datalen = addr_size + 2 + data_size;
+    SCRUTINY_CONSTEXPR uint16_t datalen = addr_size + 2 + data_size_8bits;
     unsigned char expected_response[9 + datalen] = { 0x83, 1, 0, 0, datalen };
     index = 5;
     index += encode_addr(&expected_response[index], data_buf);
-    expected_response[index++] = (data_size >> 8) & 0xFF;
-    expected_response[index++] = (data_size >> 0) & 0xFF;
-    std::memcpy(&expected_response[index], data_buf, data_size);
+    expected_response[index++] = (data_size_8bits >> 8) & 0xFF;
+    expected_response[index++] = (data_size_8bits >> 0) & 0xFF;
+
+#if CHAR_BIT == 8    
+    expected_response[index++] = 0x11;
+    expected_response[index++] = 0x22;
+    expected_response[index++] = 0x33;
+#elif CHAR_BIT == 16
+    // Protocol is big endian
+    expected_response[index++] = 0x11;
+    expected_response[index++] = 0x22;
+    expected_response[index++] = 0x33;    
+    expected_response[index++] = 0x44;    
+    expected_response[index++] = 0x55;    
+    expected_response[index++] = 0x66;
+#endif
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
