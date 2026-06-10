@@ -48,6 +48,14 @@ namespace scrutiny
                 length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
                 cursor += 2;
 
+#if CHAR_BIT == 16
+                if (length & 1u > 0)
+                {
+                    m_invalid = true;
+                    return;
+                }
+#endif
+
                 if (static_cast<uint32_t>(addr_size) + 2u + length > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
                 {
                     m_invalid = true;
@@ -78,7 +86,7 @@ namespace scrutiny
             uintptr_t addr;
             if (m_finished || m_invalid)
             {
-                return;
+                return; 
             }
 
             if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - m_bytes_read))

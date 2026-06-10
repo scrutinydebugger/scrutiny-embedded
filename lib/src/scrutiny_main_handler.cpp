@@ -1176,17 +1176,16 @@ namespace scrutiny
                 {
                     for (uint16_t i = 0; i < stack.write_mem.block.length_char(); i++)
                     {
-                        // TODO : check 16 bits char
                         unsigned char temp;
                         temp = stack.write_mem.block.start_address[i];
 #if CHAR_BIT == 8
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
                         temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
 #elif CHAR_BIT == 16
-                        temp |= (stack.write_mem.block.source_data[2 * i] & stack.write_mem.block.mask[2 * i]);            // Bit to 1
-                        temp &= (stack.write_mem.block.source_data[2 * i] | (~stack.write_mem.block.mask[2 * i]));         // Bit to 0
-                        temp |= (stack.write_mem.block.source_data[2 * i + 1] & stack.write_mem.block.mask[2 * i + 1]);    // Bit to 1
-                        temp &= (stack.write_mem.block.source_data[2 * i + 1] | (~stack.write_mem.block.mask[2 * i + 1])); // Bit to 0
+                        unsigned char const val16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
+                        unsigned char const mask16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.mask[2 * i]);
+                        temp |= (val16bits & mask16bits);            // Bit to 1
+                        temp &= (val16bits | (~mask16bits));         // Bit to 0
 #else
 #error
 #endif
