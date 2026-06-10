@@ -1184,8 +1184,8 @@ namespace scrutiny
 #elif CHAR_BIT == 16
                         unsigned char const val16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
                         unsigned char const mask16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.mask[2 * i]);
-                        temp |= (val16bits & mask16bits);            // Bit to 1
-                        temp &= (val16bits | (~mask16bits));         // Bit to 0
+                        temp |= (val16bits & mask16bits);    // Bit to 1
+                        temp &= (val16bits | (~mask16bits)); // Bit to 0
 #else
 #error
 #endif

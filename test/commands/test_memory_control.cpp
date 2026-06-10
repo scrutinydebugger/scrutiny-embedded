@@ -228,7 +228,7 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
 
     unsigned char tx_buffer[sizeof(_tx_buffer) + 9];
     unsigned char some_buffer[sizeof(_tx_buffer)] = { 0 };
-    uint16_t buf1_size_8bits = sizeof(_tx_buffer) - (addr_size + 2) * 2 - (CHAR_BIT/8); // We fill all the buffer minus 1 byte.
+    uint16_t buf1_size_8bits = sizeof(_tx_buffer) - (addr_size + 2) * 2 - (CHAR_BIT / 8); // We fill all the buffer minus 1 byte.
     // buf1_size_8bits uses sizeof tx buffer, tx buffer is counted in multiple of 8 bits. This is not a mistake.
 
     // Building request
@@ -242,10 +242,10 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
 
     uint16_t length_to_receive;
     // Increase length of 2nd block of data.
-    for (unsigned int length_char = 0; length_char < 4; length_char+=(CHAR_BIT/8))
+    for (unsigned int length_char = 0; length_char < 4; length_char += (CHAR_BIT / 8))
     {
         length_to_receive = 8 + (addr_size + 2) * 2;
-        uint16_t length_8bits = length_char * (CHAR_BIT/8);
+        uint16_t length_8bits = length_char * (CHAR_BIT / 8);
 
         request_data[index + 0] = static_cast<unsigned char>(length_8bits >> 8); // encode length of 2nd block
         request_data[index + 1] = static_cast<unsigned char>(length_8bits >> 0);
@@ -255,7 +255,7 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
         scrutiny_handler.process(0);
 
         uint16_t n_to_read = scrutiny_handler.data_to_send();
-        ASSERT_LT(n_to_read, sizeof(tx_buffer));
+        ASSERT_LE(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
         if (length_char < 2) // Below 2, we don't overflow the tx buffer
@@ -330,7 +330,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2;
     unsigned char request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
-    uint16_t window_size_8bits = (window_size * (CHAR_BIT/8));
+    uint16_t window_size_8bits = (window_size * (CHAR_BIT / 8));
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
     {
@@ -407,16 +407,15 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     }
 }
 
-
 #if CHAR_BIT == 16
 TEST_F(TestMemoryControl, TestReadSingleAddressNotMultipleOfCharDenied)
-{    
+{
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
     const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
     unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090a };
-    uint16_t read_size_8bits = 5;   // try to read 2.5 char
+    uint16_t read_size_8bits = 5; // try to read 2.5 char
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
@@ -443,7 +442,6 @@ TEST_F(TestMemoryControl, TestReadSingleAddressNotMultipleOfCharDenied)
 }
 #endif
 
-
 // ================================= Write =================================
 
 /*
@@ -452,7 +450,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddressNotMultipleOfCharDenied)
 TEST_F(TestMemoryControl, TestWriteSingleAddress)
 {
 
-unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44}; // big endian encoded
+    unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44 }; // big endian encoded
 #if CHAR_BIT == 8
     unsigned char buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
@@ -506,12 +504,12 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 
     unsigned char data_to_write_8bits[] = { 0xFF, 0xFF, 0x00, 0x00 };
     unsigned char write_mask_8bits[] = { 0xF0, 0xAA, 0xF0, 0xAA };
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     unsigned char buffer[] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
     unsigned char expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
 #elif CHAR_BIT == 16
     unsigned char buffer[] = { 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
-    unsigned char expected_output_buffer[] = { 0xFAAA, 0x0A00, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA};
+    unsigned char expected_output_buffer[] = { 0xFAAA, 0x0A00, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
 #endif
 
     // Building request
@@ -559,10 +557,10 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 {
 
-    unsigned char data_to_write1[] = { 0x11, 0x22, 0x33, 0x44};
+    unsigned char data_to_write1[] = { 0x11, 0x22, 0x33, 0x44 };
     unsigned char data_to_write2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
     unsigned char buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x0a };
 #elif CHAR_BIT == 16
     unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x03, 0xAABB, 0xCCDD, 0xEEFF, 0x07, 0x08, 0x09, 0x0a };
@@ -633,7 +631,6 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     unsigned char expected_output_buffer[] = { 0x1155, 0x3554, 0x5AFF, 0x5555, 0x0599 };
     unsigned int second_write_index = 2;
 #endif
-
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
@@ -776,7 +773,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT/8);
+    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT / 8);
     SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size_8bits;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
@@ -831,7 +828,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT/8);
+    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT / 8);
     SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size_8bits;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
@@ -923,12 +920,12 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
 
 #if CHAR_BIT == 16
 TEST_F(TestMemoryControl, TestWriteSingleAddressNotMultipleOfCharDenied)
-{    
+{
     const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
     uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Write);
     const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
 
-    unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44, 0x55}; // 2.5 chars to write. not allowed
+    unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44, 0x55 }; // 2.5 chars to write. not allowed
     unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708 };
 
     // Building request

@@ -86,7 +86,7 @@ namespace scrutiny
             uintptr_t addr;
             if (m_finished || m_invalid)
             {
-                return; 
+                return;
             }
 
             if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - m_bytes_read))
