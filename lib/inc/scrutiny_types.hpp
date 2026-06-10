@@ -180,10 +180,10 @@ namespace scrutiny
         unsigned char *source_data;
         unsigned char *mask;
 
-        inline uint16_t length_8bits(void) const { return length * (CHAR_BIT/8);}
+        inline uint16_t length_8bits(void) const { return length * (CHAR_BIT / 8); }
     };
 
-    /// @brief Represents a memory block with data/mask pointer where the data is encoded with 8bits per char. 
+    /// @brief Represents a memory block with data/mask pointer where the data is encoded with 8bits per char.
     /// Mainly used for memory write operations.
     struct MemoryBlock8Bits
     {
@@ -192,7 +192,7 @@ namespace scrutiny
         unsigned char *source_data;
         unsigned char *mask;
 
-        inline uint16_t length_char(void) const { return length / (CHAR_BIT/8);}
+        inline uint16_t length_char(void) const { return length / (CHAR_BIT / 8); }
     };
 } // namespace scrutiny
 

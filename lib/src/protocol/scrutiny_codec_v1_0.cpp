@@ -93,8 +93,8 @@ namespace scrutiny
             length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
-            memblock->start_address = reinterpret_cast<unsigned char *>(addr);
-            memblock->length = length_8bits;
+            memblock_8bits->start_address = reinterpret_cast<unsigned char *>(addr);
+            memblock_8bits->length = length_8bits;
 
             if (m_bytes_read == m_request_datasize)
             {
@@ -148,7 +148,7 @@ namespace scrutiny
                 if (length_8bits & 1U > 0)
                 {
                     m_invalid = true;
-                    return;                    
+                    return;
                 }
 #endif
 
@@ -173,7 +173,7 @@ namespace scrutiny
             }
         }
 
-        void WriteMemoryBlocksRequestParser::next(MemoryBlock *const memblock)
+        void WriteMemoryBlocksRequestParser::next(MemoryBlock8Bits *const memblock_8bits)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             uint16_t length_8bits;
@@ -192,6 +192,7 @@ namespace scrutiny
 
             codecs::decode_address_big_endian_8bits(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
+            // We expect the length to match the protocol. Therefore, the length should be the number of 8bits block
             length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
@@ -203,19 +204,19 @@ namespace scrutiny
                 return;
             }
 
-            memblock->start_address = reinterpret_cast<unsigned char *>(addr);
-            memblock->source_data_8bits = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
+            memblock_8bits->start_address = reinterpret_cast<unsigned char *>(addr);
+            memblock_8bits->source_data = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
             m_bytes_read += length_8bits;
             if (m_masked_write)
             {
-                memblock->mask_8bits = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
+                memblock_8bits->mask = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
                 m_bytes_read += length_8bits;
             }
             else
             {
-                memblock->mask_8bits = SCRUTINY_NULL;
+                memblock_8bits->mask = SCRUTINY_NULL;
             }
-            memblock->length_8bits = length_8bits;
+            memblock_8bits->length = length_8bits;
 
             if (m_bytes_read == m_size_limit)
             {
@@ -241,26 +242,26 @@ namespace scrutiny
             reset();
         }
 
-        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
+        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
 
-            if (memblock->length_8bits > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2) // Make sure that the addition below doesn't blow up
+            if (memblock_8bits->length > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2) // Make sure that the addition below doesn't blow up
             {
                 m_overflow = true;
                 return;
             }
 
-            if (addr_size + 2 + memblock->length_8bits > static_cast<uint16_t>(m_size_limit - m_cursor))
+            if (addr_size + 2 + memblock_8bits->length > static_cast<uint16_t>(m_size_limit - m_cursor))
             {
                 m_overflow = true;
                 return;
             }
 
-            m_cursor += codecs::encode_address_big_endian_8bits(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock->length_8bits, &m_buffer[m_cursor]);
-            tools::memcpy_dilate_8bits(&m_buffer[m_cursor], memblock->start_address, memblock->length);
-            m_cursor += memblock->length;
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
+            tools::memcpy_dilate_8bits(&m_buffer[m_cursor], memblock_8bits->start_address, memblock_8bits->length);
+            m_cursor += memblock_8bits->length;
 
             m_response->data_length = m_cursor;
         }
@@ -281,7 +282,7 @@ namespace scrutiny
             reset();
         }
 
-        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock const *const memblock)
+        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
 
@@ -291,8 +292,8 @@ namespace scrutiny
                 return;
             }
 
-            m_cursor += codecs::encode_address_big_endian_8bits(memblock->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock->length, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
             m_response->data_length = static_cast<uint16_t>(m_cursor);
         }
 

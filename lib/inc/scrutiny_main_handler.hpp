@@ -176,12 +176,25 @@ namespace scrutiny
         void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
-        bool touches_forbidden_region(MemoryBlockNative const *const block) const;
         bool touches_forbidden_region(void const *const addr_start, size_t const length_char) const;
-        bool touches_readonly_region(MemoryBlockNative const *const block) const;
         bool touches_readonly_region(void const *const addr_start, size_t const length_char) const;
-        bool touches_forbidden_region(MemoryBlock8Bits const *const block) const;
-        bool touches_readonly_region(MemoryBlock8Bits const *const block) const;
+
+        inline bool touches_forbidden_region(MemoryBlockNative const *const block) const
+        {
+            return touches_forbidden_region(block->start_address, block->length);
+        }
+        inline bool touches_readonly_region(MemoryBlockNative const *const block) const
+        {
+            return touches_readonly_region(block->start_address, block->length);
+        }
+        inline bool touches_forbidden_region(MemoryBlock8Bits const *const block) const
+        {
+            return touches_forbidden_region(block->start_address, block->length / (CHAR_BIT / 8)); // length in char
+        }
+        inline bool touches_readonly_region(MemoryBlock8Bits const *const block) const
+        {
+            return touches_readonly_region(block->start_address, block->length / (CHAR_BIT / 8)); // length in char
+        }
         Status::eStatus check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time

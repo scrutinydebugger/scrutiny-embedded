@@ -43,12 +43,12 @@ class TestMemoryControl : public ScrutinyTest
 */
 TEST_F(TestMemoryControl, TestReadSingleAddress)
 {
-    // Building request
-    #if CHAR_BIT == 8
+// Building request
+#if CHAR_BIT == 8
     unsigned char data_buf[] = { 0x11, 0x22, 0x33 };
-    #elif CHAR_BIT == 16
+#elif CHAR_BIT == 16
     unsigned char data_buf[] = { 0x1122, 0x3344, 0x5566 };
-    #endif
+#endif
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
     SCRUTINY_CONSTEXPR uint16_t data_size_8bits = SIZEOF_8BITS(data_buf);
     unsigned char request_data[8 + addr_size + 2] = { 3, 1, 0, addr_size + 2 };
@@ -68,7 +68,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     expected_response[index++] = (data_size_8bits >> 0) & 0xFF;
 
     // Manually encode the response to guarantee big endianness
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     expected_response[index++] = 0x11;
     expected_response[index++] = 0x22;
     expected_response[index++] = 0x33;
@@ -76,9 +76,9 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     // Protocol is big endian
     expected_response[index++] = 0x11;
     expected_response[index++] = 0x22;
-    expected_response[index++] = 0x33;    
-    expected_response[index++] = 0x44;    
-    expected_response[index++] = 0x55;    
+    expected_response[index++] = 0x33;
+    expected_response[index++] = 0x44;
+    expected_response[index++] = 0x55;
     expected_response[index++] = 0x66;
 #endif
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -103,7 +103,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
 */
 TEST_F(TestMemoryControl, TestReadMultipleAddress)
 {
-#if CHAR_BIT == 8    
+#if CHAR_BIT == 8
     unsigned char data_buf1[] = { 0x11, 0x22, 0x33 };
     unsigned char data_buf2[] = { 0x12, 0x34, 0x56, 0x78 };
     unsigned char data_buf3[] = { 0x13, 0x24 };
@@ -417,11 +417,10 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44 };
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
 #elif CHAR_BIT == 16
-    unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };    
+    unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
     unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88 }; // big endian encoded
     unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x5566, 0x7788, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
 #endif
-
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);

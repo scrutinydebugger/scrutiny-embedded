@@ -1032,12 +1032,12 @@ namespace scrutiny
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
                 protocol::ReadMemoryBlocksResponseEncoder *readmem_encoder;
-                MemoryBlock block;
+                MemoryBlock8Bits block;
             } read_mem;
 
             struct
             {
-                MemoryBlock block;
+                MemoryBlock8Bits block;
                 protocol::WriteMemoryBlocksRequestParser *writemem_parser;
                 protocol::WriteMemoryBlocksResponseEncoder *writemem_encoder;
             } write_mem;
@@ -1167,7 +1167,10 @@ namespace scrutiny
 
                 if (!masked)
                 {
-                    tools::memcpy_compress_from_8bits(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
+                    tools::memcpy_compress_from_8bits(
+                        stack.write_mem.block.start_address,
+                        stack.write_mem.block.source_data,
+                        stack.write_mem.block.length);
                 }
                 else
                 {
@@ -1305,11 +1308,6 @@ namespace scrutiny
         return code;
     }
 
-    bool MainHandler::touches_forbidden_region(MemoryBlock const *const block) const
-    {
-        return touches_forbidden_region(block->start_address, block->length);
-    }
-
     bool MainHandler::touches_forbidden_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_forbidden_address_range_set())
@@ -1335,11 +1333,6 @@ namespace scrutiny
             }
         }
         return false;
-    }
-
-    bool MainHandler::touches_readonly_region(MemoryBlock const *const block) const
-    {
-        return touches_readonly_region(block->start_address, block->length);
     }
 
     bool MainHandler::touches_readonly_region(void const *const addr_start, size_t const length) const
