@@ -445,6 +445,14 @@ TEST_F(TestDatalogControl, TestConfigureOperandCountMismatch)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
 }
 
+TEST_F(TestDatalogControl, TestBadDecimation)
+{
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.decimation = 0; // Not supported
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
+
 TEST_F(TestDatalogControl, TestConfigureBadOperands)
 {
 
@@ -809,7 +817,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     cursor += codecs::encode_16_bits_big_endian_8bits(scrutiny_handler.datalogger()->get_acquisition_id(), &expected_response[cursor]);
     cursor += codecs::encode_16_bits_big_endian_8bits((uint16_t)0xabcd, &expected_response[cursor]);
     cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_entry_count(), &expected_response[cursor]);
-    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_total_size(), &expected_response[cursor]);
+    cursor += codecs::encode_32_bits_big_endian_8bits((uint32_t)reader->get_total_size_char(), &expected_response[cursor]);
     cursor +=
         codecs::encode_32_bits_big_endian_8bits((uint32_t)scrutiny_handler.datalogger()->log_points_after_trigger(), &expected_response[cursor]);
     add_crc(expected_response, sizeof(expected_response) - 4);

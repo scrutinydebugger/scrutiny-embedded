@@ -115,6 +115,11 @@ namespace scrutiny
                 m_config_valid = false;
             }
 
+            if (m_config.decimation == 0)
+            {
+                m_config_valid = false;
+            }
+
             // Size are consistent so far, we can read the operand and items definition without crashing anything
             if (m_config_valid)
             {
@@ -149,8 +154,8 @@ namespace scrutiny
                     else if (m_config.trigger.operands[i].type == OperandType::VarBit)
                     {
                         // Works with and without 64bits support
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * 8 - 1) ||
-                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * 8)
+                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * CHAR_BIT - 1) ||
+                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT)
                         {
                             m_config_valid = false;
                         }

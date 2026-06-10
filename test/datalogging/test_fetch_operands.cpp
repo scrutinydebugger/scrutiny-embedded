@@ -38,13 +38,13 @@ class TestFetchOperands : public ScrutinyTest
     scrutiny::MainHandler scrutiny_handler;
     scrutiny::Config config;
 
-    unsigned char _rx_buffer[128];
-    unsigned char _tx_buffer[128];
+    uint8_t _rx_buffer[128];
+    uint8_t _tx_buffer[128];
 
-    unsigned char forbidden_buffer[128];
-    unsigned char forbidden_buffer2[128];
-    unsigned char readonly_buffer[128];
-    unsigned char readonly_buffer2[128];
+    uint8_t forbidden_buffer[128];
+    uint8_t forbidden_buffer2[128];
+    uint8_t readonly_buffer[128];
+    uint8_t readonly_buffer2[128];
 
     scrutiny::AddressRange readonly_ranges[2];
     scrutiny::AddressRange forbidden_ranges[2];

@@ -555,7 +555,7 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
         datalogging::DataReader *reader = datalogger.get_reader();
         reader->reset();
 
-        EXPECT_GE(reader->get_total_size(), 9 * sizeof(dlbuffer.data) / 10) << error_msg; // 90% usage at least
+        EXPECT_GE(reader->get_total_size_char(), 9 * sizeof(dlbuffer.data) / 10) << error_msg; // 90% usage at least
     }
 }
 

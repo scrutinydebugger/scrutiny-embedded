@@ -48,6 +48,12 @@ namespace scrutiny
                 length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
                 cursor += 2;
 
+                if ((addr_size + 2 + length) > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
+                {
+                    m_invalid = true;
+                    return;
+                }
+
                 m_required_tx_buffer_size += addr_size + 2 + length;
 
                 if (cursor == m_request_datasize)
@@ -118,7 +124,7 @@ namespace scrutiny
         void WriteMemoryBlocksRequestParser::validate(void)
         {
             SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-            uint16_t cursor = 0;
+            uint32_t cursor = 0;
 
             while (true)
             {
@@ -132,6 +138,12 @@ namespace scrutiny
                 cursor += addr_size;
                 length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
                 cursor += 2;
+                if (length > static_cast<uint16_t>(m_size_limit - cursor))
+                {
+                    m_invalid = true;
+                    return;
+                }
+
                 cursor += length;
                 if (m_masked_write)
                 {
@@ -176,7 +188,7 @@ namespace scrutiny
             m_bytes_read += 2;
 
             if ((length > static_cast<uint16_t>(m_size_limit - m_bytes_read)) ||
-                (m_masked_write && (length << 1) > static_cast<uint16_t>(m_size_limit - m_bytes_read)))
+                (m_masked_write && length > static_cast<uint16_t>((m_size_limit - m_bytes_read) >> 1)))
             {
                 m_invalid = true;
                 m_finished = true;
@@ -303,7 +315,7 @@ namespace scrutiny
             VariableType::eVariableType vtype = rpv->type;
             if (rpv->type == VariableType::boolean)
             {
-                // The embedded lib suer may use "boolean" which has no size.
+                // The embedded lib user may use "boolean" which has no size.
                 // We need to tell the server the real size of it so it can encode data
                 // while writing. Convert to boolean8, boolean16 or boolean32
                 // bool size is compiler specific. can be 8bits or int.
@@ -340,7 +352,11 @@ namespace scrutiny
                 return;
             }
 
-            if (typesize == 1u || typesize == 2u || typesize == 4u
+            if (
+#if CHAR_BIT == 8
+                typesize == 1u ||
+#endif
+                typesize == 2u || typesize == 4u
 #if SCRUTINY_SUPPORT_64BITS
                 || typesize == 8u
 #endif
@@ -636,8 +652,12 @@ namespace scrutiny
             Request const *const request,
             RequestData::GetInfo::GetSpecialMemoryRegionLocation *const request_data)
         {
-            request_data->region_type = request->data[0];
-            request_data->region_index = request->data[1];
+            if (request->data_length != 2)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+            request_data->region_type = request->data[0] & 0xFF;
+            request_data->region_index = request->data[1] & 0xFF;
             return ResponseCode::OK;
         }
 
@@ -730,7 +750,7 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[cursor++] = response_data->loop_name_length;
+            response->data[cursor++] = loop_name_length;
             // strings are 1 char per character. Unless the user uses utf-16, memcpy is fine with a 16bits byte
             memcpy(&response->data[cursor], response_data->loop_name, loop_name_length);
             cursor += loop_name_length;
@@ -932,7 +952,7 @@ namespace scrutiny
             Request const *const request,
             RequestData::CommControl::Connect *const request_data)
         {
-            SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(CommControl::DISCOVER_MAGIC);
+            SCRUTINY_CONSTEXPR uint16_t magic_size = sizeof(CommControl::CONNECT_MAGIC);
             SCRUTINY_CONSTEXPR uint16_t datalen = magic_size;
 
             if (request->data_length != datalen)
