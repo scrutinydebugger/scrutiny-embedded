@@ -41,7 +41,7 @@ namespace scrutiny
         {
           public:
             void init(Request const *const request);
-            void next(MemoryBlock *const memblock);
+            void next(MemoryBlockNative *const memblock);
             inline bool finished(void) const { return m_finished; };
             inline bool is_valid(void) const { return !m_invalid; };
             inline uint16_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
@@ -61,7 +61,7 @@ namespace scrutiny
         {
           public:
             void init(Response *const response, uint16_t const max_size);
-            void write(MemoryBlock const *const memblock);
+            void write(MemoryBlockNative const *const memblock);
             inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 
@@ -77,7 +77,7 @@ namespace scrutiny
         {
           public:
             void init(Request const *const request, bool const masked_write);
-            void next(MemoryBlock *const memblock);
+            void next(MemoryBlockNative *const memblock);
             inline bool finished(void) const { return m_finished; };
             inline bool is_valid(void) const { return !m_invalid; };
             inline uint32_t required_tx_buffer_size(void) const { return m_required_tx_buffer_size; }
@@ -99,7 +99,7 @@ namespace scrutiny
         {
           public:
             void init(Response *const response, uint16_t const max_size);
-            void write(MemoryBlock const *const memblock);
+            void write(MemoryBlockNative const *const memblock);
             inline bool overflow(void) const { return m_overflow; };
             void reset(void);
 

@@ -1167,12 +1167,13 @@ namespace scrutiny
 
                 if (!masked)
                 {
-                    memcpy(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
+                    tools::memcpy_compress_from_8bits(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
                 }
                 else
                 {
                     for (uint16_t i = 0; i < stack.write_mem.block.length; i++)
                     {
+                        // TODO : check 16 bits char
                         unsigned char temp;
                         temp = stack.write_mem.block.start_address[i];
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1

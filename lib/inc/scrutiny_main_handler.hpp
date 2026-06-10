@@ -176,10 +176,12 @@ namespace scrutiny
         void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
-        bool touches_forbidden_region(MemoryBlock const *const block) const;
-        bool touches_forbidden_region(void const *const addr_start, size_t const length) const;
-        bool touches_readonly_region(MemoryBlock const *const block) const;
-        bool touches_readonly_region(void const *const addr_start, size_t const length) const;
+        bool touches_forbidden_region(MemoryBlockNative const *const block) const;
+        bool touches_forbidden_region(void const *const addr_start, size_t const length_char) const;
+        bool touches_readonly_region(MemoryBlockNative const *const block) const;
+        bool touches_readonly_region(void const *const addr_start, size_t const length_char) const;
+        bool touches_forbidden_region(MemoryBlock8Bits const *const block) const;
+        bool touches_readonly_region(MemoryBlock8Bits const *const block) const;
         Status::eStatus check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time
