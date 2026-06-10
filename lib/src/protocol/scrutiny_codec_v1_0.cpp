@@ -251,7 +251,7 @@ namespace scrutiny
 
             m_cursor += codecs::encode_address_big_endian_8bits(memblock->start_address, &m_buffer[m_cursor]);
             m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock->length, &m_buffer[m_cursor]);
-            tools::memcpy_dilate_8bits(&m_buffer[m_cursor], memblock->start_address, memblock->length);
+            memcpy(&m_buffer[m_cursor], memblock->start_address, memblock->length);
             m_cursor += memblock->length;
 
             m_response->data_length = m_cursor;
