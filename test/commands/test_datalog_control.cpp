@@ -184,51 +184,59 @@ uint16_t TestDatalogControl::encode_datalogger_config(
 
     for (uint32_t i = 0; i < dlconfig->trigger.operand_count; i++)
     {
-        if (cursor + 1 > max_size)
+        uint32_t operand_index = SCRUTINY_MIN(i, datalogging::MAX_OPERANDS - 1); // Clip. We have a test that wants an extra operand
+        if (cursor + 1 >= max_size)
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].type), &buffer[cursor]);
-        switch (dlconfig->trigger.operands[i].type)
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].type), &buffer[cursor]);
+        switch (dlconfig->trigger.operands[operand_index].type)
         {
         case datalogging::OperandType::Literal:
-            if (cursor + 4 > max_size)
+            if (cursor + 4 >= max_size)
             {
                 return 0;
             }
-            codecs::encode_float_big_endian_8bits(dlconfig->trigger.operands[i].data.literal.val, &buffer[cursor]);
+            codecs::encode_float_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.literal.val, &buffer[cursor]);
             cursor += 4;
             break;
         case datalogging::OperandType::Rpv:
-            if (cursor + 2 > max_size)
+            if (cursor + 2 >= max_size)
             {
                 return 0;
             }
-            codecs::encode_16_bits_big_endian_8bits(dlconfig->trigger.operands[i].data.rpv.id, &buffer[cursor]);
+            codecs::encode_16_bits_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.rpv.id, &buffer[cursor]);
             cursor += 2;
             break;
         case datalogging::OperandType::Var:
-            if (cursor + 1 + SIZEOF_8BITS(void *) > max_size)
+            if (cursor + 1 + SIZEOF_8BITS(void *) >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.var.datatype), &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[i].data.var.addr, &buffer[cursor]);
+            cursor +=
+                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.var.datatype), &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.var.addr, &buffer[cursor]);
             break;
 
         case datalogging::OperandType::VarBit:
-            if (cursor + 1 + 1 + 1 + SIZEOF_8BITS(void *) > max_size)
+            if (cursor + 1 + 1 + 1 + SIZEOF_8BITS(void *) >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.datatype), &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[i].data.varbit.addr, &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitoffset), &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[i].data.varbit.bitsize), &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(
+                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.datatype),
+                &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.varbit.addr, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(
+                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.bitoffset),
+                &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(
+                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.bitsize),
+                &buffer[cursor]);
             break;
         }
     }
-    if (cursor + 1 > max_size)
+    if (cursor + 1 >= max_size)
     {
         return 0;
     }
@@ -236,29 +244,30 @@ uint16_t TestDatalogControl::encode_datalogger_config(
     cursor += codecs::encode_8_bits_8bits(dlconfig->items_count, &buffer[cursor]);
     for (uint32_t i = 0; i < dlconfig->items_count; i++)
     {
-        if (cursor + 1 > max_size)
+        uint32_t item_index = SCRUTINY_MIN(i, SCRUTINY_DATALOGGING_MAX_SIGNAL - 1); // Clip. We have a test that wants an extra operand
+        if (cursor + 1 >= max_size)
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[i].type), &buffer[cursor]);
-        switch (dlconfig->items_to_log[i].type)
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[item_index].type), &buffer[cursor]);
+        switch (dlconfig->items_to_log[item_index].type)
         {
         case datalogging::LoggableType::Time:
             break;
         case datalogging::LoggableType::Memory:
-            if (cursor + 1 + SIZEOF_8BITS(void *) > max_size)
+            if (cursor + 1 + SIZEOF_8BITS(void *) >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[i].data.memory.address, &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[i].data.memory.size, &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[item_index].data.memory.address, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[item_index].data.memory.size, &buffer[cursor]);
             break;
         case datalogging::LoggableType::Rpv:
-            if (cursor + 2 > max_size)
+            if (cursor + 2 >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[i].data.rpv.id, &buffer[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[item_index].data.rpv.id, &buffer[cursor]);
             break;
         }
     }
@@ -310,17 +319,12 @@ void TestDatalogControl::test_configure(
     bool check_response,
     char const *error_msg)
 {
-    static unsigned char request_data[256] = { 5, 2 };
+    static unsigned char request_data[256];
+
+    memset(request_data, 0, sizeof(request_data));
+    request_data[0] = 5;
+    request_data[1] = 2;
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
-    if (sizeof(request_data) < (size_t)payload_size + 8)
-    {
-        std::cout << "DATA: ";
-        for (size_t i = 0; i < sizeof(request_data); i++)
-        {
-            std::cout << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(request_data[i]);
-        }
-        std::cout << std::endl;
-    }
     ASSERT_GT(sizeof(request_data), (size_t)payload_size + 8) << error_msg;
     ASSERT_GT(sizeof(_rx_buffer), (size_t)payload_size) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;

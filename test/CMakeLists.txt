@@ -10,6 +10,8 @@ FetchContent_Declare(
   GIT_TAG 9dc2a429e6e33136fb3340b47ffee88161a7660d
 )
 
+option(SCRUTINY_TEST_WITH_ASAN "" OFF)
+
 set(SCRUTINYTEST_DISABLE_EXCEPTIONS OFF)
 set(SCRUTINYTEST_MODE FULL)
 set(SCRUTINYTEST_MAX_TEST_CASES 1024)
@@ -100,7 +102,14 @@ else()
         set(LINKER_NO_PIE_OPTION "")
     endif()
 
+    if (SCRUTINY_TEST_WITH_ASAN)
+        target_compile_options(scrutiny-embedded PRIVATE -fsanitize=address)
+        target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address)
+        target_link_libraries(${PROJECT_NAME} -fsanitize=address)
+    endif()
+
     target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
+
     target_link_options(${PROJECT_NAME} PUBLIC ${LINKER_NO_PIE_OPTION})
 endif()
