@@ -315,7 +315,7 @@ void TestDatalogControl::test_configure(
     if (sizeof(request_data) < (size_t)payload_size + 8)
     {
         std::cout << "DATA: ";
-        for (int i = 0; i < sizeof(request_data); i++)
+        for (size_t i = 0; i < sizeof(request_data); i++)
         {
             std::cout << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(request_data[i]);
         }
