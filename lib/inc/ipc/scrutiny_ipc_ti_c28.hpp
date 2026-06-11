@@ -1,3 +1,11 @@
+//    scrutiny_ipc_ti_c28.hpp
+//        An implementation of the Scrutiny IPC for Texas Instrument C200 family
+//
+//   - License : MIT - See LICENSE file
+//   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
+//
+//    Copyright (c) 2021 Scrutiny Debugger
+
 #ifndef ___SCRUTINY_IPC_TI_C28_H___
 #define ___SCRUTINY_IPC_TI_C28_H___
 

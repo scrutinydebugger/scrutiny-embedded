@@ -368,6 +368,9 @@
         },
         "test/test_cwrapper.cpp": {
             "docstring": "A testsuite for the CWrapper"
+        },
+        "lib/inc/ipc/scrutiny_ipc_ti_c28.hpp": {
+            "docstring": "An implementation of the Scrutiny IPC for Texas Instrument C200 family"
         }
     },
     "authors": {}
