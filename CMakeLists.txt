@@ -13,6 +13,11 @@ option(INSTALL_FOLDER "Install folder" ${CMAKE_CURRENT_BINARY_DIR}/install )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if (SCRUTINY_USE_ASAN)
+    add_compile_options(-fsanitize=address)
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=address")
+endif()
+
 add_subdirectory(lib)
 include(lib/cmake/scrutiny.cmake)    # Make available for project importing us with FetchContent
 

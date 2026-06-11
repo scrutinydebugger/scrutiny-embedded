@@ -175,5 +175,7 @@ uint8_t read_8(ELFEndianess const endianness, uint8_t const buf[]);
 uint16_t read_16(ELFEndianess const endianness, uint8_t const buf[]);
 uint32_t read_32(ELFEndianess const endianness, uint8_t const buf[]);
 uint64_t read_64(ELFEndianess const endianness, uint8_t const buf[]);
+uint64_t read_128(ELFEndianess const endianness, uint8_t const buf[]);
+uint64_t read_256(ELFEndianess const endianness, uint8_t const buf[]);
 
 #endif

@@ -10,6 +10,8 @@ FetchContent_Declare(
   GIT_TAG 9dc2a429e6e33136fb3340b47ffee88161a7660d
 )
 
+option(SCRUTINY_USE_ASAN "" OFF)
+
 set(SCRUTINYTEST_DISABLE_EXCEPTIONS OFF)
 set(SCRUTINYTEST_MODE FULL)
 set(SCRUTINYTEST_MAX_TEST_CASES 1024)
@@ -27,7 +29,6 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/test_timebase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_crc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_codecs.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/protocol/test_protocol_rx_parsing.cpp
@@ -41,6 +42,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/commands/test_datalog_control.cpp
     )
 
+
 if (SCRUTINY_ENABLE_DATALOGGING)
     target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_fetch_operands.cpp
@@ -50,6 +52,7 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/test_raw_encoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/datalogging/raw_format_parser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_variable_fetching.cpp
+
     )
 endif()
 
@@ -60,6 +63,14 @@ if (SCRUTINY_BUILD_CWRAPPER)
     target_link_libraries(${PROJECT_NAME}
         scrutiny-cwrapper
     )
+endif()
+
+find_package(Threads)
+if (Threads_FOUND)
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_ipc.cpp
+    )
+    target_link_libraries(${PROJECT_NAME} Threads::Threads)
 endif()
 
 target_include_directories(${PROJECT_NAME}
@@ -93,5 +104,6 @@ else()
 
     target_compile_options(scrutiny-embedded PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror ${COMPILER_NO_PIE_OPTION})
+
     target_link_options(${PROJECT_NAME} PUBLIC ${LINKER_NO_PIE_OPTION})
 endif()

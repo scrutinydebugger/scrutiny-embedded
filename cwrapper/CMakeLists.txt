@@ -43,6 +43,7 @@ if (${SCRUTINY_CWRAPPER_EXTRACT_CPP_CONSTANTS})
             -D CMAKE_TOOLCHAIN_FILE=${PROJECT_BINARY_DIR}/host_toochain.cmake
             -D SCRUTINY_ELF_SYMDUMP_STRICT_BUILD=OFF     # For maximum compatibility in case of untested compiler
             -D CMAKE_INSTALL_PREFIX=${SYMDUMP_INSTALL_DIR}
+        BUILD_ALWAYS ON # Will not force a full rebuild, but will invoke cmake on it. Then it decide if it needs a rebuild or not.
     )
 
     set(ELF_SYMDUP ${SYMDUMP_INSTALL_DIR}/bin/${SYMDUMP_PROJECT_NAME})
