@@ -380,10 +380,10 @@ pipeline {
             }
         }
     }
-    post {
-        // Clean after build
-        //always {
-        //    deleteDir()
-        //}
-    }
+   // post {
+   //     // Clean after build
+   //     always {
+   //         deleteDir()
+   //     }
+   // }
 }
