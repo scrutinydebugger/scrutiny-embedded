@@ -382,8 +382,8 @@ pipeline {
     }
     post {
         // Clean after build
-        always {
-            deleteDir()
-        }
+        //always {
+        //    deleteDir()
+        //}
     }
 }
