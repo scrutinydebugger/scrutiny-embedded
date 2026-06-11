@@ -43,26 +43,44 @@ class TestMemoryControl : public ScrutinyTest
 */
 TEST_F(TestMemoryControl, TestReadSingleAddress)
 {
-    // Building request
+// Building request
+#if CHAR_BIT == 8
     unsigned char data_buf[] = { 0x11, 0x22, 0x33 };
+#elif CHAR_BIT == 16
+    unsigned char data_buf[] = { 0x1122, 0x3344, 0x5566 };
+#endif
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
-    SCRUTINY_CONSTEXPR uint16_t data_size = sizeof(data_buf);
+    SCRUTINY_CONSTEXPR uint16_t data_size_8bits = SIZEOF_8BITS(data_buf);
     unsigned char request_data[8 + addr_size + 2] = { 3, 1, 0, addr_size + 2 };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], data_buf);
-    request_data[index++] = (data_size >> 8) & 0xFF;
-    request_data[index++] = (data_size >> 0) & 0xFF;
+    request_data[index++] = (data_size_8bits >> 8) & 0xFF;
+    request_data[index++] = (data_size_8bits >> 0) & 0xFF;
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Building expected response
     unsigned char tx_buffer[32];
-    SCRUTINY_CONSTEXPR uint16_t datalen = addr_size + 2 + data_size;
+    SCRUTINY_CONSTEXPR uint16_t datalen = addr_size + 2 + data_size_8bits;
     unsigned char expected_response[9 + datalen] = { 0x83, 1, 0, 0, datalen };
     index = 5;
     index += encode_addr(&expected_response[index], data_buf);
-    expected_response[index++] = (data_size >> 8) & 0xFF;
-    expected_response[index++] = (data_size >> 0) & 0xFF;
-    std::memcpy(&expected_response[index], data_buf, data_size);
+    expected_response[index++] = (data_size_8bits >> 8) & 0xFF;
+    expected_response[index++] = (data_size_8bits >> 0) & 0xFF;
+
+    // Manually encode the response to guarantee big endianness
+#if CHAR_BIT == 8
+    expected_response[index++] = 0x11;
+    expected_response[index++] = 0x22;
+    expected_response[index++] = 0x33;
+#elif CHAR_BIT == 16
+    // Protocol is big endian
+    expected_response[index++] = 0x11;
+    expected_response[index++] = 0x22;
+    expected_response[index++] = 0x33;
+    expected_response[index++] = 0x44;
+    expected_response[index++] = 0x55;
+    expected_response[index++] = 0x66;
+#endif
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
@@ -85,14 +103,21 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
 */
 TEST_F(TestMemoryControl, TestReadMultipleAddress)
 {
+#if CHAR_BIT == 8
     unsigned char data_buf1[] = { 0x11, 0x22, 0x33 };
-    unsigned char data_buf2[] = { 0x44, 0x55, 0x66, 0x77 };
-    unsigned char data_buf3[] = { 0x88, 0x99 };
+    unsigned char data_buf2[] = { 0x12, 0x34, 0x56, 0x78 };
+    unsigned char data_buf3[] = { 0x13, 0x24 };
+#elif CHAR_BIT == 16
+    unsigned char data_buf1[] = { 0x1122, 0x3344, 0x5566 };
+    unsigned char data_buf2[] = { 0x1234, 0x5678, 0x9abc, 0xdef0 };
+    unsigned char data_buf3[] = { 0x1324, 0x3546 };
+
+#endif
     unsigned char tx_buffer[64];
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
-    SCRUTINY_CONSTEXPR uint16_t data_size1 = sizeof(data_buf1);
-    SCRUTINY_CONSTEXPR uint16_t data_size2 = sizeof(data_buf2);
-    SCRUTINY_CONSTEXPR uint16_t data_size3 = sizeof(data_buf3);
+    SCRUTINY_CONSTEXPR uint16_t data_size1 = SIZEOF_8BITS(data_buf1);
+    SCRUTINY_CONSTEXPR uint16_t data_size2 = SIZEOF_8BITS(data_buf2);
+    SCRUTINY_CONSTEXPR uint16_t data_size3 = SIZEOF_8BITS(data_buf3);
     SCRUTINY_CONSTEXPR uint16_t datalen_req = (addr_size + 2) * 3;
 
     // Building request
@@ -116,17 +141,17 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     index += encode_addr(&expected_response[index], data_buf1);
     expected_response[index++] = (data_size1 >> 8) & 0xFF;
     expected_response[index++] = (data_size1 >> 0) & 0xFF;
-    std::memcpy(&expected_response[index], data_buf1, data_size1);
+    memcpy_dilate_8bits(&expected_response[index], data_buf1, data_size1);
     index += data_size1;
     index += encode_addr(&expected_response[index], data_buf2);
     expected_response[index++] = (data_size2 >> 8) & 0xFF;
     expected_response[index++] = (data_size2 >> 0) & 0xFF;
-    std::memcpy(&expected_response[index], data_buf2, data_size2);
+    memcpy_dilate_8bits(&expected_response[index], data_buf2, data_size2);
     index += data_size2;
     index += encode_addr(&expected_response[index], data_buf3);
     expected_response[index++] = (data_size3 >> 8) & 0xFF;
     expected_response[index++] = (data_size3 >> 0) & 0xFF;
-    std::memcpy(&expected_response[index], data_buf3, data_size3);
+    memcpy_dilate_8bits(&expected_response[index], data_buf3, data_size3);
     index += data_size3;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
@@ -201,43 +226,45 @@ TEST_F(TestMemoryControl, TestReadAddressOverflow)
     const scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
     const scrutiny::protocol::ResponseCode::eResponseCode ok = scrutiny::protocol::ResponseCode::OK;
 
-    unsigned char tx_buffer[sizeof(_rx_buffer) * 2];
-    unsigned char some_buffer[sizeof(_rx_buffer)] = { 0 };
-    uint16_t buf1_size = sizeof(_rx_buffer) - (addr_size + 2) * 2 - 1; // We fill all the buffer minus 1 byte.
+    unsigned char tx_buffer[sizeof(_tx_buffer) + 9];
+    unsigned char some_buffer[sizeof(_tx_buffer)] = { 0 };
+    uint16_t buf1_size_8bits = sizeof(_tx_buffer) - (addr_size + 2) * 2 - (CHAR_BIT / 8); // We fill all the buffer minus 1 byte.
+    // buf1_size_8bits uses sizeof tx buffer, tx buffer is counted in multiple of 8 bits. This is not a mistake.
 
     // Building request
     unsigned char request_data[64] = { static_cast<unsigned char>(cmd), subfn, 0, (addr_size + 2) * 2 };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], &some_buffer);
-    request_data[index++] = static_cast<unsigned char>(buf1_size >> 8);
-    request_data[index++] = static_cast<unsigned char>(buf1_size >> 0);
+    request_data[index++] = static_cast<unsigned char>(buf1_size_8bits >> 8);
+    request_data[index++] = static_cast<unsigned char>(buf1_size_8bits >> 0);
 
     index += encode_addr(&request_data[index], &some_buffer); // 2nd block
 
     uint16_t length_to_receive;
     // Increase length of 2nd block of data.
-    for (unsigned int length = 0; length < 4; length++)
+    for (unsigned int length_char = 0; length_char < 4; length_char += (CHAR_BIT / 8))
     {
         length_to_receive = 8 + (addr_size + 2) * 2;
+        uint16_t length_8bits = length_char * (CHAR_BIT / 8);
 
-        request_data[index + 0] = static_cast<unsigned char>(length >> 8); // encode length of 2nd block
-        request_data[index + 1] = static_cast<unsigned char>(length >> 0);
+        request_data[index + 0] = static_cast<unsigned char>(length_8bits >> 8); // encode length of 2nd block
+        request_data[index + 1] = static_cast<unsigned char>(length_8bits >> 0);
         add_crc(request_data, length_to_receive - 4);
 
         scrutiny_handler.receive_data(request_data, length_to_receive);
         scrutiny_handler.process(0);
 
         uint16_t n_to_read = scrutiny_handler.data_to_send();
-        ASSERT_LT(n_to_read, sizeof(tx_buffer));
+        ASSERT_LE(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        if (length < 2) // Below 2, we don't overflow the tx buffer
+        if (length_char < 2) // Below 2, we don't overflow the tx buffer
         {
-            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[length=" << static_cast<uint32_t>(length) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[length=" << static_cast<uint32_t>(length_char) << "]";
         }
         else // We should have overflown the tx buffer here.
         {
-            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow) << "[length=" << static_cast<uint32_t>(length) << "]";
+            ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow) << "[length=" << static_cast<uint32_t>(length_char) << "]";
         }
         scrutiny_handler.process(0);
     }
@@ -303,14 +330,15 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2;
     unsigned char request_data[8 + datalen] = { 3, 1, 0, datalen };
     uint16_t window_size = 4;
+    uint16_t window_size_8bits = (window_size * (CHAR_BIT / 8));
     unsigned int index = 0;
     for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
     {
         void *read_addr = reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(buf) + i);
         index = 4;
         index += encode_addr(&request_data[4], read_addr);
-        request_data[index + 0] = static_cast<unsigned char>(window_size >> 8);
-        request_data[index + 1] = static_cast<unsigned char>(window_size >> 0);
+        request_data[index + 0] = static_cast<unsigned char>((window_size_8bits >> 8) & 0xFF);
+        request_data[index + 1] = static_cast<unsigned char>((window_size_8bits >> 0) & 0xFF);
         add_crc(request_data, sizeof(request_data) - 4);
 
         scrutiny_handler.receive_data(request_data, sizeof(request_data));
@@ -379,6 +407,41 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
     }
 }
 
+#if CHAR_BIT == 16
+TEST_F(TestMemoryControl, TestReadSingleAddressNotMultipleOfCharDenied)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+
+    unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090a };
+    uint16_t read_size_8bits = 5; // try to read 2.5 char
+
+    // Building request
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
+    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2;
+    unsigned char request_data[8 + datalen_req] = { 3, 1, 0, datalen_req };
+    unsigned int index = 4;
+    index += encode_addr(&request_data[index], buffer);
+    request_data[index++] = (read_size_8bits >> 8) & 0xFF;
+    request_data[index++] = (read_size_8bits >> 0) & 0xFF;
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    unsigned char tx_buffer[32];
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
+}
+#endif
+
 // ================================= Write =================================
 
 /*
@@ -387,19 +450,24 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
 TEST_F(TestMemoryControl, TestWriteSingleAddress)
 {
 
+    unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44 }; // big endian encoded
+#if CHAR_BIT == 8
     unsigned char buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
-    unsigned char data_to_write[] = { 0x11, 0x22, 0x33, 0x44 };
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+#elif CHAR_BIT == 16
+    unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
+    unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
+#endif
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
-    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write);
+    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write_8bits);
     unsigned char request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
-    request_data[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
-    request_data[index++] = (sizeof(data_to_write) >> 0) & 0xFF;
-    std::memcpy(&request_data[index], data_to_write, sizeof(data_to_write));
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 8) & 0xFF;
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 0) & 0xFF;
+    std::memcpy(&request_data[index], data_to_write_8bits, sizeof(data_to_write_8bits));
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Building expected response
@@ -408,8 +476,8 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     unsigned char expected_response[9 + datalen_resp] = { 0x83, 2, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
-    expected_response[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
-    expected_response[index++] = (sizeof(data_to_write) >> 0) & 0xFF;
+    expected_response[index++] = (sizeof(data_to_write_8bits) >> 8) & 0xFF;
+    expected_response[index++] = (sizeof(data_to_write_8bits) >> 0) & 0xFF;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
@@ -434,22 +502,27 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
 TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 {
 
+    unsigned char data_to_write_8bits[] = { 0xFF, 0xFF, 0x00, 0x00 };
+    unsigned char write_mask_8bits[] = { 0xF0, 0xAA, 0xF0, 0xAA };
+#if CHAR_BIT == 8
     unsigned char buffer[] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
-    unsigned char data_to_write[] = { 0xFF, 0xFF, 0x00, 0x00 };
-    unsigned char write_mask[] = { 0xF0, 0xAA, 0xF0, 0xAA };
     unsigned char expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
+#elif CHAR_BIT == 16
+    unsigned char buffer[] = { 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
+    unsigned char expected_output_buffer[] = { 0xFAAA, 0x0A00, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
+#endif
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
-    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write) * 2;
+    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write_8bits) * 2;
     unsigned char request_data[8 + datalen_req] = { 3, 3, 0, datalen_req };
     unsigned int index = 4;
     index += encode_addr(&request_data[index], buffer);
-    request_data[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
-    request_data[index++] = (sizeof(data_to_write) >> 0) & 0xFF;
-    std::memcpy(&request_data[index], data_to_write, sizeof(data_to_write));
-    index += sizeof(data_to_write);
-    std::memcpy(&request_data[index], write_mask, sizeof(write_mask));
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 8) & 0xFF;
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 0) & 0xFF;
+    std::memcpy(&request_data[index], data_to_write_8bits, sizeof(data_to_write_8bits));
+    index += sizeof(data_to_write_8bits);
+    std::memcpy(&request_data[index], write_mask_8bits, sizeof(write_mask_8bits));
     add_crc(request_data, sizeof(request_data) - 4);
 
     // Building expected response
@@ -458,8 +531,8 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     unsigned char expected_response[9 + datalen_resp] = { 0x83, 3, 0, 0, datalen_resp };
     index = 5;
     index += encode_addr(&expected_response[index], buffer);
-    expected_response[index++] = (sizeof(data_to_write) >> 8) & 0xFF;
-    expected_response[index++] = (sizeof(data_to_write) >> 0) & 0xFF;
+    expected_response[index++] = (sizeof(data_to_write_8bits) >> 8) & 0xFF;
+    expected_response[index++] = (sizeof(data_to_write_8bits) >> 0) & 0xFF;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     // Process
@@ -484,10 +557,14 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 {
 
-    unsigned char buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
     unsigned char data_to_write1[] = { 0x11, 0x22, 0x33, 0x44 };
-    unsigned char data_to_write2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
-    unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x09, 0x0a };
+    unsigned char data_to_write2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+    unsigned char buffer[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+#if CHAR_BIT == 8
+    unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x0a };
+#elif CHAR_BIT == 16
+    unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x03, 0xAABB, 0xCCDD, 0xEEFF, 0x07, 0x08, 0x09, 0x0a };
+#endif
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
@@ -540,13 +617,20 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 */
 TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
 {
-
-    unsigned char buffer[] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x99 };
     unsigned char data_to_write1[] = { 0x11, 0x22, 0x33, 0x44 };
     unsigned char write_mask1[] = { 0xFF, 0x00, 0xF0, 0x0F };
-    unsigned char data_to_write2[] = { 0xAA, 0xAA, 0x55, 0x55, 0x0F };
-    unsigned char write_mask2[] = { 0x0F, 0xAA, 0xAA, 0x55, 0xF0 };
+    unsigned char data_to_write2[] = { 0xAA, 0xAA, 0x55, 0x55, 0x0F, 0x00 };
+    unsigned char write_mask2[] = { 0x0F, 0xAA, 0xAA, 0x55, 0xF0, 0x00 };
+
+#if CHAR_BIT == 8
+    unsigned char buffer[] = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x99 };
     unsigned char expected_output_buffer[] = { 0x11, 0x55, 0x35, 0x54, 0x5A, 0xFF, 0x55, 0x55, 0x05, 0x99 };
+    unsigned int second_write_index = 4;
+#elif CHAR_BIT == 16
+    unsigned char buffer[] = { 0x5555, 0x5555, 0x5555, 0x5555, 0x5599 };
+    unsigned char expected_output_buffer[] = { 0x1155, 0x3554, 0x5AFF, 0x5555, 0x0599 };
+    unsigned int second_write_index = 2;
+#endif
 
     // Building request
     SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
@@ -561,7 +645,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     std::memcpy(&request_data[index], write_mask1, sizeof(write_mask1));
     index += sizeof(write_mask1);
 
-    index += encode_addr(&request_data[index], &buffer[4]);
+    index += encode_addr(&request_data[index], &buffer[second_write_index]);
     request_data[index++] = (sizeof(data_to_write2) >> 8) & 0xFF;
     request_data[index++] = (sizeof(data_to_write2) >> 0) & 0xFF;
     std::memcpy(&request_data[index], data_to_write2, sizeof(data_to_write2));
@@ -578,7 +662,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     index += encode_addr(&expected_response[index], buffer);
     expected_response[index++] = (sizeof(data_to_write1) >> 8) & 0xFF;
     expected_response[index++] = (sizeof(data_to_write1) >> 0) & 0xFF;
-    index += encode_addr(&expected_response[index], &buffer[4]);
+    index += encode_addr(&expected_response[index], &buffer[second_write_index]);
     expected_response[index++] = (sizeof(data_to_write2) >> 8) & 0xFF;
     expected_response[index++] = (sizeof(data_to_write2) >> 0) & 0xFF;
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -689,17 +773,17 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR uint16_t window_size = 4;
-    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size;
+    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT / 8);
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size_8bits;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
-    for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
+    for (unsigned int i = 0; i < sizeof(buf) - window_size_8bits; i++)
     {
         void *write_addr = reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(buf) + i);
         index = 4;
         index += encode_addr(&request_data[4], write_addr);
-        request_data[index + 0] = static_cast<unsigned char>(window_size >> 8);
-        request_data[index + 1] = static_cast<unsigned char>(window_size >> 0);
+        request_data[index + 0] = static_cast<unsigned char>(window_size_8bits >> 8);
+        request_data[index + 1] = static_cast<unsigned char>(window_size_8bits >> 0);
         // We don't care about the data to write here. We just check if it's accepted or refused.
         add_crc(request_data, sizeof(request_data) - 4);
 
@@ -744,17 +828,17 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
 
-    SCRUTINY_CONSTEXPR uint16_t window_size = 4;
-    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size;
+    SCRUTINY_CONSTEXPR uint16_t window_size_8bits = 4 * (CHAR_BIT / 8);
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size_8bits;
     unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
     unsigned int index = 0;
-    for (unsigned int i = 0; i < sizeof(buf) - window_size; i++)
+    for (unsigned int i = 0; i < sizeof(buf) - window_size_8bits; i++)
     {
         void *write_addr = reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(buf) + i);
         index = 4;
         index += encode_addr(&request_data[4], write_addr);
-        request_data[index + 0] = static_cast<unsigned char>(window_size >> 8);
-        request_data[index + 1] = static_cast<unsigned char>(window_size >> 0);
+        request_data[index + 0] = static_cast<unsigned char>(window_size_8bits >> 8);
+        request_data[index + 1] = static_cast<unsigned char>(window_size_8bits >> 0);
         // We don't care about the data to write here. We just check if it's accepted or refused.
         add_crc(request_data, sizeof(request_data) - 4);
 
@@ -833,3 +917,39 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         scrutiny_handler.process(0);
     }
 }
+
+#if CHAR_BIT == 16
+TEST_F(TestMemoryControl, TestWriteSingleAddressNotMultipleOfCharDenied)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Write);
+    const scrutiny::protocol::ResponseCode::eResponseCode invalid = scrutiny::protocol::ResponseCode::InvalidRequest;
+
+    unsigned char data_to_write_8bits[] = { 0x11, 0x22, 0x33, 0x44, 0x55 }; // 2.5 chars to write. not allowed
+    unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708 };
+
+    // Building request
+    SCRUTINY_CONSTEXPR uint32_t addr_size = SIZEOF_8BITS(uintptr_t);
+    SCRUTINY_CONSTEXPR uint16_t datalen_req = addr_size + 2 + sizeof(data_to_write_8bits);
+    unsigned char request_data[8 + datalen_req] = { 3, 2, 0, datalen_req };
+    unsigned int index = 4;
+    index += encode_addr(&request_data[index], buffer);
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 8) & 0xFF;
+    request_data[index++] = (sizeof(data_to_write_8bits) >> 0) & 0xFF;
+    std::memcpy(&request_data[index], data_to_write_8bits, sizeof(data_to_write_8bits));
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    // Building expected response
+    unsigned char tx_buffer[32];
+    // Process
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+
+    uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
+}
+#endif

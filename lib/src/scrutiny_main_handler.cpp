@@ -1032,12 +1032,12 @@ namespace scrutiny
             {
                 protocol::ReadMemoryBlocksRequestParser *readmem_parser;
                 protocol::ReadMemoryBlocksResponseEncoder *readmem_encoder;
-                MemoryBlock block;
+                MemoryBlock8Bits block;
             } read_mem;
 
             struct
             {
-                MemoryBlock block;
+                MemoryBlock8Bits block;
                 protocol::WriteMemoryBlocksRequestParser *writemem_parser;
                 protocol::WriteMemoryBlocksResponseEncoder *writemem_encoder;
             } write_mem;
@@ -1167,16 +1167,28 @@ namespace scrutiny
 
                 if (!masked)
                 {
-                    memcpy(stack.write_mem.block.start_address, stack.write_mem.block.source_data, stack.write_mem.block.length);
+                    tools::memcpy_compress_from_8bits(
+                        stack.write_mem.block.start_address,
+                        stack.write_mem.block.source_data,
+                        stack.write_mem.block.length);
                 }
                 else
                 {
-                    for (uint16_t i = 0; i < stack.write_mem.block.length; i++)
+                    for (uint16_t i = 0; i < stack.write_mem.block.length_char(); i++)
                     {
                         unsigned char temp;
                         temp = stack.write_mem.block.start_address[i];
+#if CHAR_BIT == 8
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
                         temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
+#elif CHAR_BIT == 16
+                        unsigned char const val16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
+                        unsigned char const mask16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.mask[2 * i]);
+                        temp |= (val16bits & mask16bits);    // Bit to 1
+                        temp &= (val16bits | (~mask16bits)); // Bit to 0
+#else
+#error
+#endif
                         stack.write_mem.block.start_address[i] = temp;
                     }
                 }
@@ -1304,11 +1316,6 @@ namespace scrutiny
         return code;
     }
 
-    bool MainHandler::touches_forbidden_region(MemoryBlock const *const block) const
-    {
-        return touches_forbidden_region(block->start_address, block->length);
-    }
-
     bool MainHandler::touches_forbidden_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_forbidden_address_range_set())
@@ -1334,11 +1341,6 @@ namespace scrutiny
             }
         }
         return false;
-    }
-
-    bool MainHandler::touches_readonly_region(MemoryBlock const *const block) const
-    {
-        return touches_readonly_region(block->start_address, block->length);
     }
 
     bool MainHandler::touches_readonly_region(void const *const addr_start, size_t const length) const

@@ -173,12 +173,26 @@ namespace scrutiny
     typedef bool (*RpvWriteCallback)(RuntimePublishedValue const rpv, AnyType const *inval, LoopHandler *const caller);
 
     /// @brief Represents a memory block with data/mask pointer. Mainly used for memory write operations.
-    struct MemoryBlock
+    struct MemoryBlockNative
     {
         unsigned char *start_address;
         uint16_t length;
         unsigned char *source_data;
         unsigned char *mask;
+
+        inline uint16_t length_8bits(void) const { return length * (CHAR_BIT / 8); }
+    };
+
+    /// @brief Represents a memory block with data/mask pointer where the data is encoded with 8bits per char.
+    /// Mainly used for memory write operations.
+    struct MemoryBlock8Bits
+    {
+        unsigned char *start_address;
+        uint16_t length;
+        unsigned char *source_data;
+        unsigned char *mask;
+
+        inline uint16_t length_char(void) const { return length / (CHAR_BIT / 8); }
     };
 } // namespace scrutiny
 
