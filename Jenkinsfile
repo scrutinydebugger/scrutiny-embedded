@@ -49,7 +49,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 scripts/build.sh
                                 '''
@@ -78,7 +78,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 CMAKE_CXX_STANDARD=98   \
                                 scripts/build.sh
                                 '''
@@ -107,7 +107,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 scripts/build.sh
                                 '''
@@ -136,7 +136,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 CMAKE_CXX_STANDARD=98 \
                                 scripts/build.sh
                                 '''
@@ -181,7 +181,6 @@ pipeline {
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/aarch64-linux-gcc.cmake \
                         SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_TEST_WITH_ASAN=1 \
                         SCRUTINY_BUILD_TESTAPP=1 \
                         scripts/build.sh
                         '''
@@ -199,7 +198,6 @@ pipeline {
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/powerpc64-linux-gcc.cmake \
                         SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_TEST_WITH_ASAN=1 \
                         SCRUTINY_BUILD_TESTAPP=1 \
                         scripts/build.sh
                         '''
@@ -240,7 +238,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
@@ -272,7 +270,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
@@ -304,7 +302,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
@@ -336,7 +334,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
@@ -369,7 +367,7 @@ pipeline {
                                 sh '''
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
-                                SCRUTINY_TEST_WITH_ASAN=1 \
+                                SCRUTINY_USE_ASAN=1 \
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
