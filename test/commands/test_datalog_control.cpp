@@ -8,6 +8,8 @@
 
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
+#include <iomanip>
+#include <iostream>
 #include <limits>
 #include <string>
 
@@ -310,6 +312,15 @@ void TestDatalogControl::test_configure(
 {
     static unsigned char request_data[256] = { 5, 2 };
     uint16_t payload_size = encode_datalogger_config(loop_id, config_id, &refconfig, &request_data[4], sizeof(request_data));
+    if (sizeof(request_data) < (size_t)payload_size + 8)
+    {
+        std::cout << "DATA: ";
+        for (int i = 0; i < sizeof(request_data); i++)
+        {
+            std::cout << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(request_data[i]);
+        }
+        std::cout << std::endl;
+    }
     ASSERT_GT(sizeof(request_data), (size_t)payload_size + 8) << error_msg;
     ASSERT_GT(sizeof(_rx_buffer), (size_t)payload_size) << error_msg;
     ASSERT_NE(payload_size, 0) << error_msg;
