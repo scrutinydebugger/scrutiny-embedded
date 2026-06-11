@@ -146,6 +146,36 @@ uint64_t read_64(ELFEndianess const endianness, uint8_t const buf[])
     return 0;
 }
 
+uint64_t read_128(ELFEndianess const endianness, uint8_t const buf[])
+{
+    uint8_t const *lo = (endianness == ELF_ENDIAN_LITTLE) ? &buf[0] : &buf[8];
+    uint8_t const *hi = (endianness == ELF_ENDIAN_LITTLE) ? &buf[8] : &buf[0];
+
+    for (int i = 0; i < 8; i++)
+    {
+        if (hi[i] != 0)
+        {
+            return 0;
+        }
+    }
+    return read_64(endianness, lo);
+}
+
+uint64_t read_256(ELFEndianess const endianness, uint8_t const buf[])
+{
+    uint8_t const *lo = (endianness == ELF_ENDIAN_LITTLE) ? &buf[0] : &buf[24];
+    uint8_t const *hi = (endianness == ELF_ENDIAN_LITTLE) ? &buf[8] : &buf[0];
+
+    for (int i = 0; i < 24; i++)
+    {
+        if (hi[i] != 0)
+        {
+            return 0;
+        }
+    }
+    return read_64(endianness, lo);
+}
+
 ELFStatus elf_read_str(
     FILE *const fptr,
     ELFSectionHeader const *const strtab_header,

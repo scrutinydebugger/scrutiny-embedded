@@ -182,6 +182,22 @@ int main(int argc, char *argv[])
         case 8:
             symbol_val = read_64(elf_header.e_endianness, fbuf);
             break;
+        case 16: // ASAN can cause this
+            symbol_val = read_128(elf_header.e_endianness, fbuf);
+            if (symbol_val == 0)
+            {
+                fprintf(stderr, "Size too big to decode (0x%lx) for %s\n", wanted_symbol->symbol.st_size, args.symbols[k]);
+                return EXIT_FAILURE;
+            }
+            break;
+        case 32: // ASAN can cause this
+            symbol_val = read_256(elf_header.e_endianness, fbuf);
+            if (symbol_val == 0)
+            {
+                fprintf(stderr, "Size too big to decode (0x%lx) for %s\n", wanted_symbol->symbol.st_size, args.symbols[k]);
+                return EXIT_FAILURE;
+            }
+            break;
         default:
             fprintf(stderr, "Unsupported symbol size 0x%lx for %s\n", wanted_symbol->symbol.st_size, args.symbols[k]);
             return EXIT_FAILURE;
