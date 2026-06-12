@@ -326,7 +326,7 @@ namespace scrutiny
 #if SCRUTINY_BUILD_TI_C28
             for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
-#if __little_endian__ || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
                 static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
                 static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
 #else
@@ -350,7 +350,7 @@ namespace scrutiny
 #if #if SCRUTINY_BUILD_TI_C28
             for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
-#if __little_endian__ || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
                 static_cast<unsigned char *>(dst)[i] =
                     (((static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i] & 0xFF));
 #else

@@ -42,15 +42,32 @@
 class ScrutinyTest : public scrutinytest::TestCase
 {
   protected:
+    inline bool is_little_endian() const
+    {
+        uint32_t x = 0x12345678;
+        return *reinterpret_cast<unsigned char *>(&x) == 0x1234;
+    }
+
     inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
     {
 #if CHAR_BIT == 8
         memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-        for (size_t i = 0; i < (nb_8bits >> 1); i++)
+        if (is_little_endian())
         {
-            static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
-            static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+            }
         }
 #endif
     }
