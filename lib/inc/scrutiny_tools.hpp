@@ -308,9 +308,9 @@ namespace scrutiny
         inline bool is_float_finite(float const val)
         {
 #if SCRUTINY_BUILD_AVR_GCC || SCRUTINY_BUILD_TI_C28
-            SCRUTINY_STATIC_ASSERT(sizeof(float) == 4, "Expect float to be 32 bits");
+            SCRUTINY_STATIC_ASSERT(sizeof(float) == sizeof(uint32_t), "Expect float to be 32 bits");
             uint32_t uv;
-            memcpy(&uv, &val, 4);
+            memcpy(&uv, &val, sizeof(uint32_t));
             uint16_t exponent = (uv >> 23) & 0xFF;
             return exponent != 0xFF;
 #else
@@ -323,11 +323,20 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
+#if SCRUTINY_BUILD_TI_C28
             for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
+#if __little_endian__ || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+#else
                 static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
                 static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+#endif
             }
+#else
+#error "16bits on non C2000 target requires to be handled here."
+#endif
 #else
 #error
 #endif
@@ -338,11 +347,20 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
+#if #if SCRUTINY_BUILD_TI_C28
             for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
+#if __little_endian__ || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+                static_cast<unsigned char *>(dst)[i] =
+                    (((static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i] & 0xFF));
+#else
                 static_cast<unsigned char *>(dst)[i] =
                     (((static_cast<unsigned char const *>(src)[2 * i] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF));
+#endif
             }
+#else
+#error "16bits on non C2000 target requires to be handled here."
+#endif
 #else
 #error
 #endif
