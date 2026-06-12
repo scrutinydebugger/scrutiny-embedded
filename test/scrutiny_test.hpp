@@ -45,7 +45,11 @@ class ScrutinyTest : public scrutinytest::TestCase
     inline bool is_little_endian() const
     {
         uint32_t x = 0x12345678;
+#if CHAR_BIT == 8
+        return *reinterpret_cast<unsigned char *>(&x) == 0x12;
+#elif CHAR_BIT == 16
         return *reinterpret_cast<unsigned char *>(&x) == 0x1234;
+#endif
     }
 
     inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
