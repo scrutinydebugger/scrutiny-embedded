@@ -347,7 +347,7 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-#if #if SCRUTINY_BUILD_TI_C28
+#if SCRUTINY_BUILD_TI_C28
             for (size_t i = 0; i < (nb_8bits >> 1); i++)
             {
 #if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
