@@ -91,16 +91,8 @@ namespace scrutiny
 #if CHAR_BIT == 8
             return encode_32_bits_big_endian_8bits(value, buff);
 #elif CHAR_BIT == 16
-            if (tools::is_little_endian())
-            {
-                buff[0] = (static_cast<unsigned char>((value >> 8) & 0xFF00)) | (static_cast<unsigned char>((value >> 24) & 0xFFu));
-                buff[1] = (static_cast<unsigned char>((value >> 0) & 0xFF00)) | (static_cast<unsigned char>((value >> 16) & 0xFFu));
-            }
-            else
-            {
-                buff[0] = static_cast<unsigned char>((value >> 16) & 0xFFFF);
-                buff[1] = static_cast<unsigned char>(value & 0xFFFF);
-            }
+            buff[0] = static_cast<unsigned char>((value >> 16) & 0xFFFF);
+            buff[1] = static_cast<unsigned char>(value & 0xFFFF);
             return 2;
 #else
 #error
