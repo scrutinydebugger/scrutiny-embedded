@@ -94,7 +94,7 @@ TEST_F(TestGetInfo, TestReadSoftwareId)
     unsigned char expected_response[9 + SIZEOF_8BITS(scrutiny::software_id)] = { 0x81, 2, 0 };
     expected_response[3] = (SIZEOF_8BITS(scrutiny::software_id) >> 8) & 0xFF;
     expected_response[4] = SIZEOF_8BITS(scrutiny::software_id) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[5], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(&expected_response[5], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
     add_crc(expected_response, 5 + SIZEOF_8BITS(scrutiny::software_id));
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));

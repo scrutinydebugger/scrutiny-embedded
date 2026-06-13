@@ -141,17 +141,17 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     index += encode_addr(&expected_response[index], data_buf1);
     expected_response[index++] = (data_size1 >> 8) & 0xFF;
     expected_response[index++] = (data_size1 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf1, data_size1);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf1, data_size1);
     index += data_size1;
     index += encode_addr(&expected_response[index], data_buf2);
     expected_response[index++] = (data_size2 >> 8) & 0xFF;
     expected_response[index++] = (data_size2 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf2, data_size2);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf2, data_size2);
     index += data_size2;
     index += encode_addr(&expected_response[index], data_buf3);
     expected_response[index++] = (data_size3 >> 8) & 0xFF;
     expected_response[index++] = (data_size3 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf3, data_size3);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf3, data_size3);
     index += data_size3;
     add_crc(expected_response, sizeof(expected_response) - 4);
 

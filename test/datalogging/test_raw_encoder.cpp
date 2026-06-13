@@ -137,22 +137,22 @@ TEST_F(TestRawEncoder, BasicEncoding)
     var2 = 0x1111;
     expected_time = 0;
 
-    memcpy_dilate_8bits(&compare_buf[0], &var1, 4);
-    memcpy_dilate_8bits(&compare_buf[4], &var2, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[0], &var1, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[4], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian_8bits(expected_time, &compare_buf[8]);
 
     var1 = 2.0f;
     var2 = 0x2222;
     expected_time = 100;
-    memcpy_dilate_8bits(&compare_buf[12], &var1, 4);
-    memcpy_dilate_8bits(&compare_buf[16], &var2, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[12], &var1, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[16], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian_8bits(expected_time, &compare_buf[20]);
 
     var1 = 3.0f;
     var2 = 0x3333;
     expected_time = 200u;
-    memcpy_dilate_8bits(&compare_buf[24], &var1, 4);
-    memcpy_dilate_8bits(&compare_buf[28], &var2, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[24], &var1, 4);
+    scrutiny::tools::memcpy_dilate_8bits_native(&compare_buf[28], &var2, 4);
     scrutiny::codecs::encode_32_bits_big_endian_8bits(expected_time, &compare_buf[32]);
 
     unsigned char const chunk_size = sizeof(dst_buffer);

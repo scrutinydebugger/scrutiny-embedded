@@ -63,7 +63,7 @@ TEST_F(TestCommControl, TestDiscover)
     uint16_t index = 5;
     expected_response[index++] = 1;
     expected_response[index++] = 0;
-    memcpy_dilate_8bits(&expected_response[index], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(&expected_response[index], scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
     index += SIZEOF_8BITS(scrutiny::software_id);
     expected_response[index++] = static_cast<unsigned char>(DISPLAY_NAME_LENGTH);
     std::memcpy(&expected_response[index], DISPLAY_NAME, DISPLAY_NAME_LENGTH);

@@ -52,30 +52,6 @@ class ScrutinyTest : public scrutinytest::TestCase
 #endif
     }
 
-    inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
-    {
-#if CHAR_BIT == 8
-        memcpy(dst, src, nb_8bits);
-#elif CHAR_BIT == 16
-        if (is_little_endian())
-        {
-            for (size_t i = 0; i < (nb_8bits >> 1); i++)
-            {
-                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
-                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < (nb_8bits >> 1); i++)
-            {
-                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
-                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
-            }
-        }
-#endif
-    }
-
     inline std::vector<unsigned char> make_payload_1(unsigned char v0)
     {
         std::vector<unsigned char> o;
