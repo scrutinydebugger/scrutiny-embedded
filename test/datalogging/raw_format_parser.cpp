@@ -144,7 +144,7 @@ void RawFormatParser::parse(uint32_t entry_count)
 
             // The parser reads back what has been written in the output buffer by the reader.
             // the output buffer is dilated. Compress back to use full char
-            scrutiny::tools::memcpy_compress_from_8bits(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
+            scrutiny::tools::memcpy_compress_from_8bits_native(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
             src_cursor += elem_size_char * (CHAR_BIT / 8);
         }
     }

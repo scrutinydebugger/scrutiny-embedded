@@ -64,7 +64,7 @@ namespace scrutiny
                 datalogging::buffer_size_t const right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
                 transfer_size_8bits = (right_hand_start_point - m_read_cursor) * (CHAR_BIT / 8);
                 transfer_size_8bits = SCRUTINY_MIN(transfer_size_8bits, new_max_8bits);
-                tools::memcpy_dilate_8bits(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
+                tools::memcpy_dilate_8bits_native(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
                 m_read_cursor += transfer_size_8bits / (CHAR_BIT / 8);
                 m_read_started = true;
                 output_cursor_8bits += transfer_size_8bits;

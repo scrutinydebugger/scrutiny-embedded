@@ -268,7 +268,7 @@ namespace scrutiny
 
             m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
             m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
-            tools::memcpy_dilate_8bits(&m_buffer[m_cursor], memblock_8bits->start_address, memblock_8bits->length);
+            tools::memcpy_dilate_8bits_native(&m_buffer[m_cursor], memblock_8bits->start_address, memblock_8bits->length);
             m_cursor += memblock_8bits->length;
 
             m_response->data_length = m_cursor;
@@ -593,7 +593,7 @@ namespace scrutiny
             }
 
             response->data_length = datalen;
-            tools::memcpy_dilate_8bits(response->data, scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
+            tools::memcpy_dilate_8bits_big_endian(response->data, scrutiny::software_id, SIZEOF_8BITS(scrutiny::software_id));
             return ResponseCode::OK;
         }
 
@@ -838,7 +838,7 @@ namespace scrutiny
             response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-            tools::memcpy_dilate_8bits(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
+            tools::memcpy_dilate_8bits_big_endian(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
             response->data[display_name_length_pos] = static_cast<unsigned char>(display_name_length & 0xFF);
             memcpy(&response->data[display_name_pos], response_data->display_name, display_name_length);
             return ResponseCode::OK;

@@ -1167,7 +1167,7 @@ namespace scrutiny
 
                 if (!masked)
                 {
-                    tools::memcpy_compress_from_8bits(
+                    tools::memcpy_compress_from_8bits_native(
                         stack.write_mem.block.start_address,
                         stack.write_mem.block.source_data,
                         stack.write_mem.block.length);
