@@ -46,9 +46,9 @@ class ScrutinyTest : public scrutinytest::TestCase
     {
         uint32_t x = 0x12345678;
 #if CHAR_BIT == 8
-        return *reinterpret_cast<unsigned char *>(&x) == 0x12;
+        return *reinterpret_cast<unsigned char *>(&x) == 0x78;
 #elif CHAR_BIT == 16
-        return *reinterpret_cast<unsigned char *>(&x) == 0x1234;
+        return *reinterpret_cast<unsigned char *>(&x) == 0x5678;
 #endif
     }
 
