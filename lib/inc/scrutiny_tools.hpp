@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "scrutiny_compiler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 
@@ -27,6 +28,31 @@ namespace scrutiny
 {
     namespace tools
     {
+        inline bool is_little_endian(void)
+        {
+#if SCRUTINY_BUILD_TI_C28
+#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+            return true;
+#else
+            return false;
+#endif
+#elif (defined(__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__ == 1) || (defined(_LITTLE_ENDIAN) && _LITTLE_ENDIAN == 1)
+            return true;
+#elif (defined(__BIG_ENDIAN__) && __BIG_ENDIAN__ == 1) || (defined(_BIG_ENDIAN) && _BIG_ENDIAN == 1)
+            return false;
+#else
+            // Runtime check. Should get optimized.
+            SCRUTINY_CONSTEXPR uint32_t x = 0x12345678;
+#if CHAR_BIT == 8
+            return *reinterpret_cast<unsigned char const *>(&x) == 0x78;
+#elif CHAR_BIT == 16
+            return *reinterpret_cast<unsigned char const *>(&x) == 0x5678;
+#else
+#error
+#endif
+#endif
+        }
+
         /// @brief Returns true if the type is supported by scrutiny
         bool is_supported_type(VariableType::eVariableType const vt);
 
@@ -364,15 +390,14 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-#if SCRUTINY_BUILD_TI_C28
-#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
-            memcpy_dilate_8bits_little_endian(dst, src, nb_8bits);
-#else
-            memcpy_dilate_8bits_big_endian(dst, src, nb_8bits);
-#endif
-#else
-#error "16bits on non C2000 target requires to be handled here."
-#endif
+            if (is_little_endian())
+            {
+                memcpy_dilate_8bits_little_endian(dst, src, nb_8bits);
+            }
+            else
+            {
+                memcpy_dilate_8bits_big_endian(dst, src, nb_8bits);
+            }
 #endif
         }
 
@@ -422,18 +447,14 @@ namespace scrutiny
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
 #elif CHAR_BIT == 16
-#if SCRUTINY_BUILD_TI_C28
-#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
-            memcpy_compress_from_8bits_little_endian(dst, src, nb_8bits);
-#else
-            memcpy_compress_from_8bits_big_endian(dst, src, nb_8bits);
-#endif
-
-#else
-#error "16bits on non C2000 target requires to be handled here."
-#endif
-#else
-#error
+            if (is_little_endian())
+            {
+                memcpy_compress_from_8bits_little_endian(dst, src, nb_8bits);
+            }
+            else
+            {
+                memcpy_compress_from_8bits_big_endian(dst, src, nb_8bits);
+            }
 #endif
         }
 

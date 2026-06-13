@@ -172,9 +172,7 @@ namespace scrutiny
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    unsigned char tmp[4];
-                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &tmp);
-                    tools::memcpy_compress_from_8bits_big_endian(&m_buffer[cursor], tmp);
+                    codecs::encode_32_bits_big_endian_char(m_timebase->get_timestamp(), &m_buffer[cursor]);
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }

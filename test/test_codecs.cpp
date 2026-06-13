@@ -126,24 +126,29 @@ TEST_F(TestCodecs, EncodeBigEndian_char)
 
 #elif CHAR_BIT == 16
 
-    unsigned char outbuffer[4];
+    unsigned char outbuffer[8];
+    unsigned char outbuffer_dilated[8];
 
-    unsigned char buffer16[1] = { 0x1234 };
+    unsigned char buffer16_dilated[2] = { 0x12, 0x34 };
     scrutiny::codecs::encode_16_bits_big_endian_char((uint16_t)0x1234u, outbuffer);
-    EXPECT_BUF_EQ(outbuffer, buffer16, sizeof(buffer16));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(outbuffer_dilated, outbuffer, 2);
+    EXPECT_BUF_EQ(outbuffer_dilated, buffer16_dilated, 2);
 
-    unsigned char buffer32[2] = { 0x1234, 0x5678 };
+    unsigned char buffer32_dilated[4] = { 0x12, 0x34, 0x56, 0x78 }; // Dilation to handle databits endianess within a single char
     scrutiny::codecs::encode_32_bits_big_endian_char((uint32_t)0x12345678u, outbuffer);
-    EXPECT_BUF_EQ(outbuffer, buffer32, sizeof(buffer32));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(outbuffer_dilated, outbuffer, 4);
+    EXPECT_BUF_EQ(outbuffer_dilated, buffer32_dilated, 4);
 
-    unsigned char buffer_float[2] = { 0x4049, 0x0fda };
+    unsigned char buffer_float_dilated[2] = { 0x40, 0x49, 0x0f, 0xda };
     scrutiny::codecs::encode_float_big_endian_char(3.1415926f, outbuffer);
-    EXPECT_BUF_EQ(outbuffer, buffer_float, sizeof(buffer_float));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(outbuffer_dilated, outbuffer, 4);
+    EXPECT_BUF_EQ(outbuffer_dilated, buffer_float_dilated, 4);
 
 #if SCRUTINY_SUPPORT_64BITS
-    unsigned char buffer64[4] = { 0x1234, 0x5678, 0x9abc, 0xdef0 };
+    unsigned char buffer64_dilated[8] = { 0x1234, 0x5678, 0x9abc, 0xdef0 };
     scrutiny::codecs::encode_64_bits_big_endian_char((uint64_t)0x123456789abcdef0u, outbuffer);
-    EXPECT_BUF_EQ(outbuffer, buffer64, sizeof(buffer64));
+    scrutiny::tools::memcpy_dilate_8bits_big_endian(outbuffer_dilated, outbuffer, 8);
+    EXPECT_BUF_EQ(outbuffer_dilated, buffer64_dilated, 8);
 #endif
 
 #endif
