@@ -182,7 +182,7 @@ namespace scrutiny
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
 #if CHAR_BIT == 8
-                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor], sizeof(uint32_t));
+                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor]);
 #elif CHAR_BIT == 16
                     // Here we handle the case where databist are little endian within a single char.
                     // Only relaible way is toe extract each 8bits nibble and reencode like we want.
