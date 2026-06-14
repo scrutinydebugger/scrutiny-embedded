@@ -1182,8 +1182,18 @@ namespace scrutiny
                         temp |= (stack.write_mem.block.source_data[i] & stack.write_mem.block.mask[i]);    // Bit to 1
                         temp &= (stack.write_mem.block.source_data[i] | (~stack.write_mem.block.mask[i])); // Bit to 0
 #elif CHAR_BIT == 16
-                        unsigned char const val16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
-                        unsigned char const mask16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.mask[2 * i]);
+                        unsigned char val16bits;
+                        unsigned char mask16bits;
+                        if (tools::is_little_endian())
+                        {
+                            val16bits = codecs::decode_16_bits_little_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
+                            mask16bits = codecs::decode_16_bits_little_endian_8bits(&stack.write_mem.block.mask[2 * i]);
+                        }
+                        else
+                        {
+                            val16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.source_data[2 * i]);
+                            mask16bits = codecs::decode_16_bits_big_endian_8bits(&stack.write_mem.block.mask[2 * i]);
+                        }
                         temp |= (val16bits & mask16bits);    // Bit to 1
                         temp &= (val16bits | (~mask16bits)); // Bit to 0
 #else

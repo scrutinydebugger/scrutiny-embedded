@@ -159,8 +159,8 @@ void RawFormatParser::parse(uint32_t entry_count)
             }
             else
             {
-                volatile int x = 1;
-                (void)x;
+                m_error = true;
+                return;
             }
 
             // The parser reads back what has been written in the output buffer by the reader.

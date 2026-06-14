@@ -126,6 +126,9 @@ namespace scrutiny
         /// @brief Takes a snapshot of the data to log and write it into the datalogger buffer
         void RawFormatEncoder::encode_next_entry(LoopHandler *const caller)
         {
+#if CHAR_BIT==16            
+            unsigned char tmp [sizeof(scrutiny::uint_biggest_t) * (CHAR_BIT/8)];
+#endif            
             if (m_error)
             {
                 return;
@@ -166,15 +169,28 @@ namespace scrutiny
                     {
                         tools::set_biggest_uint(outval, 0);
                     }
+#if CHAR_BIT == 8                    
                     cursor += codecs::encode_anytype_big_endian_char(&outval, rpv.type, &m_buffer[cursor]);
+#elif CHAR_BIT == 16
+                    uint16_t nb_8bits = codecs::encode_anytype_big_endian_8bits(&outval, rpv.type, tmp);
+                    tools::memcpy_compress_from_8bits_native(&m_buffer[cursor], tmp, nb_8bits);
+                    cursor += nb_8bits / (CHAR_BIT/8);
+#endif
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    unsigned char tmp[4];
+#if CHAR_BIT == 8
+                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor], sizeof(uint32_t));
+#elif CHAR_BIT == 16    
+                    // Here we handle the case where databist are little endian within a single char.
+                    // Only relaible way is toe extract each 8bits nibble and reencode like we want.
+                    // Since read_dialte_8bits do a dilate_native, we encode with 8bits_native.
                     codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), tmp);
-                    tools::memcpy_compress_from_8bits_big_endian(&m_buffer[cursor], tmp, 4);
+                    tools::memcpy_compress_from_8bits_native(&m_buffer[cursor], tmp, sizeof(uint32_t) * (CHAR_BIT/8));
+#endif
+                    
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }
