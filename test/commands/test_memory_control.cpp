@@ -517,7 +517,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     {
         ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
     }
-#endif    
+#endif
 }
 
 /*
@@ -584,7 +584,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     {
         ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
     }
-#endif  
+#endif
 }
 
 /*
@@ -657,7 +657,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     {
         ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
     }
-#endif   
+#endif
 }
 
 /*
@@ -740,7 +740,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     {
         ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
     }
-#endif  
+#endif
 }
 
 TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)
