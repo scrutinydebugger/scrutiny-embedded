@@ -21,6 +21,7 @@ namespace scrutiny
         // =============================
         // =========== ENCODE ==========
         // =============================
+
         inline uint_least8_t encode_8_bits_8bits(uint_least8_t const value, unsigned char *const buff)
         {
             buff[0] = static_cast<unsigned char>(value & 0xFFu);

@@ -27,6 +27,7 @@
 #define SCRUTINY_FINAL final
 #define SCRUTINY_EXPLICIT explicit
 #define SCRUTINY_NULL_FN_PTR(t) nullptr
+#define SCRUTINY_CONSTEXPR_FUNC constexpr
 #else
 #define SCRUTINY_CONSTEXPR const
 #define SCRUTINY_ENUM(name, type) enum name
@@ -36,6 +37,7 @@
 #define SCRUTINY_FINAL
 #define SCRUTINY_EXPLICIT
 #define SCRUTINY_NULL_FN_PTR(t) reinterpret_cast<t>(NULL)
+#define SCRUTINY_CONSTEXPR_FUNC
 #endif
 
 // ========== Platform detection ==========

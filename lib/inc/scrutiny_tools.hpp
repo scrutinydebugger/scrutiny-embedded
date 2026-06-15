@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "scrutiny_compiler.hpp"
 #include "scrutiny_setup.hpp"
 #include "scrutiny_types.hpp"
 
@@ -27,6 +28,31 @@ namespace scrutiny
 {
     namespace tools
     {
+        inline bool is_little_endian(void)
+        {
+#if SCRUTINY_BUILD_TI_C28
+#if (defined(__little_endian__) && __little_endian__) || defined(_LITTLE_ENDIAN_) // Those macros are defined by the C2000 compiler
+            return true;
+#else
+            return false;
+#endif
+#elif (defined(__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__ == 1) || (defined(_LITTLE_ENDIAN) && _LITTLE_ENDIAN == 1)
+            return true;
+#elif (defined(__BIG_ENDIAN__) && __BIG_ENDIAN__ == 1) || (defined(_BIG_ENDIAN) && _BIG_ENDIAN == 1)
+            return false;
+#else
+            // Runtime check. Should get optimized.
+            SCRUTINY_CONSTEXPR uint32_t x = 0x12345678;
+#if CHAR_BIT == 8
+            return *reinterpret_cast<unsigned char const *>(&x) == 0x78;
+#elif CHAR_BIT == 16
+            return *reinterpret_cast<unsigned char const *>(&x) == 0x5678;
+#else
+#error
+#endif
+#endif
+        }
+
         /// @brief Returns true if the type is supported by scrutiny
         bool is_supported_type(VariableType::eVariableType const vt);
 
@@ -308,9 +334,9 @@ namespace scrutiny
         inline bool is_float_finite(float const val)
         {
 #if SCRUTINY_BUILD_AVR_GCC || SCRUTINY_BUILD_TI_C28
-            SCRUTINY_STATIC_ASSERT(sizeof(float) == 4, "Expect float to be 32 bits");
+            SCRUTINY_STATIC_ASSERT(sizeof(float) == sizeof(uint32_t), "Expect float to be 32 bits");
             uint32_t uv;
-            memcpy(&uv, &val, 4);
+            memcpy(&uv, &val, sizeof(uint32_t));
             uint16_t exponent = (uv >> 23) & 0xFF;
             return exponent != 0xFF;
 #else
@@ -318,7 +344,12 @@ namespace scrutiny
 #endif
         }
 
-        inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+        /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
+        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use big endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the destination buffer to write.
+        inline void memcpy_dilate_8bits_big_endian(void *const dst, void const *const src, size_t const nb_8bits)
         {
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
@@ -328,12 +359,54 @@ namespace scrutiny
                 static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
                 static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
             }
-#else
-#error
 #endif
         }
 
-        inline void memcpy_compress_from_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+        /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
+        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use little endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the destination buffer to write.
+        inline void memcpy_dilate_8bits_little_endian(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
+                static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
+            }
+#endif
+        }
+
+        /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
+        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use target endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the destination buffer to write.
+        inline void memcpy_dilate_8bits_native(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            if (is_little_endian())
+            {
+                memcpy_dilate_8bits_little_endian(dst, src, nb_8bits);
+            }
+            else
+            {
+                memcpy_dilate_8bits_big_endian(dst, src, nb_8bits);
+            }
+#endif
+        }
+
+        /// @brief Copy a buffer that has 8bits per char into a buffer that has CHAR_BIT bits per char. For most platforms
+        /// this translates to a memcpy. Different behavior for 16bits char. Uses big endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the source buffer
+        inline void memcpy_compress_from_8bits_big_endian(void *const dst, void const *const src, size_t const nb_8bits)
         {
 #if CHAR_BIT == 8
             memcpy(dst, src, nb_8bits);
@@ -343,8 +416,45 @@ namespace scrutiny
                 static_cast<unsigned char *>(dst)[i] =
                     (((static_cast<unsigned char const *>(src)[2 * i] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF));
             }
-#else
-#error
+#endif
+        }
+
+        /// @brief Copy a buffer that has 8bits per char into a buffer that has CHAR_BIT bits per char. For most platforms
+        /// this translates to a memcpy. Different behavior for 16bits char. Uses little endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the source buffer
+        inline void memcpy_compress_from_8bits_little_endian(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            for (size_t i = 0; i < (nb_8bits >> 1); i++)
+            {
+                static_cast<unsigned char *>(dst)[i] =
+                    (((static_cast<unsigned char const *>(src)[2 * i + 1] & 0xFF) << 8) | (static_cast<unsigned char const *>(src)[2 * i] & 0xFF));
+            }
+#endif
+        }
+
+        /// @brief Copy a buffer that has 8bits per char into a buffer that has CHAR_BIT bits per char. For most platforms
+        /// this translates to a memcpy. Different behavior for 16bits char. Uses target endianness
+        /// @param dst Destination buffer
+        /// @param src Source buffer
+        /// @param nb_8bits Number of char in the source buffer
+        inline void memcpy_compress_from_8bits_native(void *const dst, void const *const src, size_t const nb_8bits)
+        {
+#if CHAR_BIT == 8
+            memcpy(dst, src, nb_8bits);
+#elif CHAR_BIT == 16
+            if (is_little_endian())
+            {
+                memcpy_compress_from_8bits_little_endian(dst, src, nb_8bits);
+            }
+            else
+            {
+                memcpy_compress_from_8bits_big_endian(dst, src, nb_8bits);
+            }
 #endif
         }
 

@@ -64,7 +64,7 @@ namespace scrutiny
                 datalogging::buffer_size_t const right_hand_start_point = (write_cursor > m_read_cursor) ? write_cursor : buffer_end;
                 transfer_size_8bits = (right_hand_start_point - m_read_cursor) * (CHAR_BIT / 8);
                 transfer_size_8bits = SCRUTINY_MIN(transfer_size_8bits, new_max_8bits);
-                tools::memcpy_dilate_8bits(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
+                tools::memcpy_dilate_8bits_native(&buffer_8bits[output_cursor_8bits], &m_encoder->m_buffer[m_read_cursor], transfer_size_8bits);
                 m_read_cursor += transfer_size_8bits / (CHAR_BIT / 8);
                 m_read_started = true;
                 output_cursor_8bits += transfer_size_8bits;
@@ -126,6 +126,9 @@ namespace scrutiny
         /// @brief Takes a snapshot of the data to log and write it into the datalogger buffer
         void RawFormatEncoder::encode_next_entry(LoopHandler *const caller)
         {
+#if CHAR_BIT == 16
+            unsigned char tmp[sizeof(scrutiny::uint_biggest_t) * (CHAR_BIT / 8)];
+#endif
             if (m_error)
             {
                 return;
@@ -166,13 +169,31 @@ namespace scrutiny
                     {
                         tools::set_biggest_uint(outval, 0);
                     }
+#if CHAR_BIT == 8
                     cursor += codecs::encode_anytype_big_endian_char(&outval, rpv.type, &m_buffer[cursor]);
+#elif CHAR_BIT == 16
+                    // Here we handle the case where data bits are little endian within a single char.
+                    // We do a little work to put that in a usable format in every sample so we can dump fast
+                    // when the server request to read.
+                    uint16_t nb_8bits = codecs::encode_anytype_big_endian_8bits(&outval, rpv.type, tmp);
+                    tools::memcpy_compress_from_8bits_native(&m_buffer[cursor], tmp, nb_8bits);
+                    cursor += nb_8bits / (CHAR_BIT / 8);
+#endif
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
-                    codecs::encode_32_bits_big_endian_char(m_timebase->get_timestamp(), &m_buffer[cursor]);
+#if CHAR_BIT == 8
+                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), &m_buffer[cursor]);
+#elif CHAR_BIT == 16
+                    // Here we handle the case where data bits are little endian within a single char.
+                    // We do a little work to put that in a usable format in every sample so we can dump fast
+                    // when the server request to read.
+                    codecs::encode_32_bits_big_endian_8bits(m_timebase->get_timestamp(), tmp);
+                    tools::memcpy_compress_from_8bits_native(&m_buffer[cursor], tmp, sizeof(uint32_t) * (CHAR_BIT / 8));
+#endif
+
                     cursor += sizeof(scrutiny::timestamp_t);
                 }
             }
@@ -232,7 +253,7 @@ namespace scrutiny
                 uint_fast8_t elem_size = 0;
                 if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
-                    elem_size = m_config->items_to_log[i].data.memory.size; // Size if char
+                    elem_size = m_config->items_to_log[i].data.memory.size; // Size in char
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
@@ -244,12 +265,12 @@ namespace scrutiny
                     }
                     else
                     {
-                        elem_size = tools::get_type_size_char(rpv.type); // Size if char
+                        elem_size = tools::get_type_size_char(rpv.type); // Size in char
                     }
                 }
                 else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
                 {
-                    elem_size = sizeof(scrutiny::timestamp_t); // Size if char
+                    elem_size = sizeof(scrutiny::timestamp_t); // Size in char
                 }
 
                 if (elem_size == 0 && !m_error)

@@ -42,16 +42,13 @@
 class ScrutinyTest : public scrutinytest::TestCase
 {
   protected:
-    inline void memcpy_dilate_8bits(void *const dst, void const *const src, size_t const nb_8bits)
+    inline bool is_little_endian() const
     {
+        uint32_t x = 0x12345678;
 #if CHAR_BIT == 8
-        memcpy(dst, src, nb_8bits);
+        return *reinterpret_cast<unsigned char *>(&x) == 0x78;
 #elif CHAR_BIT == 16
-        for (size_t i = 0; i < (nb_8bits >> 1); i++)
-        {
-            static_cast<unsigned char *>(dst)[2 * i] = (static_cast<unsigned char const *>(src)[i] >> 8) & 0xFF;
-            static_cast<unsigned char *>(dst)[2 * i + 1] = (static_cast<unsigned char const *>(src)[i] & 0xFF);
-        }
+        return *reinterpret_cast<unsigned char *>(&x) == 0x5678;
 #endif
     }
 

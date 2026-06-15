@@ -73,13 +73,25 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
     expected_response[index++] = 0x22;
     expected_response[index++] = 0x33;
 #elif CHAR_BIT == 16
-    // Protocol is big endian
-    expected_response[index++] = 0x11;
-    expected_response[index++] = 0x22;
-    expected_response[index++] = 0x33;
-    expected_response[index++] = 0x44;
-    expected_response[index++] = 0x55;
-    expected_response[index++] = 0x66;
+    // Protocol is big endian, but data bytes endianness is target specific.
+    if (is_little_endian())
+    {
+        expected_response[index++] = 0x22;
+        expected_response[index++] = 0x11;
+        expected_response[index++] = 0x44;
+        expected_response[index++] = 0x33;
+        expected_response[index++] = 0x66;
+        expected_response[index++] = 0x55;
+    }
+    else
+    {
+        expected_response[index++] = 0x11;
+        expected_response[index++] = 0x22;
+        expected_response[index++] = 0x33;
+        expected_response[index++] = 0x44;
+        expected_response[index++] = 0x55;
+        expected_response[index++] = 0x66;
+    }
 #endif
     add_crc(expected_response, sizeof(expected_response) - 4);
 
@@ -141,17 +153,17 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
     index += encode_addr(&expected_response[index], data_buf1);
     expected_response[index++] = (data_size1 >> 8) & 0xFF;
     expected_response[index++] = (data_size1 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf1, data_size1);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf1, data_size1);
     index += data_size1;
     index += encode_addr(&expected_response[index], data_buf2);
     expected_response[index++] = (data_size2 >> 8) & 0xFF;
     expected_response[index++] = (data_size2 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf2, data_size2);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf2, data_size2);
     index += data_size2;
     index += encode_addr(&expected_response[index], data_buf3);
     expected_response[index++] = (data_size3 >> 8) & 0xFF;
     expected_response[index++] = (data_size3 >> 0) & 0xFF;
-    memcpy_dilate_8bits(&expected_response[index], data_buf3, data_size3);
+    scrutiny::tools::memcpy_dilate_8bits_native(&expected_response[index], data_buf3, data_size3);
     index += data_size3;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
@@ -456,7 +468,8 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0x44, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
 #elif CHAR_BIT == 16
     unsigned char buffer[] = { 0x0102, 0x0304, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
-    unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
+    unsigned char expected_output_buffer_be[] = { 0x1122, 0x3344, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
+    unsigned char expected_output_buffer_le[] = { 0x2211, 0x4433, 0x0506, 0x0708, 0x090A, 0x0B0C, 0x0D0E, 0x0F10, 0x1011, 0x1213 };
 #endif
 
     // Building request
@@ -493,7 +506,18 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+#if CHAR_BIT == 8
     ASSERT_BUF_EQ(buffer, expected_output_buffer, sizeof(expected_output_buffer));
+#elif CHAR_BIT == 16
+    if (is_little_endian())
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_le, sizeof(expected_output_buffer_le));
+    }
+    else
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
+    }
+#endif
 }
 
 /*
@@ -502,14 +526,15 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
 TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 {
 
-    unsigned char data_to_write_8bits[] = { 0xFF, 0xFF, 0x00, 0x00 };
-    unsigned char write_mask_8bits[] = { 0xF0, 0xAA, 0xF0, 0xAA };
+    unsigned char data_to_write_8bits[] = { 0xFF, 0xFF, 0x00, 0x00, 0x55, 0x55 };
+    unsigned char write_mask_8bits[] = { 0xF0, 0xAA, 0xF0, 0xAA, 0xAF, 0x55 };
 #if CHAR_BIT == 8
     unsigned char buffer[] = { 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
-    unsigned char expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA };
+    unsigned char expected_output_buffer[] = { 0xFA, 0xAA, 0x0A, 0x00, 0x05, 0xFF, 0xAA, 0xAA, 0xAA, 0xAA };
 #elif CHAR_BIT == 16
     unsigned char buffer[] = { 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
-    unsigned char expected_output_buffer[] = { 0xFAAA, 0x0A00, 0xAAAA, 0xAAAA, 0xAAAA, 0xAAAA };
+    unsigned char expected_output_buffer_be[] = { 0xFAAA, 0x0A00, 0x05FF, 0xAAAA, 0xAAAA, 0xAAAA };
+    unsigned char expected_output_buffer_le[] = { 0xAAFA, 0x000A, 0xFF05, 0xAAAA, 0xAAAA, 0xAAAA };
 #endif
 
     // Building request
@@ -548,7 +573,18 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+#if CHAR_BIT == 8
     ASSERT_BUF_EQ(buffer, expected_output_buffer, sizeof(expected_output_buffer));
+#elif CHAR_BIT == 16
+    if (is_little_endian())
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_le, sizeof(expected_output_buffer_le));
+    }
+    else
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
+    }
+#endif
 }
 
 /*
@@ -563,7 +599,8 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 #if CHAR_BIT == 8
     unsigned char expected_output_buffer[] = { 0x11, 0x22, 0x33, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x0a };
 #elif CHAR_BIT == 16
-    unsigned char expected_output_buffer[] = { 0x1122, 0x3344, 0x03, 0xAABB, 0xCCDD, 0xEEFF, 0x07, 0x08, 0x09, 0x0a };
+    unsigned char expected_output_buffer_be[] = { 0x1122, 0x3344, 0x03, 0xAABB, 0xCCDD, 0xEEFF, 0x07, 0x08, 0x09, 0x0a };
+    unsigned char expected_output_buffer_le[] = { 0x2211, 0x4433, 0x03, 0xBBAA, 0xDDCC, 0xFFEE, 0x07, 0x08, 0x09, 0x0a };
 #endif
 
     // Building request
@@ -609,7 +646,18 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+#if CHAR_BIT == 8
     ASSERT_BUF_EQ(buffer, expected_output_buffer, sizeof(expected_output_buffer));
+#elif CHAR_BIT == 16
+    if (is_little_endian())
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_le, sizeof(expected_output_buffer_le));
+    }
+    else
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
+    }
+#endif
 }
 
 /*
@@ -628,7 +676,8 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     unsigned int second_write_index = 4;
 #elif CHAR_BIT == 16
     unsigned char buffer[] = { 0x5555, 0x5555, 0x5555, 0x5555, 0x5599 };
-    unsigned char expected_output_buffer[] = { 0x1155, 0x3554, 0x5AFF, 0x5555, 0x0599 };
+    unsigned char expected_output_buffer_be[] = { 0x1155, 0x3554, 0x5AFF, 0x5555, 0x0599 };
+    unsigned char expected_output_buffer_le[] = { 0x5511, 0x5435, 0xFF5A, 0x5555, 0x5509 };
     unsigned int second_write_index = 2;
 #endif
 
@@ -680,7 +729,18 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
     EXPECT_EQ(nread, n_to_read);
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
+#if CHAR_BIT == 8
     ASSERT_BUF_EQ(buffer, expected_output_buffer, sizeof(expected_output_buffer));
+#elif CHAR_BIT == 16
+    if (is_little_endian())
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_le, sizeof(expected_output_buffer_le));
+    }
+    else
+    {
+        ASSERT_BUF_EQ(buffer, expected_output_buffer_be, sizeof(expected_output_buffer_be));
+    }
+#endif
 }
 
 TEST_F(TestMemoryControl, TestWriteSingleAddress_InvalidDataLength)

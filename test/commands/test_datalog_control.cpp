@@ -8,8 +8,6 @@
 
 #include "scrutinytest/scrutinytest.hpp"
 #include <cstring>
-#include <iomanip>
-#include <iostream>
 #include <limits>
 #include <string>
 
