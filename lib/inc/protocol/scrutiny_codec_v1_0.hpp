@@ -276,6 +276,7 @@ namespace scrutiny
                     uint32_t heartbeat_timeout;
                     uint32_t comm_rx_timeout;
                     uint_least8_t address_size;
+                    uint_least8_t char_bit;
                 };
                 struct Connect
                 {

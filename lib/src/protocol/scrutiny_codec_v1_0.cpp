@@ -874,8 +874,9 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_size = 4;
             SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_size = 4;
             SCRUTINY_CONSTEXPR uint16_t address_size_size = 1;
-            SCRUTINY_CONSTEXPR uint16_t datalen =
-                rx_buffer_size_len + tx_buffer_size_len + max_bitrate_size + heartbeat_timeout_size + comm_rx_timeout_size + address_size_size;
+            SCRUTINY_CONSTEXPR uint16_t char_bit_size = 1;
+            SCRUTINY_CONSTEXPR uint16_t datalen = rx_buffer_size_len + tx_buffer_size_len + max_bitrate_size + heartbeat_timeout_size +
+                                                  comm_rx_timeout_size + address_size_size + char_bit_size;
 
             SCRUTINY_CONSTEXPR uint16_t rx_buffer_size_pos = 0;
             SCRUTINY_CONSTEXPR uint16_t tx_buffer_size_pos = rx_buffer_size_pos + rx_buffer_size_len;
@@ -883,6 +884,7 @@ namespace scrutiny
             SCRUTINY_CONSTEXPR uint16_t heartbeat_timeout_pos = max_bitrate_pos + max_bitrate_size;
             SCRUTINY_CONSTEXPR uint16_t comm_rx_timeout_pos = heartbeat_timeout_pos + heartbeat_timeout_size;
             SCRUTINY_CONSTEXPR uint16_t address_size_pos = comm_rx_timeout_pos + comm_rx_timeout_size;
+            SCRUTINY_CONSTEXPR uint16_t char_bit_pos = address_size_pos + address_size_size;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
@@ -896,7 +898,8 @@ namespace scrutiny
             codecs::encode_32_bits_big_endian_8bits(response_data->max_bitrate, &response->data[max_bitrate_pos]);
             codecs::encode_32_bits_big_endian_8bits(response_data->heartbeat_timeout, &response->data[heartbeat_timeout_pos]);
             codecs::encode_32_bits_big_endian_8bits(response_data->comm_rx_timeout, &response->data[comm_rx_timeout_pos]);
-            response->data[address_size_pos] = response_data->address_size; // Size in 8bits
+            codecs::encode_8_bits_8bits(response_data->address_size, &response->data[address_size_pos]);
+            codecs::encode_8_bits_8bits(response_data->char_bit, &response->data[char_bit_pos]);
 
             return ResponseCode::OK;
         }
