@@ -176,7 +176,7 @@ TEST_F(TestCommControl, TestGetParams)
     unsigned char request_data[8] = { 2, 3, 0, 0 };
     SCRUTINY_CONSTEXPR unsigned char address_size = SIZEOF_8BITS(uintptr_t);
     add_crc(request_data, sizeof(request_data) - 4);
-    SCRUTINY_CONSTEXPR uint16_t datalen = 2 + 2 + 4 + 4 + 4 + 1;
+    SCRUTINY_CONSTEXPR uint16_t datalen = 2 + 2 + 4 + 4 + 4 + 1 + 1;
 
     unsigned char expected_response[9 + datalen] = { 0x82, 3, 0, 0, datalen };
     unsigned char i = 5;
@@ -197,6 +197,7 @@ TEST_F(TestCommControl, TestGetParams)
     expected_response[i++] = (SCRUTINY_COMM_RX_TIMEOUT_US >> 8) & 0xFF;
     expected_response[i++] = (SCRUTINY_COMM_RX_TIMEOUT_US >> 0) & 0xFF;
     expected_response[i++] = address_size;
+    expected_response[i++] = CHAR_BIT;
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.comm()->connect();

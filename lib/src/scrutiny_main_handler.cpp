@@ -953,6 +953,7 @@ namespace scrutiny
             stack.get_params.response_data.comm_rx_timeout = SCRUTINY_COMM_RX_TIMEOUT_US;
             stack.get_params.response_data.heartbeat_timeout = SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US;
             stack.get_params.response_data.address_size = SIZEOF_8BITS(void *);
+            stack.get_params.response_data.char_bit = CHAR_BIT;
             code = m_codec.encode_response_comm_get_params(&stack.get_params.response_data, response);
             break;
         }
