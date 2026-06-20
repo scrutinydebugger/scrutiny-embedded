@@ -12,7 +12,7 @@ env.Append(LINKFLAGS=["-gdwarf-4"])
 #     print("Program path", program_path)
 #     if env.Execute(f"./scripts/with-venv.sh scrutiny get-firmware-id {program_path} --apply --output workfolder"):
 #         env.Exit(1)
-#     if env.Execute(f"./scripts/with-venv.sh scrutiny make-metadata --version='0.0.1' --author='ScrutinnyDevs' --project-name='ArduinoConsole' --output workfolder"):
+#     if env.Execute(f"./scripts/with-venv.sh scrutiny make-metadata --version='0.0.1' --author='ScrutinyDevs' --project-name='ArduinoConsole' --output workfolder"):
 #         env.Exit(1)
 #     if env.Execute(f"./scripts/with-venv.sh scrutiny elf2varmap {program_path} --output workfolder"):
 #         env.Exit(1)

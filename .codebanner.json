@@ -31,7 +31,7 @@
             "docstring": "Definition of a run-time configuration of the scrutiny module.\nTo be filled in startup phase"
         },
         "lib/inc/scrutiny_loop_handler.hpp": {
-            "docstring": "LoopHandler definition.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
+            "docstring": "LoopHandler definition.\nLoop Handler is to be run in a specific time domain and will make some features available that depend on the execution frequency such as embedded datalogging"
         },
         "lib/inc/scrutiny_main_handler.hpp": {
             "docstring": "The main scrutiny class to be manipulated by the user"
@@ -52,37 +52,37 @@
             "docstring": "Definitions of encode/decode functions for the scrutiny protocol V1.0"
         },
         "lib/inc/protocol/scrutiny_comm_handler.hpp": {
-            "docstring": "Manage the tranport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
+            "docstring": "Manage the transport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
         },
         "lib/inc/protocol/scrutiny_protocol.hpp": {
             "docstring": "Main include file for the scrutiny protocol"
         },
         "lib/inc/protocol/scrutiny_protocol_definitions.hpp": {
-            "docstring": "Defines Request/Rsponse objects and commands/subfunctions IDs.\n Not version specific"
+            "docstring": "Defines Request/Response objects and commands/subfunctions IDs.\n Not version specific"
         },
         "lib/src/scrutiny_config.cpp": {
             "docstring": "Implementation of the run-time Scrutiny configuration"
         },
         "lib/src/scrutiny_loop_handler.cpp": {
-            "docstring": "LoopHandler implementation.\nLoop Handler is to be run in a specific time domain and will make some features available that depends on the execution requency such as embedded datalogging"
+            "docstring": "LoopHandler implementation.\nLoop Handler is to be run in a specific time domain and will make some features available that depend on the execution frequency such as embedded datalogging"
         },
         "lib/src/scrutiny_main_handler.cpp": {
             "docstring": "The main scrutiny class to be manipulated by the user."
         },
         "lib/src/scrutiny_software_id.cpp": {
-            "docstring": "Instanciation of the global ID used for firmware tagging"
+            "docstring": "Instantiation of the global ID used for firmware tagging"
         },
         "lib/src/protocol/scrutiny_codec_v1_0.cpp": {
             "docstring": "Encode/Decode functions for the Scrutiny Protocol V1.0"
         },
         "lib/src/protocol/scrutiny_comm_handler.cpp": {
-            "docstring": "Manage the tranport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
+            "docstring": "Manage the transport-ish layer of the communication protocol. Converts Request/Response to byte stream and validate CRC"
         },
         "lib/src/protocol/scrutiny_protocol_definitions.cpp": {
-            "docstring": "Instanciation of protocol definitions such as magic payload."
+            "docstring": "Instantiation of protocol definitions such as magic payload."
         },
         "test/scrutiny_test.cpp": {
-            "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
+            "docstring": "Base class for CPP unit tests.\n All tests should inherit this class.\n Includes a bunch of helpers for easy testing."
         },
         "test/test_crc.cpp": {
             "docstring": "Test CRC calculation"
@@ -91,7 +91,7 @@
             "docstring": "Test our minimalist time tracker"
         },
         "test/scrutiny_test.hpp": {
-            "docstring": "Base class for CPP unit tests.\n All test should inherit this class.\n Includes bunch of helper for easy testing."
+            "docstring": "Base class for CPP unit tests.\n All tests should inherit this class.\n Includes a bunch of helpers for easy testing."
         },
         "test/commands/test_comm_control.cpp": {
             "docstring": "Test the behaviour of the embedded module when CommControl commands are received"
@@ -106,7 +106,7 @@
             "docstring": "Test the behaviour of the embedded module when UserCommand commands are received"
         },
         "test/protocol/test_comm_handler.cpp": {
-            "docstring": "Test the tranport-ish layer good behaviour at high level."
+            "docstring": "Test the transport-ish layer good behaviour at high level."
         },
         "test/protocol/test_protocol_rx_parsing.cpp": {
             "docstring": "Make sure reception of request bytes are correctly decoded"
@@ -133,7 +133,7 @@
             "docstring": "Placeholder file for variable extraction test"
         },
         "projects/testapp/src/comm_channels/udp_bridge.cpp": {
-            "docstring": "Class that open a UDP port and handle a single client."
+            "docstring": "Class that opens a UDP port and handles a single client."
         },
         "projects/testapp/include/file1.hpp": {
             "docstring": "Placeholder file for variable extraction test"
@@ -145,7 +145,7 @@
             "docstring": "Placeholder file for variable extraction test"
         },
         "projects/testapp/include/comm_channels/udp_bridge.hpp": {
-            "docstring": "Class that open a UDP port and handle a single client."
+            "docstring": "Class that opens a UDP port and handles a single client."
         },
         "projects/testapp/include/argument_parser.hpp": {
             "docstring": "For CLI parsing"
@@ -154,16 +154,16 @@
             "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
         },
         "projects/testapp/include/comm_channels/nix_serial_port_bridge.hpp": {
-            "docstring": "Class that make a *Nix Serial port available as a communication channel for the Testapp"
+            "docstring": "Class that makes a *Nix Serial port available as a communication channel for the Testapp"
         },
         "projects/testapp/include/comm_channels/win_serial_port_bridge.hpp": {
-            "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
+            "docstring": "Class that makes a Windows Serial port available as a communication channel for the Testapp"
         },
         "projects/testapp/src/comm_channels/nix_serial_port_bridge.cpp": {
-            "docstring": "Class that make a *Nix Serial port available as a communication channel for the Testapp"
+            "docstring": "Class that makes a *Nix Serial port available as a communication channel for the Testapp"
         },
         "projects/testapp/src/comm_channels/win_serial_port_bridge.cpp": {
-            "docstring": "Class that make a Windows Serial port available as a communication channel for the Testapp"
+            "docstring": "Class that makes a Windows Serial port available as a communication channel for the Testapp"
         },
         "lib/inc/scrutiny_common_codecs.hpp": {
             "docstring": "Some codecs function used across the project"
@@ -190,19 +190,19 @@
             "docstring": "Some common encoding/decoding functions used across the project."
         },
         "lib/src/datalogging/scrutiny_datalogger.cpp": {
-            "docstring": "The implementation of the datalogger object that should exist in each loop "
+            "docstring": "The implementation of the datalogger object that should exist in each loop"
         },
         "projects/testapp/src/include_test.cpp": {
-            "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
+            "docstring": "Just a file that makes sure that we can include scrutiny.hpp in a blank file without breaking anything"
         },
         "test/test_ipc.cpp": {
-            "docstring": "Test for the Inter-process communication tools"
+            "docstring": "Tests for the inter-process communication tools"
         },
         "test/test_variable_fetching.cpp": {
             "docstring": "Test the capacity to read a variable from the memory given the debugging info"
         },
         "test/test_types.cpp": {
-            "docstring": "Some tests dones on scrutiny types"
+            "docstring": "Some tests done on scrutiny types"
         },
         "test/commands/test_memory_control_rpv.cpp": {
             "docstring": "Test the memory control command dedicated for Runtime Published Values"
@@ -235,16 +235,16 @@
             "docstring": "Test the DataLogControl command used to configure, control and reads the datalogger"
         },
         "test/datalogging/test_datalogger.cpp": {
-            "docstring": "Test suite for the datalogger object. Test its capacity to log, trigger access bitfields and report error on bad config."
+            "docstring": "Test suite for the datalogger object. Tests its capacity to log, trigger, access bitfields, and report errors on bad config."
         },
         "test/datalogging/raw_format_parser.hpp": {
-            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
+            "docstring": "Class that can read the data encoded by the datalogging encoder. It does what the server would do for testing purposes"
         },
         "test/datalogging/test_raw_encoder.cpp": {
             "docstring": "Test suite for the RawFormat encoder."
         },
         "test/datalogging/raw_format_parser.cpp": {
-            "docstring": "Class that can reads the data encoded by the datalogging encoder. It does what the server would do for testing purpose"
+            "docstring": "Class that can read the data encoded by the datalogging encoder. It does what the server would do for testing purposes"
         },
         "lib/inc/static_analysis_build_config.hpp": {
             "docstring": "Stubbed configuration file used for static analysis with hardcoded values instead of values coming from cmake"
@@ -262,13 +262,13 @@
             "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
         },
         "projects/c_testapp/include/comm_channels/nix_serial_port_bridge.h": {
-            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+            "docstring": "Serial interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/include/comm_channels/udp_bridge.h": {
-            "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
+            "docstring": "UDP interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/include/comm_channels/win_serial_port_bridge.h": {
-            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+            "docstring": "Serial interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/src/main.c": {
             "docstring": "Entry point of C TestApp"
@@ -277,16 +277,16 @@
             "docstring": "For CLI parsing"
         },
         "projects/c_testapp/src/include_test.c": {
-            "docstring": "Just a file that make sure that we can include scrutiny.hpp in a blank file without breaking anything"
+            "docstring": "Just a file that makes sure that we can include scrutiny.hpp in a blank file without breaking anything"
         },
         "projects/c_testapp/src/comm_channels/win_serial_port_bridge.c": {
-            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+            "docstring": "Serial interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/src/comm_channels/nix_serial_port_bridge.c": {
-            "docstring": "Serial interface fopr the C testapp. Used to talk with the server"
+            "docstring": "Serial interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/src/comm_channels/udp_bridge.c": {
-            "docstring": "UDP interface fopr the C testapp. Used to talk with the server"
+            "docstring": "UDP interface for the C testapp. Used to talk with the server"
         },
         "projects/c_testapp/include/file2.h": {
             "docstring": "Placeholder file for variable extraction test"
@@ -319,7 +319,7 @@
             "docstring": "Windows serial port abstraction"
         },
         "projects/c_testapp/src/tools.c": {
-            "docstring": "Miscelaneous tools for C TestApp"
+            "docstring": "Miscellaneous tools for C TestApp"
         },
         "lib/inc/ipc/scrutiny_ipc_tricore.hpp": {
             "docstring": "An implementation of the Scrutiny IPC based on Tricore intrinsics to store atomically"
@@ -352,7 +352,7 @@
             "docstring": "Command line parsing"
         },
         "cwrapper/elf-symdump/src/main.c": {
-            "docstring": "A simple tool that read a .elf and finds the value of a symbol if available. Invoked like: \n scrutoiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2"
+            "docstring": "A simple tool that reads a .elf and finds the value of a symbol if available. Invoked like: \n scrutiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2"
         },
         "projects/testapp/include/file4.hpp": {
             "docstring": "Placeholder file for variable extraction test"
@@ -370,7 +370,7 @@
             "docstring": "A testsuite for the CWrapper"
         },
         "lib/inc/ipc/scrutiny_ipc_ti_c28.hpp": {
-            "docstring": "An implementation of the Scrutiny IPC for Texas Instrument C200 family"
+            "docstring": "An implementation of the Scrutiny IPC for Texas Instruments C2000 family"
         }
     },
     "authors": {}

@@ -60,7 +60,7 @@ typedef enum
 #define SHT_FINI_ARRAY 15             /* Array of destructors */
 #define SHT_PREINIT_ARRAY 16          /* Array of pre-constructors */
 #define SHT_GROUP 17                  /* Section group */
-#define SHT_SYMTAB_SHNDX 18           /* Extended section indeces */
+#define SHT_SYMTAB_SHNDX 18           /* Extended section indices */
 #define SHT_NUM 19                    /* Number of defined types.  */
 #define SHT_LOOS 0x60000000           /* Start OS-specific.  */
 #define SHT_GNU_ATTRIBUTES 0x6ffffff5 /* Object attributes.  */

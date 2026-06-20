@@ -1,5 +1,5 @@
 //    udp_bridge.cpp
-//        Class that open a UDP port and handle a single client.
+//        Class that opens a UDP port and handles a single client.
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

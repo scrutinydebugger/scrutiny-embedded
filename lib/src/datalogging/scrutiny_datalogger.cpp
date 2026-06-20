@@ -206,7 +206,7 @@ namespace scrutiny
                 }
             }
 
-            // The configuration is good. Let's initialize to do an start logging
+            // The configuration is good. Let's initialize to start logging
             if (m_config_valid)
             {
                 m_encoder.set_timebase(m_timebase);

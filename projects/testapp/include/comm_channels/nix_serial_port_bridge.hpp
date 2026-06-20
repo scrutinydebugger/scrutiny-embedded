@@ -1,5 +1,5 @@
 //    nix_serial_port_bridge.hpp
-//        Class that make a *Nix Serial port available as a communication channel for the Testapp
+//        Class that makes a *Nix Serial port available as a communication channel for the Testapp
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

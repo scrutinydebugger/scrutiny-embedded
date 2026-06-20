@@ -148,7 +148,7 @@ namespace scrutiny
             return get_required_type_size_8bits(get_platform_boolean_size_8bits());
         }
 
-        /// @brief Return the bool variablt type that matches the paltform ``bool`` size. Compiler specific.
+        /// @brief Return the bool variable type that matches the platform ``bool`` size. Compiler specific.
         inline VariableType::eVariableType get_platform_boolean()
         {
             return make_type(VariableTypeType::_boolean, get_platform_boolean_size());
@@ -345,7 +345,7 @@ namespace scrutiny
         }
 
         /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
-        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use big endianness
+        /// translates to a memcpy on most platforms. Different behavior for 16bits char. Use big endianness
         /// @param dst Destination buffer
         /// @param src Source buffer
         /// @param nb_8bits Number of char in the destination buffer to write.
@@ -363,7 +363,7 @@ namespace scrutiny
         }
 
         /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
-        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use little endianness
+        /// translates to a memcpy on most platforms. Different behavior for 16bits char. Use little endianness
         /// @param dst Destination buffer
         /// @param src Source buffer
         /// @param nb_8bits Number of char in the destination buffer to write.
@@ -381,7 +381,7 @@ namespace scrutiny
         }
 
         /// @brief Take an array of char and copy to a destination buffer, making sure that there is only 8bits per char.
-        /// tarnslate to a memcpy on most platforms. Different behavior for 16bits char. Use target endianness
+        /// translates to a memcpy on most platforms. Different behavior for 16bits char. Use target endianness
         /// @param dst Destination buffer
         /// @param src Source buffer
         /// @param nb_8bits Number of char in the destination buffer to write.

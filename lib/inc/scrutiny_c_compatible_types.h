@@ -156,7 +156,7 @@ typedef union
 } scrutiny_c_any_type_fast_t;
 
 /// @brief  Represent a RuntimePublishedValue definition.
-/// It is a data object with a type and a ID that can be read/written by the server
+/// It is a data object with a type and an ID that can be read/written by the server
 typedef struct
 {
     uint16_t id;

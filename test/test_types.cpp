@@ -1,5 +1,5 @@
 //    test_types.cpp
-//        Some tests dones on scrutiny types
+//        Some tests done on scrutiny types
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

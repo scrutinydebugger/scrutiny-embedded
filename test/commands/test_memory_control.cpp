@@ -111,7 +111,7 @@ TEST_F(TestMemoryControl, TestReadSingleAddress)
 }
 
 /*
-    Reads a 3 memory block and expect a response with a valid content
+    Reads 3 memory blocks and expects a response with valid content
 */
 TEST_F(TestMemoryControl, TestReadMultipleAddress)
 {
@@ -183,7 +183,7 @@ TEST_F(TestMemoryControl, TestReadMultipleAddress)
 }
 
 /*
-    Sends multiple requests with an invalid amount of data and expect to receive and "InvalidRequest" response
+    Sends multiple requests with an invalid amount of data and expects to receive an "InvalidRequest" response
 */
 TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
 {
@@ -225,8 +225,8 @@ TEST_F(TestMemoryControl, TestReadAddressInvalidRequest)
 }
 
 /*
-    Sends multiple request for 2 blocks of data. The first block will almost fill the transmit buffer.
-    Depending on the size of the second block, we expect either a valid respons or an "overflow" response if we ask
+    Sends multiple requests for 2 blocks of data. The first block will almost fill the transmit buffer.
+    Depending on the size of the second block, we expect either a valid response or an "overflow" response if we ask
     for more data than what can fit in the TX buffer.
 */
 
@@ -373,7 +373,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
 }
 
 /*
-We make sure we can read readonly adress ranges without issues. Same test as TestReadForbiddenAddress, but we expect OK response code.
+We make sure we can read readonly address ranges without issues. Same test as TestReadForbiddenAddress, but we expect OK response code.
 */
 TEST_F(TestMemoryControl, TestReadReadonlyAddress)
 {
@@ -521,7 +521,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddress)
 }
 
 /*
-    Write a single memory block and expect it to be written.
+    Write a single memory block with a mask and expect it to be written.
 */
 TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 {
@@ -588,7 +588,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked)
 }
 
 /*
-    Write 2  memory block in a single request and expect it to be written.
+    Write 2 memory blocks in a single request and expect them to be written.
 */
 TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 {
@@ -661,7 +661,7 @@ TEST_F(TestMemoryControl, TestWriteMultipleAddress)
 }
 
 /*
-    Write 2  memory block in a single request and expect it to be written with a mask.
+    Write 2 memory blocks in a single request and expect them to be written with a mask.
 */
 TEST_F(TestMemoryControl, TestWriteMultipleAddressMasked)
 {
@@ -922,9 +922,9 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
 }
 
 /*
-    Test that invalid request are processed as such.
-    We make a valid request with 2 write command. Then we adjust the request length to have partial or extra data.
-    We skip the 2 valid possiblities (1 full wirte command, 2 full write command). All the other shall be returned as invalid.
+    Test that invalid requests are processed as such.
+    We make a valid request with 2 write commands. Then we adjust the request length to have partial or extra data.
+    We skip the 2 valid possibilities (1 full write command, 2 full write commands). All the others shall be returned as invalid.
 */
 TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
 {
@@ -954,7 +954,7 @@ TEST_F(TestMemoryControl, TestWriteMemoryInvalidRequest)
         request_data[index++] = (data_to_write_length >> 8) & 0xFF;
         request_data[index++] = (data_to_write_length >> 0) & 0xFF;
         index += data_to_write_length;
-        // Seond block
+        // Second block
         index += encode_addr(&request_data[index], some_data);
         request_data[index++] = (data_to_write_length >> 8) & 0xFF;
         request_data[index++] = (data_to_write_length >> 0) & 0xFF;

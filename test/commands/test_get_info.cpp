@@ -310,7 +310,7 @@ TEST_F(TestGetInfo, TestGetRPVCount)
 }
 
 /*
-    Reads the  Runtime Published Values definitions
+    Reads the Runtime Published Values definitions
 */
 
 TEST_F(TestGetInfo, TestGetRPVDefinition)
@@ -321,7 +321,7 @@ TEST_F(TestGetInfo, TestGetRPVDefinition)
         { 0x1122, scrutiny::VariableType::uint32 },
         { 0x3344, scrutiny::VariableType::float32 },
         { 0x5566, scrutiny::VariableType::uint16 },
-        // Type "boolean" has no size encoded, expect the library to encode the paltform size to give to the server.
+        // Type "boolean" has no size encoded, expect the library to encode the platform size to give to the server.
         { 0x7788, scrutiny::VariableType::boolean }
     };
 
@@ -509,7 +509,7 @@ TEST_F(TestGetInfo, TestGetLoopCountNoLoopSet)
 
     // Make expected response
     unsigned char expected_response[9 + 1] = { 0x81, 8, 0, 0, 1 };
-    expected_response[5] = 0; // 2 loops
+    expected_response[5] = 0; // 0 loops
     add_crc(expected_response, sizeof(expected_response) - 4);
 
     scrutiny_handler.receive_data(request_data, sizeof(request_data));

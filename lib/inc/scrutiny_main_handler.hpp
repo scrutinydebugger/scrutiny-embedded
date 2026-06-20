@@ -150,13 +150,13 @@ namespace scrutiny
             return &m_comm_handler;
         }
 
-        /// @brief Returns a pointer the the given configuration
+        /// @brief Returns a pointer to the given configuration
         inline Config *get_config(void)
         {
             return &m_config;
         }
 
-        /// @brief Returns a pointer the the given configuration in read-only
+        /// @brief Returns a pointer to the given configuration in read-only
         inline Config const *get_config_ro(void) const
         {
             return &m_config;
@@ -200,7 +200,7 @@ namespace scrutiny
         Timebase m_timebase;                   // Timebase to keep track of time
         protocol::CommHandler m_comm_handler;  // The communication handler that parses the request and manages the buffers
         bool m_processing_request;             // True when a request is being processed
-        bool m_disconnect_pending;             // INdicates that a disconnect request has been received and must be processed right away
+        bool m_disconnect_pending;             // Indicates that a disconnect request has been received and must be processed right away
         Config m_config;                       // The configuration
         bool m_enabled;                        // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
         bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
@@ -244,7 +244,7 @@ namespace scrutiny
             DataloggingError::eDataloggingError error;      // Error related to datalogging mechanism
             bool request_arm_trigger;                       // Flag indicating that a request has been made to arm the trigger
             bool request_ownership_release;                 // Flag indicating that a request has been made to release ownership of the datalogger
-            bool request_disarm_trigger;                    // Flag indicating that a request has been made to darm the trigger
+            bool request_disarm_trigger;                    // Flag indicating that a request has been made to disarm the trigger
             bool pending_ownership_release;                 // Flag indicating that a request for ownership release is presently being processed
             bool reading_in_progress;                       // Flag indicating that the datalogging data is presently being read by the user.
             uint_least8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read

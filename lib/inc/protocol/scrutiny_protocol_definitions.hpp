@@ -1,5 +1,5 @@
 //    scrutiny_protocol_definitions.hpp
-//        Defines Request/Rsponse objects and commands/subfunctions IDs.
+//        Defines Request/Response objects and commands/subfunctions IDs.
 //        Not version specific
 //
 //   - License : MIT - See LICENSE file

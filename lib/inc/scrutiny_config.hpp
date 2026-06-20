@@ -36,7 +36,7 @@ namespace scrutiny
         /// @param tx_buffer_size Transmission buffer size
         void set_buffers(unsigned char *rx_buffer, uint16_t const rx_buffer_size, unsigned char *tx_buffer, uint16_t const tx_buffer_size);
 
-        /// @brief Define some memory section that are to be left untouched
+        /// @brief Define some memory sections that are to be left untouched
         /// @param range Array of ranges represented by the `AddressRange` object.
         /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
         /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
@@ -51,7 +51,7 @@ namespace scrutiny
         void set_readonly_address_range(AddressRange const *ranges, uint_least8_t const count);
 
         /// @brief Configures the Runtime Published Values
-        /// @param array Array of `scrutiny::RuntimePublishedValues` that contains the definition of each RPV.
+        /// @param array Array of `scrutiny::RuntimePublishedValue` that contains the definition of each RPV.
         /// This array must be allocated outside of Scrutiny and stay
         /// allocated forever as no copy will be made
         /// @param nbr Number of RPV in the array
@@ -64,10 +64,10 @@ namespace scrutiny
             RpvWriteCallback const wr_cb = SCRUTINY_NULL_FN_PTR(RpvWriteCallback));
 
         /// @brief Defines the different loops (tasks) in the application.
-        /// @param loops Arrays of pointer to the `scrutiny::LoopHandlers`.
+        /// @param loops Array of pointers to the `scrutiny::LoopHandler`.
         /// This array must be allocated outside of Scrutiny and stay
         /// allocated forever as no copy will be made
-        /// @param loop_count Number of `scrutiny::LoopHandlers`
+        /// @param loop_count Number of `scrutiny::LoopHandler` instances
         void set_loops(LoopHandler **loops, uint_least8_t loop_count);
 
         /// @brief Sets a callback to be called by Scrutiny after a request to the UserCommand function.
@@ -90,7 +90,7 @@ namespace scrutiny
         /// @brief Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
         /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
         /// the integrator responsibility to ensure thread safety
-        /// @param callback The callback to be call upon datalogging trigger
+        /// @param callback The callback to be called upon datalogging trigger
         inline void set_datalogging_trigger_callback(datalogging::trigger_callback_t callback)
         {
             m_datalogger_trigger_callback = callback;
@@ -102,7 +102,7 @@ namespace scrutiny
             return m_user_command_callback != SCRUTINY_NULL_FN_PTR(user_command_callback_t);
         }
 
-        /// @brief Returns true if the communication buffers were sets
+        /// @brief Returns true if the communication buffers were set
         inline bool is_buffer_set(void) const
         {
             return (m_rx_buffer != SCRUTINY_NULL) && (m_tx_buffer != SCRUTINY_NULL);

@@ -53,7 +53,7 @@ namespace scrutiny
     /// @brief User Command Callback function
     typedef ctypes::scrutiny_c_user_command_callback_t user_command_callback_t;
 
-    /// @brief Represent a type type, meaning a type without its size. uint8, uin16, int32 all have type type uint.
+    /// @brief Represent a type type, meaning a type without its size. uint8, uint16, int32 all have type type uint.
     class VariableTypeType
     {
       public:
@@ -154,7 +154,7 @@ namespace scrutiny
 #define BiggestFloat VariableType::float32
 #endif
 
-    /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and a ID that can be read/written by the server
+    /// @brief  Represent a RuntimePublishedValue definition. It is a data object with a type and an ID that can be read/written by the server
     struct RuntimePublishedValue
     {
         inline void to_c_struct(ctypes::scrutiny_c_runtime_published_value_t *rpv_c) const

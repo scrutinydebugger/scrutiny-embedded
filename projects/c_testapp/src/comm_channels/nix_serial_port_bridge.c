@@ -1,5 +1,5 @@
 //    nix_serial_port_bridge.c
-//        Serial interface fopr the C testapp. Used to talk with the server
+//        Serial interface for the C testapp. Used to talk with the server
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -149,7 +149,7 @@ comm_channel_status_e nix_serial_port_start(nix_serial_port_t *serial_port)
     if (cfsetospeed(&tty, baudrate) != 0)
     {
         nix_serial_port_stop(serial_port);
-        ERR_RETURN("Cannot open port. ifcfsetospeed failed");
+        ERR_RETURN("Cannot open port. cfsetospeed failed");
     }
 
     if (tcsetattr(serial_port->m_fd, TCSANOW, &tty) != 0)

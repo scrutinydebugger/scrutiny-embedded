@@ -52,10 +52,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     scrutiny_c_main_handler_t *scrutiny_c_main_handler_construct(void *mem, size_t const size);
 
     /// @brief Wrapper for `MainHandler::init()`.
-    /// Initialize The MainHandler
+    /// Initialize the MainHandler.
     /// @param main_handler The `MainHandler` object to work on.
     /// @param config The configuration to apply on the `MainHandler`.
-    /// return SCRUTINY_C_SUCCESS on success, SCRUTINY_C_ERROR otherwise
+    /// @return SCRUTINY_C_SUCCESS on success, SCRUTINY_C_ERROR otherwise
     scrutiny_c_status_e scrutiny_c_main_handler_init(scrutiny_c_main_handler_t *main_handler, scrutiny_c_config_t *config);
 
     /// @brief Wrapper for `MainHandler::process()`
@@ -108,7 +108,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
         uint16_t const tx_buffer_size);
 
     /// @brief Wrapper for `Config::set_forbidden_address_range()`
-    /// Defines some memory section that are to be left untouched
+    /// Defines some memory sections that are to be left untouched
     /// @param config The `scrutiny::Config` object to work on
     /// @param ranges Array of ranges represented by the `AddressRange` object.
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
@@ -119,8 +119,8 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
         scrutiny_c_address_range_t const *ranges,
         uint_least8_t const count);
 
-    /// @brief Wrapper for `Config::set_readonly_address_range()
-    /// Defines some memory sections that are read-only`
+    /// @brief Wrapper for `Config::set_readonly_address_range()`
+    /// Defines some memory sections that are read-only.
     /// @param config The `scrutiny::Config` object to work on
     /// @param ranges Array of ranges represented by the `scrutiny::AddressRange` object.
     /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
@@ -131,10 +131,10 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
         scrutiny_c_address_range_t const *ranges,
         uint_least8_t const count);
 
-    /// @brief Wrapper for `scrutiny::set_published_values()`
+    /// @brief Wrapper for `Config::set_published_values()`
     /// Configures the Runtime Published Values
     /// @param config The `scrutiny::Config` object to work on
-    /// @param array Array of `scrutiny::RuntimePublishedValues` that contains the definition of each RPV.
+    /// @param array Array of `scrutiny::RuntimePublishedValue` that contains the definition of each RPV.
     /// This array must be allocated outside of Scrutiny and stay
     /// allocated forever as no copy will be made
     /// @param nbr Number of RPV in the array
@@ -150,7 +150,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     /// @brief Wrapper for `Config::set_loops()`
     /// Defines the different loops (tasks) in the application.
     /// @param config The `scrutiny::Config` object to work on
-    /// @param loops Arrays of pointer to the `scrutiny::LoopHandler`.
+    /// @param loops Array of pointers to the `scrutiny::LoopHandler`.
     /// This array must be allocated outside of Scrutiny and stay
     /// allocated forever as no copy will be made
     /// @param loop_count Number of `scrutiny::LoopHandler`
@@ -176,11 +176,11 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
         scrutiny_c_datalogging_buffer_size_t buffer_size);
 
     /// @brief Wrapper for `Config::set_datalogging_trigger_callback()`
-    /// Sets a callback to be called by Scrutiny when a datalogging trigger condition is triggered. This callback will be called from the
+    /// Sets a callback to be called by Scrutiny when a datalogging trigger condition is met. This callback will be called from the
     /// context of the LoopHandler using the datalogger with no thread safety. This means that if data are to be passed to another task, it is
-    /// the integrator responsibility to ensure thread safety
+    /// the integrator's responsibility to ensure thread safety.
     /// @param config The `scrutiny::Config` object to work on
-    /// @param callback The callback to be call upon datalogging trigger
+    /// @param callback The callback to be called upon datalogging trigger
     void scrutiny_c_config_set_datalogging_trigger_callback(scrutiny_c_config_t *config, scrutiny_c_datalogging_trigger_callback_t callback);
 #endif
     /// @brief Setter for `Config::max_bitrate`
@@ -190,12 +190,12 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
 
     /// @brief Setter for `Config::session_counter_seed`
     /// @param config The `scrutiny::Config` object to work on
-    /// @param bitrate The seed value
+    /// @param seed The seed value
     void scrutiny_c_config_set_session_counter_seed(scrutiny_c_config_t *config, uint32_t const seed);
 
     /// @brief Setter for `Config::display_name`
     /// @param config The `scrutiny::Config` object to work on
-    /// @param bitrate The name
+    /// @param name The name
     void scrutiny_c_config_set_display_name(scrutiny_c_config_t *config, char const *name);
 
     /// @brief Setter for `Config::memory_write_enable`
@@ -219,9 +219,9 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
         char const *name);
 
     /// @brief Wrapper for `FixedFrequencyLoopHandler::process()`
-    /// Process function be called at each iteration of the loop.
+    /// Process function to be called at each iteration of the loop.
     /// @param loop_handler The `FixedFrequencyLoopHandler` object to work on
-    /// @param timestep_100n The real, used when graphing with MeasuredTime
+    /// @param timestep_100n The actual elapsed time in units of 100ns, used when graphing with MeasuredTime
     void scrutiny_c_loop_handler_fixed_freq_process(scrutiny_c_loop_handler_ff_t *loop_handler, scrutiny_c_timediff_t const timestep_100n);
 
     /// @brief Wrapper for `VariableFrequencyLoopHandler::VariableFrequencyLoopHandler()`.
@@ -233,7 +233,7 @@ extern size_t const SCRUTINY_C_LOOP_HANDLER_VF_SIZE;
     scrutiny_c_loop_handler_vf_t *scrutiny_c_loop_handler_variable_freq_construct(void *mem, size_t const size, char const *name);
 
     /// @brief Wrapper for `VariableFrequencyLoopHandler::process()`
-    /// Process function be called at each iteration of the loop.
+    /// Process function to be called at each iteration of the loop.
     /// @param loop_handler The `VariableFrequencyLoopHandler` object to work on
     /// @param timestep_100ns Time delta since last call to `process()` in multiple of 100ns
     void scrutiny_c_loop_handler_variable_freq_process(scrutiny_c_loop_handler_vf_t *loop_handler, scrutiny_c_timediff_t timestep_100ns);

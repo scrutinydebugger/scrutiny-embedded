@@ -1,6 +1,6 @@
 //    test_datalogger.cpp
-//        Test suite for the datalogger object. Test its capacity to log, trigger access bitfields
-//        and report error on bad config.
+//        Test suite for the datalogger object. Tests its capacity to log, trigger, access bitfields,
+//        and report errors on bad config.
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -144,8 +144,8 @@ class TestDatalogger : public ScrutinyTest
     {                                                                                                                                                \
         ASSERT_BUF_SET(dlbuffer.canary1, 0xAA, sizeof(dlbuffer.canary1)) << "dlbuffer canary died!";                                                 \
         ASSERT_BUF_SET(dlbuffer.canary2, 0x55, sizeof(dlbuffer.canary2)) << "dlbuffer canary died!";                                                 \
-        ASSERT_BUF_SET(output_buffer.canary1, 0xAA, sizeof(output_buffer.canary1)) << "otuput_buffer canary died!";                                  \
-        ASSERT_BUF_SET(output_buffer.canary2, 0x55, sizeof(output_buffer.canary2)) << "otuput_buffer canary died!";                                  \
+        ASSERT_BUF_SET(output_buffer.canary1, 0xAA, sizeof(output_buffer.canary1)) << "output_buffer canary died!";                                  \
+        ASSERT_BUF_SET(output_buffer.canary2, 0x55, sizeof(output_buffer.canary2)) << "output_buffer canary died!";                                  \
     } while (0)
 
 #elif CHAR_BIT == 16
@@ -154,8 +154,8 @@ class TestDatalogger : public ScrutinyTest
     {                                                                                                                                                \
         ASSERT_BUF_SET(dlbuffer.canary1, 0xAAAA, sizeof(dlbuffer.canary1)) << "dlbuffer canary died!";                                               \
         ASSERT_BUF_SET(dlbuffer.canary2, 0x5555, sizeof(dlbuffer.canary2)) << "dlbuffer canary died!";                                               \
-        ASSERT_BUF_SET(output_buffer.canary1, 0xAAAA, sizeof(output_buffer.canary1)) << "otuput_buffer canary died!";                                \
-        ASSERT_BUF_SET(output_buffer.canary2, 0x5555, sizeof(output_buffer.canary2)) << "otuput_buffer canary died!";                                \
+        ASSERT_BUF_SET(output_buffer.canary1, 0xAAAA, sizeof(output_buffer.canary1)) << "output_buffer canary died!";                                \
+        ASSERT_BUF_SET(output_buffer.canary2, 0x5555, sizeof(output_buffer.canary2)) << "output_buffer canary died!";                                \
     } while (0)
 #endif
 

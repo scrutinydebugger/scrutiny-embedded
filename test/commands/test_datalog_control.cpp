@@ -304,10 +304,10 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
 
 /// @brief Runs a test for DataLogControl-Configure command.
 /// @param loop_id Loop ID to configure
-/// @param config_id  The configuraiton ID
-/// @param refconfig The datalog coniguration
+/// @param config_id  The configuration ID
+/// @param refconfig The datalog configuration
 /// @param expected_code Expected response code returned through CommHandler
-/// @param check_response When true, make sure the respons eis valid.
+/// @param check_response When true, make sure the response is valid.
 /// @param error_msg Error message to log in case of failure
 void TestDatalogControl::test_configure(
     uint_least8_t loop_id,
@@ -370,7 +370,7 @@ TEST_F(TestDatalogControl, TestGetSetup)
 #if SCRUTINY_DATALOGGING_ENCODING == SCRUTINY_DATALOGGING_ENCODING_RAW
     expected_response[9] = static_cast<unsigned char>(datalogging::EncodingType::RAW);
 #else
-#error Unkown encoding
+#error Unknown encoding
 #endif
     expected_response[10] = SCRUTINY_DATALOGGING_MAX_SIGNAL;
     add_crc(expected_response, sizeof(expected_response) - 4);
@@ -749,7 +749,7 @@ TEST_F(TestDatalogControl, TestGetStatus)
     scrutiny_handler.process(0); // Receive status
     check_get_status(datalogging::DataLogger::State::Armed, 0, 0);
 
-    // We are rmed. We will force a full acquisition and make sure it is correctly reported.
+    // We are armed. We will force a full acquisition and make sure it is correctly reported.
     scrutiny_handler.datalogger()->force_trigger();
     for (uint32_t i = 0; i < sizeof(dlbuffer) / 4; i++)
     {
@@ -789,7 +789,7 @@ TEST_F(TestDatalogControl, TestGetAcquisitionMetadata)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
-    // Expect a failure because there is no daa available.
+    // Expect a failure because there is no data available.
     EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 6, protocol::ResponseCode::FailureToProceed);
 
     // Force an acquisition to happen
@@ -854,7 +854,7 @@ TEST_F(TestDatalogControl, TestReadAcquisitionNoDataAvailable)
     ASSERT_LT(n_to_read, sizeof(tx_buffer));
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     scrutiny_handler.process(0);
-    // Expect a failure because there is no daa available.
+    // Expect a failure because there is no data available.
     EXPECT_IS_PROTOCOL_RESPONSE(tx_buffer, protocol::CommandId::DataLogControl, 7, protocol::ResponseCode::FailureToProceed);
 }
 

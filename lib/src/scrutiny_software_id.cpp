@@ -1,5 +1,5 @@
 //    scrutiny_software_id.cpp
-//        Instanciation of the global ID used for firmware tagging
+//        Instantiation of the global ID used for firmware tagging
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

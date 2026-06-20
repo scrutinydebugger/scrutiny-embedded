@@ -1,5 +1,5 @@
 //    scrutiny_comm_handler.cpp
-//        Manage the tranport-ish layer of the communication protocol. Converts Request/Response
+//        Manage the transport-ish layer of the communication protocol. Converts Request/Response
 //        to byte stream and validate CRC
 //
 //   - License : MIT - See LICENSE file
@@ -163,7 +163,7 @@ namespace scrutiny
                     if (m_active_request.data_length > m_rx_buffer_size)
                     {
                         m_rx_error = RxError::Overflow;
-                        m_rx_state = RxFSMState::Error; // Timeout will bring it back to wroking state
+                        m_rx_state = RxFSMState::Error; // Timeout will bring it back to working state
                         break;
                     }
 
@@ -416,7 +416,7 @@ namespace scrutiny
             return true;
         }
 
-        // Check if the last request received is a valid "Comm Discover request".
+        // Check if the last request received is a valid "Comm Connect request".
         bool CommHandler::received_connect_request(void) const
         {
             if (m_active_request.command_id != static_cast<uint_least8_t>(CommandId::CommControl))
