@@ -1,6 +1,6 @@
 //    test_datalogger.cpp
-//        Test suite for the datalogger object. Tests its capacity to log, trigger, access bitfields,
-//        and report errors on bad config.
+//        Test suite for the datalogger object. Tests its capacity to log, trigger, access
+//        bitfields, and report errors on bad config.
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

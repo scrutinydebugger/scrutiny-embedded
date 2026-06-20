@@ -1,7 +1,7 @@
 //    scrutiny_loop_handler.cpp
 //        LoopHandler implementation.
 //        Loop Handler is to be run in a specific time domain and will make some features available
-//        that depends on the execution frequency such as embedded datalogging
+//        that depend on the execution frequency such as embedded datalogging
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
