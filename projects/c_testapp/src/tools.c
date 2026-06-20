@@ -1,5 +1,5 @@
 //    tools.c
-//        Miscelaneous tools for C TestApp
+//        Miscellaneous tools for C TestApp
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

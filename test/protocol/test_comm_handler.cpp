@@ -1,5 +1,5 @@
 //    test_comm_handler.cpp
-//        Test the tranport-ish layer good behaviour at high level.
+//        Test the transport-ish layer good behaviour at high level.
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

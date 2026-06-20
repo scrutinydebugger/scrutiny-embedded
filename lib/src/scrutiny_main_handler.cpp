@@ -1587,7 +1587,7 @@ namespace scrutiny
             }
 
             // Do not wait on feedback from loop here on purpose
-            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            // That would be additional complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
             m_datalogging.request_arm_trigger = true;
             code = protocol::ResponseCode::OK;
 
@@ -1603,7 +1603,7 @@ namespace scrutiny
             }
 
             // Do not wait on feedback from loop here on purpose
-            // That would be additionnal complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
+            // That would be additional complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
             m_datalogging.request_disarm_trigger = true;
             code = protocol::ResponseCode::OK;
 

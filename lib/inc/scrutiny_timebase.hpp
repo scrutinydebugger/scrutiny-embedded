@@ -38,7 +38,7 @@ namespace scrutiny
 
         /// @brief Returns the number of microseconds elapsed since the timestamp has been taken
         /// @param timestamp The timestamp
-        /// @return Time delta in multiple of 100ns
+        /// @return Time delta in microseconds
         inline timediff_t elapsed_us_since(timestamp_t const timestamp) const { return elapsed_since(timestamp) / 10; }
 
         /// @brief Returns true if the given timeout has elapsed since the given timestamp
@@ -51,7 +51,7 @@ namespace scrutiny
         }
 
         /// @brief Put back the timebase at the given timestamp (default 0)
-        /// @param val timestamp to use a actual value
+        /// @param val Timestamp to use as the actual value
         inline void reset(timestamp_t const val = 0) { m_time_100ns = val; }
 
       protected:

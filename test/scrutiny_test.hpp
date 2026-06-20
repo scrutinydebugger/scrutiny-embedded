@@ -1,7 +1,7 @@
 //    scrutiny_test.hpp
 //        Base class for CPP unit tests.
-//        All test should inherit this class.
-//         Includes bunch of helper for easy testing.
+//        All tests should inherit this class.
+//        Includes a bunch of helpers for easy testing.
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)

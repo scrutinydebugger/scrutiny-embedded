@@ -126,7 +126,7 @@ namespace scrutiny
 
         struct TriggerConfig
         {
-            /// @brief Reads a configuration and make a copy of it
+            /// @brief Reads a configuration and makes a copy of it
             /// @param other The configuration to copy
             void copy_from(TriggerConfig const *const other)
             {
@@ -180,7 +180,7 @@ namespace scrutiny
 
         struct Configuration
         {
-            /// @brief Reads a configuration and make a copy of it
+            /// @brief Reads a configuration and makes a copy of it
             /// @param other The configuration to copy
             void copy_from(Configuration *other)
             {
@@ -200,7 +200,7 @@ namespace scrutiny
 
             LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
 
-            uint_least8_t items_count; // Number of items to logs
+            uint_least8_t items_count; // Number of items to log
             uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
             uint_least8_t probe_location;

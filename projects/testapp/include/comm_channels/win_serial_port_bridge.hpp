@@ -1,5 +1,5 @@
 //    win_serial_port_bridge.hpp
-//        Class that make a Windows Serial port available as a communication channel for the
+//        Class that makes a Windows Serial port available as a communication channel for the
 //        Testapp
 //
 //   - License : MIT - See LICENSE file

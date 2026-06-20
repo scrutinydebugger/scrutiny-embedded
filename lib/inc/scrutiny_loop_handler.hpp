@@ -1,7 +1,7 @@
 //    scrutiny_loop_handler.hpp
 //        LoopHandler definition.
 //        Loop Handler is to be run in a specific time domain and will make some features available
-//        that depends on the execution requency such as embedded datalogging
+//        that depend on the execution frequency such as embedded datalogging
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -113,7 +113,7 @@ namespace scrutiny
             return &m_timebase;
         }
 
-        /// @brief Return the a readonly pointer to the timebase used by the Loop Handler
+        /// @brief Return a read-only pointer to the timebase used by the Loop Handler
         inline Timebase *get_timebase_ro(void)
         {
             return &m_timebase;
@@ -156,7 +156,7 @@ namespace scrutiny
 
       protected:
         /// @brief Initialize the Loop Handler
-        /// @return SUCCESS ons uccess, ERROR otherwise
+        /// @return SUCCESS on success, ERROR otherwise
         Status::eStatus init(MainHandler *const main_handler);
 
         /// @brief Process method common to both FixedFreqLoop and VariableFreqLoop
@@ -192,10 +192,10 @@ namespace scrutiny
         {
         }
 
-        /// @brief Process function be called at each iteration of the loop.
+        /// @brief Process function to be called at each iteration of the loop.
         void process();
 
-        /// @brief Process function be called at each iteration of the loop.
+        /// @brief Process function to be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t const timestep_100ns);
 
@@ -232,7 +232,7 @@ namespace scrutiny
             return 0;
         }
 
-        /// @brief Process function be called at each iteration of the loop.
+        /// @brief Process function to be called at each iteration of the loop.
         /// @param timestep_100ns Time delta since last call to process() in multiple of 100ns
         void process(timediff_t const timestep_100ns);
 

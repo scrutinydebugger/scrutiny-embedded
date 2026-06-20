@@ -1,5 +1,5 @@
 //    scrutiny_comm_handler.hpp
-//        Manage the tranport-ish layer of the communication protocol. Converts Request/Response
+//        Manage the transport-ish layer of the communication protocol. Converts Request/Response
 //        to byte stream and validate CRC
 //
 //   - License : MIT - See LICENSE file
@@ -33,7 +33,7 @@ namespace scrutiny
             /// @param tx_buffer Buffer for transmission
             /// @param tx_buffer_size Transmission buffer size
             /// @param timebase Pointer to a timebase object to keep track of time
-            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny enabled device are
+            /// @param session_counter_seed Seed to initialize the session ID counter to avoid collision if multiple scrutiny-enabled devices are
             /// connected to the same channel
             void init(
                 unsigned char *const rx_buffer,
@@ -109,7 +109,7 @@ namespace scrutiny
             /// @brief Returns true if the CommHandler is presently receiving. False otherwise
             inline bool receiving(void) const { return (m_state == State::Receiving); }
 
-            /// @brief Returns true if the CommHandler is presently. Might be disabled if the configuration is invalid
+            /// @brief Returns true if the CommHandler is presently active. Might be disabled if the configuration is invalid
             inline bool is_enabled(void) const { return m_enabled; }
 
             /// @brief Enables the CommHandler

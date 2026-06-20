@@ -768,7 +768,7 @@ namespace scrutiny
             }
 
             response->data[cursor++] = loop_name_length;
-            // strings are 1 char per character. Unless the user uses utf-16, memcpy is fine with a 16bits byte
+            // Strings use 1 char per character. Unless the user uses UTF-16, memcpy is fine with a 16-bit char
             memcpy(&response->data[cursor], response_data->loop_name, loop_name_length);
             cursor += loop_name_length;
 

@@ -41,7 +41,7 @@ class TestMemoryControlRPV : public ScrutinyTest
     }
 };
 
-// ==== Test Runtime Published Valuers
+// ==== Test Runtime Published Values
 static bool rpv_read_callback(scrutiny::RuntimePublishedValue rpv, scrutiny::AnyType *outval, scrutiny::LoopHandler *const caller)
 {
     static_cast<void>(caller);
@@ -457,7 +457,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVNonExistingID)
 }
 
 /*
-    Send a read request that cause a response biuger than tx buffer. Expects overflow response
+    Send a read request that causes a response bigger than the tx buffer. Expects overflow response
 */
 
 TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
@@ -477,7 +477,7 @@ TEST_F(TestMemoryControlRPV, TestReadRPVResponseOverflow)
     scrutiny_handler.comm()->connect();
 
     uint16_t bufsize = scrutiny_handler.comm()->tx_buffer_size();
-    uint16_t nbrpv = bufsize / 6 + 1; // Will cause overflow. Do not hceck overhead. Buffer store data only
+    uint16_t nbrpv = bufsize / 6 + 1; // Will cause overflow. Do not check overhead. Buffer stores data only
     uint16_t request_buffer_size = nbrpv * 2 + 8;
     unsigned char *request_data = new unsigned char[request_buffer_size];
     request_data[0] = 3;                         // command
@@ -562,7 +562,7 @@ TEST_F(TestMemoryControlRPV, TestWriteSingleRPV)
 }
 
 /*
-    Try to write a multiple RPV. Validate that the data reach the destination intact
+    Try to write multiple RPVs. Validate that the data reach the destination intact
 */
 TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 {
@@ -615,7 +615,7 @@ TEST_F(TestMemoryControlRPV, TestWriteMultipleRPV)
 }
 
 /*
-    Try to write multiple RPV, on of each type. Validate that the data reach the destination intact
+    Try to write multiple RPVs, one of each type. Validate that the data reach the destination intact
 */
 struct TestEntry
 {

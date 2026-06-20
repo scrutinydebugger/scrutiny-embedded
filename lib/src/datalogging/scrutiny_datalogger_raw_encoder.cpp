@@ -30,7 +30,7 @@ namespace scrutiny
         /// @return Number of bytes written
         datalogging::buffer_size_t RawFormatReader::read_dilate_8bits(unsigned char *const buffer_8bits, datalogging::buffer_size_t max_size_8bits)
         {
-// Make sure we do not read half a char. We don't have a state variable to remember that. Would be innefficient.
+// Make sure we do not read half a char. We don't have a state variable to remember that. Would be inefficient.
 #if CHAR_BIT == 8
 #elif CHAR_BIT == 16
             max_size_8bits &= static_cast<datalogging::buffer_size_t>(-2);
@@ -163,7 +163,7 @@ namespace scrutiny
                     bool const success = m_main_handler->get_rpv_read_callback()(
                         rpv,
                         &outval,
-                        caller); // We assume that this is not nullptr. We rely on datalogger::configure
+                        caller); // We assume that the callback is not nullptr. We rely on datalogger::configure to validate this.
 
                     if (!success)
                     {

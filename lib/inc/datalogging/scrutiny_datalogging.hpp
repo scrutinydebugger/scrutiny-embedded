@@ -26,8 +26,8 @@ namespace scrutiny
         /// @brief Converts a value stored as AnyType into AnyTypeCompare which is the same,
         /// but the value in the biggest integer format will be valid
         /// @param vtype The variable type. Will be modified by this function (may convert uint8 to uint32)
-        /// @param val The data to be modified. Will mostly writes 0 into uninitialized section so that when passing from uint8 to uint32, both values
-        /// are equals.
+        /// @param val The data to be modified. Will mostly write 0 into uninitialized sections so that when passing from uint8 to uint32, both values
+        /// are equal.
         void convert_to_compare_type(VariableType::eVariableType *const vtype, AnyType *const val);
 
         /// @brief Reads an operand used for log trigger

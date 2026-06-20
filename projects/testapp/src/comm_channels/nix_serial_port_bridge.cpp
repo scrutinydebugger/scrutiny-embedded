@@ -1,5 +1,6 @@
 //    nix_serial_port_bridge.cpp
-//        Class that make a *Nix Serial port available as a communication channel for the Testapp
+//        Class that makes a *Nix Serial port available as a communication channel for the
+//        Testapp
 //
 //   - License : MIT - See LICENSE file
 //   - Project : Scrutiny Debugger (github.com/scrutinydebugger/scrutiny-embedded)
@@ -137,7 +138,7 @@ void NixSerialPortBridge::start()
     if (cfsetospeed(&tty, baudrate) != 0)
     {
         stop();
-        throw_system_error("Cannot open port. ifcfsetospeed failed");
+        throw_system_error("Cannot open port. cfsetospeed failed");
     }
 
     if (tcsetattr(m_fd, TCSANOW, &tty) != 0)

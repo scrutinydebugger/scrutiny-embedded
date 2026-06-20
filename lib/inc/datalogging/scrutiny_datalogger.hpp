@@ -114,7 +114,7 @@ namespace scrutiny
             /// @brief Returns true if the active configuration is valid. Must be called after a call to "configure"
             inline bool config_valid(void) const { return m_config_valid; }
 
-            /// @brief Returns the number of point after the trigger, indicating the exact position of the trigger point in a acquisition
+            /// @brief Returns the number of points after the trigger, indicating the exact position of the trigger point in an acquisition
             inline buffer_size_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
 
             /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete

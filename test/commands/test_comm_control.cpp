@@ -276,7 +276,7 @@ TEST_F(TestCommControl, TestDisconnect)
 
     uint16_t nread = scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_EQ(nread, n_to_read);
-    scrutiny_handler.process(0); // We need a subsequent call to process because disconnection hapens once the response is completely sent.
+    scrutiny_handler.process(0); // We need a subsequent call to process because disconnection happens once the response is completely sent.
 
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
     ASSERT_FALSE(scrutiny_handler.comm()->is_connected());
