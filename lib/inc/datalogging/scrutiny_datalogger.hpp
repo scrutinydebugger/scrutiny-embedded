@@ -169,11 +169,11 @@ namespace scrutiny
             LoopHandler *m_owner; // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
             struct
             {
-                bool previous_val;                        // Trigger condition result of the previous cycle
-                timestamp_t rising_edge_timestamp;        // Timestamp at which the condition passed from false to true
-                trigger::ConditionSet conditions;         // All the conditons object in a union
-                trigger::BaseCondition *active_condition; // A pointer to the active condition object.
-            } m_trigger;                                  // Data related to the graph trigger
+                bool previous_val;                           // Trigger condition result of the previous cycle
+                timestamp_t rising_edge_timestamp;           // Timestamp at which the condition passed from false to true
+                trigger::ActiveCondition active_condition;   // The active condition object.
+                trigger::ConditionSharedData condition_data; // Persistent data across trigger evaluation
+            } m_trigger;                                     // Data related to the graph trigger
         };
     } // namespace datalogging
 } // namespace scrutiny
