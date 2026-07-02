@@ -500,6 +500,44 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
+TEST_F(TestDatalogControl, TestConfigureOperandVarInForbiddenRegion)
+{
+    uint32_t forbidden_var;
+    AddressRange forbidden_ranges[1];
+    forbidden_ranges[0] = tools::make_address_range(&forbidden_var, sizeof(forbidden_var));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].type = datalogging::OperandType::Var;
+    refconfig.trigger.operands[1].data.var.addr = &forbidden_var;
+    refconfig.trigger.operands[1].data.var.datatype = VariableType::uint32;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
+}
+
+TEST_F(TestDatalogControl, TestConfigureOperandVarBitInForbiddenRegion)
+{
+    uint32_t forbidden_var;
+    AddressRange forbidden_ranges[1];
+    forbidden_ranges[0] = tools::make_address_range(&forbidden_var, sizeof(forbidden_var));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].data.varbit.addr = &forbidden_var;
+    refconfig.trigger.operands[1].data.varbit.datatype = VariableType::uint32;
+    refconfig.trigger.operands[1].data.varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].data.varbit.bitsize = 8;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
+}
+
 TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
