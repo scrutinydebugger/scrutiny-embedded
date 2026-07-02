@@ -214,15 +214,11 @@ namespace scrutiny
                 if (success)
                 {
                     AnyTypeFast mask;
-                    uint_fast8_t i;
 #if CHAR_BIT == 8
                     if (output_type_size == VariableTypeSize::_8)
                     {
-                        mask.uint8 = 1;
-                        for (i = 1; i < bitsize; i++)
-                        {
-                            mask.uint8 |= (static_cast<uint_fast8_t>(1) << i);
-                        }
+                        mask.uint8 =
+                            (bitsize < 8u) ? static_cast<uint_fast8_t>((UINT8_C(1) << bitsize) - 1u) : static_cast<uint_fast8_t>(UINT8_C(0xFF));
                         val->uint8 &= mask.uint8;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -236,16 +232,8 @@ namespace scrutiny
 #endif
                         if (output_type_size == VariableTypeSize::_16)
                     {
-#if CHAR_BIT == 8
-                        mask.uint16 = 0x1FF;
-                        for (i = 9; i < bitsize; i++)
-#else
-                        mask.uint16 = 1;
-                        for (i = 1; i < bitsize; i++)
-#endif
-                        {
-                            mask.uint16 |= (static_cast<uint_fast16_t>(1) << i);
-                        }
+                        mask.uint16 = (bitsize < 16u) ? static_cast<uint_fast16_t>((UINT16_C(1) << bitsize) - 1u)
+                                                      : static_cast<uint_fast16_t>(UINT16_C(0xFFFF));
                         val->uint16 &= mask.uint16;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -257,11 +245,7 @@ namespace scrutiny
                     }
                     else if (output_type_size == VariableTypeSize::_32)
                     {
-                        mask.uint32 = 0x1FFFF;
-                        for (i = 17; i < bitsize; i++)
-                        {
-                            mask.uint32 |= (static_cast<uint_fast32_t>(1) << i);
-                        }
+                        mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((UINT32_C(1) << bitsize) - 1u) : UINT32_C(0xFFFFFFFF);
                         val->uint32 &= mask.uint32;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -274,11 +258,7 @@ namespace scrutiny
 #if SCRUTINY_SUPPORT_64BITS
                     else if (output_type_size == VariableTypeSize::_64)
                     {
-                        mask.uint64 = 0x1FFFFFFFF;
-                        for (i = 33; i < bitsize; i++)
-                        {
-                            mask.uint64 |= (static_cast<uint_fast64_t>(1) << i);
-                        }
+                        mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((UINT64_C(1) << bitsize) - 1u) : UINT64_C(0xFFFFFFFFFFFFFFFF);
                         val->uint64 &= mask.uint64;
                         if (var_tt == VariableTypeType::_sint)
                         {
