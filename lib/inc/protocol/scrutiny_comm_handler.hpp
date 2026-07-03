@@ -65,11 +65,6 @@ namespace scrutiny
             /// @brief Returns the number of bytes pending to be sent.
             uint16_t data_to_send(void) const;
 
-            /// @brief Tells if the Request object has a CRC that matches its payload content.
-            /// @param req The request to check
-            /// @return True if the CRC is valid. False otherwise
-            static bool check_crc(Request const *const req);
-
             // Writes the CRC property of the response based on the payload content.
             void add_crc(Response *const response) const;
 
@@ -203,6 +198,7 @@ namespace scrutiny
             uint16_t m_nbytes_to_send;    // Number of bytes to send in this response
             uint16_t m_nbytes_sent;       // Number of bytes sent up to now. Includes headers and CRC
             TxError::eTxError m_tx_error; // Last Transmission error code
+            uint32_t m_crc;               // CRC of the incoming data computed has bytes come in
 
           private:
             static uint32_t s_session_counter; // A counter to generate session ID
