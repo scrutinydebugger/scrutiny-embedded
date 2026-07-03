@@ -83,7 +83,7 @@ class TestTriggerConditions : public ScrutinyTest
 
 TEST_F(TestTriggerConditions, AlwaysTrue)
 {
-    using always_true = scrutiny::datalogging::trigger::AlwaysTrueCondition;
+    typedef scrutiny::datalogging::trigger::AlwaysTrueCondition always_true;
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     EXPECT_TRUE(always_true::evaluate(&cond_data, SCRUTINY_NULL, SCRUTINY_NULL));
 }
@@ -93,7 +93,7 @@ TEST_F(TestTriggerConditions, OperatorEQ)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using eq = scrutiny::datalogging::trigger::EqualCondition;
+    typedef scrutiny::datalogging::trigger::EqualCondition eq;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -109,7 +109,7 @@ TEST_F(TestTriggerConditions, OperatorNEQ)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using neq = scrutiny::datalogging::trigger::NotEqualCondition;
+    typedef scrutiny::datalogging::trigger::NotEqualCondition neq;
 
     vals[0]._float = 0.5f;
     vals[1]._float = 0.5f;
@@ -125,7 +125,7 @@ TEST_F(TestTriggerConditions, OperatorGT)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using gt = scrutiny::datalogging::trigger::GreaterThanCondition;
+    typedef scrutiny::datalogging::trigger::GreaterThanCondition gt;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -143,7 +143,7 @@ TEST_F(TestTriggerConditions, OperatorGET)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using get = scrutiny::datalogging::trigger::GreaterOrEqualThanCondition;
+    typedef scrutiny::datalogging::trigger::GreaterOrEqualThanCondition get;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
@@ -161,7 +161,7 @@ TEST_F(TestTriggerConditions, OperatorLT)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using lt = scrutiny::datalogging::trigger::LessThanCondition;
+    typedef scrutiny::datalogging::trigger::LessThanCondition lt;
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -179,7 +179,7 @@ TEST_F(TestTriggerConditions, OperatorLET)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using let = scrutiny::datalogging::trigger::LessOrEqualThanCondition;
+    typedef scrutiny::datalogging::trigger::LessOrEqualThanCondition let;
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
@@ -197,7 +197,7 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using eq = scrutiny::datalogging::trigger::EqualCondition;
+    typedef scrutiny::datalogging::trigger::EqualCondition eq;
 
     for (int i = 0; i < 2; i++)
     {
@@ -265,7 +265,7 @@ TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using lt = scrutiny::datalogging::trigger::LessThanCondition;
+    typedef scrutiny::datalogging::trigger::LessThanCondition lt;
 
     for (int i = 0; i < 2; i++)
     {
@@ -307,7 +307,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    using cmt = scrutiny::datalogging::trigger::ChangeMoreThanCondition;
+    typedef scrutiny::datalogging::trigger::ChangeMoreThanCondition cmt;
     cmt::reset(&cond_data);
 
     // Test positive change
@@ -360,7 +360,7 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
-    using cmt = scrutiny::datalogging::trigger::ChangeMoreThanCondition;
+    typedef scrutiny::datalogging::trigger::ChangeMoreThanCondition cmt;
     // ===== Float - Sint
     cmt::reset(&cond_data);
     // Test positive change
@@ -589,7 +589,7 @@ TEST_F(TestTriggerConditions, IsWithin)
     scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[3];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[3];
-    using is_within = scrutiny::datalogging::trigger::IsWithinCondition;
+    typedef scrutiny::datalogging::trigger::IsWithinCondition is_within;
 
     is_within::reset(&cond_data);
     // Test positive change
