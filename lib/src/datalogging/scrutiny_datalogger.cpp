@@ -46,7 +46,9 @@ namespace scrutiny
             m_state = State::Idle;
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
-            m_trigger.active_condition = SCRUTINY_NULL;
+            m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
+            m_trigger.active_condition.reset_fn = trigger::AlwaysTrueCondition::reset;
+            m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
 
             m_trigger_cursor_location = 0;
             m_trigger_timestamp = 0;
@@ -79,38 +81,55 @@ namespace scrutiny
             switch (m_config.trigger.condition)
             {
             case SupportedTriggerConditions::AlwaysTrue:
-                m_trigger.active_condition = &m_trigger.conditions.always_true;
+                m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::AlwaysTrueCondition::reset;
                 break;
             case SupportedTriggerConditions::Equal:
-                m_trigger.active_condition = &m_trigger.conditions.eq;
+                m_trigger.active_condition.operand_count = trigger::EqualCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::EqualCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::EqualCondition::reset;
                 break;
             case SupportedTriggerConditions::NotEqual:
-                m_trigger.active_condition = &m_trigger.conditions.neq;
+                m_trigger.active_condition.operand_count = trigger::NotEqualCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::NotEqualCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::NotEqualCondition::reset;
                 break;
             case SupportedTriggerConditions::LessThan:
-                m_trigger.active_condition = &m_trigger.conditions.lt;
+                m_trigger.active_condition.operand_count = trigger::LessThanCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::LessThanCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::LessThanCondition::reset;
                 break;
             case SupportedTriggerConditions::LessOrEqualThan:
-                m_trigger.active_condition = &m_trigger.conditions.let;
+                m_trigger.active_condition.operand_count = trigger::LessOrEqualThanCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::LessOrEqualThanCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::LessOrEqualThanCondition::reset;
                 break;
             case SupportedTriggerConditions::GreaterThan:
-                m_trigger.active_condition = &m_trigger.conditions.gt;
+                m_trigger.active_condition.operand_count = trigger::GreaterThanCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::GreaterThanCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::GreaterThanCondition::reset;
                 break;
             case SupportedTriggerConditions::GreaterOrEqualThan:
-                m_trigger.active_condition = &m_trigger.conditions.get;
+                m_trigger.active_condition.operand_count = trigger::GreaterOrEqualThanCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::GreaterOrEqualThanCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::GreaterOrEqualThanCondition::reset;
                 break;
             case SupportedTriggerConditions::ChangeMoreThan:
-                m_trigger.active_condition = &m_trigger.conditions.cmt;
+                m_trigger.active_condition.operand_count = trigger::ChangeMoreThanCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::ChangeMoreThanCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::ChangeMoreThanCondition::reset;
                 break;
             case SupportedTriggerConditions::IsWithin:
-                m_trigger.active_condition = &m_trigger.conditions.within;
+                m_trigger.active_condition.operand_count = trigger::IsWithinCondition::get_operand_count();
+                m_trigger.active_condition.eval_fn = trigger::IsWithinCondition::evaluate;
+                m_trigger.active_condition.reset_fn = trigger::IsWithinCondition::reset;
                 break;
             default:
-                m_trigger.active_condition = &m_trigger.conditions.always_true; // fallback to avoid nullptr;
                 m_config_valid = false;
             }
 
-            if (m_config.trigger.operand_count != m_trigger.active_condition->get_operand_count())
+            if (m_config.trigger.operand_count != m_trigger.active_condition.operand_count)
             {
                 m_config_valid = false;
             }
@@ -210,7 +229,7 @@ namespace scrutiny
             if (m_config_valid)
             {
                 m_encoder.set_timebase(m_timebase);
-                m_trigger.active_condition->reset(m_trigger.conditions.data());
+                m_trigger.active_condition.reset_fn(&m_trigger.condition_data);
                 m_encoder.reset();
                 m_state = State::Configured;
             }
@@ -361,7 +380,7 @@ namespace scrutiny
             bool outval = false;
             AnyType opvals[MAX_OPERANDS];
             VariableType::eVariableType optypes[MAX_OPERANDS];
-            const unsigned int nb_operand = m_trigger.active_condition->get_operand_count();
+            const unsigned int nb_operand = m_trigger.active_condition.operand_count;
 
             if (nb_operand > MAX_OPERANDS)
             {
@@ -386,8 +405,8 @@ namespace scrutiny
                     convert_to_compare_type(&optypes[i], &opvals[i]);
                 }
 
-                bool condition_result = m_trigger.active_condition->evaluate(
-                    m_trigger.conditions.data(),
+                bool condition_result = m_trigger.active_condition.eval_fn(
+                    &m_trigger.condition_data,
                     reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(optypes),
                     reinterpret_cast<AnyTypeCompare *>(opvals));
 

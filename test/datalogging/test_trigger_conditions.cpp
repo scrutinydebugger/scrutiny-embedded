@@ -83,113 +83,121 @@ class TestTriggerConditions : public ScrutinyTest
 
 TEST_F(TestTriggerConditions, AlwaysTrue)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
-    EXPECT_TRUE(cond.always_true.evaluate(cond.data(), SCRUTINY_NULL, SCRUTINY_NULL));
+    typedef scrutiny::datalogging::trigger::AlwaysTrueCondition always_true;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
+    EXPECT_TRUE(always_true::evaluate(&cond_data, SCRUTINY_NULL, SCRUTINY_NULL));
 }
 
 TEST_F(TestTriggerConditions, OperatorEQ)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::EqualCondition eq;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.5f;
-    EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, OperatorNEQ)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::NotEqualCondition neq;
 
     vals[0]._float = 0.5f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.neq.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(neq::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.4f;
-    EXPECT_TRUE(cond.neq.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(neq::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, OperatorGT)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::GreaterThanCondition gt;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.gt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(gt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.5f;
-    EXPECT_FALSE(cond.gt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(gt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.6f;
-    EXPECT_TRUE(cond.gt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(gt::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, OperatorGET)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::GreaterOrEqualThanCondition get;
 
     vals[0]._float = 0.4f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.get.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(get::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.5f;
-    EXPECT_TRUE(cond.get.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(get::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.6f;
-    EXPECT_TRUE(cond.get.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(get::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, OperatorLT)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::LessThanCondition lt;
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.lt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(lt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.5f;
-    EXPECT_FALSE(cond.lt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(lt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.4f;
-    EXPECT_TRUE(cond.lt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(lt::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, OperatorLET)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::LessOrEqualThanCondition let;
 
     vals[0]._float = 0.6f;
     vals[1]._float = 0.5f;
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
-    EXPECT_FALSE(cond.let.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(let::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.5f;
-    EXPECT_TRUE(cond.let.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(let::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 0.4f;
-    EXPECT_TRUE(cond.let.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(let::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, Equality_AllTypes)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::EqualCondition eq;
 
     for (int i = 0; i < 2; i++)
     {
@@ -200,63 +208,65 @@ TEST_F(TestTriggerConditions, Equality_AllTypes)
         vals[op1]._float = 0.6f;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._float = 0.5f;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._uint = 2;
         vals[op1]._float = 2.1f;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._float = 2.0f;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._float = 2.1f;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_float;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._float = 2.0f;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._uint = 3;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._uint = 2;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._uint = 2;
         vals[op1]._uint = 3;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._uint = 2;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._sint = 2;
         vals[op1]._sint = 3;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
         vals[op1]._sint = 2;
-        EXPECT_TRUE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_TRUE(eq::evaluate(&cond_data, valtypes, vals));
 
         vals[op0]._sint = -1;
         vals[op1]._uint = static_cast<scrutiny::uint_biggest_t>(-1);
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_FALSE(cond.eq.evaluate(cond.data(), valtypes, vals));
+        EXPECT_FALSE(eq::evaluate(&cond_data, valtypes, vals));
     }
 }
 
 TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
+    typedef scrutiny::datalogging::trigger::LessThanCondition lt;
+
     for (int i = 0; i < 2; i++)
     {
         const int op0 = (i == 0) ? 0 : 1;
@@ -268,36 +278,37 @@ TEST_F(TestTriggerConditions, LT_MixedSignAndTypes)
         vals[op1]._sint = -5;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        EXPECT_EQ(cond.lt.evaluate(cond.data(), valtypes, vals), truefalse);
+        EXPECT_EQ(lt::evaluate(&cond_data, valtypes, vals), truefalse);
         vals[op0]._float = -6;
-        EXPECT_EQ(cond.lt.evaluate(cond.data(), valtypes, vals), !truefalse);
+        EXPECT_EQ(lt::evaluate(&cond_data, valtypes, vals), !truefalse);
 
         vals[op0]._float = -1.0f;
         vals[op1]._uint = 0;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_float;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_uint;
-        EXPECT_EQ(cond.lt.evaluate(cond.data(), valtypes, vals), !truefalse);
+        EXPECT_EQ(lt::evaluate(&cond_data, valtypes, vals), !truefalse);
 
         vals[op0]._sint = -6;
         vals[op1]._sint = -5;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_sint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        EXPECT_EQ(cond.lt.evaluate(cond.data(), valtypes, vals), !truefalse);
+        EXPECT_EQ(lt::evaluate(&cond_data, valtypes, vals), !truefalse);
 
         vals[op0]._uint = static_cast<scrutiny::uint_biggest_t>(-2);
         vals[op1]._sint = -1;
         valtypes[op0] = scrutiny::datalogging::VariableTypeCompare::_uint;
         valtypes[op1] = scrutiny::datalogging::VariableTypeCompare::_sint;
-        EXPECT_EQ(cond.lt.evaluate(cond.data(), valtypes, vals), truefalse);
+        EXPECT_EQ(lt::evaluate(&cond_data, valtypes, vals), truefalse);
     }
 }
 
 TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
-    cond.cmt.reset(cond.data());
+    typedef scrutiny::datalogging::trigger::ChangeMoreThanCondition cmt;
+    cmt::reset(&cond_data);
 
     // Test positive change
     vals[0]._float = 10.0f;
@@ -305,151 +316,152 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_Basic)
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 5.0f; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 10.1f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 20.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 30.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // Test negative change
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     vals[0]._float = 10.0f;
     vals[1]._float = -5.0f; // NEgative change of 5.0
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 20.0f; // Positive change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 14.9f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 14.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 5.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = -5.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[2];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[2];
 
+    typedef scrutiny::datalogging::trigger::ChangeMoreThanCondition cmt;
     // ===== Float - Sint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._float = 10.0f;
     vals[1]._sint = 5; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_sint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 5.0f; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 10.1f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 20.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 30.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // Test negative change
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     vals[0]._float = 10.0f;
     vals[1]._sint = -5; // NEgative change of 5.0
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 20.0f; // Positive change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 14.9f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 14.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 5.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = -5.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // ===== Float - Uint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._float = 10.0f;
     vals[1]._uint = 5; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_uint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 5.0f; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._float = 10.1f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 11.0f;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 20.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._float = 30.0f;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // ===== Uint - Uint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._uint = static_cast<scrutiny::uint_biggest_t>(-1000);
     vals[1]._uint = 5; // Positive change of 5.0
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_uint;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_uint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 1;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint -= 10; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 2;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // ===== Uint - Sint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._uint = static_cast<scrutiny::uint_biggest_t>(-1000);
     ;
@@ -457,46 +469,46 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_uint;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_sint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 1;
     ;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint -= 10; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 4;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // Test negative change
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     vals[0]._uint = static_cast<scrutiny::uint_biggest_t>(-1000);
     vals[1]._sint = -5; // NEgative change of 5.0
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 20; // Positive change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint -= 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint -= 4;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint -= 100;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint -= 10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // ===== Sint - Sint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._sint = -100;
     ;
@@ -504,46 +516,46 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_sint;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_sint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._sint += 1;
     ;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._sint -= 10; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._sint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += 4;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += 10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // Test negative change
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     vals[0]._sint = -100;
     vals[1]._sint = -5; // NEgative change of 5.0
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._sint += 20; // Positive change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += -6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += -4;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += -100;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._sint += -10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 
     // ===== Sint - Uint
-    cond.cmt.reset(cond.data());
+    cmt::reset(&cond_data);
     // Test positive change
     vals[0]._sint = -100;
     ;
@@ -551,34 +563,35 @@ TEST_F(TestTriggerConditions, ChangeMoreThan_AllTypes)
     valtypes[0] = scrutiny::datalogging::VariableTypeCompare::_sint;
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_sint;
 
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 1;
     ;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint -= 10; // Negative change has no effect
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
 
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 4;
-    EXPECT_FALSE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 10;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
     vals[0]._uint += 6;
-    EXPECT_TRUE(cond.cmt.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(cmt::evaluate(&cond_data, valtypes, vals));
 }
 
 TEST_F(TestTriggerConditions, IsWithin)
 {
-    scrutiny::datalogging::trigger::ConditionSet cond;
+    scrutiny::datalogging::trigger::ConditionSharedData cond_data;
     scrutiny::datalogging::AnyTypeCompare vals[3];
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[3];
+    typedef scrutiny::datalogging::trigger::IsWithinCondition is_within;
 
-    cond.within.reset(cond.data());
+    is_within::reset(&cond_data);
     // Test positive change
     vals[0]._float = 10.0f;
     vals[1]._float = 5.0f;
@@ -587,17 +600,17 @@ TEST_F(TestTriggerConditions, IsWithin)
     valtypes[1] = scrutiny::datalogging::VariableTypeCompare::_float;
     valtypes[2] = scrutiny::datalogging::VariableTypeCompare::_float;
 
-    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(is_within::evaluate(&cond_data, valtypes, vals));
 
     vals[1]._float = 11.01f;
-    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(is_within::evaluate(&cond_data, valtypes, vals));
 
     vals[1]._float = 11.00f;
-    EXPECT_TRUE(cond.within.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(is_within::evaluate(&cond_data, valtypes, vals));
 
     vals[1]._float = 8.99f;
-    EXPECT_FALSE(cond.within.evaluate(cond.data(), valtypes, vals));
+    EXPECT_FALSE(is_within::evaluate(&cond_data, valtypes, vals));
 
     vals[1]._float = 9.0f;
-    EXPECT_TRUE(cond.within.evaluate(cond.data(), valtypes, vals));
+    EXPECT_TRUE(is_within::evaluate(&cond_data, valtypes, vals));
 }
