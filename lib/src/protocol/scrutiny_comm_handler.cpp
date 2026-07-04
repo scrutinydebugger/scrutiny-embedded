@@ -127,6 +127,7 @@ namespace scrutiny
                         if ((len - i) >= 2)
                         {
                             m_active_request.data_length = (static_cast<uint16_t>(data[i]) << 8u) | (static_cast<uint16_t>(data[i + 1]));
+                            m_crc = tools::crc32(&data[i], 2, m_crc);
                             m_per_state_data.length_bytes_received = 2;
                             i += 2;
                             next_state = true;
@@ -134,6 +135,7 @@ namespace scrutiny
                         else
                         {
                             m_active_request.data_length = static_cast<uint16_t>(data[i]) << 8u;
+                            m_crc = tools::crc32(&data[i], 1, m_crc);
                             m_per_state_data.length_bytes_received = 1;
                             i += 1;
                         }
@@ -141,6 +143,7 @@ namespace scrutiny
                     else
                     {
                         m_active_request.data_length |= static_cast<uint16_t>(data[i]);
+                        m_crc = tools::crc32(&data[i], 1, m_crc);
                         m_per_state_data.length_bytes_received = 2;
                         i += 1;
                         next_state = true;
@@ -148,7 +151,6 @@ namespace scrutiny
 
                     if (next_state)
                     {
-                        m_crc = tools::crc32(&data[i - 2], 2, m_crc);
                         if (m_active_request.data_length == 0)
                         {
                             m_per_state_data.crc_bytes_received = 0;
