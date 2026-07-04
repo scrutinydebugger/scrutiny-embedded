@@ -39,6 +39,7 @@ namespace scrutiny
             m_active_response.data = m_tx_buffer; // Half duplex comm. Share buffer
             m_active_response.data_max_length = m_tx_buffer_size;
             m_enabled = true;
+            m_crc = 0;
 
             if (m_rx_buffer_size < MINIMUM_RX_BUFFER_SIZE || m_rx_buffer_size > MAXIMUM_RX_BUFFER_SIZE)
             {
@@ -92,6 +93,7 @@ namespace scrutiny
                 {
                 case RxFSMState::WaitForCommand:
                 {
+                    m_crc = 0;
                     if ((data[i] & 0x80) != 0) // Invalid command
                     {
                         m_rx_error = RxError::InvalidCommand;
@@ -100,6 +102,7 @@ namespace scrutiny
                     else
                     {
                         m_active_request.command_id = data[i];
+                        m_crc = tools::crc32(&data[i], 1, m_crc);
                         m_rx_state = RxFSMState::WaitForSubfunction;
                         i += 1;
                     }
@@ -109,6 +112,7 @@ namespace scrutiny
                 case RxFSMState::WaitForSubfunction:
                 {
                     m_active_request.subfunction_id = data[i];
+                    m_crc = tools::crc32(&data[i], 1, m_crc);
                     m_rx_state = RxFSMState::WaitForLength;
                     i += 1;
                     m_per_state_data.length_bytes_received = 0;
@@ -144,6 +148,7 @@ namespace scrutiny
 
                     if (next_state)
                     {
+                        m_crc = tools::crc32(&data[i - 2], 2, m_crc);
                         if (m_active_request.data_length == 0)
                         {
                             m_per_state_data.crc_bytes_received = 0;
@@ -172,6 +177,7 @@ namespace scrutiny
                     uint16_t const data_bytes_to_read = (available_bytes >= missing_bytes) ? missing_bytes : available_bytes;
 
                     memcpy(&m_rx_buffer[m_per_state_data.data_bytes_received], &data[i], data_bytes_to_read);
+                    m_crc = tools::crc32(&data[i], data_bytes_to_read, m_crc);
                     m_per_state_data.data_bytes_received += data_bytes_to_read;
                     i += data_bytes_to_read;
 
@@ -203,7 +209,7 @@ namespace scrutiny
                         m_active_request.crc |= static_cast<uint32_t>(data[i]) << 0;
                         m_state = State::Idle;
 
-                        if (check_crc(&m_active_request))
+                        if (m_crc == m_active_request.crc)
                         {
                             process_active_request();
                         }
@@ -471,19 +477,6 @@ namespace scrutiny
             return m_nbytes_to_send - m_nbytes_sent;
         }
 
-        bool CommHandler::check_crc(Request const *const req)
-        {
-            uint32_t crc = 0;
-            unsigned char header_data[4];
-            header_data[0] = req->command_id;
-            header_data[1] = req->subfunction_id;
-            header_data[2] = (req->data_length >> 8) & 0xFF;
-            header_data[3] = req->data_length & 0xFF;
-            crc = tools::crc32(header_data, sizeof(header_data));
-            crc = tools::crc32(req->data, req->data_length, crc);
-            return (crc == req->crc);
-        }
-
         void CommHandler::add_crc(Response *const response) const
         {
             if (response->data_length > m_tx_buffer_size)
@@ -523,6 +516,7 @@ namespace scrutiny
             m_request_received = false;
             m_rx_error = RxError::None;
             m_last_rx_timestamp = m_timebase->get_timestamp();
+            m_crc = 0;
 
             if (m_state == State::Receiving)
             {

@@ -153,5 +153,6 @@ namespace scrutiny
             }
             return ~crc;
         }
+
     } // namespace tools
 } // namespace scrutiny
