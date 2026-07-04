@@ -47,7 +47,7 @@ namespace scrutiny
             m_trigger.previous_val = false;
             m_trigger.rising_edge_timestamp = 0;
             m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
-            m_trigger.active_condition.reset_fn = trigger::AlwaysTrueCondition::reset;
+            m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
             m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
 
             m_trigger_cursor_location = 0;
@@ -83,37 +83,37 @@ namespace scrutiny
             case SupportedTriggerConditions::AlwaysTrue:
                 m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::AlwaysTrueCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::Equal:
                 m_trigger.active_condition.operand_count = trigger::EqualCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::EqualCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::EqualCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::NotEqual:
                 m_trigger.active_condition.operand_count = trigger::NotEqualCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::NotEqualCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::NotEqualCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::LessThan:
                 m_trigger.active_condition.operand_count = trigger::LessThanCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::LessThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::LessThanCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::LessOrEqualThan:
                 m_trigger.active_condition.operand_count = trigger::LessOrEqualThanCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::LessOrEqualThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::LessOrEqualThanCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::GreaterThan:
                 m_trigger.active_condition.operand_count = trigger::GreaterThanCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::GreaterThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::GreaterThanCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::GreaterOrEqualThan:
                 m_trigger.active_condition.operand_count = trigger::GreaterOrEqualThanCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::GreaterOrEqualThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::GreaterOrEqualThanCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             case SupportedTriggerConditions::ChangeMoreThan:
                 m_trigger.active_condition.operand_count = trigger::ChangeMoreThanCondition::get_operand_count();
@@ -123,7 +123,7 @@ namespace scrutiny
             case SupportedTriggerConditions::IsWithin:
                 m_trigger.active_condition.operand_count = trigger::IsWithinCondition::get_operand_count();
                 m_trigger.active_condition.eval_fn = trigger::IsWithinCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::IsWithinCondition::reset;
+                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
                 break;
             default:
                 m_config_valid = false;
@@ -229,7 +229,10 @@ namespace scrutiny
             if (m_config_valid)
             {
                 m_encoder.set_timebase(m_timebase);
-                m_trigger.active_condition.reset_fn(&m_trigger.condition_data);
+                if (m_trigger.active_condition.reset_fn != SCRUTINY_NULL_FN_PTR(trigger::ResetFn))
+                {
+                    m_trigger.active_condition.reset_fn(&m_trigger.condition_data);
+                }
                 m_encoder.reset();
                 m_state = State::Configured;
             }
