@@ -37,6 +37,50 @@ namespace scrutiny
         SCRUTINY_CONSTEXPR unsigned int MAXIMUM_RX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum reception buffer size in bytes
         SCRUTINY_CONSTEXPR unsigned int MAXIMUM_TX_BUFFER_SIZE = 0xFFFF - BUFFER_OVERFLOW_MARGIN; // Maximum transmission buffer size in bytes
 
+        class ResponseEncoderBase
+        {
+          public:
+            void init(Response *const response, uint16_t const max_size);
+            inline bool overflow(void) const { return m_overflow; };
+            void reset(void);
+
+          protected:
+            unsigned char *m_buffer;
+            Response *m_response;
+            uint16_t m_cursor;
+            uint16_t m_size_limit;
+            bool m_overflow;
+        };
+
+        class ReadMemoryBlocksResponseEncoder : public ResponseEncoderBase
+        {
+          public:
+            void write(MemoryBlock8Bits const *const memblock_8bits);
+        };
+        class WriteMemoryBlocksResponseEncoder : public ResponseEncoderBase
+        {
+          public:
+            void write(MemoryBlock8Bits const *const memblock_8bits);
+        };
+
+        class GetRPVDefinitionResponseEncoder : public ResponseEncoderBase
+        {
+          public:
+            void write(RuntimePublishedValue const *const rpv);
+        };
+
+        class ReadRPVResponseEncoder : public ResponseEncoderBase
+        {
+          public:
+            void write(RuntimePublishedValue const *const rpv, AnyType const v);
+        };
+
+        class WriteRPVResponseEncoder : public ResponseEncoderBase
+        {
+          public:
+            void write(RuntimePublishedValue const *const rpv);
+        };
+
         class ReadMemoryBlocksRequestParser
         {
           public:
@@ -55,22 +99,6 @@ namespace scrutiny
             uint16_t m_required_tx_buffer_size;
             bool m_finished;
             bool m_invalid;
-        };
-
-        class ReadMemoryBlocksResponseEncoder
-        {
-          public:
-            void init(Response *const response, uint16_t const max_size);
-            void write(MemoryBlock8Bits const *const memblock_8bits);
-            inline bool overflow(void) const { return m_overflow; };
-            void reset(void);
-
-          protected:
-            unsigned char *m_buffer;
-            Response *m_response;
-            uint16_t m_cursor;
-            uint16_t m_size_limit;
-            bool m_overflow;
         };
 
         class WriteMemoryBlocksRequestParser
@@ -95,54 +123,6 @@ namespace scrutiny
             bool m_masked_write;
         };
 
-        class WriteMemoryBlocksResponseEncoder
-        {
-          public:
-            void init(Response *const response, uint16_t const max_size);
-            void write(MemoryBlock8Bits const *const memblock_8bits);
-            inline bool overflow(void) const { return m_overflow; };
-            void reset(void);
-
-          protected:
-            unsigned char *m_buffer;
-            Response *m_response;
-            uint16_t m_cursor;
-            uint16_t m_size_limit;
-            bool m_overflow;
-        };
-
-        class GetRPVDefinitionResponseEncoder
-        {
-          public:
-            void init(Response *const response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const { return m_overflow; };
-            void reset(void);
-
-          protected:
-            unsigned char *m_buffer;
-            Response *m_response;
-            uint16_t m_cursor;
-            uint16_t m_size_limit;
-            bool m_overflow;
-        };
-
-        class ReadRPVResponseEncoder
-        {
-          public:
-            void init(Response *const response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *const rpv, AnyType const v);
-            inline bool overflow(void) const { return m_overflow; };
-            void reset(void);
-
-          protected:
-            unsigned char *m_buffer;
-            Response *m_response;
-            uint16_t m_cursor;
-            uint16_t m_size_limit;
-            bool m_overflow;
-        };
-
         class ReadRPVRequestParser
         {
           public:
@@ -160,22 +140,6 @@ namespace scrutiny
             uint16_t m_request_len;
             bool m_finished;
             bool m_invalid;
-        };
-
-        class WriteRPVResponseEncoder
-        {
-          public:
-            void init(Response *const response, uint16_t const max_size);
-            void write(RuntimePublishedValue const *const rpv);
-            inline bool overflow(void) const { return m_overflow; };
-            void reset(void);
-
-          protected:
-            unsigned char *m_buffer;
-            Response *m_response;
-            uint16_t m_cursor;
-            uint16_t m_size_limit;
-            bool m_overflow;
         };
 
         class WriteRPVRequestParser

@@ -240,191 +240,6 @@ namespace scrutiny
             m_required_tx_buffer_size = 0;
         }
 
-        //==============================================================
-
-        void ReadMemoryBlocksResponseEncoder::init(Response *const response, uint16_t const max_size)
-        {
-            m_size_limit = max_size;
-            m_buffer = response->data;
-            m_response = response;
-            reset();
-        }
-
-        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
-        {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-
-            if (memblock_8bits->length > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2) // Make sure that the addition below doesn't blow up
-            {
-                m_overflow = true;
-                return;
-            }
-
-            if (addr_size + 2 + memblock_8bits->length > static_cast<uint16_t>(m_size_limit - m_cursor))
-            {
-                m_overflow = true;
-                return;
-            }
-
-            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
-            tools::memcpy_dilate_8bits_native(&m_buffer[m_cursor], memblock_8bits->start_address, memblock_8bits->length);
-            m_cursor += memblock_8bits->length;
-
-            m_response->data_length = m_cursor;
-        }
-
-        void ReadMemoryBlocksResponseEncoder::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
-
-        //==============================================================
-
-        void WriteMemoryBlocksResponseEncoder::init(Response *const response, uint16_t const max_size)
-        {
-            m_size_limit = max_size;
-            m_buffer = response->data;
-            m_response = response;
-            reset();
-        }
-
-        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
-        {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-
-            if (addr_size + 2u > static_cast<uint16_t>(m_size_limit - m_cursor))
-            {
-                m_overflow = true;
-                return;
-            }
-
-            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
-            m_response->data_length = static_cast<uint16_t>(m_cursor);
-        }
-
-        void WriteMemoryBlocksResponseEncoder::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
-
-        //==============================================================
-
-        void GetRPVDefinitionResponseEncoder::init(Response *const response, uint16_t const max_size)
-        {
-            m_size_limit = max_size;
-            m_buffer = response->data;
-            m_response = response;
-            reset();
-        }
-
-        void GetRPVDefinitionResponseEncoder::write(RuntimePublishedValue const *const rpv)
-        {
-            // id (2) + type (1) + address size (2,4,8)
-            if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
-            {
-                m_overflow = true;
-                return;
-            }
-            VariableType::eVariableType vtype = rpv->type;
-            if (rpv->type == VariableType::boolean)
-            {
-                // The embedded lib user may use "boolean" which has no size.
-                // We need to tell the server the real size of it so it can encode data
-                // while writing. Convert to boolean8, boolean16 or boolean32
-                // bool size is compiler specific. can be 8bits or int.
-                vtype = tools::get_platform_boolean();
-            }
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits_8bits(static_cast<uint_least8_t>(vtype), &m_buffer[m_cursor]);
-            m_response->data_length = m_cursor;
-        }
-
-        void GetRPVDefinitionResponseEncoder::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
-
-        //==============================================================
-
-        void ReadRPVResponseEncoder::init(Response *const response, uint16_t const max_size)
-        {
-            m_size_limit = max_size;
-            m_buffer = response->data;
-            m_response = response;
-            reset();
-        }
-
-        void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
-        {
-            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
-            // id (2) + type (1)
-            if (2u + typesize > static_cast<uint16_t>(m_size_limit - m_cursor))
-            {
-                m_overflow = true;
-                return;
-            }
-
-            if (
-#if CHAR_BIT == 8
-                typesize == 1u ||
-#endif
-                typesize == 2u || typesize == 4u
-#if SCRUTINY_SUPPORT_64BITS
-                || typesize == 8u
-#endif
-            )
-            {
-                m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
-                m_cursor += codecs::encode_anytype_big_endian_8bits(&v, typesize, &m_buffer[m_cursor]);
-                m_response->data_length = m_cursor;
-            }
-        }
-
-        void ReadRPVResponseEncoder::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
-
-        //==============================================================
-
-        void WriteRPVResponseEncoder::init(Response *const response, uint16_t const max_size)
-        {
-            m_size_limit = max_size;
-            m_buffer = response->data;
-            m_response = response;
-            reset();
-        }
-
-        void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
-        {
-            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
-            // id (2) + datalen (1)
-            if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
-            {
-                m_overflow = true;
-                return;
-            }
-
-            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
-            m_cursor += codecs::encode_8_bits_8bits(typesize, &m_buffer[m_cursor]);
-
-            m_response->data_length = m_cursor;
-        }
-
-        void WriteRPVResponseEncoder::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
-
-        //==============================================================
-
         void ReadRPVRequestParser::init(Request const *const request)
         {
             m_buffer = request->data;
@@ -562,6 +377,125 @@ namespace scrutiny
         }
 
         //==============================================================
+
+        // =================== Encoders ===============
+        void ResponseEncoderBase::init(Response *const response, uint16_t const max_size)
+        {
+            m_size_limit = max_size;
+            m_buffer = response->data;
+            m_response = response;
+            reset();
+        }
+        void ResponseEncoderBase::reset(void)
+        {
+            m_cursor = 0;
+            m_overflow = false;
+        }
+
+        void ReadMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
+        {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
+
+            if (memblock_8bits->length > MAXIMUM_TX_BUFFER_SIZE - addr_size - 2) // Make sure that the addition below doesn't blow up
+            {
+                m_overflow = true;
+                return;
+            }
+
+            if (addr_size + 2 + memblock_8bits->length > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
+            tools::memcpy_dilate_8bits_native(&m_buffer[m_cursor], memblock_8bits->start_address, memblock_8bits->length);
+            m_cursor += memblock_8bits->length;
+
+            m_response->data_length = m_cursor;
+        }
+
+        void WriteMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
+        {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
+
+            if (addr_size + 2u > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+
+            m_cursor += codecs::encode_address_big_endian_8bits(memblock_8bits->start_address, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(memblock_8bits->length, &m_buffer[m_cursor]);
+            m_response->data_length = static_cast<uint16_t>(m_cursor);
+        }
+
+        void GetRPVDefinitionResponseEncoder::write(RuntimePublishedValue const *const rpv)
+        {
+            // id (2) + type (1) + address size (2,4,8)
+            if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+            VariableType::eVariableType vtype = rpv->type;
+            if (rpv->type == VariableType::boolean)
+            {
+                // The embedded lib user may use "boolean" which has no size.
+                // We need to tell the server the real size of it so it can encode data
+                // while writing. Convert to boolean8, boolean16 or boolean32
+                // bool size is compiler specific. can be 8bits or int.
+                vtype = tools::get_platform_boolean();
+            }
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits_8bits(static_cast<uint_least8_t>(vtype), &m_buffer[m_cursor]);
+            m_response->data_length = m_cursor;
+        }
+
+        void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
+        {
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
+            // id (2) + type (1)
+            if (2u + typesize > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+
+            if (
+#if CHAR_BIT == 8
+                typesize == 1u ||
+#endif
+                typesize == 2u || typesize == 4u
+#if SCRUTINY_SUPPORT_64BITS
+                || typesize == 8u
+#endif
+            )
+            {
+                m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+                m_cursor += codecs::encode_anytype_big_endian_8bits(&v, typesize, &m_buffer[m_cursor]);
+                m_response->data_length = m_cursor;
+            }
+        }
+
+        void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)
+        {
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
+            // id (2) + datalen (1)
+            if (2u + 1u > static_cast<uint16_t>(m_size_limit - m_cursor))
+            {
+                m_overflow = true;
+                return;
+            }
+
+            m_cursor += codecs::encode_16_bits_big_endian_8bits(rpv->id, &m_buffer[m_cursor]);
+            m_cursor += codecs::encode_8_bits_8bits(typesize, &m_buffer[m_cursor]);
+
+            m_response->data_length = m_cursor;
+        }
+
+        // =====================
 
         //==============================================================
 
