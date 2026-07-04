@@ -153,7 +153,7 @@ namespace scrutiny
                 }
 
 #if CHAR_BIT == 16
-                if (length_8bits & 1U > 0)
+                if ((length_8bits & 1U) > 0)
                 {
                     m_invalid = true;
                     return;
