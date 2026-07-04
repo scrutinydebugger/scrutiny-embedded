@@ -1315,7 +1315,7 @@ namespace scrutiny
         }
 
         uintptr_t const block_start = reinterpret_cast<uintptr_t>(addr_start);
-        uintptr_t const block_end = block_start + length;
+        uintptr_t const block_end = block_start + length - 1;
 
         for (unsigned int i = 0; i < m_config.forbidden_ranges_count(); i++)
         {
@@ -1337,7 +1337,7 @@ namespace scrutiny
         }
 
         uintptr_t const block_start = reinterpret_cast<uintptr_t>(addr_start);
-        uintptr_t const block_end = block_start + length;
+        uintptr_t const block_end = block_start + length - 1;
         for (unsigned int i = 0; i < m_config.readonly_ranges_count(); i++)
         {
             AddressRange const &range = m_config.readonly_ranges()[i];
@@ -1481,7 +1481,7 @@ namespace scrutiny
                 {
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
-                            tools::get_type_size_8bits(config->trigger.operands[i].data.var.datatype)))
+                            tools::get_type_size_char(config->trigger.operands[i].data.var.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
@@ -1489,9 +1489,10 @@ namespace scrutiny
                 }
                 else if (config->trigger.operands[i].type == datalogging::OperandType::VarBit)
                 {
+                    // The library needs to access the full type, even if bitsize is small.
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.varbit.addr,
-                            config->trigger.operands[i].data.varbit.bitoffset + config->trigger.operands[i].data.varbit.bitsize))
+                            tools::get_type_size_char(config->trigger.operands[i].data.varbit.datatype)))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;

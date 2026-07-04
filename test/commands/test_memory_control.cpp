@@ -332,7 +332,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
@@ -360,7 +360,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
+        if (i < 3 || i > 9) // Sliding window is completely out of forbidden region
         {
             ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
@@ -383,7 +383,7 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddressContainment)
     unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
@@ -426,7 +426,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
 
     // indices [6,7,8,9] are readonly
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange readonly_range[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_readonly_address_range(readonly_range, sizeof(readonly_range) / sizeof(scrutiny::AddressRange));
 
@@ -866,7 +866,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
     unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
 
@@ -894,7 +894,7 @@ TEST_F(TestMemoryControl, TestWriteForbiddenAddress)
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        if (i < 2 || i > 10) // Sliding window is completely out of forbidden region
+        if (i < 3 || i > 9) // Sliding window is completely out of forbidden region
         {
             ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
@@ -921,7 +921,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(scrutiny::AddressRange));
 
@@ -949,7 +949,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
         ASSERT_LT(n_to_read, sizeof(tx_buffer));
         scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
-        if (i < 2 || i > 10) // Sliding window is completely out of readonly region
+        if (i < 3 || i > 9) // Sliding window is completely out of readonly region
         {
             ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, ok) << "[i=" << static_cast<uint32_t>(i) << "]";
         }
@@ -971,7 +971,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddressRegionContained)
     unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
-    uintptr_t end = start + 4;
+    uintptr_t end = start + 4 - 1;
     scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end) };
     config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(scrutiny::AddressRange));
 

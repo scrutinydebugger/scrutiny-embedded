@@ -538,6 +538,26 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitInForbiddenRegion)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
 
+TEST_F(TestDatalogControl, TestConfigureOperandVarBitAlmostInForbiddenRegion)
+{
+    unsigned char forbidden_buffer[8];
+    AddressRange forbidden_ranges[1];
+    forbidden_ranges[0] = tools::make_address_range(&forbidden_buffer[4], 2); // Protect indices 4,5
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].data.varbit.addr = &forbidden_buffer[2];
+    refconfig.trigger.operands[1].data.varbit.datatype = VariableType::uint16;
+    refconfig.trigger.operands[1].data.varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].data.varbit.bitsize = 8;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::OK); // We don't overflow
+}
+
 TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
