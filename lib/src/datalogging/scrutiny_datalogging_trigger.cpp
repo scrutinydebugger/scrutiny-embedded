@@ -24,48 +24,31 @@ namespace scrutiny
     {
         namespace trigger
         {
-            namespace relational_operators
+            template <class T> bool apply_relational_op(RelationalOperator::eRelationalOperator cond, T arg1, T arg2)
             {
-                template <class T1, class T2> class eq
+                switch (cond)
                 {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 == v2; }
-                };
+                case RelationalOperator::Equal:
+                    return (arg1 == arg2);
+                case RelationalOperator::NotEqual:
+                    return (arg1 != arg2);
+                case RelationalOperator::GreaterThan:
+                    return (arg1 > arg2);
+                case RelationalOperator::GreaterOrEqualThan:
+                    return (arg1 >= arg2);
+                case RelationalOperator::LessThan:
+                    return (arg1 < arg2);
+                case RelationalOperator::LessOrEqualThan:
+                    return (arg1 <= arg2);
+                default:
+                    return false;
+                }
+            }
 
-                template <class T1, class T2> class neq
-                {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 != v2; }
-                };
-
-                template <class T1, class T2> class gt
-                {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 > v2; }
-                };
-
-                template <class T1, class T2> class get
-                {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 >= v2; }
-                };
-
-                template <class T1, class T2> class lt
-                {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 < v2; }
-                };
-
-                template <class T1, class T2> class let
-                {
-                  public:
-                    static inline bool eval(T1 const v1, T2 const v2) { return v1 <= v2; }
-                };
-
-            } // namespace relational_operators
-
-            template <template <class, class> class OPERATOR>
-            bool RelationalCompare(VariableTypeCompare::eVariableTypeCompare const operand_types[], AnyTypeCompare const operand_vals[])
+            bool RelationalCompare(
+                RelationalOperator::eRelationalOperator const op,
+                VariableTypeCompare::eVariableTypeCompare const operand_types[],
+                AnyTypeCompare const operand_vals[])
             {
                 SCRUTINY_CONSTEXPR uint_biggest_t UINT_2_INT_MAX = static_cast<uint_biggest_t>(-1) >> 1;
 
@@ -75,30 +58,31 @@ namespace scrutiny
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
                     {
-                        return OPERATOR<float, float>::eval(operand_vals[0]._float, operand_vals[1]._float);
+                        return apply_relational_op<float>(op, operand_vals[0]._float, operand_vals[1]._float);
                     }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
                     {
-                        return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._sint));
+                        return apply_relational_op<float>(op, operand_vals[0]._float, static_cast<float>(operand_vals[1]._sint));
                     }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
                     {
-                        return OPERATOR<float, float>::eval(operand_vals[0]._float, static_cast<float>(operand_vals[1]._uint));
+                        return apply_relational_op<float>(op, operand_vals[0]._float, static_cast<float>(operand_vals[1]._uint));
                     }
                 }
                 else if (operand_types[0] == VariableTypeCompare::_sint)
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
                     {
-                        return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._sint), operand_vals[1]._float);
+                        return apply_relational_op<float>(op, static_cast<float>(operand_vals[0]._sint), operand_vals[1]._float);
                     }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
                     {
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(operand_vals[0]._sint, operand_vals[1]._sint);
+                        return apply_relational_op<int_biggest_t>(op, operand_vals[0]._sint, operand_vals[1]._sint);
                     }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
                     {
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                        return apply_relational_op<int_biggest_t>(
+                            op,
                             operand_vals[0]._sint,
                             static_cast<int_biggest_t>((operand_vals[1]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[1]._uint));
                     }
@@ -107,22 +91,23 @@ namespace scrutiny
                 {
                     if (operand_types[1] == VariableTypeCompare::_float)
                     {
-                        return OPERATOR<float, float>::eval(static_cast<float>(operand_vals[0]._uint), operand_vals[1]._float);
+                        return apply_relational_op<float>(op, static_cast<float>(operand_vals[0]._uint), operand_vals[1]._float);
                     }
                     else if (operand_types[1] == VariableTypeCompare::_sint)
                     {
-                        return OPERATOR<int_biggest_t, int_biggest_t>::eval(
+                        return apply_relational_op<int_biggest_t>(
+                            op,
                             static_cast<int_biggest_t>((operand_vals[0]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[0]._uint),
                             operand_vals[1]._sint);
                     }
                     else if (operand_types[1] == VariableTypeCompare::_uint)
                     {
-                        return OPERATOR<uint_biggest_t, uint_biggest_t>::eval(operand_vals[0]._uint, operand_vals[1]._uint);
+                        return apply_relational_op<uint_biggest_t>(op, operand_vals[0]._uint, operand_vals[1]._uint);
                     }
                 }
 
                 return false;
-            }
+            } // namespace trigger
 
             bool EqualCondition::evaluate(
                 ConditionSharedData *const data,
@@ -130,7 +115,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::eq>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::Equal, operand_types, operand_vals);
             }
 
             bool NotEqualCondition::evaluate(
@@ -139,7 +124,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::neq>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::NotEqual, operand_types, operand_vals);
             }
 
             bool GreaterThanCondition::evaluate(
@@ -148,7 +133,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::gt>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::GreaterThan, operand_types, operand_vals);
             }
 
             bool GreaterOrEqualThanCondition::evaluate(
@@ -157,7 +142,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::get>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::GreaterOrEqualThan, operand_types, operand_vals);
             }
 
             bool LessThanCondition::evaluate(
@@ -166,7 +151,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::lt>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::LessThan, operand_types, operand_vals);
             }
 
             bool LessOrEqualThanCondition::evaluate(
@@ -175,7 +160,7 @@ namespace scrutiny
                 AnyTypeCompare const operand_vals[])
             {
                 static_cast<void>(data);
-                return RelationalCompare<relational_operators::let>(operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::LessOrEqualThan, operand_types, operand_vals);
             }
 
             bool ChangeMoreThanCondition::evaluate(

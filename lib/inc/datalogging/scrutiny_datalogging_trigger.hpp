@@ -43,6 +43,22 @@ namespace scrutiny
                 unsigned int operand_count;
             };
 
+            class RelationalOperator
+            {
+              public:
+                // clang-format off
+                SCRUTINY_ENUM(eRelationalOperator, uint_least8_t)
+                {
+                    Equal,
+                    NotEqual,
+                    GreaterThan,
+                    GreaterOrEqualThan,
+                    LessThan,
+                    LessOrEqualThan
+                };
+                // clang-format on
+            };
+
             struct EqualCondition
             {
                 static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
