@@ -372,6 +372,46 @@ TEST_F(TestMemoryControl, TestReadForbiddenAddress)
     }
 }
 
+// Try to read a big chunk of memory with a smal piece inside being forbidden
+TEST_F(TestMemoryControl, TestReadForbiddenAddressContainment)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Read);
+    const scrutiny::protocol::ResponseCode::eResponseCode forbidden = scrutiny::protocol::ResponseCode::Forbidden;
+
+    unsigned char tx_buffer[32];
+    unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+    // indices [6,7,8,9] are forbidden
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
+    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2;
+    unsigned char request_data[8 + datalen] = { 3, 1, 0, datalen };
+    uint16_t window_size = end - start + 2;
+    uint16_t window_size_8bits = (window_size * (CHAR_BIT / 8));
+    unsigned int index = 0;
+
+    void *read_addr = reinterpret_cast<void *>(start - 1);
+    index = 4;
+    index += encode_addr(&request_data[4], read_addr);
+    request_data[index + 0] = static_cast<unsigned char>((window_size_8bits >> 8) & 0xFF);
+    request_data[index + 1] = static_cast<unsigned char>((window_size_8bits >> 0) & 0xFF);
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden);
+}
+
 /*
 We make sure we can read readonly address ranges without issues. Same test as TestReadForbiddenAddress, but we expect OK response code.
 */
@@ -882,8 +922,8 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
     // indices [6,7,8,9] are forbidden
     uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
     uintptr_t end = start + 4;
-    scrutiny::AddressRange forbidden_ranges[] = { scrutiny::tools::make_address_range(start, end) };
-    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(scrutiny::AddressRange));
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end) };
+    config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(scrutiny::AddressRange));
 
     scrutiny_handler.init(&config);
     scrutiny_handler.comm()->connect();
@@ -919,6 +959,46 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddress)
         }
         scrutiny_handler.process(0);
     }
+}
+
+TEST_F(TestMemoryControl, TestWriteReadOnlyAddressRegionContained)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::MemoryControl;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::MemoryControl::Subfunction::Write);
+    const scrutiny::protocol::ResponseCode::eResponseCode forbidden = scrutiny::protocol::ResponseCode::Forbidden;
+
+    unsigned char tx_buffer[32];
+    unsigned char buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+    // indices [6,7,8,9] are forbidden
+    uintptr_t start = reinterpret_cast<uintptr_t>(buf) + 6;
+    uintptr_t end = start + 4;
+    scrutiny::AddressRange readonly_ranges[] = { scrutiny::tools::make_address_range(start, end) };
+    config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(scrutiny::AddressRange));
+
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR unsigned int window_size_8bits = 6 * (CHAR_BIT / 8);
+    SCRUTINY_CONSTEXPR unsigned char datalen = SIZEOF_8BITS(void *) + 2 + window_size_8bits;
+    unsigned char request_data[8 + datalen] = { 3, 2, 0, datalen };
+    unsigned int index = 0;
+
+    void *write_addr = reinterpret_cast<void *>(start - 1);
+    index = 4;
+    index += encode_addr(&request_data[4], write_addr);
+    request_data[index + 0] = static_cast<unsigned char>(window_size_8bits >> 8);
+    request_data[index + 1] = static_cast<unsigned char>(window_size_8bits >> 0);
+    // We don't care about the data to write here. We just check if it's accepted or refused.
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden);
 }
 
 /*

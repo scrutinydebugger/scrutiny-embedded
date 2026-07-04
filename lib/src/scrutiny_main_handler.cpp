@@ -1321,12 +1321,7 @@ namespace scrutiny
         {
             AddressRange const &range = m_config.forbidden_ranges()[i];
 
-            if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
-            {
-                return true;
-            }
-
-            if (block_end >= reinterpret_cast<uintptr_t>(range.start) && block_end <= reinterpret_cast<uintptr_t>(range.end))
+            if (block_start <= reinterpret_cast<uintptr_t>(range.end) && block_end >= reinterpret_cast<uintptr_t>(range.start))
             {
                 return true;
             }
@@ -1347,12 +1342,7 @@ namespace scrutiny
         {
             AddressRange const &range = m_config.readonly_ranges()[i];
 
-            if (block_start >= reinterpret_cast<uintptr_t>(range.start) && block_start <= reinterpret_cast<uintptr_t>(range.end))
-            {
-                return true;
-            }
-
-            if (block_end >= reinterpret_cast<uintptr_t>(range.start) && block_end <= reinterpret_cast<uintptr_t>(range.end))
+            if (block_start <= reinterpret_cast<uintptr_t>(range.end) && block_end >= reinterpret_cast<uintptr_t>(range.start))
             {
                 return true;
             }
