@@ -643,3 +643,25 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionVariableFreq)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     EXPECT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
+
+TEST_F(TestGetInfo, TestGetLoopDefinitionOOBId)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::GetInfo;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::GetInfo::Subfunction::GetLoopDefinition);
+    const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::FailureToProceed;
+
+    unsigned char tx_buffer[32];
+
+    unsigned char request_data[8 + 1] = { 1, 9, 0, 1, 3 }; // No loop ID=3
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
+}

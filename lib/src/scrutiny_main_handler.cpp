@@ -803,7 +803,7 @@ namespace scrutiny
         {
             m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
             uint_least8_t const loop_id = stack.get_loop_def.request_data.loop_id;
-            if (!m_config.is_loop_handlers_configured() || loop_id > m_config.m_loop_count)
+            if (!m_config.is_loop_handlers_configured() || loop_id >= m_config.m_loop_count)
             {
                 code = protocol::ResponseCode::FailureToProceed;
                 break;
