@@ -160,7 +160,6 @@ namespace scrutiny
         };
         struct LoggableItem
         {
-            LoggableType::eLoggableType type;
             union
             {
                 struct
@@ -176,6 +175,7 @@ namespace scrutiny
                 {
                 } time;
             } data;
+            LoggableType::eLoggableType type;
         };
 
         struct Configuration
@@ -198,14 +198,14 @@ namespace scrutiny
                 }
             }
 
-            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
-
-            uint_least8_t items_count; // Number of items to log
+            uint32_t timeout_100ns;    // Time after which an acquisition is considered complete even if the buffer is not full
             uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
+            uint_least8_t items_count; // Number of items to log
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
             uint_least8_t probe_location;
-            uint32_t timeout_100ns; // Time after which an acquisition is considered complete even if the buffer is not full
-            TriggerConfig trigger;  // The trigger configuration
+
+            TriggerConfig trigger;                                      // The trigger configuration
+            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
         };
 
         /// @brief Datalogging Trigger callback

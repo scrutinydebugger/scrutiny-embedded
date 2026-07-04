@@ -591,7 +591,6 @@ TEST_F(TestTriggerConditions, IsWithin)
     scrutiny::datalogging::VariableTypeCompare::eVariableTypeCompare valtypes[3];
     typedef scrutiny::datalogging::trigger::IsWithinCondition is_within;
 
-    is_within::reset(&cond_data);
     // Test positive change
     vals[0]._float = 10.0f;
     vals[1]._float = 5.0f;

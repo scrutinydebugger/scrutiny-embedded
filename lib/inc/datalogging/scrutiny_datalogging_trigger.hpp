@@ -43,9 +43,24 @@ namespace scrutiny
                 unsigned int operand_count;
             };
 
+            class RelationalOperator
+            {
+              public:
+                // clang-format off
+                SCRUTINY_ENUM(eRelationalOperator, uint_least8_t)
+                {
+                    Equal,
+                    NotEqual,
+                    GreaterThan,
+                    GreaterOrEqualThan,
+                    LessThan,
+                    LessOrEqualThan
+                };
+                // clang-format on
+            };
+
             struct EqualCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -55,7 +70,6 @@ namespace scrutiny
 
             struct NotEqualCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -65,7 +79,6 @@ namespace scrutiny
 
             struct GreaterThanCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -75,7 +88,6 @@ namespace scrutiny
 
             struct GreaterOrEqualThanCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -85,7 +97,6 @@ namespace scrutiny
 
             struct LessThanCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -95,7 +106,6 @@ namespace scrutiny
 
             struct LessOrEqualThanCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -119,7 +129,6 @@ namespace scrutiny
 
             struct IsWithinCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
@@ -129,7 +138,6 @@ namespace scrutiny
 
             struct AlwaysTrueCondition
             {
-                static void reset(ConditionSharedData *const data) { static_cast<void>(data); }
                 static bool evaluate(
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
