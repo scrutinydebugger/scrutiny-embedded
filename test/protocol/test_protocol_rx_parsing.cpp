@@ -52,6 +52,7 @@ TEST_F(TestRxParsing, TestRx_ZeroLen_BytePerByte)
     for (unsigned int i = 0; i < sizeof(data); i++)
     {
         comm.receive_data(&data[i], 1);
+        data[i] ^= 0xFF; // destroy previous data
     }
 
     ASSERT_TRUE(comm.request_received());
@@ -91,7 +92,30 @@ TEST_F(TestRxParsing, TestRx_NonZeroLen_BytePerByte)
     for (unsigned int i = 0; i < sizeof(data); i++)
     {
         comm.receive_data(&data[i], 1);
+        data[i] ^= 0xFF; // Destroy previous data
     }
+
+    ASSERT_TRUE(comm.request_received());
+    scrutiny::protocol::Request const *req = comm.get_request();
+    EXPECT_EQ(req->command_id, 1);
+    EXPECT_EQ(req->subfunction_id, 2);
+    EXPECT_EQ(req->data_length, 3);
+    EXPECT_EQ(req->data[0], 0x11);
+    EXPECT_EQ(req->data[1], 0x22);
+    EXPECT_EQ(req->data[2], 0x33);
+
+    EXPECT_EQ(comm.get_rx_error(), scrutiny::protocol::RxError::None);
+}
+
+//=============================================================================
+TEST_F(TestRxParsing, TestRx_NonZeroLen_SplitInLen)
+{
+    unsigned char data[11] = { 1, 2, 0, 3, 0x11, 0x22, 0x33 };
+    add_crc(data, 7);
+
+    comm.receive_data(&data[0], 3); // cmd
+    memset(data, 0xFF, 3);          // Destroy data to catch negative indexing
+    comm.receive_data(&data[3], 8); // data
 
     ASSERT_TRUE(comm.request_received());
     scrutiny::protocol::Request const *req = comm.get_request();
