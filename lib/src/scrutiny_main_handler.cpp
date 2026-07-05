@@ -128,12 +128,6 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    bool MainHandler::read_memory(void *dst, void const *const src, uint32_t const size) const
-    {
-        memcpy(dst, src, size);
-        return true;
-    }
-
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
         uint_least8_t typesize_char = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
