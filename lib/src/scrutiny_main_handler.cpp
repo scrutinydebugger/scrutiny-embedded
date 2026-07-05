@@ -217,8 +217,8 @@ namespace scrutiny
 #if CHAR_BIT == 8
                     if (output_type_size == VariableTypeSize::_8)
                     {
-                        mask.uint8 =
-                            (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u) : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
+                        mask.uint8 = (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u)
+                                                    : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
                         val->uint8 &= mask.uint8;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -245,7 +245,8 @@ namespace scrutiny
                     }
                     else if (output_type_size == VariableTypeSize::_32)
                     {
-                        mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u) : static_cast<uint32_t>(0xFFFFFFFF);
+                        mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u)
+                                                      : static_cast<uint32_t>(0xFFFFFFFF);
                         val->uint32 &= mask.uint32;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -258,7 +259,8 @@ namespace scrutiny
 #if SCRUTINY_SUPPORT_64BITS
                     else if (output_type_size == VariableTypeSize::_64)
                     {
-                        mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u) : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
+                        mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u)
+                                                      : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
                         val->uint64 &= mask.uint64;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -1007,7 +1009,7 @@ namespace scrutiny
         protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
-        union
+        struct
         {
             struct
             {
