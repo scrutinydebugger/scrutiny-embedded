@@ -133,8 +133,8 @@ namespace scrutiny
             else if (operand->type == OperandType::VarBit)
             {
                 success = main_handler->fetch_variable_bitfield(
-                    operand->data.var.addr,
-                    tools::get_var_type_type(operand->data.var.datatype),
+                    operand->data.varbit.addr,
+                    tools::get_var_type_type(operand->data.varbit.datatype),
                     operand->data.varbit.bitoffset,
                     operand->data.varbit.bitsize,
                     val,
