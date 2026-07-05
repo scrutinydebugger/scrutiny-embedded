@@ -1009,7 +1009,7 @@ namespace scrutiny
         protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
 
         // Make sure the compiler optimize stack space. Because it may well not (don't trust this guy.)
-        struct
+        union
         {
             struct
             {
