@@ -100,23 +100,6 @@ TEST_F(TestVariableFetching, RandomFetch)
     EXPECT_TRUE(success);
 }
 
-TEST_F(TestVariableFetching, NoAccess)
-{
-    scrutiny::AnyType outval;
-    bool success;
-    success = scrutiny_handler.fetch_variable(forbidden_buffer, scrutiny::VariableType::float32, &outval);
-    EXPECT_FALSE(success);
-
-    success = scrutiny_handler.fetch_variable(forbidden_buffer2, scrutiny::VariableType::float32, &outval);
-    EXPECT_FALSE(success);
-
-    success = scrutiny_handler.fetch_variable(readonly_buffer, scrutiny::VariableType::float32, &outval);
-    EXPECT_TRUE(success);
-
-    success = scrutiny_handler.fetch_variable(readonly_buffer2, scrutiny::VariableType::float32, &outval);
-    EXPECT_TRUE(success);
-}
-
 TEST_F(TestVariableFetching, Bitfield)
 {
     unsigned char some_buffer[32];

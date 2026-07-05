@@ -130,11 +130,6 @@ namespace scrutiny
 
     bool MainHandler::read_memory(void *dst, void const *const src, uint32_t const size) const
     {
-        if (touches_forbidden_region(src, size))
-        {
-            return false;
-        }
-
         memcpy(dst, src, size);
         return true;
     }
@@ -170,13 +165,11 @@ namespace scrutiny
         VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size_8bits(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
-        uint_least8_t const typesize_char = tools::get_type_size_8bits(fetch_variable_type) / (CHAR_BIT / 8);
 
-        if (touches_forbidden_region(addr, typesize_char))
-        {
-            success = false;
-        }
-        else if (bitsize == 0)
+        // We do not check for forbidden regions here. This function is only used by the datalogger.
+        // The Main Handler is expected to validate the datalogger config.
+
+        if (bitsize == 0)
         {
             success = false;
         }

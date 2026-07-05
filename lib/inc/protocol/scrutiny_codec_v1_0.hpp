@@ -155,9 +155,9 @@ namespace scrutiny
             unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
+            MainHandler const *m_main_handler;
             bool m_finished;
             bool m_invalid;
-            MainHandler const *m_main_handler;
         };
 
         namespace ResponseData

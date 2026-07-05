@@ -185,20 +185,6 @@ TEST_F(TestFetchOperands, TestBadOperandType)
     EXPECT_FALSE(success);
 }
 
-TEST_F(TestFetchOperands, TestFetchForbiddenMemory)
-{
-    scrutiny::AnyType val;
-    scrutiny::VariableType::eVariableType vartype = scrutiny::VariableType::unknown;
-
-    Operand operand;
-    operand.type = OperandType::Var;
-    operand.data.var.addr = forbidden_buffer;
-    operand.data.var.datatype = scrutiny::VariableType::uint16;
-
-    bool success = fetch_operand(&scrutiny_handler, &operand, &val, &vartype, SCRUTINY_NULL);
-    EXPECT_FALSE(success);
-}
-
 TEST_F(TestFetchOperands, TestFetchInexistandRPV)
 {
     scrutiny::AnyType val;

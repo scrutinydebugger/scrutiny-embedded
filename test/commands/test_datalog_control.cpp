@@ -500,6 +500,23 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
+TEST_F(TestDatalogControl, TestConfigureSignalInForbiddenRegion)
+{
+    uint32_t forbidden_var;
+    AddressRange forbidden_ranges[1];
+    forbidden_ranges[0] = tools::make_address_range(&forbidden_var, sizeof(forbidden_var));
+    config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+    scrutiny_handler.init(&config);
+    scrutiny_handler.comm()->connect();
+
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.items_to_log[1].data.memory.address = &forbidden_var;
+    refconfig.items_to_log[1].data.memory.size = sizeof(forbidden_var);
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
+}
+
 TEST_F(TestDatalogControl, TestConfigureOperandVarInForbiddenRegion)
 {
     uint32_t forbidden_var;
