@@ -174,6 +174,15 @@ namespace scrutiny
                 trigger::ActiveCondition active_condition;   // The active condition object.
                 trigger::ConditionSharedData condition_data; // Persistent data across trigger evaluation
             } m_trigger;                                     // Data related to the graph trigger
+
+            union
+            {
+                struct
+                {
+                    AnyType opvals[MAX_OPERANDS];
+                    VariableType::eVariableType optypes[MAX_OPERANDS];
+                } check_trigger;
+            } m_stack_data; // Move some data out of the stack.
         };
     } // namespace datalogging
 } // namespace scrutiny

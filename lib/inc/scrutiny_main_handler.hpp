@@ -105,7 +105,13 @@ namespace scrutiny
         /// @param src  Source buffer
         /// @param size Size of data to transfer
         /// @return true on success, false on failure
-        bool read_memory(void *const dst, void const *const src, uint32_t const size) const;
+        inline bool read_memory(void *const dst, void const *const src, uint32_t const size) const
+        {
+            // We keep a wrapper over memcpy to check for permission.
+            // Right now, oermissions are enforced outisde and it's enough
+            memcpy(dst, src, size);
+            return true;
+        }
 
         /// @brief Reads a variable from a memory location. Ensure the respect of forbidden regions and will not make unaligned memory access
         /// @param addr Address at which the variable is stored

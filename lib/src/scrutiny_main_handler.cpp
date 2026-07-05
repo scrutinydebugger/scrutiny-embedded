@@ -128,17 +128,6 @@ namespace scrutiny
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
-    bool MainHandler::read_memory(void *dst, void const *const src, uint32_t const size) const
-    {
-        if (touches_forbidden_region(src, size))
-        {
-            return false;
-        }
-
-        memcpy(dst, src, size);
-        return true;
-    }
-
     bool MainHandler::fetch_variable(void const *const addr, VariableType::eVariableType const variable_type, AnyType *const val) const
     {
         uint_least8_t typesize_char = tools::get_type_size_8bits(variable_type) / (CHAR_BIT / 8);
@@ -170,13 +159,11 @@ namespace scrutiny
         VariableTypeSize::eVariableTypeSize const output_type_size = tools::get_required_type_size_8bits(output_required_size);
         VariableType::eVariableType const fetch_variable_type = tools::make_type(VariableTypeType::_uint, fetch_type_size);
         VariableType::eVariableType const output_variable_type = tools::make_type(var_tt, output_type_size);
-        uint_least8_t const typesize_char = tools::get_type_size_8bits(fetch_variable_type) / (CHAR_BIT / 8);
 
-        if (touches_forbidden_region(addr, typesize_char))
-        {
-            success = false;
-        }
-        else if (bitsize == 0)
+        // We do not check for forbidden regions here. This function is only used by the datalogger.
+        // The Main Handler is expected to validate the datalogger config.
+
+        if (bitsize == 0)
         {
             success = false;
         }
@@ -217,8 +204,8 @@ namespace scrutiny
 #if CHAR_BIT == 8
                     if (output_type_size == VariableTypeSize::_8)
                     {
-                        mask.uint8 =
-                            (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u) : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
+                        mask.uint8 = (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u)
+                                                    : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
                         val->uint8 &= mask.uint8;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -245,7 +232,8 @@ namespace scrutiny
                     }
                     else if (output_type_size == VariableTypeSize::_32)
                     {
-                        mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u) : static_cast<uint32_t>(0xFFFFFFFF);
+                        mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u)
+                                                      : static_cast<uint32_t>(0xFFFFFFFF);
                         val->uint32 &= mask.uint32;
                         if (var_tt == VariableTypeType::_sint)
                         {
@@ -258,7 +246,8 @@ namespace scrutiny
 #if SCRUTINY_SUPPORT_64BITS
                     else if (output_type_size == VariableTypeSize::_64)
                     {
-                        mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u) : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
+                        mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u)
+                                                      : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
                         val->uint64 &= mask.uint64;
                         if (var_tt == VariableTypeType::_sint)
                         {
