@@ -402,19 +402,19 @@ namespace scrutiny
                     if (fetch_operand(
                             m_main_handler,
                             &m_config.trigger.operands[i],
-                            &m_temp_data.check_trigger.opvals[i],
-                            &m_temp_data.check_trigger.optypes[i],
+                            &m_stack_data.check_trigger.opvals[i],
+                            &m_stack_data.check_trigger.optypes[i],
                             SCRUTINY_NULL) == false)
                     {
                         return false;
                     }
-                    convert_to_compare_type(&m_temp_data.check_trigger.optypes[i], &m_temp_data.check_trigger.opvals[i]);
+                    convert_to_compare_type(&m_stack_data.check_trigger.optypes[i], &m_stack_data.check_trigger.opvals[i]);
                 }
 
-                bool condition_result = m_trigger.active_condition.eval_fn(
+                bool const condition_result = m_trigger.active_condition.eval_fn(
                     &m_trigger.condition_data,
-                    reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(m_temp_data.check_trigger.optypes),
-                    reinterpret_cast<AnyTypeCompare *>(m_temp_data.check_trigger.opvals));
+                    reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(m_stack_data.check_trigger.optypes),
+                    reinterpret_cast<AnyTypeCompare *>(m_stack_data.check_trigger.opvals));
 
                 if (condition_result)
                 {

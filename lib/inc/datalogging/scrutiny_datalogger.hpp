@@ -182,7 +182,7 @@ namespace scrutiny
                     AnyType opvals[MAX_OPERANDS];
                     VariableType::eVariableType optypes[MAX_OPERANDS];
                 } check_trigger;
-            } m_temp_data;
+            } m_stack_data; // Move some data out of the stack.
         };
     } // namespace datalogging
 } // namespace scrutiny
