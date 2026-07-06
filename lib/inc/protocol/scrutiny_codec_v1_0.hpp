@@ -111,8 +111,6 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            void validate(void);
-
             unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_size_limit;
@@ -413,18 +411,59 @@ namespace scrutiny
                 Request const *const request,
                 RequestData::CommControl::Disconnect *const request_data);
 
-            ReadMemoryBlocksRequestParser *decode_request_memory_control_read(Request const *const request);
-            ReadMemoryBlocksResponseEncoder *encode_response_memory_control_read(Response *const response, uint16_t const max_size);
+            inline ReadMemoryBlocksRequestParser *decode_request_memory_control_read(Request const *const request)
+            {
+                parsers.m_memory_control_read_request_parser.init(request);
+                return &parsers.m_memory_control_read_request_parser;
+            }
+            inline ReadMemoryBlocksResponseEncoder *encode_response_memory_control_read(Response *const response, uint16_t const max_size)
+            {
+                response->data_length = 0;
+                encoders.m_memory_control_read_response_encoder.init(response, max_size);
+                return &encoders.m_memory_control_read_response_encoder;
+            }
 
-            WriteMemoryBlocksRequestParser *decode_request_memory_control_write(Request const *const request, bool const masked_wirte);
-            WriteMemoryBlocksResponseEncoder *encode_response_memory_control_write(Response *const response, uint16_t const max_size);
+            inline WriteMemoryBlocksRequestParser *decode_request_memory_control_write(Request const *const request, bool const masked_write)
+            {
+                parsers.m_memory_control_write_request_parser.init(request, masked_write);
+                return &parsers.m_memory_control_write_request_parser;
+            }
+            inline WriteMemoryBlocksResponseEncoder *encode_response_memory_control_write(Response *const response, uint16_t const max_size)
+            {
+                response->data_length = 0;
+                encoders.m_memory_control_write_response_encoder.init(response, max_size);
+                return &encoders.m_memory_control_write_response_encoder;
+            }
 
-            GetRPVDefinitionResponseEncoder *encode_response_get_rpv_definition(Response *const response, uint16_t const max_size);
-            ReadRPVRequestParser *decode_request_memory_control_read_rpv(Request const *const request);
-            ReadRPVResponseEncoder *encode_response_memory_control_read_rpv(Response *const response, uint16_t const max_size);
+            inline GetRPVDefinitionResponseEncoder *encode_response_get_rpv_definition(Response *const response, uint16_t const max_size)
+            {
+                response->data_length = 0;
+                encoders.m_get_rpv_definition_response_encoder.init(response, max_size);
+                return &encoders.m_get_rpv_definition_response_encoder;
+            }
+            inline ReadRPVResponseEncoder *encode_response_memory_control_read_rpv(Response *const response, uint16_t const max_size)
+            {
+                response->data_length = 0;
+                encoders.m_read_rpv_response_encoder.init(response, max_size);
+                return &encoders.m_read_rpv_response_encoder;
+            }
+            inline ReadRPVRequestParser *decode_request_memory_control_read_rpv(Request const *const request)
+            {
+                parsers.m_memory_control_read_rpv_parser.init(request);
+                return &parsers.m_memory_control_read_rpv_parser;
+            }
 
-            WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler *main_handler);
-            WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size);
+            inline WriteRPVResponseEncoder *encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size)
+            {
+                response->data_length = 0;
+                encoders.m_write_rpv_response_encoder.init(response, max_size);
+                return &encoders.m_write_rpv_response_encoder;
+            }
+            inline WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler *main_handler)
+            {
+                parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
+                return &parsers.m_memory_control_write_rpv_parser;
+            }
 
 #if SCRUTINY_ENABLE_DATALOGGING
             ResponseCode::eResponseCode encode_response_datalogging_get_setup(
