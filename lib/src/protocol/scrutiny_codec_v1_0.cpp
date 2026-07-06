@@ -696,14 +696,14 @@ namespace scrutiny
             uint_least8_t display_name_length = response_data->display_name_length;
             display_name_length = (display_name_length > MAX_DISPLAY_NAME_LENGTH) ? MAX_DISPLAY_NAME_LENGTH : display_name_length;
 
-            uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
+            uint16_t const datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
-            response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
+            response->data_length = datalen;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             tools::memcpy_dilate_8bits_big_endian(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
