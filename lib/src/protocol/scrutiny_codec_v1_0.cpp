@@ -198,11 +198,6 @@ namespace scrutiny
             m_buffer = request->data;
             m_request_len = request->data_length;
             reset();
-            validate();
-        }
-
-        void ReadRPVRequestParser::validate(void)
-        {
             // It's a list of 16 bits value. So we need an even number of bytes
             if ((m_request_len & 0x01) != 0)
             {
@@ -337,7 +332,8 @@ namespace scrutiny
             m_size_limit = max_size;
             m_buffer = response->data;
             m_response = response;
-            reset();
+            m_cursor = 0;
+            m_overflow = false;
         }
 
         void ReadMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)

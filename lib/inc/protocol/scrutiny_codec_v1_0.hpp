@@ -42,11 +42,6 @@ namespace scrutiny
           public:
             void init(Response *const response, uint16_t const max_size);
             inline bool overflow(void) const { return m_overflow; };
-            inline void reset(void)
-            {
-                m_cursor = 0;
-                m_overflow = false;
-            }
 
           protected:
             unsigned char *m_buffer;
@@ -134,8 +129,6 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            void validate(void);
-
             unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_len;
