@@ -526,18 +526,8 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = 0x00;
-            if (response_data->memory_write)
-                response->data[0] |= 0x80;
-
-            if (response_data->datalogging)
-                response->data[0] |= 0x40;
-
-            if (response_data->user_command)
-                response->data[0] |= 0x20;
-
-            if (response_data->_64bits)
-                response->data[0] |= 0x10;
+            response->data[0] = (response_data->memory_write ? 0x80u : 0u) | (response_data->datalogging ? 0x40u : 0u) |
+                                (response_data->user_command ? 0x20u : 0u) | (response_data->_64bits ? 0x10u : 0u);
 
             response->data_length = 1;
             return ResponseCode::OK;
