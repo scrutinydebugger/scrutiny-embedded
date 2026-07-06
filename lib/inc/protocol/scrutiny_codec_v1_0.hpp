@@ -92,7 +92,6 @@ namespace scrutiny
             void reset(void);
 
           protected:
-            void validate();
             unsigned char *m_buffer;
             uint16_t m_bytes_read;
             uint16_t m_request_datasize;

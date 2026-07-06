@@ -30,53 +30,20 @@ namespace scrutiny
     {
 
         //==============================================================
-        void ReadMemoryBlocksRequestParser::validate(void)
-        {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-            uint32_t cursor = 0;
-
-            while (true)
-            {
-                uint16_t length;
-                if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - cursor))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                cursor += addr_size;
-                length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
-                cursor += 2;
-
-#if CHAR_BIT == 16
-                if (length & 1u > 0)
-                {
-                    m_invalid = true;
-                    return;
-                }
-#endif
-
-                if (static_cast<uint32_t>(addr_size) + 2u + length > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                m_required_tx_buffer_size += addr_size + 2 + length;
-
-                if (cursor == m_request_datasize)
-                {
-                    break;
-                }
-            }
-        }
-
         void ReadMemoryBlocksRequestParser::init(Request const *const request)
         {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             m_buffer = request->data;
             m_request_datasize = request->data_length;
             reset();
-            validate();
+            MemoryBlock8Bits block{};
+            while (!m_invalid && !m_finished) // Traverse once for validation
+            {
+                next(&block);
+                m_required_tx_buffer_size += addr_size + 2 + block.length;
+            }
+            m_bytes_read = 0;
+            m_finished = false;
         }
 
         void ReadMemoryBlocksRequestParser::next(MemoryBlock8Bits *const memblock_8bits)
@@ -99,6 +66,22 @@ namespace scrutiny
             codecs::decode_address_big_endian_8bits(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
             length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
+
+#if CHAR_BIT == 16
+            if (length_8bits & 1u > 0)
+            {
+                m_invalid = true;
+                return;
+            }
+#endif
+
+            if (static_cast<uint32_t>(addr_size) + 2u + length_8bits > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
+            {
+                m_invalid = true;
+                m_finished = true;
+                return;
+            }
+
             m_bytes_read += 2;
 
             memblock_8bits->start_address = reinterpret_cast<unsigned char *>(addr);
