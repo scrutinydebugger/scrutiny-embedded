@@ -339,11 +339,6 @@ namespace scrutiny
             m_response = response;
             reset();
         }
-        void ResponseEncoderBase::reset(void)
-        {
-            m_cursor = 0;
-            m_overflow = false;
-        }
 
         void ReadMemoryBlocksResponseEncoder::write(MemoryBlock8Bits const *const memblock_8bits)
         {
