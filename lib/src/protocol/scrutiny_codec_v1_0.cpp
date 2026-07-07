@@ -36,10 +36,14 @@ namespace scrutiny
             m_buffer = request->data;
             m_request_datasize = request->data_length;
             reset();
-            MemoryBlock8Bits block{};
-            while (!m_invalid && !m_finished) // Traverse once for validation
+            MemoryBlock8Bits block;
+            while (true) // Traverse once for validation
             {
                 next(&block);
+                if (m_invalid || m_finished)
+                {
+                    break;
+                }
                 m_required_tx_buffer_size += addr_size + 2 + block.length;
             }
             m_bytes_read = 0;
@@ -110,10 +114,14 @@ namespace scrutiny
             m_size_limit = request->data_length;
             m_masked_write = masked_write;
             reset();
-            MemoryBlock8Bits block{};
-            while (!m_invalid && !m_finished) // Traverse once for validation
+            MemoryBlock8Bits block;
+            while (true) // Traverse once for validation
             {
                 next(&block);
+                if (m_invalid || m_finished)
+                {
+                    break;
+                }
                 m_required_tx_buffer_size += addr_size + 2;
             }
             m_bytes_read = 0;
