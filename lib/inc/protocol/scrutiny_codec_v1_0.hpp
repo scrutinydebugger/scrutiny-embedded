@@ -456,7 +456,7 @@ namespace scrutiny
                 encoders.m_write_rpv_response_encoder.init(response, max_size);
                 return &encoders.m_write_rpv_response_encoder;
             }
-            inline WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler *main_handler)
+            inline WriteRPVRequestParser *decode_request_memory_control_write_rpv(Request const *const request, MainHandler const *const main_handler)
             {
                 parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
                 return &parsers.m_memory_control_write_rpv_parser;
