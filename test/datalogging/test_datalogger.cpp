@@ -328,6 +328,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     dlconfig.items_to_log[3].type = datalogging::LoggableType::Time;
 
     dlconfig.decimation = 2;
+    dlconfig.timeout_100ns = 0;
 
     dlconfig.trigger.hold_time_100ns = 50;
     dlconfig.trigger.operand_count = 2;
@@ -393,7 +394,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         for (unsigned int i = 0; i < 500; i++)
         {
             datalogger.process();
-            if (i == 6) // 50us delay
+            if (i == 5) // 5us delay
             {
                 var1_at_trigger = var1;
                 var2_at_trigger = var2;
@@ -486,16 +487,22 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         ASSERT_GT(data->size(), 0);
         ASSERT_GE(data->size(), datalogger.log_points_after_trigger() * parser.get_entry_size_char());
 
-        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(entry_count - datalogger.log_points_after_trigger()), 1u);
+        // We allow up to 2 samples offset. 2 different mechanism can cause a off by 1 error
+        // 1. The code does not round() to avoid float operations. This test uses round()
+        // 2. We may not know if we used the remaining buffer until we overshoot it by 1 sample.
+        //    The size of a sample can be variable in the buffer and the position of the trigger is
+        //    relative to the buffer size, not a number of sample.
+        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(entry_count - datalogger.log_points_after_trigger()), 2u)
+            << "probe_location" << probe_location;
 
         float mid_var1 = *reinterpret_cast<float *>(parser.get_parsed_data_location(trigger_location, 0));
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(parser.get_parsed_data_location(trigger_location, 1));
         uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(trigger_location, 2));
 
-        // Validate position of trigger and end of graph. Allow a margin of 3 (1.5 entry because decimation=2)
-        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
-        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 3) << error_msg;
-        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
+        // Validate position of trigger and end of graph. Allow a margin of 5 (2.5 entry because decimation=2)
+        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 5) << error_msg;
+        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 5) << error_msg;
+        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 5) << error_msg;
     }
 }
 
