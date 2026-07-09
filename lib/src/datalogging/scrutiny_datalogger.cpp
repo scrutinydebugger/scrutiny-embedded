@@ -404,7 +404,7 @@ namespace scrutiny
                             &m_config.trigger.operands[i],
                             &m_stack_data.check_trigger.opvals[i],
                             &m_stack_data.check_trigger.optypes[i],
-                            SCRUTINY_NULL) == false)
+                            m_owner) == false)
                     {
                         return false;
                     }
