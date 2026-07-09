@@ -65,7 +65,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct NotEqualCondition
@@ -74,7 +74,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct GreaterThanCondition
@@ -83,7 +83,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct GreaterOrEqualThanCondition
@@ -92,7 +92,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct LessThanCondition
@@ -101,7 +101,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct LessOrEqualThanCondition
@@ -110,7 +110,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct ChangeMoreThanCondition
@@ -124,7 +124,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 2;
+                static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct IsWithinCondition
@@ -133,7 +133,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 3;
+                static inline unsigned int get_operand_count(void) { return 3; }
             };
 
             struct AlwaysTrueCondition
@@ -142,7 +142,7 @@ namespace scrutiny
                     ConditionSharedData *const data,
                     VariableTypeCompare::eVariableTypeCompare const operand_types[],
                     AnyTypeCompare const operand_vals[]);
-                static SCRUTINY_CONSTEXPR unsigned int OPERAND_COUNT = 0;
+                static inline unsigned int get_operand_count(void) { return 0; }
             }; // namespace AlwaysTrueCondition
 
         } // namespace trigger

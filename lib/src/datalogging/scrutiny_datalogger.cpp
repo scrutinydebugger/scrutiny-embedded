@@ -22,44 +22,44 @@ namespace scrutiny
     namespace datalogging
     {
 
-        static trigger::ActiveCondition SCRUTINY_CONSTEXPR CONDITION_CONFIG_LUT[9] = {
+        static trigger::ActiveCondition const CONDITION_CONFIG_LUT[9] = {
             // IMPORTANT. Keep in sync with  SupportedTriggerConditions enum.
             { // AlwaysTrue
               trigger::AlwaysTrueCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::AlwaysTrueCondition::OPERAND_COUNT },
+              trigger::AlwaysTrueCondition::get_operand_count() },
             { // Equal
               trigger::EqualCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::EqualCondition::OPERAND_COUNT },
+              trigger::EqualCondition::get_operand_count() },
             { // NotEqual
               trigger::NotEqualCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::NotEqualCondition::OPERAND_COUNT },
+              trigger::NotEqualCondition::get_operand_count() },
             { // LessThan
               trigger::LessThanCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::LessThanCondition::OPERAND_COUNT },
+              trigger::LessThanCondition::get_operand_count() },
             { // LessOrEqualThan
               trigger::LessOrEqualThanCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::LessOrEqualThanCondition::OPERAND_COUNT },
+              trigger::LessOrEqualThanCondition::get_operand_count() },
             { // GreaterThan
               trigger::GreaterThanCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::GreaterThanCondition::OPERAND_COUNT },
+              trigger::GreaterThanCondition::get_operand_count() },
             { // GreaterOrEqualThan
               trigger::GreaterOrEqualThanCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::GreaterOrEqualThanCondition::OPERAND_COUNT },
+              trigger::GreaterOrEqualThanCondition::get_operand_count() },
             { // ChangeMoreThan
               trigger::ChangeMoreThanCondition::evaluate,
               trigger::ChangeMoreThanCondition::reset,
-              trigger::ChangeMoreThanCondition::OPERAND_COUNT },
+              trigger::ChangeMoreThanCondition::get_operand_count() },
             { // IsWithin
               trigger::IsWithinCondition::evaluate,
               SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
-              trigger::IsWithinCondition::OPERAND_COUNT }
+              trigger::IsWithinCondition::get_operand_count() }
         };
 
         Status::eStatus DataLogger::init(
@@ -89,7 +89,7 @@ namespace scrutiny
             m_trigger.rising_edge_timestamp = 0;
             m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
             m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-            m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::OPERAND_COUNT;
+            m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
 
             m_trigger_cursor_location = 0;
             m_trigger_timestamp = 0;
