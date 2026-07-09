@@ -352,17 +352,6 @@ namespace scrutiny
             return false;
         }
 
-        datalogging::buffer_size_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
-        {
-            return (m_state == State::Triggered) ? m_remaining_data_to_write : 0;
-        }
-
-        datalogging::buffer_size_t DataLogger::data_counter_since_trigger(void) const
-        {
-            // This counter gets reset when trigger happens.
-            return (m_state == State::Triggered) ? m_encoder.get_data_write_counter() : 0;
-        }
-
         void DataLogger::process_acquisition(void)
         {
             if (++m_decimation_counter >= m_config.decimation)

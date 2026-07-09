@@ -118,10 +118,17 @@ namespace scrutiny
             inline buffer_size_t log_points_after_trigger(void) const { return m_log_points_after_trigger; }
 
             /// @brief Returns the number of bytes that needs to be acquired since trigger so that the acquisition is considered complete
-            buffer_size_t get_bytes_to_acquire_from_trigger_to_completion(void) const;
+            inline buffer_size_t get_bytes_to_acquire_from_trigger_to_completion(void) const
+            {
+                return (m_state == State::Triggered) ? m_remaining_data_to_write : 0;
+            }
 
             /// @brief Returns the number of bytes acquired since the trigger event.
-            buffer_size_t data_counter_since_trigger(void) const;
+            inline buffer_size_t data_counter_since_trigger(void) const
+            {
+                // This counter gets reset when trigger happens.
+                return (m_state == State::Triggered) ? m_encoder.get_data_write_counter() : 0;
+            }
 
             /// @brief Return the LoopHandler that owns the datalogger. Null if owned by the MainHandler. This value is updated by the owner himself.
             inline LoopHandler *get_owner(void) const { return m_owner; }
