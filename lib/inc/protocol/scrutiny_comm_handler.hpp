@@ -183,9 +183,9 @@ namespace scrutiny
             unsigned char *m_tx_buffer;         // The transmission buffer
             uint16_t m_rx_buffer_size;          // The reception buffer size
             uint16_t m_tx_buffer_size;          // The transmission buffer size
+            bool m_request_received;            // Flag indicating if a full request has been received
             RxFSMState::eRxFSMState m_rx_state; // Reception Finite State Machine state
             RxError::eRxError m_rx_error;       // Last reception error code
-            bool m_request_received;            // Flag indicating if a full request has been received
             union
             {
                 uint16_t data_bytes_received;        // Number of bytes part of the data payload received up to now

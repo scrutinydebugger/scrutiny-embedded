@@ -28,12 +28,12 @@ namespace scrutiny
                 crc = 0;
             }
 
-            uint_least8_t command_id;
-            uint_least8_t subfunction_id;
-            uint16_t data_length;
-            uint16_t data_max_length;
             unsigned char *data;
             uint32_t crc;
+            uint16_t data_length;
+            uint16_t data_max_length;
+            uint_least8_t command_id;
+            uint_least8_t subfunction_id;
         };
 
         struct Response
@@ -46,13 +46,13 @@ namespace scrutiny
                 data_length = 0;
             }
 
+            unsigned char *data;
+            uint32_t crc;
+            uint16_t data_length;
+            uint16_t data_max_length;
             uint_least8_t command_id;
             uint_least8_t subfunction_id;
             uint_least8_t response_code;
-            uint16_t data_length;
-            uint16_t data_max_length;
-            unsigned char *data;
-            uint32_t crc;
         };
 
         class CommandId
