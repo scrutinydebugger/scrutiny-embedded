@@ -532,12 +532,7 @@ namespace scrutiny
 
         bool CommHandler::connect(void)
         {
-            if (!m_enabled)
-            {
-                return false;
-            }
-
-            if (m_session_active)
+            if (!m_enabled || m_session_active)
             {
                 return false;
             }
