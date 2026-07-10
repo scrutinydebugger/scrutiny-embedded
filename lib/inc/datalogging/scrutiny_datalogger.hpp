@@ -151,14 +151,14 @@ namespace scrutiny
             void write_uncompressed_entry(void);
             uint16_t read_next_entry_size(buffer_size_t *cursor);
 
-            Configuration m_config;            // The datalogger configuration object
-            MainHandler const *m_main_handler; // A pointer to the main handler
-            DataEncoder m_encoder;             // The data encoder that reads the data and lay it into the datalogging buffer
-            buffer_size_t m_buffer_size;       // The datalogging buffer size
+            Configuration m_config;      // The datalogger configuration object
+            DataEncoder m_encoder;       // The data encoder that reads the data and lay it into the datalogging buffer
+            buffer_size_t m_buffer_size; // The datalogging buffer size
             // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
             trigger_callback_t m_trigger_callback;
 
-            LoopHandler *m_owner;       // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
+            MainHandler const *m_main_handler; // A pointer to the main handler
+            LoopHandler *m_owner;              // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
             Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
