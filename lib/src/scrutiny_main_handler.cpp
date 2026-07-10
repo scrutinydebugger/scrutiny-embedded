@@ -482,22 +482,6 @@ namespace scrutiny
         }
     }
 
-    bool MainHandler::rpv_exists(uint16_t const id) const
-    {
-        uint16_t const rpv_count = m_config.get_rpv_count();
-        bool found = false;
-        for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
-        {
-            if (m_config.get_rpvs_array()[i].id == id)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        return found;
-    }
-
     bool MainHandler::get_rpv(uint16_t const id, RuntimePublishedValue *const rpv) const
     {
         uint16_t const rpv_count = m_config.get_rpv_count();
@@ -507,7 +491,10 @@ namespace scrutiny
             if (m_config.get_rpvs_array()[i].id == id)
             {
                 found = true;
-                *rpv = m_config.get_rpvs_array()[i];
+                if (rpv != SCRUTINY_NULL)
+                {
+                    *rpv = m_config.get_rpvs_array()[i];
+                }
                 break;
             }
         }
