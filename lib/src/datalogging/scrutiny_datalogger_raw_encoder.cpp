@@ -146,16 +146,16 @@ namespace scrutiny
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
                 LoggableItem const &item = m_config->items_to_log[i];
-                if (item.type == datalogging::LoggableType::Memory)
+                if (item.common.type == datalogging::LoggableType::Memory)
                 {
-                    m_main_handler->read_memory(&m_buffer[cursor], item.data.memory.address, item.data.memory.size);
-                    cursor += item.data.memory.size; // We verified that this is not 0 in init
+                    m_main_handler->read_memory(&m_buffer[cursor], item.memory.address, item.memory.size);
+                    cursor += item.memory.size; // We verified that this is not 0 in init
                 }
-                else if (item.type == datalogging::LoggableType::Rpv)
+                else if (item.common.type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
                     AnyType outval;
-                    uint16_t const rpv_id = item.data.rpv.id;
+                    uint16_t const rpv_id = item.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv); // assumed valid because of config validation
                     // We assume that the callback is not nullptr. We rely on datalogger::configure to validate this.
                     bool const success = m_main_handler->get_rpv_read_callback()(rpv, &outval, caller);
@@ -175,7 +175,7 @@ namespace scrutiny
                     cursor += nb_8bits / (CHAR_BIT / 8);
 #endif
                 }
-                else if (item.type == datalogging::LoggableType::Time)
+                else if (item.common.type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
@@ -241,15 +241,15 @@ namespace scrutiny
                     break;
                 }
                 uint_fast8_t elem_size = 0;
-                if (item.type == datalogging::LoggableType::Memory)
+                if (item.common.type == datalogging::LoggableType::Memory)
                 {
-                    elem_size = item.data.memory.size; // Size in char
+                    elem_size = item.memory.size; // Size in char
                 }
-                else if (item.type == datalogging::LoggableType::Rpv)
+                else if (item.common.type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
 
-                    if (!m_main_handler->get_rpv(item.data.rpv.id, &rpv))
+                    if (!m_main_handler->get_rpv(item.rpv.id, &rpv))
                     {
                         m_error = true;
                     }
@@ -258,7 +258,7 @@ namespace scrutiny
                         elem_size = tools::get_type_size_char(rpv.type); // Size in char
                     }
                 }
-                else if (item.type == datalogging::LoggableType::Time)
+                else if (item.common.type == datalogging::LoggableType::Time)
                 {
                     elem_size = sizeof(scrutiny::timestamp_t); // Size in char
                 }

@@ -247,8 +247,8 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[item_index].type), &buffer[cursor]);
-        switch (dlconfig->items_to_log[item_index].type)
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[item_index].common.type), &buffer[cursor]);
+        switch (dlconfig->items_to_log[item_index].common.type)
         {
         case datalogging::LoggableType::Time:
             break;
@@ -257,15 +257,15 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[item_index].data.memory.address, &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[item_index].data.memory.size, &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[item_index].memory.address, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[item_index].memory.size, &buffer[cursor]);
             break;
         case datalogging::LoggableType::Rpv:
             if (cursor + 2 >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[item_index].data.rpv.id, &buffer[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[item_index].rpv.id, &buffer[cursor]);
             break;
         }
     }
@@ -283,12 +283,12 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     refconfig.timeout_100ns = 0x11223344;
     refconfig.items_count = 3;
 
-    refconfig.items_to_log[0].type = datalogging::LoggableType::Time;
-    refconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    refconfig.items_to_log[1].data.memory.address = &m_some_var_logged1;
-    refconfig.items_to_log[1].data.memory.size = sizeof(m_some_var_logged1);
-    refconfig.items_to_log[2].type = datalogging::LoggableType::Rpv;
-    refconfig.items_to_log[2].data.rpv.id = 0x8888;
+    refconfig.items_to_log[0].common.type = datalogging::LoggableType::Time;
+    refconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    refconfig.items_to_log[1].memory.address = &m_some_var_logged1;
+    refconfig.items_to_log[1].memory.size = sizeof(m_some_var_logged1);
+    refconfig.items_to_log[2].common.type = datalogging::LoggableType::Rpv;
+    refconfig.items_to_log[2].rpv.id = 0x8888;
 
     refconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
     refconfig.trigger.hold_time_100ns = 0xaabbccdd;
@@ -401,12 +401,12 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
     EXPECT_EQ(dlconfig->probe_location, refconfig.probe_location);
     EXPECT_EQ(dlconfig->timeout_100ns, refconfig.timeout_100ns);
     ASSERT_EQ(dlconfig->items_count, refconfig.items_count);
-    EXPECT_EQ(dlconfig->items_to_log[0].type, refconfig.items_to_log[0].type);
-    EXPECT_EQ(dlconfig->items_to_log[1].type, refconfig.items_to_log[1].type);
-    EXPECT_EQ(dlconfig->items_to_log[1].data.memory.address, refconfig.items_to_log[1].data.memory.address);
-    EXPECT_EQ(dlconfig->items_to_log[1].data.memory.size, refconfig.items_to_log[1].data.memory.size);
-    EXPECT_EQ(dlconfig->items_to_log[2].type, refconfig.items_to_log[2].type);
-    EXPECT_EQ(dlconfig->items_to_log[2].data.rpv.id, refconfig.items_to_log[2].data.rpv.id);
+    EXPECT_EQ(dlconfig->items_to_log[0].common.type, refconfig.items_to_log[0].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[1].common.type, refconfig.items_to_log[1].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[1].memory.address, refconfig.items_to_log[1].memory.address);
+    EXPECT_EQ(dlconfig->items_to_log[1].memory.size, refconfig.items_to_log[1].memory.size);
+    EXPECT_EQ(dlconfig->items_to_log[2].common.type, refconfig.items_to_log[2].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[2].rpv.id, refconfig.items_to_log[2].rpv.id);
     EXPECT_EQ(dlconfig->trigger.condition, refconfig.trigger.condition);
     EXPECT_EQ(dlconfig->trigger.hold_time_100ns, refconfig.trigger.hold_time_100ns);
     EXPECT_EQ(dlconfig->trigger.operand_count, refconfig.trigger.operand_count);
@@ -512,8 +512,8 @@ TEST_F(TestDatalogControl, TestConfigureSignalInForbiddenRegion)
 
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.items_to_log[1].data.memory.address = &forbidden_var;
-    refconfig.items_to_log[1].data.memory.size = sizeof(forbidden_var);
+    refconfig.items_to_log[1].memory.address = &forbidden_var;
+    refconfig.items_to_log[1].memory.size = sizeof(forbidden_var);
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
@@ -590,8 +590,8 @@ TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.items_to_log[0].type = datalogging::LoggableType::Rpv;
-    refconfig.items_to_log[0].data.rpv.id = 0x9999; // doesn't exist
+    refconfig.items_to_log[0].common.type = datalogging::LoggableType::Rpv;
+    refconfig.items_to_log[0].rpv.id = 0x9999; // doesn't exist
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }

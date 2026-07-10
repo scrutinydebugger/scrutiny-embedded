@@ -155,24 +155,27 @@ namespace scrutiny
             };
             // clang-format on
         };
-        struct LoggableItem
+
+        union LoggableItem
         {
-            union
+            struct
             {
-                struct
-                {
-                    void *address;
-                    uint_least8_t size;
-                } memory;
-                struct
-                {
-                    uint16_t id;
-                } rpv;
-                struct
-                {
-                } time;
-            } data;
-            LoggableType::eLoggableType type;
+                void *_pad1;
+                uint_least8_t _pad2;
+                LoggableType::eLoggableType type;
+            } common;
+            struct
+            {
+                void *address;
+                uint_least8_t size;
+            } memory;
+            struct
+            {
+                uint16_t id;
+            } rpv;
+            struct
+            {
+            } time;
         };
 
         struct Configuration

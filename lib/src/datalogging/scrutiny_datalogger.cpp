@@ -198,23 +198,23 @@ namespace scrutiny
 
                 for (uint_least8_t i = 0; i < m_config.items_count; i++)
                 {
-                    if (m_config.items_to_log[i].type == LoggableType::Rpv)
+                    if (m_config.items_to_log[i].common.type == LoggableType::Rpv)
                     {
                         if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }
 
-                        if (!m_main_handler->rpv_exists(m_config.items_to_log[i].data.rpv.id))
+                        if (!m_main_handler->rpv_exists(m_config.items_to_log[i].rpv.id))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.items_to_log[i].type == LoggableType::Memory)
+                    else if (m_config.items_to_log[i].common.type == LoggableType::Memory)
                     {
                         // Nothing to validate
                     }
-                    else if (m_config.items_to_log[i].type == LoggableType::Time)
+                    else if (m_config.items_to_log[i].common.type == LoggableType::Time)
                     {
                         // Nothing to validate
                     }

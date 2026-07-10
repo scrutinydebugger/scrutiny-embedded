@@ -1092,9 +1092,9 @@ namespace scrutiny
                     return ResponseCode::InvalidRequest;
                 }
 
-                config->items_to_log[i].type = static_cast<datalogging::LoggableType::eLoggableType>(request->data[cursor++]);
+                config->items_to_log[i].common.type = static_cast<datalogging::LoggableType::eLoggableType>(request->data[cursor++]);
 
-                switch (config->items_to_log[i].type)
+                switch (config->items_to_log[i].common.type)
                 {
                 case datalogging::LoggableType::Memory:
                 {
@@ -1104,8 +1104,8 @@ namespace scrutiny
                     }
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
-                        reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
-                    config->items_to_log[i].data.memory.size = request->data[cursor++];
+                        reinterpret_cast<uintptr_t *>(&config->items_to_log[i].memory.address));
+                    config->items_to_log[i].memory.size = request->data[cursor++];
                     break;
                 }
                 case datalogging::LoggableType::Rpv:
@@ -1115,7 +1115,7 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
 
-                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
+                    config->items_to_log[i].rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }

@@ -1497,19 +1497,19 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < config->items_count; i++)
             {
-                if (config->items_to_log[i].type == datalogging::LoggableType::Memory)
+                if (config->items_to_log[i].common.type == datalogging::LoggableType::Memory)
                 {
 #if SCRUTINY_SUPPORT_PROTECTED_REGIONS
-                    if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
+                    if (touches_forbidden_region(config->items_to_log[i].memory.address, config->items_to_log[i].memory.size))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
 #endif
                 }
-                else if (config->items_to_log[i].type == datalogging::LoggableType::Rpv)
+                else if (config->items_to_log[i].common.type == datalogging::LoggableType::Rpv)
                 {
-                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].data.rpv.id))
+                    if (!m_config.is_read_published_values_configured() || !rpv_exists(config->items_to_log[i].rpv.id))
                     {
                         code = protocol::ResponseCode::FailureToProceed;
                         break;
