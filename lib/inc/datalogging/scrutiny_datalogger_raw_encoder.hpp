@@ -77,7 +77,7 @@ namespace scrutiny
             inline datalogging::buffer_size_t get_read_cursor(void) const { return m_first_valid_entry_index * m_entry_size; }
             inline datalogging::buffer_size_t get_write_cursor(void) const { return m_next_entry_write_index * m_entry_size; }
             inline bool error(void) const { return m_error; }
-            inline datalogging::buffer_size_t get_entry_count(void) const { return m_entries_count; }
+            inline datalogging::buffer_size_t get_entry_count(void) const { return (m_full) ? m_max_entries : m_next_entry_write_index; }
             inline datalogging::buffer_size_t get_buffer_effective_size(void) const { return m_entry_size * m_max_entries; }
             inline bool buffer_full(void) const { return m_full; }
             datalogging::buffer_size_t remaining_bytes_to_full() const;
@@ -97,7 +97,7 @@ namespace scrutiny
             datalogging::buffer_size_t m_first_valid_entry_index;
             datalogging::buffer_size_t m_entry_write_counter;
             uint16_t m_entry_size;
-            datalogging::buffer_size_t m_entries_count;
+
             bool m_full;
             bool m_error;
         };
@@ -114,6 +114,7 @@ namespace scrutiny
         {
             return m_encoder->error();
         }
+
     } // namespace datalogging
 } // namespace scrutiny
 

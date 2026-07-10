@@ -94,7 +94,7 @@ namespace scrutiny
                 return 0;
             }
 
-            return m_encoder->m_entries_count * m_encoder->m_entry_size;
+            return m_encoder->get_entry_count() * m_encoder->m_entry_size;
         }
 
         /// @brief Reset the reader
@@ -117,7 +117,6 @@ namespace scrutiny
             m_first_valid_entry_index(0),
             m_entry_write_counter(0),
             m_entry_size(0),
-            m_entries_count(0),
             m_full(false),
             m_error(false)
         {
@@ -194,11 +193,6 @@ namespace scrutiny
                 }
             }
 
-            if (!m_full)
-            {
-                m_entries_count++;
-            }
-
             m_next_entry_write_index++;
             if (m_next_entry_write_index >= m_max_entries)
             {
@@ -231,7 +225,6 @@ namespace scrutiny
             m_next_entry_write_index = 0;
             m_first_valid_entry_index = 0;
             m_entry_size = 0;
-            m_entries_count = 0;
             m_full = false;
             m_max_entries = 0;
 
