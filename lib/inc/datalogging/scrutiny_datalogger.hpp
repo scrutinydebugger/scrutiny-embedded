@@ -186,8 +186,7 @@ namespace scrutiny
             {
                 struct
                 {
-                    AnyType opvals[MAX_OPERANDS];
-                    VariableType::eVariableType optypes[MAX_OPERANDS];
+                    AnyValAndTypePair ops_data[MAX_OPERANDS];
                 } check_trigger;
             } m_stack_data; // Move some data out of the stack.
         };

@@ -45,144 +45,120 @@ namespace scrutiny
                 }
             }
 
-            bool RelationalCompare(
-                RelationalOperator::eRelationalOperator const op,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool RelationalCompare(RelationalOperator::eRelationalOperator const op, AnyValAndTypeComparePair const operands[])
             {
                 SCRUTINY_CONSTEXPR uint_biggest_t UINT_2_INT_MAX = static_cast<uint_biggest_t>(-1) >> 1;
 
                 // Now our values are stored either in a float32 or an integer of the biggest supported types.
                 // Number of type comparison will greatly be reduced
-                if (operand_types[0] == VariableTypeCompare::_float)
+                if (operands[0].valtype == VariableTypeCompare::_float)
                 {
-                    if (operand_types[1] == VariableTypeCompare::_float)
+                    if (operands[1].valtype == VariableTypeCompare::_float)
                     {
-                        return apply_relational_op<float>(op, operand_vals[0]._float, operand_vals[1]._float);
+                        return apply_relational_op<float>(op, operands[0].val._float, operands[1].val._float);
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_sint)
+                    else if (operands[1].valtype == VariableTypeCompare::_sint)
                     {
-                        return apply_relational_op<float>(op, operand_vals[0]._float, static_cast<float>(operand_vals[1]._sint));
+                        return apply_relational_op<float>(op, operands[0].val._float, static_cast<float>(operands[1].val._sint));
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_uint)
+                    else if (operands[1].valtype == VariableTypeCompare::_uint)
                     {
-                        return apply_relational_op<float>(op, operand_vals[0]._float, static_cast<float>(operand_vals[1]._uint));
+                        return apply_relational_op<float>(op, operands[0].val._float, static_cast<float>(operands[1].val._uint));
                     }
                 }
-                else if (operand_types[0] == VariableTypeCompare::_sint)
+                else if (operands[0].valtype == VariableTypeCompare::_sint)
                 {
-                    if (operand_types[1] == VariableTypeCompare::_float)
+                    if (operands[1].valtype == VariableTypeCompare::_float)
                     {
-                        return apply_relational_op<float>(op, static_cast<float>(operand_vals[0]._sint), operand_vals[1]._float);
+                        return apply_relational_op<float>(op, static_cast<float>(operands[0].val._sint), operands[1].val._float);
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_sint)
+                    else if (operands[1].valtype == VariableTypeCompare::_sint)
                     {
-                        return apply_relational_op<int_biggest_t>(op, operand_vals[0]._sint, operand_vals[1]._sint);
+                        return apply_relational_op<int_biggest_t>(op, operands[0].val._sint, operands[1].val._sint);
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_uint)
+                    else if (operands[1].valtype == VariableTypeCompare::_uint)
                     {
                         return apply_relational_op<int_biggest_t>(
                             op,
-                            operand_vals[0]._sint,
-                            static_cast<int_biggest_t>((operand_vals[1]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[1]._uint));
+                            operands[0].val._sint,
+                            static_cast<int_biggest_t>((operands[1].val._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operands[1].val._uint));
                     }
                 }
-                else if (operand_types[0] == VariableTypeCompare::_uint)
+                else if (operands[0].valtype == VariableTypeCompare::_uint)
                 {
-                    if (operand_types[1] == VariableTypeCompare::_float)
+                    if (operands[1].valtype == VariableTypeCompare::_float)
                     {
-                        return apply_relational_op<float>(op, static_cast<float>(operand_vals[0]._uint), operand_vals[1]._float);
+                        return apply_relational_op<float>(op, static_cast<float>(operands[0].val._uint), operands[1].val._float);
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_sint)
+                    else if (operands[1].valtype == VariableTypeCompare::_sint)
                     {
                         return apply_relational_op<int_biggest_t>(
                             op,
-                            static_cast<int_biggest_t>((operand_vals[0]._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operand_vals[0]._uint),
-                            operand_vals[1]._sint);
+                            static_cast<int_biggest_t>((operands[0].val._uint > UINT_2_INT_MAX) ? UINT_2_INT_MAX : operands[0].val._uint),
+                            operands[1].val._sint);
                     }
-                    else if (operand_types[1] == VariableTypeCompare::_uint)
+                    else if (operands[1].valtype == VariableTypeCompare::_uint)
                     {
-                        return apply_relational_op<uint_biggest_t>(op, operand_vals[0]._uint, operand_vals[1]._uint);
+                        return apply_relational_op<uint_biggest_t>(op, operands[0].val._uint, operands[1].val._uint);
                     }
                 }
 
                 return false;
             } // namespace trigger
 
-            bool EqualCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool EqualCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::Equal, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::Equal, operands);
             }
 
-            bool NotEqualCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool NotEqualCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::NotEqual, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::NotEqual, operands);
             }
 
-            bool GreaterThanCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool GreaterThanCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::GreaterThan, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::GreaterThan, operands);
             }
 
-            bool GreaterOrEqualThanCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool GreaterOrEqualThanCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::GreaterOrEqualThan, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::GreaterOrEqualThan, operands);
             }
 
-            bool LessThanCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool LessThanCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::LessThan, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::LessThan, operands);
             }
 
-            bool LessOrEqualThanCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool LessOrEqualThanCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                return RelationalCompare(RelationalOperator::LessOrEqualThan, operand_types, operand_vals);
+                return RelationalCompare(RelationalOperator::LessOrEqualThan, operands);
             }
 
-            bool ChangeMoreThanCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool ChangeMoreThanCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 // We can reasonably make the assumption that the delta will be a human-sized value.
                 // Therefore, a float is adequate for it. Will avoid bloating this code for no reason
                 float delta = 0;
                 bool outval = false;
-                if (operand_types[1] == VariableTypeCompare::_float)
+                if (operands[1].valtype == VariableTypeCompare::_float)
                 {
-                    delta = operand_vals[1]._float;
+                    delta = operands[1].val._float;
                 }
-                else if (operand_types[1] == VariableTypeCompare::_uint)
+                else if (operands[1].valtype == VariableTypeCompare::_uint)
                 {
-                    delta = static_cast<float>(operand_vals[1]._uint);
+                    delta = static_cast<float>(operands[1].val._uint);
                 }
-                else if (operand_types[1] == VariableTypeCompare::_sint)
+                else if (operands[1].valtype == VariableTypeCompare::_sint)
                 {
-                    delta = static_cast<float>(operand_vals[1]._sint);
+                    delta = static_cast<float>(operands[1].val._sint);
                 }
                 else
                 {
@@ -191,37 +167,37 @@ namespace scrutiny
 
                 if (data->cmt.initialized)
                 {
-                    if (operand_types[0] == VariableTypeCompare::_uint)
+                    if (operands[0].valtype == VariableTypeCompare::_uint)
                     {
                         if (delta >= 0)
                         {
-                            outval = (operand_vals[0]._uint > data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
+                            outval = (operands[0].val._uint > data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
                         }
                         else
                         {
-                            outval = (operand_vals[0]._uint < data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
+                            outval = (operands[0].val._uint < data->cmt.previous_val._uint + static_cast<int_biggest_t>(delta));
                         }
                     }
-                    else if (operand_types[0] == VariableTypeCompare::_sint)
+                    else if (operands[0].valtype == VariableTypeCompare::_sint)
                     {
                         if (delta >= 0)
                         {
-                            outval = (operand_vals[0]._sint > data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
+                            outval = (operands[0].val._sint > data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
                         }
                         else
                         {
-                            outval = (operand_vals[0]._sint < data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
+                            outval = (operands[0].val._sint < data->cmt.previous_val._sint + static_cast<int_biggest_t>(delta));
                         }
                     }
-                    else if (operand_types[0] == VariableTypeCompare::_float)
+                    else if (operands[0].valtype == VariableTypeCompare::_float)
                     {
                         if (delta >= 0)
                         {
-                            outval = (operand_vals[0]._float > data->cmt.previous_val._float + delta);
+                            outval = (operands[0].val._float > data->cmt.previous_val._float + delta);
                         }
                         else
                         {
-                            outval = (operand_vals[0]._float < data->cmt.previous_val._float + delta);
+                            outval = (operands[0].val._float < data->cmt.previous_val._float + delta);
                         }
                     }
                 }
@@ -230,32 +206,29 @@ namespace scrutiny
                     data->cmt.initialized = true;
                 }
 
-                memcpy(&data->cmt.previous_val, &operand_vals[0], sizeof(data->cmt.previous_val));
+                memcpy(&data->cmt.previous_val, &operands[0].val, sizeof(data->cmt.previous_val));
 
                 return outval;
             }
 
-            bool IsWithinCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool IsWithinCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
                 float operands_vals_float[3];
 
                 for (uint_fast8_t i = 0; i < 3; i++)
                 {
-                    if (operand_types[i] == VariableTypeCompare::_uint)
+                    if (operands[i].valtype == VariableTypeCompare::_uint)
                     {
-                        operands_vals_float[i] = static_cast<float>(operand_vals[i]._uint);
+                        operands_vals_float[i] = static_cast<float>(operands[i].val._uint);
                     }
-                    else if (operand_types[i] == VariableTypeCompare::_sint)
+                    else if (operands[i].valtype == VariableTypeCompare::_sint)
                     {
-                        operands_vals_float[i] = static_cast<float>(operand_vals[i]._sint);
+                        operands_vals_float[i] = static_cast<float>(operands[i].val._sint);
                     }
-                    else if (operand_types[i] == VariableTypeCompare::_float)
+                    else if (operands[i].valtype == VariableTypeCompare::_float)
                     {
-                        operands_vals_float[i] = operand_vals[i]._float;
+                        operands_vals_float[i] = operands[i].val._float;
                     }
                     else
                     {
@@ -267,14 +240,10 @@ namespace scrutiny
                 return diffabs <= margin;
             }
 
-            bool AlwaysTrueCondition::evaluate(
-                ConditionSharedData *const data,
-                VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                AnyTypeCompare const operand_vals[])
+            bool AlwaysTrueCondition::evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[])
             {
                 static_cast<void>(data);
-                static_cast<void>(operand_types);
-                static_cast<void>(operand_vals);
+                static_cast<void>(operands);
                 return true;
             }
         } // namespace trigger

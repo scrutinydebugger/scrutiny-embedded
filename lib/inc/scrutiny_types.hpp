@@ -77,9 +77,9 @@ namespace scrutiny
         // clang-format off
         SCRUTINY_ENUM(eVariableTypeSize, uint_least8_t)
         {
-#if CHAR_BIT==8            
+#if CHAR_BIT==8
             _8 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_8,
-#endif            
+#endif
             _16 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_16,
             _32 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_32,
             _64 = ctypes::SCRUTINY_C_VARIABLE_TYPE_SIZE_64,
@@ -134,6 +134,12 @@ namespace scrutiny
 
     /// @brief The fast version of AnyType
     typedef ctypes::scrutiny_c_any_type_fast_t AnyTypeFast;
+
+    struct AnyValAndTypePair
+    {
+        AnyType val;
+        VariableType::eVariableType valtype;
+    };
 
 #if SCRUTINY_SUPPORT_64BITS
     typedef uint64_t uint_biggest_t;

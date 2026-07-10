@@ -32,57 +32,56 @@ TEST(TestDataLoggingTypes, AnyTypeCompareCast)
 
 TEST(TestDataLoggingTypes, ConvertToCompareType)
 {
-    scrutiny::VariableType::eVariableType vtype;
-    scrutiny::AnyType v;
+    scrutiny::AnyValAndTypePair vpair;
 
 #if CHAR_BIT == 8
-    vtype = scrutiny::VariableType::sint8;
-    v.sint8 = -50;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -50);
+    vpair.valtype = scrutiny::VariableType::sint8;
+    vpair.val.sint8 = -50;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._sint, -50);
 #endif
 
-    vtype = scrutiny::VariableType::sint16;
-    v.sint16 = -1000;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -1000);
+    vpair.valtype = scrutiny::VariableType::sint16;
+    vpair.val.sint16 = -1000;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._sint, -1000);
 
-    vtype = scrutiny::VariableType::sint32;
-    v.sint32 = -100000;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -100000);
+    vpair.valtype = scrutiny::VariableType::sint32;
+    vpair.val.sint32 = -100000;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._sint, -100000);
 
 #if CHAR_BIT == 8
-    vtype = scrutiny::VariableType::uint8;
-    v.uint8 = 50;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_uint, 50u);
+    vpair.valtype = scrutiny::VariableType::uint8;
+    vpair.val.uint8 = 50;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._uint, 50u);
 #endif
 
-    vtype = scrutiny::VariableType::uint16;
-    v.uint16 = 1000;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_uint, 1000u);
+    vpair.valtype = scrutiny::VariableType::uint16;
+    vpair.val.uint16 = 1000;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._uint, 1000u);
 
-    vtype = scrutiny::VariableType::uint32;
-    v.uint32 = 100000;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_uint, 100000u);
+    vpair.valtype = scrutiny::VariableType::uint32;
+    vpair.val.uint32 = 100000;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._uint, 100000u);
 
 #if SCRUTINY_SUPPORT_64BITS
-    vtype = scrutiny::VariableType::uint64;
-    v.uint64 = 0x123456789ABC;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_uint, 0x123456789ABCu);
+    vpair.valtype = scrutiny::VariableType::uint64;
+    vpair.val.uint64 = 0x123456789ABC;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._uint, 0x123456789ABCu);
 
-    vtype = scrutiny::VariableType::sint64;
-    v.sint64 = -0x123456789ABC;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_sint, -0x123456789ABC);
+    vpair.valtype = scrutiny::VariableType::sint64;
+    vpair.val.sint64 = -0x123456789ABC;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._sint, -0x123456789ABC);
 
-    vtype = scrutiny::VariableType::float64;
-    v.float64 = 3.1415926;
-    scrutiny::datalogging::convert_to_compare_type(&vtype, &v);
-    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyTypeCompare *>(&v)->_float, 3.1415926f);
+    vpair.valtype = scrutiny::VariableType::float64;
+    vpair.val.float64 = 3.1415926;
+    scrutiny::datalogging::convert_to_compare_type(&vpair);
+    EXPECT_EQ(reinterpret_cast<scrutiny::datalogging::AnyValAndTypeComparePair *>(&vpair)->val._float, 3.1415926f);
 #endif
 }

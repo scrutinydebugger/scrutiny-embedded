@@ -24,16 +24,16 @@ namespace scrutiny
         /// will have a valid value with zeros in the MSBs
         /// @param vtype Variable type of the input data
         /// @param val Input data
-        void convert_to_compare_type(VariableType::eVariableType *const vtype, AnyType *const val)
+        void convert_to_compare_type(AnyValAndTypePair *const val_type_pair)
         {
-            switch (*vtype)
+            switch (val_type_pair->valtype)
             {
 #if SCRUTINY_SUPPORT_64BITS
             case VariableType::float64:
             {
-                *vtype = VariableType::float32;
-                float const valf32 = static_cast<float>(val->float64);
-                val->float32 = valf32;
+                val_type_pair->valtype = VariableType::float32;
+                float const valf32 = static_cast<float>(val_type_pair->val.float64);
+                val_type_pair->val.float32 = valf32;
                 break;
             }
 #endif
@@ -47,50 +47,50 @@ namespace scrutiny
 #endif
             case VariableType::boolean: // No size encoded
             {
-                *vtype = BiggestUint;
-                tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->boolean));
+                val_type_pair->valtype = BiggestUint;
+                tools::set_biggest_uint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.boolean));
                 break;
             }
 #if CHAR_BIT == 8
             case VariableType::sint8:
             {
-                *vtype = BiggestSint;
-                tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint8));
+                val_type_pair->valtype = BiggestSint;
+                tools::set_biggest_sint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.sint8));
                 break;
             }
 #endif
             case VariableType::sint16:
             {
-                *vtype = BiggestSint;
-                tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint16));
+                val_type_pair->valtype = BiggestSint;
+                tools::set_biggest_sint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.sint16));
                 break;
             }
 
             case VariableType::sint32:
             {
-                *vtype = BiggestSint;
-                tools::set_biggest_sint(*val, static_cast<uint_biggest_t>(val->sint32));
+                val_type_pair->valtype = BiggestSint;
+                tools::set_biggest_sint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.sint32));
                 break;
             }
 #if CHAR_BIT == 8
             case VariableType::uint8:
             {
-                *vtype = BiggestUint;
-                tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->uint8));
+                val_type_pair->valtype = BiggestUint;
+                tools::set_biggest_uint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.uint8));
                 break;
             }
 #endif
             case VariableType::uint16:
             {
-                *vtype = BiggestUint;
-                tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->uint16));
+                val_type_pair->valtype = BiggestUint;
+                tools::set_biggest_uint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.uint16));
                 break;
             }
 
             case VariableType::uint32:
             {
-                *vtype = BiggestUint;
-                tools::set_biggest_uint(*val, static_cast<uint_biggest_t>(val->uint32));
+                val_type_pair->valtype = BiggestUint;
+                tools::set_biggest_uint(val_type_pair->val, static_cast<uint_biggest_t>(val_type_pair->val.uint32));
                 break;
             }
 
@@ -108,27 +108,26 @@ namespace scrutiny
         bool fetch_operand(
             MainHandler const *const main_handler,
             Operand const *const operand,
-            AnyType *const val,
-            VariableType::eVariableType *const variable_type,
+            AnyValAndTypePair *const val_type_pair,
             LoopHandler *const caller)
         {
             bool success = true;
             if (operand->type == OperandType::Literal)
             {
-                val->float32 = operand->data.literal.val;
-                *variable_type = VariableType::float32;
+                val_type_pair->val.float32 = operand->data.literal.val;
+                val_type_pair->valtype = VariableType::float32;
             }
             else if (operand->type == OperandType::Rpv)
             {
                 RuntimePublishedValue rpv;
                 main_handler->get_rpv(operand->data.rpv.id, &rpv);
-                success = main_handler->get_rpv_read_callback()(rpv, val, caller);
-                *variable_type = rpv.type;
+                success = main_handler->get_rpv_read_callback()(rpv, &val_type_pair->val, caller);
+                val_type_pair->valtype = rpv.type;
             }
             else if (operand->type == OperandType::Var)
             {
-                success = main_handler->fetch_variable(operand->data.var.addr, operand->data.var.datatype, val);
-                *variable_type = operand->data.var.datatype;
+                success = main_handler->fetch_variable(operand->data.var.addr, operand->data.var.datatype, &val_type_pair->val);
+                val_type_pair->valtype = operand->data.var.datatype;
             }
             else if (operand->type == OperandType::VarBit)
             {
@@ -137,8 +136,7 @@ namespace scrutiny
                     tools::get_var_type_type(operand->data.varbit.datatype),
                     operand->data.varbit.bitoffset,
                     operand->data.varbit.bitsize,
-                    val,
-                    variable_type);
+                    val_type_pair);
             }
             else
             {
@@ -147,8 +145,8 @@ namespace scrutiny
 
             if (!success)
             {
-                memset(val, 0, sizeof(AnyType));
-                *variable_type = VariableType::float32;
+                memset(&val_type_pair->val, 0, sizeof(AnyType));
+                val_type_pair->valtype = VariableType::float32;
             }
 
             return success;

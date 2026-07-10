@@ -149,8 +149,7 @@ namespace scrutiny
         VariableTypeType::eVariableTypeType const var_tt,
         uint_fast8_t const bitoffset,
         uint_fast8_t const bitsize,
-        AnyType *const val,
-        VariableType::eVariableType *const output_type) const
+        AnyValAndTypePair *const val_type_pair) const
     {
         bool success = true;
         uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
@@ -169,28 +168,28 @@ namespace scrutiny
         }
         else if (var_tt == VariableTypeType::_sint || var_tt == VariableTypeType::_uint || var_tt == VariableTypeType::_boolean)
         {
-            success = fetch_variable(addr, fetch_variable_type, val);
+            success = fetch_variable(addr, fetch_variable_type, &val_type_pair->val);
             if (success)
             {
 #if CHAR_BIT == 8
                 if (fetch_type_size == VariableTypeSize::_8)
                 {
-                    val->uint8 >>= bitoffset;
+                    val_type_pair->val.uint8 >>= bitoffset;
                 }
                 else
 #endif
                     if (fetch_type_size == VariableTypeSize::_16)
                 {
-                    val->uint16 >>= bitoffset;
+                    val_type_pair->val.uint16 >>= bitoffset;
                 }
                 else if (fetch_type_size == VariableTypeSize::_32)
                 {
-                    val->uint32 >>= bitoffset;
+                    val_type_pair->val.uint32 >>= bitoffset;
                 }
 #if SCRUTINY_SUPPORT_64BITS
                 else if (fetch_type_size == VariableTypeSize::_64)
                 {
-                    val->uint64 >>= bitoffset;
+                    val_type_pair->val.uint64 >>= bitoffset;
                 }
 #endif
                 else // Unsupported
@@ -206,12 +205,12 @@ namespace scrutiny
                     {
                         mask.uint8 = (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u)
                                                     : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
-                        val->uint8 &= mask.uint8;
+                        val_type_pair->val.uint8 &= mask.uint8;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint8 >> (bitsize - 1))
+                            if (val_type_pair->val.uint8 >> (bitsize - 1))
                             {
-                                val->uint8 |= (~mask.uint8);
+                                val_type_pair->val.uint8 |= (~mask.uint8);
                             }
                         }
                     }
@@ -221,12 +220,12 @@ namespace scrutiny
                     {
                         mask.uint16 = (bitsize < 16u) ? static_cast<uint_fast16_t>((static_cast<uint16_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint_fast16_t>(static_cast<uint16_t>(0xFFFF));
-                        val->uint16 &= mask.uint16;
+                        val_type_pair->val.uint16 &= mask.uint16;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint16 >> (bitsize - 1))
+                            if (val_type_pair->val.uint16 >> (bitsize - 1))
                             {
-                                val->uint16 |= (~mask.uint16);
+                                val_type_pair->val.uint16 |= (~mask.uint16);
                             }
                         }
                     }
@@ -234,12 +233,12 @@ namespace scrutiny
                     {
                         mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint32_t>(0xFFFFFFFF);
-                        val->uint32 &= mask.uint32;
+                        val_type_pair->val.uint32 &= mask.uint32;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint32 >> (bitsize - 1))
+                            if (val_type_pair->val.uint32 >> (bitsize - 1))
                             {
-                                val->uint32 |= (~mask.uint32);
+                                val_type_pair->val.uint32 |= (~mask.uint32);
                             }
                         }
                     }
@@ -248,12 +247,12 @@ namespace scrutiny
                     {
                         mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
-                        val->uint64 &= mask.uint64;
+                        val_type_pair->val.uint64 &= mask.uint64;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint64 >> (bitsize - 1))
+                            if (val_type_pair->val.uint64 >> (bitsize - 1))
                             {
-                                val->uint64 |= (~mask.uint64);
+                                val_type_pair->val.uint64 |= (~mask.uint64);
                             }
                         }
                     }
@@ -268,12 +267,12 @@ namespace scrutiny
 
         if (!success)
         {
-            *output_type = VariableType::unknown;
-            memset(val, 0, sizeof(AnyType));
+            val_type_pair->valtype = VariableType::unknown;
+            memset(&val_type_pair->val, 0, sizeof(AnyType));
         }
         else
         {
-            *output_type = output_variable_type;
+            val_type_pair->valtype = output_variable_type;
         }
 
         return success;

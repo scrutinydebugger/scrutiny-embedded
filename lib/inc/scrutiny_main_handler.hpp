@@ -135,8 +135,7 @@ namespace scrutiny
             VariableTypeType::eVariableTypeType const var_tt,
             uint_fast8_t const bitoffset,
             uint_fast8_t const bitsize,
-            AnyType *const val,
-            VariableType::eVariableType *const output_type) const;
+            AnyValAndTypePair * const val_type_pair) const;
 
         /// @brief Returns a pointer to the datalogger object
         inline datalogging::DataLogger *datalogger(void)

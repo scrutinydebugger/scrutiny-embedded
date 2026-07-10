@@ -388,22 +388,16 @@ namespace scrutiny
 
                 for (unsigned int i = 0; i < nb_operand; i++)
                 {
-                    if (fetch_operand(
-                            m_main_handler,
-                            &m_config.trigger.operands[i],
-                            &m_stack_data.check_trigger.opvals[i],
-                            &m_stack_data.check_trigger.optypes[i],
-                            m_owner) == false)
+                    if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &m_stack_data.check_trigger.ops_data[i], m_owner) == false)
                     {
                         return false;
                     }
-                    convert_to_compare_type(&m_stack_data.check_trigger.optypes[i], &m_stack_data.check_trigger.opvals[i]);
+                    convert_to_compare_type(&m_stack_data.check_trigger.ops_data[i]);
                 }
 
                 bool const condition_result = m_trigger.active_condition.eval_fn(
                     &m_trigger.condition_data,
-                    reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(m_stack_data.check_trigger.optypes),
-                    reinterpret_cast<AnyTypeCompare *>(m_stack_data.check_trigger.opvals));
+                    reinterpret_cast<AnyValAndTypeComparePair *>(m_stack_data.check_trigger.ops_data));
 
                 if (condition_result)
                 {

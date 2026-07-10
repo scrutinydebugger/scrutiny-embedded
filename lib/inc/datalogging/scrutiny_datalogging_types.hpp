@@ -61,6 +61,15 @@ namespace scrutiny
             // clang-format on
         };
 
+        struct AnyValAndTypeComparePair
+        {
+            AnyTypeCompare val;
+            VariableTypeCompare::eVariableTypeCompare valtype;
+        };
+
+#if SCRUTINY_HAS_CPP11
+        static_assert(sizeof(AnyValAndTypeComparePair) == sizeof(AnyValAndTypePair), "Mismatch in pair struct");
+#endif
         class OperandType
         {
           public:
