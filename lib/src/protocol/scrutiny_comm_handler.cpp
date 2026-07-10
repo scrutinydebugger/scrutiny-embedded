@@ -194,9 +194,14 @@ namespace scrutiny
 
                 case RxFSMState::WaitForCRC:
                 {
+                    // Assumption that CRC is reset to 0 at the beginning
+                    // Data is received MSB first, so each new byte moves the data by 8
                     m_active_request.crc <<= 8;
                     m_active_request.crc |= static_cast<uint32_t>(data[i] & 0xFF);
-                    if (m_per_state_data.crc_bytes_received == 3)
+                    m_per_state_data.crc_bytes_received++;
+                    i += 1;
+
+                    if (m_per_state_data.crc_bytes_received >= 4)
                     {
                         m_state = State::Idle;
 
@@ -209,9 +214,6 @@ namespace scrutiny
                             reset_rx();
                         }
                     }
-
-                    m_per_state_data.crc_bytes_received++;
-                    i += 1;
                     break;
                 }
 
