@@ -108,7 +108,7 @@ namespace scrutiny
         inline bool read_memory(void *const dst, void const *const src, uint32_t const size) const
         {
             // We keep a wrapper over memcpy to check for permission.
-            // Right now, oermissions are enforced outisde and it's enough
+            // Right now, permissions are enforced outisde and it's enough
             memcpy(dst, src, size);
             return true;
         }
@@ -204,20 +204,20 @@ namespace scrutiny
 #endif
         Status::eStatus check_config(void);
 
-        Timebase m_timebase;                   // Timebase to keep track of time
-        protocol::CommHandler m_comm_handler;  // The communication handler that parses the request and manages the buffers
-        bool m_processing_request;             // True when a request is being processed
-        bool m_disconnect_pending;             // Indicates that a disconnect request has been received and must be processed right away
-        Config m_config;                       // The configuration
-        bool m_enabled;                        // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
-        bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
-                                               // should not be updated on subsequent ProcessAgain code
-        timestamp_t m_process_again_timestamp; // Timestamp at which the first ProcessAgain code has been returned to ensure timeout
 #if SCRUTINY_ACTUAL_PROTOCOL_VERSION == SCRUTINY_PROTOCOL_VERSION(1, 0)
         protocol::CodecV1_0 m_codec; // Communication protocol Codec
 #else
 #error Unsupported codec
 #endif
+        Config m_config;                       // The configuration
+        protocol::CommHandler m_comm_handler;  // The communication handler that parses the request and manages the buffers
+        Timebase m_timebase;                   // Timebase to keep track of time
+        timestamp_t m_process_again_timestamp; // Timestamp at which the first ProcessAgain code has been returned to ensure timeout
+        bool m_processing_request;             // True when a request is being processed
+        bool m_disconnect_pending;             // Indicates that a disconnect request has been received and must be processed right away
+        bool m_enabled;                        // Indicates that scrutiny is enabled. Will be disabled if the configuration is wrong.
+        bool m_process_again_timestamp_taken;  // Indicates that a timestamp has been taken on ProcessAgain response code, meaning that the timestamp
+                                               // should not be updated on subsequent ProcessAgain code
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
@@ -236,9 +236,9 @@ namespace scrutiny
 
         struct ThreadSafeData
         {
-            datalogging::DataLogger::State::eState datalogger_state;
             datalogging::buffer_size_t bytes_to_acquire_from_trigger_to_completion;
             datalogging::buffer_size_t write_counter_since_trigger;
+            datalogging::DataLogger::State::eState datalogger_state;
         };
 
         struct
@@ -248,14 +248,14 @@ namespace scrutiny
 
             LoopHandler *owner;                             // LoopHandler that presently own the Datalogger
             LoopHandler *new_owner;                         // LoopHandler that is requested to take ownership of the  Datalogger
+            uint32_t read_acquisition_crc;                  // CRC of the datalogging buffer content
+            uint_least8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
             DataloggingError::eDataloggingError error;      // Error related to datalogging mechanism
             bool request_arm_trigger;                       // Flag indicating that a request has been made to arm the trigger
             bool request_ownership_release;                 // Flag indicating that a request has been made to release ownership of the datalogger
             bool request_disarm_trigger;                    // Flag indicating that a request has been made to disarm the trigger
             bool pending_ownership_release;                 // Flag indicating that a request for ownership release is presently being processed
             bool reading_in_progress;                       // Flag indicating that the datalogging data is presently being read by the user.
-            uint_least8_t read_acquisition_rolling_counter; // Counter to validate the order of the data packet being read
-            uint32_t read_acquisition_crc;                  // CRC of the datalogging buffer content
         } m_datalogging;                                    // All data related to the datalogging feature
 #endif
     };

@@ -135,24 +135,12 @@ namespace scrutiny
 
         struct TriggerConfig
         {
-            /// @brief Reads a configuration and makes a copy of it
-            /// @param other The configuration to copy
-            void copy_from(TriggerConfig const *const other)
-            {
-                for (unsigned int i = 0; i < MAX_OPERANDS; i++)
-                {
-                    memcpy(&operands[i], &other->operands[i], sizeof(Operand));
-                }
+            inline void copy_from(TriggerConfig const *const other) { memcpy(this, other, sizeof(TriggerConfig)); }
 
-                condition = other->condition;
-                operand_count = other->operand_count;
-                hold_time_100ns = other->hold_time_100ns;
-            }
-
-            SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
-            uint_least8_t operand_count;                                       // Number of given operands
-            uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
             Operand operands[MAX_OPERANDS];                                    // The operand definitions
+            uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
+            uint_least8_t operand_count;                                       // Number of given operands
+            SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
         };
 
         class LoggableType
@@ -191,30 +179,15 @@ namespace scrutiny
         {
             /// @brief Reads a configuration and makes a copy of it
             /// @param other The configuration to copy
-            void copy_from(Configuration *other)
-            {
-                items_count = other->items_count;
-                decimation = other->decimation;
-                probe_location = other->probe_location;
-                timeout_100ns = other->timeout_100ns;
-                trigger.copy_from(&other->trigger);
-                if (items_count <= SCRUTINY_DATALOGGING_MAX_SIGNAL)
-                {
-                    for (unsigned int i = 0; i < items_count; i++)
-                    {
-                        memcpy(&items_to_log[i], &other->items_to_log[i], sizeof(LoggableItem));
-                    }
-                }
-            }
+            inline void copy_from(Configuration const *const other) { memcpy(this, other, sizeof(Configuration)); }
 
+            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
+            TriggerConfig trigger;                                      // The trigger configuration
             uint32_t timeout_100ns;    // Time after which an acquisition is considered complete even if the buffer is not full
             uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
             uint_least8_t items_count; // Number of items to log
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
             uint_least8_t probe_location;
-
-            TriggerConfig trigger;                                      // The trigger configuration
-            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
         };
 
         /// @brief Datalogging Trigger callback

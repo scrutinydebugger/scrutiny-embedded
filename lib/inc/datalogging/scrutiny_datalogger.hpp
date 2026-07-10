@@ -151,35 +151,33 @@ namespace scrutiny
             void write_uncompressed_entry(void);
             uint16_t read_next_entry_size(buffer_size_t *cursor);
 
+            Configuration m_config;            // The datalogger configuration object
             MainHandler const *m_main_handler; // A pointer to the main handler
+            DataEncoder m_encoder;             // The data encoder that reads the data and lay it into the datalogging buffer
             buffer_size_t m_buffer_size;       // The datalogging buffer size
-            trigger_callback_t
-                m_trigger_callback; // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
+            // A function pointer to be called when the trigger trigs. Executed in the owner loop (no thread safety)
+            trigger_callback_t m_trigger_callback;
 
+            LoopHandler *m_owner;       // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
             Timebase const *m_timebase; // Pointer to the timebase of the owning loop. Used for logging at trigger handling (hold time & timeouts)
-            State::eState m_state;      // Internal state
             timestamp_t m_trigger_timestamp;         // The timestamp at which the trigger happened
             buffer_size_t m_trigger_cursor_location; // Cursor location when trigger point has been recorded
-
             // Amount of data that still need to be written before going to ACQUISITION_COMPLETE. Used to control probe location
             buffer_size_t m_remaining_data_to_write;
-            bool m_manual_trigger; // Indicates if a manual trigger have been requested
-
-            Configuration m_config;                   // The datalogger configuration object
-            bool m_config_valid;                      // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
-            DataEncoder m_encoder;                    // The data encoder that reads the data and lay it into the datalogging buffer
+            buffer_size_t m_log_points_after_trigger; // Number of log entry counted after the trigger condition was fulfilled.
             uint16_t m_decimation_counter;            // counter used for effective decimation
             uint16_t m_acquisition_id;                // The acquisition ID of the last acquired acquisition
             uint16_t m_config_id;                     // The configuration ID given by the server
-            buffer_size_t m_log_points_after_trigger; // Number of log entry counted after the trigger condition was fulfilled.
+            bool m_manual_trigger;                    // Indicates if a manual trigger have been requested
+            bool m_config_valid;                      // Flag indicating whether the configuration is valid or not. Set after a call to `configure`
+            State::eState m_state;                    // Internal state
 
-            LoopHandler *m_owner; // A pointer to the loop owning the datalogger. Should reflect MainHandler::m_datalogging.owner.
             struct
             {
-                bool previous_val;                           // Trigger condition result of the previous cycle
-                timestamp_t rising_edge_timestamp;           // Timestamp at which the condition passed from false to true
                 trigger::ActiveCondition active_condition;   // The active condition object.
                 trigger::ConditionSharedData condition_data; // Persistent data across trigger evaluation
+                timestamp_t rising_edge_timestamp;           // Timestamp at which the condition passed from false to true
+                bool previous_val;                           // Trigger condition result of the previous cycle
             } m_trigger;                                     // Data related to the graph trigger
 
             union

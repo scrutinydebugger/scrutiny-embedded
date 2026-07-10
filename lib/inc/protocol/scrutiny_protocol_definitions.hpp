@@ -25,6 +25,7 @@ namespace scrutiny
                 command_id = 0;
                 subfunction_id = 0;
                 data_length = 0;
+                crc = 0;
             }
 
             uint_least8_t command_id;

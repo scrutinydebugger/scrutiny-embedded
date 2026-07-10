@@ -19,15 +19,15 @@
 namespace scrutiny
 {
     MainHandler::MainHandler(void) :
-        m_timebase(),
+        m_codec(),
+        m_config(),
         m_comm_handler(),
+        m_timebase(),
+        m_process_again_timestamp(0),
         m_processing_request(false),
         m_disconnect_pending(false),
-        m_config(),
         m_enabled(false),
-        m_process_again_timestamp_taken(false),
-        m_process_again_timestamp(0),
-        m_codec()
+        m_process_again_timestamp_taken(false)
 #if SCRUTINY_ENABLE_DATALOGGING
         ,
         m_datalogging()

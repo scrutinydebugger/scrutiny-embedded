@@ -220,23 +220,22 @@ namespace scrutiny
       private:
         unsigned char *m_rx_buffer; // The comm Rx buffer
         unsigned char *m_tx_buffer; // The comm Tx buffer
-        uint16_t m_rx_buffer_size;  // The comm Rx buffer size
-        uint16_t m_tx_buffer_size;
+
 #if SCRUTINY_SUPPORT_PROTECTED_REGIONS                  // The comm Tx buffer size
         AddressRange const *m_forbidden_address_ranges; // The forbidden address range array pointer. nullptr if unset
         AddressRange const *m_readonly_address_ranges;  // The read-only address range array pointer. nullptr if unset
         uint_least8_t m_forbidden_range_count;          // The forbidden address range count
         uint_least8_t m_readonly_range_count;           // The read-only address range count
 #endif
-        RuntimePublishedValue const *m_rpvs;   // The array of Runtime Published Values. nullptr if unset
-        RpvReadCallback m_rpv_read_callback;   // The callback to perform read operation on a Runtime Published Value (RPV)
-        RpvWriteCallback m_rpv_write_callback; // The callback to perform write operation on a Runtime Published Value (RPV)
-        LoopHandler **m_loops;                 // The array of Loop Handler pointers
-        uint16_t m_rpv_count;                  // The number of Runtime Published Values in the RPV array
-        uint_least8_t m_loop_count;            // Number of Loop Handler in the array
-
-        /// @brief Callback to be called on a User Command request.
+        RuntimePublishedValue const *m_rpvs;             // The array of Runtime Published Values. nullptr if unset
+        RpvReadCallback m_rpv_read_callback;             // The callback to perform read operation on a Runtime Published Value (RPV)
+        RpvWriteCallback m_rpv_write_callback;           // The callback to perform write operation on a Runtime Published Value (RPV)
         user_command_callback_t m_user_command_callback; // Callback to call when a User Command service call is requested by the server
+        LoopHandler **m_loops;                           // The array of Loop Handler pointers
+        uint16_t m_rx_buffer_size;                       // The comm Rx buffer size
+        uint16_t m_tx_buffer_size;
+        uint16_t m_rpv_count;       // The number of Runtime Published Values in the RPV array
+        uint_least8_t m_loop_count; // Number of Loop Handler in the array
 
 #if SCRUTINY_ENABLE_DATALOGGING
         unsigned char *m_datalogger_buffer;                            // Buffer that stores the datalogging data

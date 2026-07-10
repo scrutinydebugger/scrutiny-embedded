@@ -286,7 +286,7 @@ namespace scrutiny
             add_crc(&m_active_response);
 
             // cmd8 + subfn8 + code8 + len16 + data + crc32
-            m_nbytes_to_send = 1 + 1 + 1 + 2 + m_active_response.data_length + 4;
+            m_nbytes_to_send = 1u + 1u + 1u + 2u + m_active_response.data_length + 4u;
 
             m_state = State::Transmitting;
             return true;
@@ -475,12 +475,11 @@ namespace scrutiny
             if (response->data_length > m_tx_buffer_size)
                 return;
 
-            unsigned char header[5];
-            header[0] = response->command_id;
-            header[1] = response->subfunction_id;
-            header[2] = response->response_code;
-            header[3] = (response->data_length >> 8) & 0xFF;
-            header[4] = response->data_length & 0xFF;
+            unsigned char const header[5] = { static_cast<unsigned char>(response->command_id),
+                                              static_cast<unsigned char>(response->subfunction_id),
+                                              static_cast<unsigned char>(response->response_code),
+                                              static_cast<unsigned char>((response->data_length >> 8) & 0xFF),
+                                              static_cast<unsigned char>(response->data_length & 0xFF) };
 
             uint32_t const crc = tools::crc32(header, sizeof(header));
             response->crc = tools::crc32(response->data, response->data_length, crc);
