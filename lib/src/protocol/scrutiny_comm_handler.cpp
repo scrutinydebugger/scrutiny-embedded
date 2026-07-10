@@ -194,21 +194,10 @@ namespace scrutiny
 
                 case RxFSMState::WaitForCRC:
                 {
-                    if (m_per_state_data.crc_bytes_received == 0)
+                    m_active_request.crc <<= 8;
+                    m_active_request.crc |= static_cast<uint32_t>(data[i] & 0xFF);
+                    if (m_per_state_data.crc_bytes_received == 3)
                     {
-                        m_active_request.crc = static_cast<uint32_t>(data[i]) << 24u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 1)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 16u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 2)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 8u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 3)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 0;
                         m_state = State::Idle;
 
                         if (m_crc == m_active_request.crc)
