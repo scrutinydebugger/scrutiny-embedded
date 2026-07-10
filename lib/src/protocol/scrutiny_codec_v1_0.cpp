@@ -30,53 +30,24 @@ namespace scrutiny
     {
 
         //==============================================================
-        void ReadMemoryBlocksRequestParser::validate(void)
-        {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-            uint32_t cursor = 0;
-
-            while (true)
-            {
-                uint16_t length;
-                if (addr_size + 2 > static_cast<uint16_t>(m_request_datasize - cursor))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                cursor += addr_size;
-                length = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
-                cursor += 2;
-
-#if CHAR_BIT == 16
-                if (length & 1u > 0)
-                {
-                    m_invalid = true;
-                    return;
-                }
-#endif
-
-                if (static_cast<uint32_t>(addr_size) + 2u + length > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                m_required_tx_buffer_size += addr_size + 2 + length;
-
-                if (cursor == m_request_datasize)
-                {
-                    break;
-                }
-            }
-        }
-
         void ReadMemoryBlocksRequestParser::init(Request const *const request)
         {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             m_buffer = request->data;
             m_request_datasize = request->data_length;
             reset();
-            validate();
+            MemoryBlock8Bits block;
+            while (true) // Traverse once for validation
+            {
+                next(&block);
+                if (m_invalid || m_finished)
+                {
+                    break;
+                }
+                m_required_tx_buffer_size += addr_size + 2 + block.length;
+            }
+            m_bytes_read = 0;
+            m_finished = false;
         }
 
         void ReadMemoryBlocksRequestParser::next(MemoryBlock8Bits *const memblock_8bits)
@@ -99,6 +70,22 @@ namespace scrutiny
             codecs::decode_address_big_endian_8bits(&m_buffer[m_bytes_read], &addr);
             m_bytes_read += addr_size;
             length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
+
+#if CHAR_BIT == 16
+            if (length_8bits & 1u > 0)
+            {
+                m_invalid = true;
+                return;
+            }
+#endif
+
+            if (static_cast<uint32_t>(addr_size) + 2u + length_8bits > static_cast<uint16_t>(MAXIMUM_TX_BUFFER_SIZE - m_required_tx_buffer_size))
+            {
+                m_invalid = true;
+                m_finished = true;
+                return;
+            }
+
             m_bytes_read += 2;
 
             memblock_8bits->start_address = reinterpret_cast<unsigned char *>(addr);
@@ -122,63 +109,23 @@ namespace scrutiny
 
         void WriteMemoryBlocksRequestParser::init(Request const *const request, bool const masked_write)
         {
+            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
             m_buffer = request->data;
             m_size_limit = request->data_length;
             m_masked_write = masked_write;
             reset();
-            validate();
-        }
-
-        void WriteMemoryBlocksRequestParser::validate(void)
-        {
-            SCRUTINY_CONSTEXPR unsigned int addr_size = SIZEOF_8BITS(void *);
-            uint32_t cursor = 0;
-
-            while (true)
+            MemoryBlock8Bits block;
+            while (true) // Traverse once for validation
             {
-                uint16_t length_8bits;
-                if (addr_size + 2 > static_cast<uint16_t>(m_size_limit - cursor))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                cursor += addr_size;
-                length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[cursor]);
-                cursor += 2;
-                if (length_8bits > static_cast<uint16_t>(m_size_limit - cursor))
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-#if CHAR_BIT == 16
-                if ((length_8bits & 1U) > 0)
-                {
-                    m_invalid = true;
-                    return;
-                }
-#endif
-
-                cursor += length_8bits;
-                if (m_masked_write)
-                {
-                    cursor += length_8bits; // With masked write. There is a mask as long as the data it self
-                }
-
-                if (cursor > m_size_limit) // Sum of block length is bigger than request length
-                {
-                    m_invalid = true;
-                    return;
-                }
-
-                m_required_tx_buffer_size += addr_size + 2;
-
-                if (cursor == m_size_limit) // That's the length in the request
+                next(&block);
+                if (m_invalid || m_finished)
                 {
                     break;
                 }
+                m_required_tx_buffer_size += addr_size + 2;
             }
+            m_bytes_read = 0;
+            m_finished = false;
         }
 
         void WriteMemoryBlocksRequestParser::next(MemoryBlock8Bits *const memblock_8bits)
@@ -204,6 +151,14 @@ namespace scrutiny
             length_8bits = codecs::decode_16_bits_big_endian_8bits(&m_buffer[m_bytes_read]);
             m_bytes_read += 2;
 
+#if CHAR_BIT == 16
+            if ((length_8bits & 1U) > 0)
+            {
+                m_invalid = true;
+                return;
+            }
+#endif
+
             if ((length_8bits > static_cast<uint16_t>(m_size_limit - m_bytes_read)) ||
                 (m_masked_write && length_8bits > static_cast<uint16_t>((m_size_limit - m_bytes_read) >> 1)))
             {
@@ -215,6 +170,12 @@ namespace scrutiny
             memblock_8bits->start_address = reinterpret_cast<unsigned char *>(addr);
             memblock_8bits->source_data = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
             m_bytes_read += length_8bits;
+
+            if (m_bytes_read > m_size_limit) // Sum of block length is bigger than request length
+            {
+                m_invalid = true;
+                return;
+            }
             if (m_masked_write)
             {
                 memblock_8bits->mask = reinterpret_cast<unsigned char *>(&m_buffer[m_bytes_read]);
@@ -245,11 +206,6 @@ namespace scrutiny
             m_buffer = request->data;
             m_request_len = request->data_length;
             reset();
-            validate();
-        }
-
-        void ReadRPVRequestParser::validate(void)
-        {
             // It's a list of 16 bits value. So we need an even number of bytes
             if ((m_request_len & 0x01) != 0)
             {
@@ -384,10 +340,6 @@ namespace scrutiny
             m_size_limit = max_size;
             m_buffer = response->data;
             m_response = response;
-            reset();
-        }
-        void ResponseEncoderBase::reset(void)
-        {
             m_cursor = 0;
             m_overflow = false;
         }
@@ -582,18 +534,8 @@ namespace scrutiny
                 return ResponseCode::Overflow;
             }
 
-            response->data[0] = 0x00;
-            if (response_data->memory_write)
-                response->data[0] |= 0x80;
-
-            if (response_data->datalogging)
-                response->data[0] |= 0x40;
-
-            if (response_data->user_command)
-                response->data[0] |= 0x20;
-
-            if (response_data->_64bits)
-                response->data[0] |= 0x10;
+            response->data[0] = (response_data->memory_write ? 0x80u : 0u) | (response_data->datalogging ? 0x40u : 0u) |
+                                (response_data->user_command ? 0x20u : 0u) | (response_data->_64bits ? 0x10u : 0u);
 
             response->data_length = 1;
             return ResponseCode::OK;
@@ -762,14 +704,14 @@ namespace scrutiny
             uint_least8_t display_name_length = response_data->display_name_length;
             display_name_length = (display_name_length > MAX_DISPLAY_NAME_LENGTH) ? MAX_DISPLAY_NAME_LENGTH : display_name_length;
 
-            uint16_t datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
+            uint16_t const datalen = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
 
             if (datalen > MINIMUM_TX_BUFFER_SIZE && datalen > response->data_max_length)
             {
                 return ResponseCode::Overflow;
             }
 
-            response->data_length = proto_maj_size + proto_min_size + software_id_size + display_name_length_size + display_name_length;
+            response->data_length = datalen;
             response->data[proto_maj_pos] = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             response->data[proto_min_pos] = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             tools::memcpy_dilate_8bits_big_endian(&response->data[firmware_id_pos], scrutiny::software_id, software_id_size);
@@ -933,67 +875,6 @@ namespace scrutiny
 
             request_data->session_id = codecs::decode_32_bits_big_endian_8bits(&request->data[0]);
             return ResponseCode::OK;
-        }
-
-        // ============================ MemoryControl ============================
-
-        ReadMemoryBlocksRequestParser *CodecV1_0::decode_request_memory_control_read(Request const *const request)
-        {
-            parsers.m_memory_control_read_request_parser.init(request);
-            return &parsers.m_memory_control_read_request_parser;
-        }
-
-        ReadMemoryBlocksResponseEncoder *CodecV1_0::encode_response_memory_control_read(Response *const response, uint16_t const max_size)
-        {
-            response->data_length = 0;
-            encoders.m_memory_control_read_response_encoder.init(response, max_size);
-            return &encoders.m_memory_control_read_response_encoder;
-        }
-
-        WriteMemoryBlocksRequestParser *CodecV1_0::decode_request_memory_control_write(Request const *const request, bool const masked_write)
-        {
-            parsers.m_memory_control_write_request_parser.init(request, masked_write);
-            return &parsers.m_memory_control_write_request_parser;
-        }
-
-        WriteMemoryBlocksResponseEncoder *CodecV1_0::encode_response_memory_control_write(Response *const response, uint16_t const max_size)
-        {
-            response->data_length = 0;
-            encoders.m_memory_control_write_response_encoder.init(response, max_size);
-            return &encoders.m_memory_control_write_response_encoder;
-        }
-
-        GetRPVDefinitionResponseEncoder *CodecV1_0::encode_response_get_rpv_definition(Response *const response, uint16_t const max_size)
-        {
-            response->data_length = 0;
-            encoders.m_get_rpv_definition_response_encoder.init(response, max_size);
-            return &encoders.m_get_rpv_definition_response_encoder;
-        }
-
-        ReadRPVResponseEncoder *CodecV1_0::encode_response_memory_control_read_rpv(Response *const response, uint16_t const max_size)
-        {
-            response->data_length = 0;
-            encoders.m_read_rpv_response_encoder.init(response, max_size);
-            return &encoders.m_read_rpv_response_encoder;
-        }
-
-        ReadRPVRequestParser *CodecV1_0::decode_request_memory_control_read_rpv(Request const *const request)
-        {
-            parsers.m_memory_control_read_rpv_parser.init(request);
-            return &parsers.m_memory_control_read_rpv_parser;
-        }
-
-        WriteRPVResponseEncoder *CodecV1_0::encode_response_memory_control_write_rpv(Response *const response, uint16_t const max_size)
-        {
-            response->data_length = 0;
-            encoders.m_write_rpv_response_encoder.init(response, max_size);
-            return &encoders.m_write_rpv_response_encoder;
-        }
-
-        WriteRPVRequestParser *CodecV1_0::decode_request_memory_control_write_rpv(Request const *const request, MainHandler *const main_handler)
-        {
-            parsers.m_memory_control_write_rpv_parser.init(request, main_handler);
-            return &parsers.m_memory_control_write_rpv_parser;
         }
 
 #if SCRUTINY_ENABLE_DATALOGGING

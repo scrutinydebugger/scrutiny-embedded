@@ -5,6 +5,7 @@
 
 #cmakedefine01 SCRUTINY_ENABLE_DATALOGGING
 #cmakedefine01 SCRUTINY_SUPPORT_64BITS
+#cmakedefine01 SCRUTINY_SUPPORT_PROTECTED_REGIONS
 
 #cmakedefine SCRUTINY_REQUEST_MAX_PROCESS_TIME_US @SCRUTINY_REQUEST_MAX_PROCESS_TIME_US@u // If a request takes more than this time to process, it will be nacked.
 #cmakedefine SCRUTINY_COMM_RX_TIMEOUT_US @SCRUTINY_COMM_RX_TIMEOUT_US@u                   // Reset reception state machine when no data is received for that amount of time.

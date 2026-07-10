@@ -43,7 +43,7 @@ namespace scrutiny
         /// @brief Tells if a Runtime Published Values with the given ID has been defined.
         /// @param id The RPV ID
         /// @return True if RPV exists in configuration.
-        bool rpv_exists(uint16_t const id) const;
+        inline bool rpv_exists(uint16_t const id) const { return get_rpv(id, SCRUTINY_NULL); }
 
         /// @brief Returns the type of a Runtime Published Value identified by its ID
         /// @param id The RPV ID
@@ -135,8 +135,7 @@ namespace scrutiny
             VariableTypeType::eVariableTypeType const var_tt,
             uint_fast8_t const bitoffset,
             uint_fast8_t const bitsize,
-            AnyType *const val,
-            VariableType::eVariableType *const output_type) const;
+            AnyValAndTypePair *const val_type_pair) const;
 
         /// @brief Returns a pointer to the datalogger object
         inline datalogging::DataLogger *datalogger(void)
@@ -182,6 +181,7 @@ namespace scrutiny
         void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         bool touches_forbidden_region(void const *const addr_start, size_t const length_char) const;
         bool touches_readonly_region(void const *const addr_start, size_t const length_char) const;
 
@@ -201,6 +201,7 @@ namespace scrutiny
         {
             return touches_readonly_region(block->start_address, block->length / (CHAR_BIT / 8)); // length in char
         }
+#endif
         Status::eStatus check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time

@@ -149,8 +149,7 @@ namespace scrutiny
         VariableTypeType::eVariableTypeType const var_tt,
         uint_fast8_t const bitoffset,
         uint_fast8_t const bitsize,
-        AnyType *const val,
-        VariableType::eVariableType *const output_type) const
+        AnyValAndTypePair *const val_type_pair) const
     {
         bool success = true;
         uint_fast8_t const fetch_required_size = ((bitoffset + bitsize - 1) >> 3) + 1;
@@ -169,28 +168,28 @@ namespace scrutiny
         }
         else if (var_tt == VariableTypeType::_sint || var_tt == VariableTypeType::_uint || var_tt == VariableTypeType::_boolean)
         {
-            success = fetch_variable(addr, fetch_variable_type, val);
+            success = fetch_variable(addr, fetch_variable_type, &val_type_pair->val);
             if (success)
             {
 #if CHAR_BIT == 8
                 if (fetch_type_size == VariableTypeSize::_8)
                 {
-                    val->uint8 >>= bitoffset;
+                    val_type_pair->val.uint8 >>= bitoffset;
                 }
                 else
 #endif
                     if (fetch_type_size == VariableTypeSize::_16)
                 {
-                    val->uint16 >>= bitoffset;
+                    val_type_pair->val.uint16 >>= bitoffset;
                 }
                 else if (fetch_type_size == VariableTypeSize::_32)
                 {
-                    val->uint32 >>= bitoffset;
+                    val_type_pair->val.uint32 >>= bitoffset;
                 }
 #if SCRUTINY_SUPPORT_64BITS
                 else if (fetch_type_size == VariableTypeSize::_64)
                 {
-                    val->uint64 >>= bitoffset;
+                    val_type_pair->val.uint64 >>= bitoffset;
                 }
 #endif
                 else // Unsupported
@@ -206,12 +205,12 @@ namespace scrutiny
                     {
                         mask.uint8 = (bitsize < 8u) ? static_cast<uint_fast8_t>((static_cast<uint8_t>(1) << bitsize) - 1u)
                                                     : static_cast<uint_fast8_t>(static_cast<uint8_t>(0xFF));
-                        val->uint8 &= mask.uint8;
+                        val_type_pair->val.uint8 &= mask.uint8;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint8 >> (bitsize - 1))
+                            if (val_type_pair->val.uint8 >> (bitsize - 1))
                             {
-                                val->uint8 |= (~mask.uint8);
+                                val_type_pair->val.uint8 |= (~mask.uint8);
                             }
                         }
                     }
@@ -221,12 +220,12 @@ namespace scrutiny
                     {
                         mask.uint16 = (bitsize < 16u) ? static_cast<uint_fast16_t>((static_cast<uint16_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint_fast16_t>(static_cast<uint16_t>(0xFFFF));
-                        val->uint16 &= mask.uint16;
+                        val_type_pair->val.uint16 &= mask.uint16;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint16 >> (bitsize - 1))
+                            if (val_type_pair->val.uint16 >> (bitsize - 1))
                             {
-                                val->uint16 |= (~mask.uint16);
+                                val_type_pair->val.uint16 |= (~mask.uint16);
                             }
                         }
                     }
@@ -234,12 +233,12 @@ namespace scrutiny
                     {
                         mask.uint32 = (bitsize < 32u) ? static_cast<uint_fast32_t>((static_cast<uint32_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint32_t>(0xFFFFFFFF);
-                        val->uint32 &= mask.uint32;
+                        val_type_pair->val.uint32 &= mask.uint32;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint32 >> (bitsize - 1))
+                            if (val_type_pair->val.uint32 >> (bitsize - 1))
                             {
-                                val->uint32 |= (~mask.uint32);
+                                val_type_pair->val.uint32 |= (~mask.uint32);
                             }
                         }
                     }
@@ -248,12 +247,12 @@ namespace scrutiny
                     {
                         mask.uint64 = (bitsize < 64u) ? static_cast<uint_fast64_t>((static_cast<uint64_t>(1) << bitsize) - 1u)
                                                       : static_cast<uint64_t>(0xFFFFFFFFFFFFFFFF);
-                        val->uint64 &= mask.uint64;
+                        val_type_pair->val.uint64 &= mask.uint64;
                         if (var_tt == VariableTypeType::_sint)
                         {
-                            if (val->uint64 >> (bitsize - 1))
+                            if (val_type_pair->val.uint64 >> (bitsize - 1))
                             {
-                                val->uint64 |= (~mask.uint64);
+                                val_type_pair->val.uint64 |= (~mask.uint64);
                             }
                         }
                     }
@@ -268,12 +267,12 @@ namespace scrutiny
 
         if (!success)
         {
-            *output_type = VariableType::unknown;
-            memset(val, 0, sizeof(AnyType));
+            val_type_pair->valtype = VariableType::unknown;
+            memset(&val_type_pair->val, 0, sizeof(AnyType));
         }
         else
         {
-            *output_type = output_variable_type;
+            val_type_pair->valtype = output_variable_type;
         }
 
         return success;
@@ -483,22 +482,6 @@ namespace scrutiny
         }
     }
 
-    bool MainHandler::rpv_exists(uint16_t const id) const
-    {
-        uint16_t const rpv_count = m_config.get_rpv_count();
-        bool found = false;
-        for (uint16_t i = 0; i < rpv_count; i++) // if unset this count will be 0
-        {
-            if (m_config.get_rpvs_array()[i].id == id)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        return found;
-    }
-
     bool MainHandler::get_rpv(uint16_t const id, RuntimePublishedValue *const rpv) const
     {
         uint16_t const rpv_count = m_config.get_rpv_count();
@@ -508,7 +491,10 @@ namespace scrutiny
             if (m_config.get_rpvs_array()[i].id == id)
             {
                 found = true;
-                *rpv = m_config.get_rpvs_array()[i];
+                if (rpv != SCRUTINY_NULL)
+                {
+                    *rpv = m_config.get_rpvs_array()[i];
+                }
                 break;
             }
         }
@@ -666,12 +652,17 @@ namespace scrutiny
             // =========== [GetSpecialMemoryRegionCount] ==========
         case protocol::GetInfo::Subfunction::GetSpecialMemoryRegionCount:
         {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
             stack.get_special_memory_region_count.response_data.nbr_readonly_region = m_config.readonly_ranges_count();
             stack.get_special_memory_region_count.response_data.nbr_forbidden_region = m_config.forbidden_ranges_count();
+#else
+            stack.get_special_memory_region_count.response_data.nbr_readonly_region = 0;
+            stack.get_special_memory_region_count.response_data.nbr_forbidden_region = 0;
+#endif
             code = m_codec.encode_response_special_memory_region_count(&stack.get_special_memory_region_count.response_data, response);
             break;
         }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
             // =========== [GetSpecialMemoryLocation] ==========
         case protocol::GetInfo::Subfunction::GetSpecialMemoryLocation:
         {
@@ -700,6 +691,7 @@ namespace scrutiny
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
+
             else if (
                 static_cast<protocol::GetInfo::MemoryRegionType::eMemoryRegionType>(
                     stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
@@ -715,11 +707,11 @@ namespace scrutiny
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
-
                 uint_least8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
+
             else
             {
                 code = protocol::ResponseCode::InvalidRequest;
@@ -732,8 +724,8 @@ namespace scrutiny
             code = m_codec.encode_response_special_memory_region_location(&stack.get_special_memory_region_location.response_data, response);
             break;
         }
-            // =================================
-
+        // =================================
+#endif
         case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesCount:
         {
             stack.get_rpv_count.response_data.count = m_config.get_rpv_count();
@@ -1064,13 +1056,13 @@ namespace scrutiny
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                 if (touches_forbidden_region(&stack.read_mem.block))
                 {
                     code = protocol::ResponseCode::Forbidden;
                     break;
                 }
-
+#endif
                 stack.read_mem.readmem_encoder->write(&stack.read_mem.block);
 
                 if (stack.read_mem.readmem_encoder->overflow())
@@ -1119,7 +1111,7 @@ namespace scrutiny
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                 if (touches_forbidden_region(&stack.write_mem.block))
                 {
                     code = protocol::ResponseCode::Forbidden;
@@ -1131,7 +1123,7 @@ namespace scrutiny
                     code = protocol::ResponseCode::Forbidden;
                     break;
                 }
-
+#endif
                 stack.write_mem.writemem_encoder->write(&stack.write_mem.block);
                 // We don't check overflow here as we rely on the request parser to be right on the required buffer size.
 
@@ -1296,6 +1288,7 @@ namespace scrutiny
         return code;
     }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     bool MainHandler::touches_forbidden_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_forbidden_address_range_set())
@@ -1338,7 +1331,7 @@ namespace scrutiny
         }
         return false;
     }
-
+#endif
     protocol::ResponseCode::eResponseCode MainHandler::process_user_command(
         protocol::Request const *const request,
         protocol::Response *const response)
@@ -1468,6 +1461,7 @@ namespace scrutiny
             {
                 if (config->trigger.operands[i].type == datalogging::OperandType::Var)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
                             tools::get_type_size_char(config->trigger.operands[i].data.var.datatype)))
@@ -1475,9 +1469,11 @@ namespace scrutiny
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->trigger.operands[i].type == datalogging::OperandType::VarBit)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     // The library needs to access the full type, even if bitsize is small.
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.varbit.addr,
@@ -1486,6 +1482,7 @@ namespace scrutiny
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->trigger.operands[i].type == datalogging::OperandType::Rpv)
                 {
@@ -1502,11 +1499,13 @@ namespace scrutiny
             {
                 if (config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {

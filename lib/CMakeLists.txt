@@ -39,6 +39,13 @@ else()
     message(STATUS "Scrutiny support for 64bits is DISABLED")
 endif()
 
+if (${SCRUTINY_SUPPORT_PROTECTED_REGIONS})
+    message(STATUS "Scrutiny support for protected regions is  ENABLED")
+else()
+    message(STATUS "Scrutiny support for protected regions is  DISABLED")
+endif()
+
+
 set(SCRUTINY_REQUEST_MAX_PROCESS_TIME_US 100000  CACHE STRING "Maximum time allowed to process a request (us)")
 set(SCRUTINY_COMM_RX_TIMEOUT_US 50000 CACHE STRING "Maximum time between reception of 2 consecutive byte (us)")
 set(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US 5000000 CACHE STRING "Maximum time without communication before closing the session (us)")

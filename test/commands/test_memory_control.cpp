@@ -313,7 +313,7 @@ TEST_F(TestMemoryControl, TestReadLengthCauseInternalOverflow)
 
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid_request);
 }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 /*
 We try to read a forbidden memory region and expects to be responded with a "Forbidden" response code.
 We define a buffer of 16 bytes. We forbid access to 4 bytes in the middle then try to read a window
@@ -458,6 +458,7 @@ TEST_F(TestMemoryControl, TestReadReadonlyAddress)
         scrutiny_handler.process(0);
     }
 }
+#endif
 
 #if CHAR_BIT == 16
 TEST_F(TestMemoryControl, TestReadSingleAddressNotMultipleOfCharDenied)
@@ -851,6 +852,7 @@ TEST_F(TestMemoryControl, TestWriteSingleAddressMasked_InvalidDataLength)
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, invalid);
 }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 /*
 Tries to write to a forbidden address range. Same approach as TestReadForbiddenAddress.
 Expect denial of access
@@ -1000,7 +1002,7 @@ TEST_F(TestMemoryControl, TestWriteReadOnlyAddressRegionContained)
 
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, forbidden);
 }
-
+#endif
 /*
     Test that invalid requests are processed as such.
     We make a valid request with 2 write commands. Then we adjust the request length to have partial or extra data.

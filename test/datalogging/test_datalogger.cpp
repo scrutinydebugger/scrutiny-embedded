@@ -28,10 +28,12 @@ static LoopHandler *g_last_rpv_callback_caller = SCRUTINY_NULL;
 static unsigned char _rx_buffer[128];
 static unsigned char _tx_buffer[128];
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 static unsigned char forbidden_buffer[32];
 static unsigned char forbidden_buffer2[32];
 static unsigned char readonly_buffer[32];
 static unsigned char readonly_buffer2[32];
+#endif
 
 static struct
 {
@@ -82,9 +84,10 @@ class TestDatalogger : public ScrutinyTest
     MainHandler scrutiny_handler;
     Config config;
     datalogging::DataLogger datalogger;
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
+#endif
     RuntimePublishedValue rpvs[3];
 
     TestDatalogger() :
@@ -94,12 +97,13 @@ class TestDatalogger : public ScrutinyTest
         config(),
         datalogger()
     {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         readonly_ranges[0] = tools::make_address_range(readonly_buffer, sizeof(readonly_buffer));
         readonly_ranges[1] = tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
 
         forbidden_ranges[0] = tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
         forbidden_ranges[1] = tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2));
-
+#endif
         rpvs[0].id = 0x1234;
         rpvs[0].type = VariableType::uint32;
         rpvs[1].id = 0x5678;
@@ -111,8 +115,10 @@ class TestDatalogger : public ScrutinyTest
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
         config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+#endif
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);
@@ -328,6 +334,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     dlconfig.items_to_log[3].type = datalogging::LoggableType::Time;
 
     dlconfig.decimation = 2;
+    dlconfig.timeout_100ns = 0;
 
     dlconfig.trigger.hold_time_100ns = 50;
     dlconfig.trigger.operand_count = 2;
@@ -393,7 +400,7 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         for (unsigned int i = 0; i < 500; i++)
         {
             datalogger.process();
-            if (i == 6) // 50us delay
+            if (i == 5) // 5us delay
             {
                 var1_at_trigger = var1;
                 var2_at_trigger = var2;
@@ -486,16 +493,22 @@ TEST_F(TestDatalogger, ComplexAcquisition)
         ASSERT_GT(data->size(), 0);
         ASSERT_GE(data->size(), datalogger.log_points_after_trigger() * parser.get_entry_size_char());
 
-        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(entry_count - datalogger.log_points_after_trigger()), 1u);
+        // We allow up to 2 samples offset. 2 different mechanism can cause a off by 1 error
+        // 1. The code does not round() to avoid float operations. This test uses round()
+        // 2. We may not know if we used the remaining buffer until we overshoot it by 1 sample.
+        //    The size of a sample can be variable in the buffer and the position of the trigger is
+        //    relative to the buffer size, not a number of sample.
+        EXPECT_NEAR(trigger_location, static_cast<uint32_t>(entry_count - datalogger.log_points_after_trigger()), 2u)
+            << "probe_location" << probe_location;
 
         float mid_var1 = *reinterpret_cast<float *>(parser.get_parsed_data_location(trigger_location, 0));
         int32_t mid_var2 = *reinterpret_cast<int32_t *>(parser.get_parsed_data_location(trigger_location, 1));
         uint32_t mid_rpv1000 = codecs::decode_32_bits_big_endian_char(parser.get_parsed_data_location(trigger_location, 2));
 
-        // Validate position of trigger and end of graph. Allow a margin of 3 (1.5 entry because decimation=2)
-        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 3.0f) << error_msg;
-        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 3) << error_msg;
-        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 3) << error_msg;
+        // Validate position of trigger and end of graph. Allow a margin of 5 (2.5 entry because decimation=2)
+        EXPECT_LE(std::abs(var1_at_trigger - mid_var1), 5) << error_msg;
+        EXPECT_LE(std::abs(var2_at_trigger - mid_var2), 5) << error_msg;
+        EXPECT_LE(std::abs(static_cast<int32_t>(rpv1000_at_trigger - mid_rpv1000)), 5) << error_msg;
     }
 }
 

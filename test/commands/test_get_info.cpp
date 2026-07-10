@@ -109,6 +109,7 @@ TEST_F(TestGetInfo, TestReadSoftwareId)
     ASSERT_BUF_EQ(tx_buffer, expected_response, sizeof(expected_response));
 }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 /*
     Reads the number of readonly and forbidden memory ranges
 */
@@ -255,6 +256,7 @@ TEST_F(TestGetInfo, TestGetSpecialMemoryRegionLocation_WrongIndex)
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
 }
 
+#endif
 /*
     Reads the number of Runtime Published Values
 */

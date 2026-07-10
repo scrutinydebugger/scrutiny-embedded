@@ -33,7 +33,7 @@ namespace scrutiny
                 } cmt; // Change More Than
             };
 
-            typedef bool (*EvalFn)(ConditionSharedData *, VariableTypeCompare::eVariableTypeCompare const[], AnyTypeCompare const[]);
+            typedef bool (*EvalFn)(ConditionSharedData *, AnyValAndTypeComparePair const[]);
             typedef void (*ResetFn)(ConditionSharedData *);
 
             struct ActiveCondition
@@ -61,55 +61,37 @@ namespace scrutiny
 
             struct EqualCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct NotEqualCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct GreaterThanCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct GreaterOrEqualThanCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct LessThanCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct LessOrEqualThanCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
@@ -120,28 +102,19 @@ namespace scrutiny
                     memset(&data->cmt.previous_val, 0, sizeof(data->cmt.previous_val));
                     data->cmt.initialized = false;
                 };
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 2; }
             };
 
             struct IsWithinCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 3; }
             };
 
             struct AlwaysTrueCondition
             {
-                static bool evaluate(
-                    ConditionSharedData *const data,
-                    VariableTypeCompare::eVariableTypeCompare const operand_types[],
-                    AnyTypeCompare const operand_vals[]);
+                static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
                 static inline unsigned int get_operand_count(void) { return 0; }
             }; // namespace AlwaysTrueCondition
 

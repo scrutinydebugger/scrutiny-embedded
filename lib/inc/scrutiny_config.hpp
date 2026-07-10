@@ -36,6 +36,7 @@ namespace scrutiny
         /// @param tx_buffer_size Transmission buffer size
         void set_buffers(unsigned char *rx_buffer, uint16_t const rx_buffer_size, unsigned char *tx_buffer, uint16_t const tx_buffer_size);
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         /// @brief Define some memory sections that are to be left untouched
         /// @param range Array of ranges represented by the `AddressRange` object.
         /// This array must be allocated outside of Scrutiny and stay allocated forever as no copy will be made
@@ -49,7 +50,7 @@ namespace scrutiny
         /// Consider using `scrutiny::tools::make_address_range` to generate these objects in a one-liner
         /// @param count Number of ranges in the given array
         void set_readonly_address_range(AddressRange const *ranges, uint_least8_t const count);
-
+#endif
         /// @brief Configures the Runtime Published Values
         /// @param array Array of `scrutiny::RuntimePublishedValue` that contains the definition of each RPV.
         /// This array must be allocated outside of Scrutiny and stay
@@ -74,11 +75,17 @@ namespace scrutiny
         /// This generic feature allows the integrator to pass down some custom request/data to the application by leveraging the already
         /// existing Scrutiny protocol.
         /// @param callback The callback
-        inline void set_user_command_callback(user_command_callback_t callback) { m_user_command_callback = callback; };
+        inline void set_user_command_callback(user_command_callback_t callback)
+        {
+            m_user_command_callback = callback;
+        };
 
         /// @brief Returns the actual user command callback. nullptr if unset
         /// @return The callback
-        inline user_command_callback_t get_user_command_callback(void) { return m_user_command_callback; };
+        inline user_command_callback_t get_user_command_callback(void)
+        {
+            return m_user_command_callback;
+        };
 
 #if SCRUTINY_ENABLE_DATALOGGING
 
@@ -107,7 +114,7 @@ namespace scrutiny
         {
             return (m_rx_buffer != SCRUTINY_NULL) && (m_tx_buffer != SCRUTINY_NULL);
         }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         /// @brief Returns true if forbidden regions have been defined
         inline bool is_forbidden_address_range_set(void) const
         {
@@ -120,6 +127,30 @@ namespace scrutiny
             return m_readonly_address_ranges != SCRUTINY_NULL;
         }
 
+        /// @brief Returns the list of forbidden address ranges. A forbidden range is never read or written by Scrutiny.
+        inline AddressRange const *forbidden_ranges(void) const
+        {
+            return m_forbidden_address_ranges;
+        }
+
+        /// @brief Returns the number of forbidden ranges configured
+        inline uint_least8_t forbidden_ranges_count(void) const
+        {
+            return m_forbidden_range_count;
+        }
+
+        /// @brief Returns the list of read-only address ranges. A read-only range is never written by Scrutiny.
+        inline AddressRange const *readonly_ranges(void) const
+        {
+            return m_readonly_address_ranges;
+        }
+
+        /// @brief Returns the number of read-only ranges configured
+        inline uint_least8_t readonly_ranges_count(void) const
+        {
+            return m_readonly_range_count;
+        }
+#endif
         /// @brief Returns true if Runtime Published Values (RPV) were defined and a Read callback has been given
         inline bool is_read_published_values_configured(void) const
         {
@@ -148,30 +179,6 @@ namespace scrutiny
         /// @brief Returns true if at least one loop support datalogging
         bool has_at_least_one_loop_with_datalogging(void) const;
 #endif
-
-        /// @brief Returns the list of forbidden address ranges. A forbidden range is never read or written by Scrutiny.
-        inline AddressRange const *forbidden_ranges(void) const
-        {
-            return m_forbidden_address_ranges;
-        }
-
-        /// @brief Returns the number of forbidden ranges configured
-        inline uint_least8_t forbidden_ranges_count(void) const
-        {
-            return m_forbidden_range_count;
-        }
-
-        /// @brief Returns the list of read-only address ranges. A read-only range is never written by Scrutiny.
-        inline AddressRange const *readonly_ranges(void) const
-        {
-            return m_readonly_address_ranges;
-        }
-
-        /// @brief Returns the number of read-only ranges configured
-        inline uint_least8_t readonly_ranges_count(void) const
-        {
-            return m_readonly_range_count;
-        }
 
         /// @brief Returns the pointer to the array of Runtime Published Values (RPV)
         inline RuntimePublishedValue const *get_rpvs_array(void) const
@@ -211,20 +218,22 @@ namespace scrutiny
         bool memory_write_enable;
 
       private:
-        unsigned char *m_rx_buffer;                     // The comm Rx buffer
-        uint16_t m_rx_buffer_size;                      // The comm Rx buffer size
-        unsigned char *m_tx_buffer;                     // The comm Tx buffer
-        uint16_t m_tx_buffer_size;                      // The comm Tx buffer size
+        unsigned char *m_rx_buffer; // The comm Rx buffer
+        unsigned char *m_tx_buffer; // The comm Tx buffer
+        uint16_t m_rx_buffer_size;  // The comm Rx buffer size
+        uint16_t m_tx_buffer_size;
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS                  // The comm Tx buffer size
         AddressRange const *m_forbidden_address_ranges; // The forbidden address range array pointer. nullptr if unset
-        uint_least8_t m_forbidden_range_count;          // The forbidden address range count
         AddressRange const *m_readonly_address_ranges;  // The read-only address range array pointer. nullptr if unset
+        uint_least8_t m_forbidden_range_count;          // The forbidden address range count
         uint_least8_t m_readonly_range_count;           // The read-only address range count
-        RuntimePublishedValue const *m_rpvs;            // The array of Runtime Published Values. nullptr if unset
-        uint16_t m_rpv_count;                           // The number of Runtime Published Values in the RPV array
-        RpvReadCallback m_rpv_read_callback;            // The callback to perform read operation on a Runtime Published Value (RPV)
-        RpvWriteCallback m_rpv_write_callback;          // The callback to perform write operation on a Runtime Published Value (RPV)
-        LoopHandler **m_loops;                          // The array of Loop Handler pointers
-        uint_least8_t m_loop_count;                     // Number of Loop Handler in the array
+#endif
+        RuntimePublishedValue const *m_rpvs;   // The array of Runtime Published Values. nullptr if unset
+        RpvReadCallback m_rpv_read_callback;   // The callback to perform read operation on a Runtime Published Value (RPV)
+        RpvWriteCallback m_rpv_write_callback; // The callback to perform write operation on a Runtime Published Value (RPV)
+        LoopHandler **m_loops;                 // The array of Loop Handler pointers
+        uint16_t m_rpv_count;                  // The number of Runtime Published Values in the RPV array
+        uint_least8_t m_loop_count;            // Number of Loop Handler in the array
 
         /// @brief Callback to be called on a User Command request.
         user_command_callback_t m_user_command_callback; // Callback to call when a User Command service call is requested by the server

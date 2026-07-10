@@ -84,6 +84,7 @@ extern "C"
         get_config(config)->set_buffers(rx_buffer, rx_buffer_size, tx_buffer, tx_buffer_size);
     }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     void scrutiny_c_config_set_forbidden_address_range(
         scrutiny_c_config_t *config,
         scrutiny_c_address_range_t const *ranges,
@@ -99,6 +100,7 @@ extern "C"
     {
         get_config(config)->set_readonly_address_range(reinterpret_cast<scrutiny::AddressRange const *>(ranges), count);
     }
+#endif
 
     void scrutiny_c_config_set_published_values(
         scrutiny_c_config_t *config,

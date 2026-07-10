@@ -21,6 +21,47 @@ namespace scrutiny
 {
     namespace datalogging
     {
+
+        static trigger::ActiveCondition const CONDITION_CONFIG_LUT[9] = {
+            // IMPORTANT. Keep in sync with  SupportedTriggerConditions enum.
+            { // AlwaysTrue
+              trigger::AlwaysTrueCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::AlwaysTrueCondition::get_operand_count() },
+            { // Equal
+              trigger::EqualCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::EqualCondition::get_operand_count() },
+            { // NotEqual
+              trigger::NotEqualCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::NotEqualCondition::get_operand_count() },
+            { // LessThan
+              trigger::LessThanCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::LessThanCondition::get_operand_count() },
+            { // LessOrEqualThan
+              trigger::LessOrEqualThanCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::LessOrEqualThanCondition::get_operand_count() },
+            { // GreaterThan
+              trigger::GreaterThanCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::GreaterThanCondition::get_operand_count() },
+            { // GreaterOrEqualThan
+              trigger::GreaterOrEqualThanCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::GreaterOrEqualThanCondition::get_operand_count() },
+            { // ChangeMoreThan
+              trigger::ChangeMoreThanCondition::evaluate,
+              trigger::ChangeMoreThanCondition::reset,
+              trigger::ChangeMoreThanCondition::get_operand_count() },
+            { // IsWithin
+              trigger::IsWithinCondition::evaluate,
+              SCRUTINY_NULL_FN_PTR(trigger::ResetFn),
+              trigger::IsWithinCondition::get_operand_count() }
+        };
+
         Status::eStatus DataLogger::init(
             MainHandler const *const main_handler,
             unsigned char *const buffer,
@@ -78,54 +119,13 @@ namespace scrutiny
                 m_config_valid = false;
             }
 
-            switch (m_config.trigger.condition)
+            uint_least8_t const condition_lut_index = static_cast<uint_least8_t>(m_config.trigger.condition);
+            if (condition_lut_index < sizeof(CONDITION_CONFIG_LUT) / sizeof(CONDITION_CONFIG_LUT[0]))
             {
-            case SupportedTriggerConditions::AlwaysTrue:
-                m_trigger.active_condition.operand_count = trigger::AlwaysTrueCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::AlwaysTrueCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::Equal:
-                m_trigger.active_condition.operand_count = trigger::EqualCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::EqualCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::NotEqual:
-                m_trigger.active_condition.operand_count = trigger::NotEqualCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::NotEqualCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::LessThan:
-                m_trigger.active_condition.operand_count = trigger::LessThanCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::LessThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::LessOrEqualThan:
-                m_trigger.active_condition.operand_count = trigger::LessOrEqualThanCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::LessOrEqualThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::GreaterThan:
-                m_trigger.active_condition.operand_count = trigger::GreaterThanCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::GreaterThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::GreaterOrEqualThan:
-                m_trigger.active_condition.operand_count = trigger::GreaterOrEqualThanCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::GreaterOrEqualThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            case SupportedTriggerConditions::ChangeMoreThan:
-                m_trigger.active_condition.operand_count = trigger::ChangeMoreThanCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::ChangeMoreThanCondition::evaluate;
-                m_trigger.active_condition.reset_fn = trigger::ChangeMoreThanCondition::reset;
-                break;
-            case SupportedTriggerConditions::IsWithin:
-                m_trigger.active_condition.operand_count = trigger::IsWithinCondition::get_operand_count();
-                m_trigger.active_condition.eval_fn = trigger::IsWithinCondition::evaluate;
-                m_trigger.active_condition.reset_fn = SCRUTINY_NULL_FN_PTR(trigger::ResetFn);
-                break;
-            default:
+                m_trigger.active_condition = CONDITION_CONFIG_LUT[condition_lut_index];
+            }
+            else
+            {
                 m_config_valid = false;
             }
 
@@ -352,17 +352,6 @@ namespace scrutiny
             return false;
         }
 
-        datalogging::buffer_size_t DataLogger::get_bytes_to_acquire_from_trigger_to_completion(void) const
-        {
-            return (m_state == State::Triggered) ? m_remaining_data_to_write : 0;
-        }
-
-        datalogging::buffer_size_t DataLogger::data_counter_since_trigger(void) const
-        {
-            // This counter gets reset when trigger happens.
-            return (m_state == State::Triggered) ? m_encoder.get_data_write_counter() : 0;
-        }
-
         void DataLogger::process_acquisition(void)
         {
             if (++m_decimation_counter >= m_config.decimation)
@@ -399,22 +388,16 @@ namespace scrutiny
 
                 for (unsigned int i = 0; i < nb_operand; i++)
                 {
-                    if (fetch_operand(
-                            m_main_handler,
-                            &m_config.trigger.operands[i],
-                            &m_stack_data.check_trigger.opvals[i],
-                            &m_stack_data.check_trigger.optypes[i],
-                            m_owner) == false)
+                    if (fetch_operand(m_main_handler, &m_config.trigger.operands[i], &m_stack_data.check_trigger.ops_data[i], m_owner) == false)
                     {
                         return false;
                     }
-                    convert_to_compare_type(&m_stack_data.check_trigger.optypes[i], &m_stack_data.check_trigger.opvals[i]);
+                    convert_to_compare_type(&m_stack_data.check_trigger.ops_data[i]);
                 }
 
                 bool const condition_result = m_trigger.active_condition.eval_fn(
                     &m_trigger.condition_data,
-                    reinterpret_cast<VariableTypeCompare::eVariableTypeCompare *>(m_stack_data.check_trigger.optypes),
-                    reinterpret_cast<AnyTypeCompare *>(m_stack_data.check_trigger.opvals));
+                    reinterpret_cast<AnyValAndTypeComparePair *>(m_stack_data.check_trigger.ops_data));
 
                 if (condition_result)
                 {

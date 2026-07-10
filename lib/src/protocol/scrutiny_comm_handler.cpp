@@ -194,21 +194,15 @@ namespace scrutiny
 
                 case RxFSMState::WaitForCRC:
                 {
-                    if (m_per_state_data.crc_bytes_received == 0)
+                    // Assumption that CRC is reset to 0 at the beginning
+                    // Data is received MSB first, so each new byte moves the data by 8
+                    m_active_request.crc <<= 8;
+                    m_active_request.crc |= static_cast<uint32_t>(data[i] & 0xFF);
+                    m_per_state_data.crc_bytes_received++;
+                    i += 1;
+
+                    if (m_per_state_data.crc_bytes_received >= 4)
                     {
-                        m_active_request.crc = static_cast<uint32_t>(data[i]) << 24u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 1)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 16u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 2)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 8u;
-                    }
-                    else if (m_per_state_data.crc_bytes_received == 3)
-                    {
-                        m_active_request.crc |= static_cast<uint32_t>(data[i]) << 0;
                         m_state = State::Idle;
 
                         if (m_crc == m_active_request.crc)
@@ -220,9 +214,6 @@ namespace scrutiny
                             reset_rx();
                         }
                     }
-
-                    m_per_state_data.crc_bytes_received++;
-                    i += 1;
                     break;
                 }
 
@@ -541,12 +532,7 @@ namespace scrutiny
 
         bool CommHandler::connect(void)
         {
-            if (!m_enabled)
-            {
-                return false;
-            }
-
-            if (m_session_active)
+            if (!m_enabled || m_session_active)
             {
                 return false;
             }
