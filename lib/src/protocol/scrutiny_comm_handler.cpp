@@ -286,7 +286,7 @@ namespace scrutiny
             add_crc(&m_active_response);
 
             // cmd8 + subfn8 + code8 + len16 + data + crc32
-            m_nbytes_to_send = 1 + 1 + 1 + 2 + m_active_response.data_length + 4;
+            m_nbytes_to_send = 1u + 1u + 1u + 2u + m_active_response.data_length + 4u;
 
             m_state = State::Transmitting;
             return true;
