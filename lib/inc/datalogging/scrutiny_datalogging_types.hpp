@@ -149,10 +149,10 @@ namespace scrutiny
                 hold_time_100ns = other->hold_time_100ns;
             }
 
-            SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
-            uint_least8_t operand_count;                                       // Number of given operands
-            uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
             Operand operands[MAX_OPERANDS];                                    // The operand definitions
+            uint32_t hold_time_100ns;                                          // Amount of time that the condition must be true for trigger to trig
+            uint_least8_t operand_count;                                       // Number of given operands
+            SupportedTriggerConditions::eSupportedTriggerConditions condition; // Selected condition
         };
 
         class LoggableType
@@ -207,14 +207,13 @@ namespace scrutiny
                 }
             }
 
+            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
+            TriggerConfig trigger;                                      // The trigger configuration
             uint32_t timeout_100ns;    // Time after which an acquisition is considered complete even if the buffer is not full
             uint16_t decimation;       // Decimation of the acquisition. Effectively reduce the sampling rate
             uint_least8_t items_count; // Number of items to log
             // A value indicating where the trigger should be located in the acquisition window. 0 means left, 255 means right. 128 = middle
             uint_least8_t probe_location;
-
-            TriggerConfig trigger;                                      // The trigger configuration
-            LoggableItem items_to_log[SCRUTINY_DATALOGGING_MAX_SIGNAL]; // Definitions of the items to log
         };
 
         /// @brief Datalogging Trigger callback
