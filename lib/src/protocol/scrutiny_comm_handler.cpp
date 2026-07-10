@@ -475,12 +475,11 @@ namespace scrutiny
             if (response->data_length > m_tx_buffer_size)
                 return;
 
-            unsigned char header[5];
-            header[0] = response->command_id;
-            header[1] = response->subfunction_id;
-            header[2] = response->response_code;
-            header[3] = (response->data_length >> 8) & 0xFF;
-            header[4] = response->data_length & 0xFF;
+            unsigned char const header[5] = { static_cast<unsigned char>(response->command_id),
+                                              static_cast<unsigned char>(response->subfunction_id),
+                                              static_cast<unsigned char>(response->response_code),
+                                              static_cast<unsigned char>((response->data_length >> 8) & 0xFF),
+                                              static_cast<unsigned char>(response->data_length & 0xFF) };
 
             uint32_t const crc = tools::crc32(header, sizeof(header));
             response->crc = tools::crc32(response->data, response->data_length, crc);
