@@ -144,48 +144,48 @@ namespace scrutiny
             {
                 for (uint_least8_t i = 0; i < m_config.trigger.operand_count; i++)
                 {
-                    if (m_config.trigger.operands[i].type == OperandType::Literal)
+                    if (m_config.trigger.operands[i].common.type == OperandType::Literal)
                     {
-                        if (!tools::is_float_finite(m_config.trigger.operands[i].data.literal.val))
+                        if (!tools::is_float_finite(m_config.trigger.operands[i].literal.val))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::Rpv)
+                    else if (m_config.trigger.operands[i].common.type == OperandType::Rpv)
                     {
                         if (!m_main_handler->get_config_ro()->is_read_published_values_configured())
                         {
                             m_config_valid = false;
                         }
 
-                        if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].data.rpv.id))
+                        if (!m_main_handler->rpv_exists(m_config.trigger.operands[i].rpv.id))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::Var)
+                    else if (m_config.trigger.operands[i].common.type == OperandType::Var)
                     {
-                        if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                        if (!tools::is_supported_type(m_config.trigger.operands[i].varbit.datatype))
                         {
                             m_config_valid = false;
                         }
                     }
-                    else if (m_config.trigger.operands[i].type == OperandType::VarBit)
+                    else if (m_config.trigger.operands[i].common.type == OperandType::VarBit)
                     {
                         // Works with and without 64bits support
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * CHAR_BIT - 1) ||
-                            m_config.trigger.operands[i].data.varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT)
+                        if (m_config.trigger.operands[i].varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * CHAR_BIT - 1) ||
+                            m_config.trigger.operands[i].varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT)
                         {
                             m_config_valid = false;
                         }
 
-                        if (!tools::is_supported_type(m_config.trigger.operands[i].data.varbit.datatype))
+                        if (!tools::is_supported_type(m_config.trigger.operands[i].varbit.datatype))
                         {
                             m_config_valid = false;
                         }
 
-                        if (m_config.trigger.operands[i].data.varbit.bitoffset + m_config.trigger.operands[i].data.varbit.bitsize >
-                            tools::get_type_size_char(m_config.trigger.operands[i].data.varbit.datatype) * CHAR_BIT)
+                        if (m_config.trigger.operands[i].varbit.bitoffset + m_config.trigger.operands[i].varbit.bitsize >
+                            tools::get_type_size_char(m_config.trigger.operands[i].varbit.datatype) * CHAR_BIT)
                         {
                             m_config_valid = false;
                         }
