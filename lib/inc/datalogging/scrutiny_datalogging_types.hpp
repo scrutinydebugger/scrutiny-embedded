@@ -22,7 +22,7 @@ namespace scrutiny
 {
     namespace datalogging
     {
-        static SCRUTINY_CONSTEXPR unsigned int MAX_OPERANDS = 4;
+        static SCRUTINY_CONSTEXPR unsigned int MAX_OPERANDS = 3;
 #if SCRUTINY_HAS_CPP11
         static_assert(SCRUTINY_DATALOGGING_MAX_SIGNAL <= 254, "SCRUTINY_DATALOGGING_MAX_SIGNAL is too big");
         static_assert(MAX_OPERANDS <= 254, "Too many operands. uint8 must be enough for iteration.");
