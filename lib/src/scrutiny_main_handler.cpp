@@ -1407,7 +1407,9 @@ namespace scrutiny
         }
 
         protocol::ResponseCode::eResponseCode code = protocol::ResponseCode::FailureToProceed;
-        switch (static_cast<protocol::DataLogControl::Subfunction::eSubfunction>(request->subfunction_id))
+        protocol::DataLogControl::Subfunction::eSubfunction const subfn =
+            static_cast<protocol::DataLogControl::Subfunction::eSubfunction>(request->subfunction_id);
+        switch (subfn)
         {
 
         case protocol::DataLogControl::Subfunction::GetSetup:
@@ -1536,6 +1538,7 @@ namespace scrutiny
             break;
         }
 
+        case protocol::DataLogControl::Subfunction::DisarmTrigger:
         case protocol::DataLogControl::Subfunction::ArmTrigger:
         {
 
@@ -1547,27 +1550,20 @@ namespace scrutiny
 
             // Do not wait on feedback from loop here on purpose
             // That would be additional complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
-            m_datalogging.request_arm_trigger = true;
-            code = protocol::ResponseCode::OK;
-
-            break;
-        }
-        case protocol::DataLogControl::Subfunction::DisarmTrigger:
-        {
-
-            if (m_datalogging.owner == SCRUTINY_NULL || m_datalogging.pending_ownership_release)
+            if (subfn == protocol::DataLogControl::Subfunction::ArmTrigger)
             {
-                code = protocol::ResponseCode::FailureToProceed;
-                break;
+                m_datalogging.request_arm_trigger = true;
+            }
+            else if (subfn == protocol::DataLogControl::Subfunction::DisarmTrigger)
+            {
+                m_datalogging.request_disarm_trigger = true;
             }
 
-            // Do not wait on feedback from loop here on purpose
-            // That would be additional complexity for minimal gain. We just don't arm if it can't be done. Keep silent.
-            m_datalogging.request_disarm_trigger = true;
             code = protocol::ResponseCode::OK;
 
             break;
         }
+
         case protocol::DataLogControl::Subfunction::GetStatus:
         {
             SCRUTINY_STATIC_ASSERT(
