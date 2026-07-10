@@ -135,7 +135,7 @@ namespace scrutiny
             VariableTypeType::eVariableTypeType const var_tt,
             uint_fast8_t const bitoffset,
             uint_fast8_t const bitsize,
-            AnyValAndTypePair * const val_type_pair) const;
+            AnyValAndTypePair *const val_type_pair) const;
 
         /// @brief Returns a pointer to the datalogger object
         inline datalogging::DataLogger *datalogger(void)
@@ -181,6 +181,7 @@ namespace scrutiny
         void process_datalogging_loop_msg(LoopHandler *const sender, LoopHandler::Loop2MainMessage *const msg);
         void process_datalogging_logic(void);
 #endif
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         bool touches_forbidden_region(void const *const addr_start, size_t const length_char) const;
         bool touches_readonly_region(void const *const addr_start, size_t const length_char) const;
 
@@ -200,6 +201,7 @@ namespace scrutiny
         {
             return touches_readonly_region(block->start_address, block->length / (CHAR_BIT / 8)); // length in char
         }
+#endif
         Status::eStatus check_config(void);
 
         Timebase m_timebase;                   // Timebase to keep track of time

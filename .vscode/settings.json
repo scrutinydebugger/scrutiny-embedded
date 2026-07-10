@@ -3,7 +3,6 @@
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
     "files.associations": {
-        "any": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",

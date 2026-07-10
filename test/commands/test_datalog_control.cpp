@@ -500,6 +500,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 TEST_F(TestDatalogControl, TestConfigureSignalInForbiddenRegion)
 {
     uint32_t forbidden_var;
@@ -574,6 +575,7 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitAlmostInForbiddenRegion)
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::OK); // We don't overflow
 }
+#endif
 
 TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {

@@ -7,7 +7,8 @@ project(scrutiny-embedded)
 
 option(SCRUTINY_BUILD_TEST "Activate test suite" OFF)
 option(SCRUTINY_ENABLE_DATALOGGING "Enable datalogging feature" ON)
-option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" ON)
+option(SCRUTINY_SUPPORT_64BITS "Enable support for 64bits variables" OFF)
+option(SCRUTINY_SUPPORT_PROTECTED_REGIONS "Allow setting read-only and forbidden regions" OFF)
 option(SCRUTINY_BUILD_CWRAPPER "Build a C99 wrapper" ON)
 option(INSTALL_FOLDER "Install folder" ${CMAKE_CURRENT_BINARY_DIR}/install )
 

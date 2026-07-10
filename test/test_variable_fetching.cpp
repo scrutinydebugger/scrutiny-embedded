@@ -22,6 +22,7 @@ class TestVariableFetching : public ScrutinyTest
     unsigned char _rx_buffer[128];
     unsigned char _tx_buffer[128];
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     unsigned char forbidden_buffer[128];
     unsigned char forbidden_buffer2[128];
     unsigned char readonly_buffer[128];
@@ -29,6 +30,7 @@ class TestVariableFetching : public ScrutinyTest
 
     scrutiny::AddressRange readonly_ranges[2];
     scrutiny::AddressRange forbidden_ranges[2];
+#endif
 
     TestVariableFetching() :
         ScrutinyTest(),
@@ -36,26 +38,32 @@ class TestVariableFetching : public ScrutinyTest
         scrutiny_handler(),
         config(),
         _rx_buffer(),
-        _tx_buffer(),
+        _tx_buffer()
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
+        ,
         forbidden_buffer(),
         forbidden_buffer2(),
         readonly_buffer(),
         readonly_buffer2()
+#endif
     {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         readonly_ranges[0] = scrutiny::tools::make_address_range(readonly_buffer, sizeof(readonly_buffer)),
         readonly_ranges[1] = scrutiny::tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
 
         forbidden_ranges[0] = scrutiny::tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
         forbidden_ranges[1] = scrutiny::tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2));
+#endif
     }
 
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
         config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
-
+#endif
         scrutiny_handler.init(&config);
     }
 };

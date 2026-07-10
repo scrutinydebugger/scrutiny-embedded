@@ -222,9 +222,9 @@ pipeline {
                 }
             }
         }
-        stage('Configs'){
+        stage('Configs 1'){
             parallel{
-                stage('GCC 64bits - No Datalogging'){
+                stage('GCC 64bits - No Datalogging '){
                     agent {
                         dockerfile {
                             additionalBuildArgs '--target native-gcc'
@@ -242,6 +242,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
                                 SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
@@ -274,6 +275,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
                                 SCRUTINY_BUILD_CWRAPPER=0 \
                                 scripts/build.sh
                                 '''
@@ -306,6 +308,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
                                 SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
                                 '''
@@ -338,6 +341,7 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
                                 SCRUTINY_DATALOGGING_BUFFER_32BITS=0 \
                                 SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh
@@ -371,6 +375,178 @@ pipeline {
                                 SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
+                                SCRUTINY_DATALOGGING_BUFFER_32BITS=1 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Configs 2'){
+            parallel{
+                stage('GCC 64bits - No Datalogging - No Prot. regions'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-64bits-nodl -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_USE_ASAN=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=0 \
+                                SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 64bits - No CWrapper - No Prot. regions'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-64bits-nocwrapper -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_USE_ASAN=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=1 \
+                                SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=0 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 32bits - No Datalogging - No Prot. regions'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-32bits-nodl -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_USE_ASAN=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=0 \
+                                SCRUTINY_SUPPORT_64BITS=0 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 32bits - No Prot. regions'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-32bits-dl-buf16 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_USE_ASAN=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=1 \
+                                SCRUTINY_SUPPORT_64BITS=0 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
+                                SCRUTINY_DATALOGGING_BUFFER_32BITS=0 \
+                                SCRUTINY_BUILD_CWRAPPER=1 \
+                                scripts/build.sh
+                                '''
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                sh '''
+                                scripts/runtests.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('GCC 64bits - Datalogging Buffer 32bits - No Prot. regions'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=native-gcc-64bits-dl-buf32 -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    stages {
+                        stage("Build") {
+                            steps {
+                                sh '''
+                                CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                                SCRUTINY_BUILD_TEST=1 \
+                                SCRUTINY_USE_ASAN=1 \
+                                SCRUTINY_BUILD_TESTAPP=1 \
+                                SCRUTINY_ENABLE_DATALOGGING=1 \
+                                SCRUTINY_SUPPORT_64BITS=1 \
+                                SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
                                 SCRUTINY_DATALOGGING_BUFFER_32BITS=1 \
                                 SCRUTINY_BUILD_CWRAPPER=1 \
                                 scripts/build.sh

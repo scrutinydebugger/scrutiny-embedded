@@ -25,10 +25,12 @@ namespace scrutiny
         m_rx_buffer = SCRUTINY_NULL;
         m_rx_buffer_size = 0;
         m_tx_buffer_size = 0;
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         m_forbidden_address_ranges = SCRUTINY_NULL;
         m_forbidden_range_count = 0;
         m_readonly_address_ranges = SCRUTINY_NULL;
         m_readonly_range_count = 0;
+#endif
         m_rpvs = SCRUTINY_NULL;
         m_rpv_count = 0;
         m_rpv_read_callback = SCRUTINY_NULL;
@@ -56,6 +58,7 @@ namespace scrutiny
         m_tx_buffer_size = tx_buffer_size;
     }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     void Config::set_forbidden_address_range(AddressRange const *range, uint_least8_t const count)
     {
         m_forbidden_address_ranges = range;
@@ -67,7 +70,7 @@ namespace scrutiny
         m_readonly_address_ranges = range;
         m_readonly_range_count = count;
     }
-
+#endif
     void Config::set_published_values(
         RuntimePublishedValue const *const array,
         uint16_t const nbr,

@@ -28,10 +28,12 @@ static LoopHandler *g_last_rpv_callback_caller = SCRUTINY_NULL;
 static unsigned char _rx_buffer[128];
 static unsigned char _tx_buffer[128];
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
 static unsigned char forbidden_buffer[32];
 static unsigned char forbidden_buffer2[32];
 static unsigned char readonly_buffer[32];
 static unsigned char readonly_buffer2[32];
+#endif
 
 static struct
 {
@@ -82,9 +84,10 @@ class TestDatalogger : public ScrutinyTest
     MainHandler scrutiny_handler;
     Config config;
     datalogging::DataLogger datalogger;
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     AddressRange readonly_ranges[2];
     AddressRange forbidden_ranges[2];
+#endif
     RuntimePublishedValue rpvs[3];
 
     TestDatalogger() :
@@ -94,12 +97,13 @@ class TestDatalogger : public ScrutinyTest
         config(),
         datalogger()
     {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         readonly_ranges[0] = tools::make_address_range(readonly_buffer, sizeof(readonly_buffer));
         readonly_ranges[1] = tools::make_address_range(readonly_buffer2, sizeof(readonly_buffer2));
 
         forbidden_ranges[0] = tools::make_address_range(forbidden_buffer, sizeof(forbidden_buffer));
         forbidden_ranges[1] = tools::make_address_range(forbidden_buffer2, sizeof(forbidden_buffer2));
-
+#endif
         rpvs[0].id = 0x1234;
         rpvs[0].type = VariableType::uint32;
         rpvs[1].id = 0x5678;
@@ -111,8 +115,10 @@ class TestDatalogger : public ScrutinyTest
     virtual void SetUp()
     {
         config.set_buffers(_rx_buffer, sizeof(_rx_buffer), _tx_buffer, sizeof(_tx_buffer));
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
         config.set_readonly_address_range(readonly_ranges, sizeof(readonly_ranges) / sizeof(readonly_ranges[0]));
         config.set_forbidden_address_range(forbidden_ranges, sizeof(forbidden_ranges) / sizeof(forbidden_ranges[0]));
+#endif
         config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
 
         scrutiny_handler.init(&config);

@@ -665,12 +665,17 @@ namespace scrutiny
             // =========== [GetSpecialMemoryRegionCount] ==========
         case protocol::GetInfo::Subfunction::GetSpecialMemoryRegionCount:
         {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
             stack.get_special_memory_region_count.response_data.nbr_readonly_region = m_config.readonly_ranges_count();
             stack.get_special_memory_region_count.response_data.nbr_forbidden_region = m_config.forbidden_ranges_count();
+#else
+            stack.get_special_memory_region_count.response_data.nbr_readonly_region = 0;
+            stack.get_special_memory_region_count.response_data.nbr_forbidden_region = 0;
+#endif
             code = m_codec.encode_response_special_memory_region_count(&stack.get_special_memory_region_count.response_data, response);
             break;
         }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
             // =========== [GetSpecialMemoryLocation] ==========
         case protocol::GetInfo::Subfunction::GetSpecialMemoryLocation:
         {
@@ -699,6 +704,7 @@ namespace scrutiny
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.readonly_ranges()[index].end);
             }
+
             else if (
                 static_cast<protocol::GetInfo::MemoryRegionType::eMemoryRegionType>(
                     stack.get_special_memory_region_location.request_data.region_type) == protocol::GetInfo::MemoryRegionType::Forbidden)
@@ -714,11 +720,11 @@ namespace scrutiny
                     code = protocol::ResponseCode::FailureToProceed;
                     break;
                 }
-
                 uint_least8_t const index = stack.get_special_memory_region_location.request_data.region_index;
                 stack.get_special_memory_region_location.response_data.start = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].start);
                 stack.get_special_memory_region_location.response_data.end = reinterpret_cast<uintptr_t>(m_config.forbidden_ranges()[index].end);
             }
+
             else
             {
                 code = protocol::ResponseCode::InvalidRequest;
@@ -731,8 +737,8 @@ namespace scrutiny
             code = m_codec.encode_response_special_memory_region_location(&stack.get_special_memory_region_location.response_data, response);
             break;
         }
-            // =================================
-
+        // =================================
+#endif
         case protocol::GetInfo::Subfunction::GetRuntimePublishedValuesCount:
         {
             stack.get_rpv_count.response_data.count = m_config.get_rpv_count();
@@ -1063,13 +1069,13 @@ namespace scrutiny
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                 if (touches_forbidden_region(&stack.read_mem.block))
                 {
                     code = protocol::ResponseCode::Forbidden;
                     break;
                 }
-
+#endif
                 stack.read_mem.readmem_encoder->write(&stack.read_mem.block);
 
                 if (stack.read_mem.readmem_encoder->overflow())
@@ -1118,7 +1124,7 @@ namespace scrutiny
                     code = protocol::ResponseCode::InvalidRequest;
                     break;
                 }
-
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                 if (touches_forbidden_region(&stack.write_mem.block))
                 {
                     code = protocol::ResponseCode::Forbidden;
@@ -1130,7 +1136,7 @@ namespace scrutiny
                     code = protocol::ResponseCode::Forbidden;
                     break;
                 }
-
+#endif
                 stack.write_mem.writemem_encoder->write(&stack.write_mem.block);
                 // We don't check overflow here as we rely on the request parser to be right on the required buffer size.
 
@@ -1295,6 +1301,7 @@ namespace scrutiny
         return code;
     }
 
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
     bool MainHandler::touches_forbidden_region(void const *const addr_start, size_t const length) const
     {
         if (!m_config.is_forbidden_address_range_set())
@@ -1337,7 +1344,7 @@ namespace scrutiny
         }
         return false;
     }
-
+#endif
     protocol::ResponseCode::eResponseCode MainHandler::process_user_command(
         protocol::Request const *const request,
         protocol::Response *const response)
@@ -1467,6 +1474,7 @@ namespace scrutiny
             {
                 if (config->trigger.operands[i].type == datalogging::OperandType::Var)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.var.addr,
                             tools::get_type_size_char(config->trigger.operands[i].data.var.datatype)))
@@ -1474,9 +1482,11 @@ namespace scrutiny
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->trigger.operands[i].type == datalogging::OperandType::VarBit)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     // The library needs to access the full type, even if bitsize is small.
                     if (touches_forbidden_region(
                             config->trigger.operands[i].data.varbit.addr,
@@ -1485,6 +1495,7 @@ namespace scrutiny
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->trigger.operands[i].type == datalogging::OperandType::Rpv)
                 {
@@ -1501,11 +1512,13 @@ namespace scrutiny
             {
                 if (config->items_to_log[i].type == datalogging::LoggableType::Memory)
                 {
+#if SCRUTINY_SUPPORT_PROTECTED_REGIONS
                     if (touches_forbidden_region(config->items_to_log[i].data.memory.address, config->items_to_log[i].data.memory.size))
                     {
                         code = protocol::ResponseCode::Forbidden;
                         break;
                     }
+#endif
                 }
                 else if (config->items_to_log[i].type == datalogging::LoggableType::Rpv)
                 {
