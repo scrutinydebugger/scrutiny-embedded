@@ -146,24 +146,20 @@ namespace scrutiny
             datalogging::buffer_size_t cursor = m_next_entry_write_index * m_entry_size;
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
-                if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
+                LoggableItem const &item = m_config->items_to_log[i];
+                if (item.type == datalogging::LoggableType::Memory)
                 {
-                    m_main_handler->read_memory(
-                        &m_buffer[cursor],
-                        m_config->items_to_log[i].data.memory.address,
-                        m_config->items_to_log[i].data.memory.size);
-                    cursor += m_config->items_to_log[i].data.memory.size; // We verified that this is not 0 in init
+                    m_main_handler->read_memory(&m_buffer[cursor], item.data.memory.address, item.data.memory.size);
+                    cursor += item.data.memory.size; // We verified that this is not 0 in init
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
+                else if (item.type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
                     AnyType outval;
-                    uint16_t const rpv_id = m_config->items_to_log[i].data.rpv.id;
+                    uint16_t const rpv_id = item.data.rpv.id;
                     m_main_handler->get_rpv(rpv_id, &rpv); // assumed valid because of config validation
-                    bool const success = m_main_handler->get_rpv_read_callback()(
-                        rpv,
-                        &outval,
-                        caller); // We assume that the callback is not nullptr. We rely on datalogger::configure to validate this.
+                    // We assume that the callback is not nullptr. We rely on datalogger::configure to validate this.
+                    bool const success = m_main_handler->get_rpv_read_callback()(rpv, &outval, caller);
 
                     if (!success)
                     {
@@ -180,7 +176,7 @@ namespace scrutiny
                     cursor += nb_8bits / (CHAR_BIT / 8);
 #endif
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
+                else if (item.type == datalogging::LoggableType::Time)
                 {
                     // No check for m_timebase == nullptr.
                     // Expect the datalogger to set it.
@@ -246,20 +242,21 @@ namespace scrutiny
 
             for (uint_fast8_t i = 0; i < m_config->items_count; i++)
             {
+                LoggableItem const &item = m_config->items_to_log[i];
                 if (m_error)
                 {
                     break;
                 }
                 uint_fast8_t elem_size = 0;
-                if (m_config->items_to_log[i].type == datalogging::LoggableType::Memory)
+                if (item.type == datalogging::LoggableType::Memory)
                 {
-                    elem_size = m_config->items_to_log[i].data.memory.size; // Size in char
+                    elem_size = item.data.memory.size; // Size in char
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Rpv)
+                else if (item.type == datalogging::LoggableType::Rpv)
                 {
                     RuntimePublishedValue rpv;
 
-                    if (!m_main_handler->get_rpv(m_config->items_to_log[i].data.rpv.id, &rpv))
+                    if (!m_main_handler->get_rpv(item.data.rpv.id, &rpv))
                     {
                         m_error = true;
                     }
@@ -268,7 +265,7 @@ namespace scrutiny
                         elem_size = tools::get_type_size_char(rpv.type); // Size in char
                     }
                 }
-                else if (m_config->items_to_log[i].type == datalogging::LoggableType::Time)
+                else if (item.type == datalogging::LoggableType::Time)
                 {
                     elem_size = sizeof(scrutiny::timestamp_t); // Size in char
                 }
