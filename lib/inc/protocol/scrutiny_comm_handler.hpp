@@ -171,11 +171,10 @@ namespace scrutiny
             timestamp_t m_heartbeat_timestamp;   // Timestamp of the last heartbeat gotten
             uint32_t m_session_id;               // Actual session ID
             uint16_t m_last_heartbeat_challenge; // Challenge received by the last heartbeat
+            State::eState m_state;               // Internal state, idle, receiving, transmitting
             bool m_enabled;                      // Enable flag
             bool m_session_active;               // Flag indicating if a session is active with the server
             bool m_first_heartbeat_received;     // Flag indicating if the first heartbeat has been received.
-            State::eState m_state; // Internal state, idle, receiving, transmitting
-
 
             // Reception
             Request m_active_request;           // The request presently being received
