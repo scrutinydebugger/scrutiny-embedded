@@ -43,7 +43,7 @@ namespace scrutiny
         /// @brief Tells if a Runtime Published Values with the given ID has been defined.
         /// @param id The RPV ID
         /// @return True if RPV exists in configuration.
-        inline bool rpv_exists(uint16_t const id) const { return get_rpv(id, SCRUTINY_NULL); }
+        inline bool rpv_exists(uint16_t const id) const { return get_rpv(id, static_cast<RuntimePublishedValue *>(SCRUTINY_NULL)); }
 
         /// @brief Returns the type of a Runtime Published Value identified by its ID
         /// @param id The RPV ID
