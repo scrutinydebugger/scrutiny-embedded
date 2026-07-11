@@ -96,15 +96,15 @@ TEST_F(TestRawEncoder, BasicEncoding)
 
     dlconfig.items_count = 3;
 
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
-    dlconfig.items_to_log[0].data.memory.address = &var1;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].memory.address = &var1;
 
-    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
-    dlconfig.items_to_log[1].data.memory.address = &var2;
+    dlconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[1].memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].memory.address = &var2;
 
-    dlconfig.items_to_log[2].type = datalogging::LoggableType::Time;
+    dlconfig.items_to_log[2].common.type = datalogging::LoggableType::Time;
 
     encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(dlbuffer.data));
     encoder.set_timebase(&timebase);
@@ -189,8 +189,8 @@ TEST_F(TestRawEncoder, RpvCallbackFailureZerosEntry)
     scrutiny_handler.init(&config);
 
     dlconfig.items_count = 1;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Rpv;
-    dlconfig.items_to_log[0].data.rpv.id = 0x1234;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Rpv;
+    dlconfig.items_to_log[0].rpv.id = 0x1234;
 
     // dlbuffer.data is pre-filled with 0xFF by SetUp() — any non-zero residue would be visible.
     encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(dlbuffer.data));
@@ -211,12 +211,12 @@ TEST_F(TestRawEncoder, BufferTooSmallForSingleEntry)
 
     // Two memory items: entry_size = 2 * sizeof(uint32_t) on any platform.
     dlconfig.items_count = 2;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
-    dlconfig.items_to_log[0].data.memory.address = &var1;
-    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
-    dlconfig.items_to_log[1].data.memory.address = &var2;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].memory.address = &var1;
+    dlconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[1].memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].memory.address = &var2;
 
     // Buffer holds only half an entry: m_max_entries = 0, encoder must report error.
     encoder.init(&scrutiny_handler, &dlconfig, dlbuffer.data, sizeof(var1));

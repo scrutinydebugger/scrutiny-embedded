@@ -130,6 +130,7 @@ typedef union
 #endif
 } scrutiny_c_any_type_t;
 
+
 /// @brief The fast version of AnyType
 typedef union
 {

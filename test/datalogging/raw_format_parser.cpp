@@ -31,15 +31,15 @@ void RawFormatParser::init(
 
 uint16_t RawFormatParser::get_item_size_char(uint16_t item_index)
 {
-    if (m_config->items_to_log[item_index].type == scrutiny::datalogging::LoggableType::Memory)
+    if (m_config->items_to_log[item_index].common.type == scrutiny::datalogging::LoggableType::Memory)
     {
-        return m_config->items_to_log[item_index].data.memory.size;
+        return m_config->items_to_log[item_index].memory.size;
     }
-    else if (m_config->items_to_log[item_index].type == scrutiny::datalogging::LoggableType::Rpv)
+    else if (m_config->items_to_log[item_index].common.type == scrutiny::datalogging::LoggableType::Rpv)
     {
-        return scrutiny::tools::get_type_size_char(m_main_handler->get_rpv_type(m_config->items_to_log[item_index].data.rpv.id));
+        return scrutiny::tools::get_type_size_char(m_main_handler->get_rpv_type(m_config->items_to_log[item_index].rpv.id));
     }
-    else if (m_config->items_to_log[item_index].type == scrutiny::datalogging::LoggableType::Time)
+    else if (m_config->items_to_log[item_index].common.type == scrutiny::datalogging::LoggableType::Time)
     {
         return sizeof(scrutiny::timestamp_t);
     }
@@ -142,16 +142,16 @@ void RawFormatParser::parse(uint32_t entry_count)
                 return;
             }
 
-            if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::Memory)
+            if (m_config->items_to_log[j].common.type == scrutiny::datalogging::LoggableType::Memory)
             {
                 scrutiny::tools::memcpy_compress_from_8bits_native(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
             }
-            else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::Rpv)
+            else if (m_config->items_to_log[j].common.type == scrutiny::datalogging::LoggableType::Rpv)
             {
                 // scrutiny::tools::memcpy_compress_from_8bits_native(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
                 scrutiny::tools::memcpy_compress_from_8bits_big_endian(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
             }
-            else if (m_config->items_to_log[j].type == scrutiny::datalogging::LoggableType::Time)
+            else if (m_config->items_to_log[j].common.type == scrutiny::datalogging::LoggableType::Time)
             {
                 // scrutiny::tools::memcpy_compress_from_8bits_native(dst_ptr, &m_buffer[src_cursor], elem_size_char * (CHAR_BIT / 8));
                 uint32_t const v = scrutiny::codecs::decode_32_bits_big_endian_8bits(&m_buffer[src_cursor]);

@@ -172,9 +172,9 @@ TEST_F(TestDatalogger, TriggerBasics)
 
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
-    dlconfig.items_to_log[0].data.memory.address = &logged_var;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].memory.address = &logged_var;
     dlconfig.decimation = 1;
     dlconfig.timeout_100ns = 0;
     dlconfig.probe_location = 128;
@@ -182,12 +182,12 @@ TEST_F(TestDatalogger, TriggerBasics)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
-    dlconfig.trigger.operands[0].data.var.addr = &my_var;
-    dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
+    dlconfig.trigger.operands[0].common.type = datalogging::OperandType::Var;
+    dlconfig.trigger.operands[0].var.addr = &my_var;
+    dlconfig.trigger.operands[0].var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
-    dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
+    dlconfig.trigger.operands[1].common.type = datalogging::OperandType::Literal;
+    dlconfig.trigger.operands[1].literal.val = 3.1415926f;
 
     datalogger.config()->copy_from(&dlconfig);
     datalogger.configure(&tb);
@@ -212,9 +212,9 @@ TEST_F(TestDatalogger, TriggerHoldTime)
 
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(logged_var);
-    dlconfig.items_to_log[0].data.memory.address = &logged_var;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(logged_var);
+    dlconfig.items_to_log[0].memory.address = &logged_var;
 
     dlconfig.decimation = 1;
     dlconfig.timeout_100ns = 0;
@@ -223,12 +223,12 @@ TEST_F(TestDatalogger, TriggerHoldTime)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
-    dlconfig.trigger.operands[0].data.var.addr = &my_var;
-    dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
+    dlconfig.trigger.operands[0].common.type = datalogging::OperandType::Var;
+    dlconfig.trigger.operands[0].var.addr = &my_var;
+    dlconfig.trigger.operands[0].var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
-    dlconfig.trigger.operands[1].data.literal.val = 3.1415926f;
+    dlconfig.trigger.operands[1].common.type = datalogging::OperandType::Literal;
+    dlconfig.trigger.operands[1].literal.val = 3.1415926f;
 
     datalogger.config()->copy_from(&dlconfig);
     datalogger.configure(&tb);
@@ -251,9 +251,9 @@ TEST_F(TestDatalogger, BasicAcquisition)
 
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(my_var);
-    dlconfig.items_to_log[0].data.memory.address = &my_var;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(my_var);
+    dlconfig.items_to_log[0].memory.address = &my_var;
     dlconfig.decimation = 2;
     dlconfig.timeout_100ns = 0;
     dlconfig.probe_location = 128;
@@ -261,12 +261,12 @@ TEST_F(TestDatalogger, BasicAcquisition)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::GreaterThan;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
-    dlconfig.trigger.operands[0].data.var.addr = &my_var;
-    dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
+    dlconfig.trigger.operands[0].common.type = datalogging::OperandType::Var;
+    dlconfig.trigger.operands[0].var.addr = &my_var;
+    dlconfig.trigger.operands[0].var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
-    dlconfig.trigger.operands[1].data.literal.val = 100;
+    dlconfig.trigger.operands[1].common.type = datalogging::OperandType::Literal;
+    dlconfig.trigger.operands[1].literal.val = 100;
 
     datalogger.config()->copy_from(&dlconfig);
     datalogger.configure(&tb);
@@ -320,18 +320,18 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     datalogger.set_owner(&loop_handler);
 
     dlconfig.items_count = 4;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
-    dlconfig.items_to_log[0].data.memory.address = &var1;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].memory.address = &var1;
 
-    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
-    dlconfig.items_to_log[1].data.memory.address = &var2;
+    dlconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[1].memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].memory.address = &var2;
 
-    dlconfig.items_to_log[2].type = datalogging::LoggableType::Rpv;
-    dlconfig.items_to_log[2].data.rpv.id = 0x1000;
+    dlconfig.items_to_log[2].common.type = datalogging::LoggableType::Rpv;
+    dlconfig.items_to_log[2].rpv.id = 0x1000;
 
-    dlconfig.items_to_log[3].type = datalogging::LoggableType::Time;
+    dlconfig.items_to_log[3].common.type = datalogging::LoggableType::Time;
 
     dlconfig.decimation = 2;
     dlconfig.timeout_100ns = 0;
@@ -340,12 +340,12 @@ TEST_F(TestDatalogger, ComplexAcquisition)
     dlconfig.trigger.operand_count = 2;
     dlconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
 
-    dlconfig.trigger.operands[0].type = datalogging::OperandType::Var;
-    dlconfig.trigger.operands[0].data.var.addr = &trigger_val;
-    dlconfig.trigger.operands[0].data.var.datatype = scrutiny::VariableType::float32;
+    dlconfig.trigger.operands[0].common.type = datalogging::OperandType::Var;
+    dlconfig.trigger.operands[0].var.addr = &trigger_val;
+    dlconfig.trigger.operands[0].var.datatype = scrutiny::VariableType::float32;
 
-    dlconfig.trigger.operands[1].type = datalogging::OperandType::Literal;
-    dlconfig.trigger.operands[1].data.literal.val = 100.0f;
+    dlconfig.trigger.operands[1].common.type = datalogging::OperandType::Literal;
+    dlconfig.trigger.operands[1].literal.val = 100.0f;
 
     uint_least8_t probe_location = 0;
     for (uint16_t probe_loop = 0; probe_loop <= 255; probe_loop++)
@@ -519,15 +519,15 @@ TEST_F(TestDatalogger, TestAlwaysUseFullBuffer)
 
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 4;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[0].data.memory.size = sizeof(var1);
-    dlconfig.items_to_log[0].data.memory.address = &var1;
-    dlconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    dlconfig.items_to_log[1].data.memory.size = sizeof(var2);
-    dlconfig.items_to_log[1].data.memory.address = &var2;
-    dlconfig.items_to_log[2].type = datalogging::LoggableType::Rpv;
-    dlconfig.items_to_log[2].data.rpv.id = 0x1000;
-    dlconfig.items_to_log[3].type = datalogging::LoggableType::Time;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[0].memory.size = sizeof(var1);
+    dlconfig.items_to_log[0].memory.address = &var1;
+    dlconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    dlconfig.items_to_log[1].memory.size = sizeof(var2);
+    dlconfig.items_to_log[1].memory.address = &var2;
+    dlconfig.items_to_log[2].common.type = datalogging::LoggableType::Rpv;
+    dlconfig.items_to_log[2].rpv.id = 0x1000;
+    dlconfig.items_to_log[3].common.type = datalogging::LoggableType::Time;
 
     dlconfig.decimation = 1;
     dlconfig.trigger.hold_time_100ns = 0;
@@ -581,7 +581,7 @@ TEST_F(TestDatalogger, TestAquireTimeCorrectly)
 #endif
     datalogging::Configuration dlconfig;
     dlconfig.items_count = 1;
-    dlconfig.items_to_log[0].type = datalogging::LoggableType::Time;
+    dlconfig.items_to_log[0].common.type = datalogging::LoggableType::Time;
 
     dlconfig.decimation = 1;
     dlconfig.timeout_100ns = 0;

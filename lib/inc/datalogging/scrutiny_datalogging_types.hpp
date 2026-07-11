@@ -84,8 +84,16 @@ namespace scrutiny
             // clang-format on
         };
 
-        union OperandData
+        union Operand
         {
+            struct
+            {
+                void *_pad1;
+                VariableType::eVariableType _pad2;
+                uint_least8_t _pad3;
+                uint_least8_t _pad4;
+                OperandType::eOperandType type;
+            } common;
             struct
             {
                 float val;
@@ -106,12 +114,6 @@ namespace scrutiny
             {
                 uint16_t id;
             } rpv;
-        };
-
-        struct Operand
-        {
-            OperandType::eOperandType type;
-            OperandData data;
         };
 
         class SupportedTriggerConditions
@@ -155,24 +157,27 @@ namespace scrutiny
             };
             // clang-format on
         };
-        struct LoggableItem
+
+        union LoggableItem
         {
-            union
+            struct
             {
-                struct
-                {
-                    void *address;
-                    uint_least8_t size;
-                } memory;
-                struct
-                {
-                    uint16_t id;
-                } rpv;
-                struct
-                {
-                } time;
-            } data;
-            LoggableType::eLoggableType type;
+                void *_pad1;
+                uint_least8_t _pad2;
+                LoggableType::eLoggableType type;
+            } common;
+            struct
+            {
+                void *address;
+                uint_least8_t size;
+            } memory;
+            struct
+            {
+                uint16_t id;
+            } rpv;
+            struct
+            {
+            } time;
         };
 
         struct Configuration

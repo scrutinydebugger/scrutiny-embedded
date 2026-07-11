@@ -1014,7 +1014,7 @@ namespace scrutiny
                 }
 
                 const datalogging::OperandType::eOperandType optype = static_cast<datalogging::OperandType::eOperandType>(request->data[cursor]);
-                config->trigger.operands[i].type = optype;
+                config->trigger.operands[i].common.type = optype;
                 cursor++;
 
                 switch (optype)
@@ -1025,7 +1025,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.literal.val = codecs::decode_float_big_endian_8bits(&request->data[cursor]);
+                    config->trigger.operands[i].literal.val = codecs::decode_float_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(float);
                     break;
                 }
@@ -1035,7 +1035,7 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
+                    config->trigger.operands[i].rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }
@@ -1045,10 +1045,10 @@ namespace scrutiny
                     {
                         return ResponseCode::InvalidRequest;
                     }
-                    config->trigger.operands[i].data.var.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
+                    config->trigger.operands[i].var.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
-                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.var.addr));
+                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].var.addr));
                     break;
                 }
                 case datalogging::OperandType::VarBit:
@@ -1058,12 +1058,12 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
 
-                    config->trigger.operands[i].data.varbit.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
+                    config->trigger.operands[i].varbit.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
-                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].data.varbit.addr));
-                    config->trigger.operands[i].data.varbit.bitoffset = request->data[cursor++] & 0xFF;
-                    config->trigger.operands[i].data.varbit.bitsize = request->data[cursor++] & 0xFF;
+                        reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].varbit.addr));
+                    config->trigger.operands[i].varbit.bitoffset = request->data[cursor++] & 0xFF;
+                    config->trigger.operands[i].varbit.bitsize = request->data[cursor++] & 0xFF;
                     break;
                 }
                 default:
@@ -1092,9 +1092,9 @@ namespace scrutiny
                     return ResponseCode::InvalidRequest;
                 }
 
-                config->items_to_log[i].type = static_cast<datalogging::LoggableType::eLoggableType>(request->data[cursor++]);
+                config->items_to_log[i].common.type = static_cast<datalogging::LoggableType::eLoggableType>(request->data[cursor++]);
 
-                switch (config->items_to_log[i].type)
+                switch (config->items_to_log[i].common.type)
                 {
                 case datalogging::LoggableType::Memory:
                 {
@@ -1104,8 +1104,8 @@ namespace scrutiny
                     }
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
-                        reinterpret_cast<uintptr_t *>(&config->items_to_log[i].data.memory.address));
-                    config->items_to_log[i].data.memory.size = request->data[cursor++];
+                        reinterpret_cast<uintptr_t *>(&config->items_to_log[i].memory.address));
+                    config->items_to_log[i].memory.size = request->data[cursor++];
                     break;
                 }
                 case datalogging::LoggableType::Rpv:
@@ -1115,7 +1115,7 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
 
-                    config->items_to_log[i].data.rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
+                    config->items_to_log[i].rpv.id = codecs::decode_16_bits_big_endian_8bits(&request->data[cursor]);
                     cursor += SIZEOF_8BITS(uint16_t);
                     break;
                 }

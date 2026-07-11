@@ -187,15 +187,15 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].type), &buffer[cursor]);
-        switch (dlconfig->trigger.operands[operand_index].type)
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].common.type), &buffer[cursor]);
+        switch (dlconfig->trigger.operands[operand_index].common.type)
         {
         case datalogging::OperandType::Literal:
             if (cursor + 4 >= max_size)
             {
                 return 0;
             }
-            codecs::encode_float_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.literal.val, &buffer[cursor]);
+            codecs::encode_float_big_endian_8bits(dlconfig->trigger.operands[operand_index].literal.val, &buffer[cursor]);
             cursor += 4;
             break;
         case datalogging::OperandType::Rpv:
@@ -203,7 +203,7 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            codecs::encode_16_bits_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.rpv.id, &buffer[cursor]);
+            codecs::encode_16_bits_big_endian_8bits(dlconfig->trigger.operands[operand_index].rpv.id, &buffer[cursor]);
             cursor += 2;
             break;
         case datalogging::OperandType::Var:
@@ -212,8 +212,8 @@ uint16_t TestDatalogControl::encode_datalogger_config(
                 return 0;
             }
             cursor +=
-                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.var.datatype), &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.var.addr, &buffer[cursor]);
+                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].var.datatype), &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].var.addr, &buffer[cursor]);
             break;
 
         case datalogging::OperandType::VarBit:
@@ -221,16 +221,13 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_8_bits_8bits(
-                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.datatype),
-                &buffer[cursor]);
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].data.varbit.addr, &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(
-                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.bitoffset),
-                &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(
-                static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].data.varbit.bitsize),
-                &buffer[cursor]);
+            cursor +=
+                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].varbit.datatype), &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->trigger.operands[operand_index].varbit.addr, &buffer[cursor]);
+            cursor +=
+                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].varbit.bitoffset), &buffer[cursor]);
+            cursor +=
+                codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->trigger.operands[operand_index].varbit.bitsize), &buffer[cursor]);
             break;
         }
     }
@@ -247,8 +244,8 @@ uint16_t TestDatalogControl::encode_datalogger_config(
         {
             return 0;
         }
-        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[item_index].type), &buffer[cursor]);
-        switch (dlconfig->items_to_log[item_index].type)
+        cursor += codecs::encode_8_bits_8bits(static_cast<unsigned char>(dlconfig->items_to_log[item_index].common.type), &buffer[cursor]);
+        switch (dlconfig->items_to_log[item_index].common.type)
         {
         case datalogging::LoggableType::Time:
             break;
@@ -257,15 +254,15 @@ uint16_t TestDatalogControl::encode_datalogger_config(
             {
                 return 0;
             }
-            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[item_index].data.memory.address, &buffer[cursor]);
-            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[item_index].data.memory.size, &buffer[cursor]);
+            cursor += codecs::encode_address_big_endian_8bits(dlconfig->items_to_log[item_index].memory.address, &buffer[cursor]);
+            cursor += codecs::encode_8_bits_8bits(dlconfig->items_to_log[item_index].memory.size, &buffer[cursor]);
             break;
         case datalogging::LoggableType::Rpv:
             if (cursor + 2 >= max_size)
             {
                 return 0;
             }
-            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[item_index].data.rpv.id, &buffer[cursor]);
+            cursor += codecs::encode_16_bits_big_endian_8bits(dlconfig->items_to_log[item_index].rpv.id, &buffer[cursor]);
             break;
         }
     }
@@ -283,21 +280,21 @@ datalogging::Configuration TestDatalogControl::get_valid_reference_configuration
     refconfig.timeout_100ns = 0x11223344;
     refconfig.items_count = 3;
 
-    refconfig.items_to_log[0].type = datalogging::LoggableType::Time;
-    refconfig.items_to_log[1].type = datalogging::LoggableType::Memory;
-    refconfig.items_to_log[1].data.memory.address = &m_some_var_logged1;
-    refconfig.items_to_log[1].data.memory.size = sizeof(m_some_var_logged1);
-    refconfig.items_to_log[2].type = datalogging::LoggableType::Rpv;
-    refconfig.items_to_log[2].data.rpv.id = 0x8888;
+    refconfig.items_to_log[0].common.type = datalogging::LoggableType::Time;
+    refconfig.items_to_log[1].common.type = datalogging::LoggableType::Memory;
+    refconfig.items_to_log[1].memory.address = &m_some_var_logged1;
+    refconfig.items_to_log[1].memory.size = sizeof(m_some_var_logged1);
+    refconfig.items_to_log[2].common.type = datalogging::LoggableType::Rpv;
+    refconfig.items_to_log[2].rpv.id = 0x8888;
 
     refconfig.trigger.condition = datalogging::SupportedTriggerConditions::Equal;
     refconfig.trigger.hold_time_100ns = 0xaabbccdd;
     refconfig.trigger.operand_count = 2;
-    refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
-    refconfig.trigger.operands[0].data.literal.val = 3.1415926f;
-    refconfig.trigger.operands[1].type = datalogging::OperandType::Var;
-    refconfig.trigger.operands[1].data.var.addr = &m_some_var_operand1;
-    refconfig.trigger.operands[1].data.var.datatype = VariableType::float32;
+    refconfig.trigger.operands[0].common.type = datalogging::OperandType::Literal;
+    refconfig.trigger.operands[0].literal.val = 3.1415926f;
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::Var;
+    refconfig.trigger.operands[1].var.addr = &m_some_var_operand1;
+    refconfig.trigger.operands[1].var.datatype = VariableType::float32;
 
     return refconfig;
 }
@@ -401,20 +398,20 @@ TEST_F(TestDatalogControl, TestConfigureValid1)
     EXPECT_EQ(dlconfig->probe_location, refconfig.probe_location);
     EXPECT_EQ(dlconfig->timeout_100ns, refconfig.timeout_100ns);
     ASSERT_EQ(dlconfig->items_count, refconfig.items_count);
-    EXPECT_EQ(dlconfig->items_to_log[0].type, refconfig.items_to_log[0].type);
-    EXPECT_EQ(dlconfig->items_to_log[1].type, refconfig.items_to_log[1].type);
-    EXPECT_EQ(dlconfig->items_to_log[1].data.memory.address, refconfig.items_to_log[1].data.memory.address);
-    EXPECT_EQ(dlconfig->items_to_log[1].data.memory.size, refconfig.items_to_log[1].data.memory.size);
-    EXPECT_EQ(dlconfig->items_to_log[2].type, refconfig.items_to_log[2].type);
-    EXPECT_EQ(dlconfig->items_to_log[2].data.rpv.id, refconfig.items_to_log[2].data.rpv.id);
+    EXPECT_EQ(dlconfig->items_to_log[0].common.type, refconfig.items_to_log[0].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[1].common.type, refconfig.items_to_log[1].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[1].memory.address, refconfig.items_to_log[1].memory.address);
+    EXPECT_EQ(dlconfig->items_to_log[1].memory.size, refconfig.items_to_log[1].memory.size);
+    EXPECT_EQ(dlconfig->items_to_log[2].common.type, refconfig.items_to_log[2].common.type);
+    EXPECT_EQ(dlconfig->items_to_log[2].rpv.id, refconfig.items_to_log[2].rpv.id);
     EXPECT_EQ(dlconfig->trigger.condition, refconfig.trigger.condition);
     EXPECT_EQ(dlconfig->trigger.hold_time_100ns, refconfig.trigger.hold_time_100ns);
     EXPECT_EQ(dlconfig->trigger.operand_count, refconfig.trigger.operand_count);
-    EXPECT_EQ(dlconfig->trigger.operands[0].type, refconfig.trigger.operands[0].type);
-    EXPECT_EQ(dlconfig->trigger.operands[0].data.literal.val, refconfig.trigger.operands[0].data.literal.val);
-    EXPECT_EQ(dlconfig->trigger.operands[1].type, refconfig.trigger.operands[1].type);
-    EXPECT_EQ(dlconfig->trigger.operands[1].data.var.addr, refconfig.trigger.operands[1].data.var.addr);
-    EXPECT_EQ(dlconfig->trigger.operands[1].data.var.datatype, refconfig.trigger.operands[1].data.var.datatype);
+    EXPECT_EQ(dlconfig->trigger.operands[0].common.type, refconfig.trigger.operands[0].common.type);
+    EXPECT_EQ(dlconfig->trigger.operands[0].literal.val, refconfig.trigger.operands[0].literal.val);
+    EXPECT_EQ(dlconfig->trigger.operands[1].common.type, refconfig.trigger.operands[1].common.type);
+    EXPECT_EQ(dlconfig->trigger.operands[1].var.addr, refconfig.trigger.operands[1].var.addr);
+    EXPECT_EQ(dlconfig->trigger.operands[1].var.datatype, refconfig.trigger.operands[1].var.datatype);
 
     EXPECT_TRUE(scrutiny_handler.datalogger()->config_valid());
 }
@@ -484,8 +481,8 @@ TEST_F(TestDatalogControl, TestConfigureBadOperands)
         char const *error_msg = s.c_str();
 #endif
         datalogging::Configuration refconfig = get_valid_reference_configuration();
-        refconfig.trigger.operands[0].type = datalogging::OperandType::Literal;
-        refconfig.trigger.operands[0].data.literal.val = bad_values[i];
+        refconfig.trigger.operands[0].common.type = datalogging::OperandType::Literal;
+        refconfig.trigger.operands[0].literal.val = bad_values[i];
         test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest, true, error_msg);
     }
 }
@@ -494,8 +491,8 @@ TEST_F(TestDatalogControl, TestConfigureOperandBadRPV)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.operands[0].type = datalogging::OperandType::Rpv;
-    refconfig.trigger.operands[0].data.rpv.id = 0x9999; // doesn't exist
+    refconfig.trigger.operands[0].common.type = datalogging::OperandType::Rpv;
+    refconfig.trigger.operands[0].rpv.id = 0x9999; // doesn't exist
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }
@@ -512,8 +509,8 @@ TEST_F(TestDatalogControl, TestConfigureSignalInForbiddenRegion)
 
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.items_to_log[1].data.memory.address = &forbidden_var;
-    refconfig.items_to_log[1].data.memory.size = sizeof(forbidden_var);
+    refconfig.items_to_log[1].memory.address = &forbidden_var;
+    refconfig.items_to_log[1].memory.size = sizeof(forbidden_var);
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
@@ -529,9 +526,9 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarInForbiddenRegion)
 
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.operands[1].type = datalogging::OperandType::Var;
-    refconfig.trigger.operands[1].data.var.addr = &forbidden_var;
-    refconfig.trigger.operands[1].data.var.datatype = VariableType::uint32;
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::Var;
+    refconfig.trigger.operands[1].var.addr = &forbidden_var;
+    refconfig.trigger.operands[1].var.datatype = VariableType::uint32;
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
@@ -547,11 +544,11 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitInForbiddenRegion)
 
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.operands[1].type = datalogging::OperandType::VarBit;
-    refconfig.trigger.operands[1].data.varbit.addr = &forbidden_var;
-    refconfig.trigger.operands[1].data.varbit.datatype = VariableType::uint32;
-    refconfig.trigger.operands[1].data.varbit.bitoffset = 0;
-    refconfig.trigger.operands[1].data.varbit.bitsize = 8;
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].varbit.addr = &forbidden_var;
+    refconfig.trigger.operands[1].varbit.datatype = VariableType::uint32;
+    refconfig.trigger.operands[1].varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].varbit.bitsize = 8;
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::Forbidden);
 }
@@ -567,11 +564,11 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitAlmostInForbiddenRegion)
 
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.trigger.operands[1].type = datalogging::OperandType::VarBit;
-    refconfig.trigger.operands[1].data.varbit.addr = &forbidden_buffer[2];
-    refconfig.trigger.operands[1].data.varbit.datatype = VariableType::uint16;
-    refconfig.trigger.operands[1].data.varbit.bitoffset = 0;
-    refconfig.trigger.operands[1].data.varbit.bitsize = 8;
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].varbit.addr = &forbidden_buffer[2];
+    refconfig.trigger.operands[1].varbit.datatype = VariableType::uint16;
+    refconfig.trigger.operands[1].varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].varbit.bitsize = 8;
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::OK); // We don't overflow
 }
@@ -590,8 +587,8 @@ TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
     datalogging::Configuration refconfig = get_valid_reference_configuration();
-    refconfig.items_to_log[0].type = datalogging::LoggableType::Rpv;
-    refconfig.items_to_log[0].data.rpv.id = 0x9999; // doesn't exist
+    refconfig.items_to_log[0].common.type = datalogging::LoggableType::Rpv;
+    refconfig.items_to_log[0].rpv.id = 0x9999; // doesn't exist
 
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::FailureToProceed);
 }

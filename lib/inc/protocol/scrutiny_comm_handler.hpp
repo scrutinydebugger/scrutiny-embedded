@@ -168,37 +168,37 @@ namespace scrutiny
             void reset_tx();
 
             Timebase const *m_timebase;          // Pointer to the timebase given by the MainHandler
+            timestamp_t m_heartbeat_timestamp;   // Timestamp of the last heartbeat gotten
+            uint32_t m_session_id;               // Actual session ID
+            uint16_t m_last_heartbeat_challenge; // Challenge received by the last heartbeat
             State::eState m_state;               // Internal state, idle, receiving, transmitting
             bool m_enabled;                      // Enable flag
-            uint32_t m_session_id;               // Actual session ID
             bool m_session_active;               // Flag indicating if a session is active with the server
-            timestamp_t m_heartbeat_timestamp;   // Timestamp of the last heartbeat gotten
-            uint16_t m_last_heartbeat_challenge; // Challenge received by the last heartbeat
             bool m_first_heartbeat_received;     // Flag indicating if the first heartbeat has been received.
 
             // Reception
-            unsigned char *m_rx_buffer;         // The reception buffer
-            uint16_t m_rx_buffer_size;          // The reception buffer size
-            unsigned char *m_tx_buffer;         // The transmission buffer
-            uint16_t m_tx_buffer_size;          // The transmission buffer size
             Request m_active_request;           // The request presently being received
+            timestamp_t m_last_rx_timestamp;    // Timestamp at which the last chunk of data was received
+            unsigned char *m_rx_buffer;         // The reception buffer
+            unsigned char *m_tx_buffer;         // The transmission buffer
+            uint16_t m_rx_buffer_size;          // The reception buffer size
+            uint16_t m_tx_buffer_size;          // The transmission buffer size
+            bool m_request_received;            // Flag indicating if a full request has been received
             RxFSMState::eRxFSMState m_rx_state; // Reception Finite State Machine state
             RxError::eRxError m_rx_error;       // Last reception error code
-            bool m_request_received;            // Flag indicating if a full request has been received
             union
             {
+                uint16_t data_bytes_received;        // Number of bytes part of the data payload received up to now
                 uint_least8_t crc_bytes_received;    // Number of bytes part of the CRC received up to now (from 0 to 4)
                 uint_least8_t length_bytes_received; // Number of bytes part of the length received up to now (from 0 to 2)
-                uint16_t data_bytes_received;        // Number of bytes part of the data payload received up to now
             } m_per_state_data;
-            timestamp_t m_last_rx_timestamp; // Timestamp at which the last chunk of data was received
 
             // Transmission
             Response m_active_response;   // The response being transmitted
+            uint32_t m_crc;               // CRC of the incoming data computed has bytes come in
             uint16_t m_nbytes_to_send;    // Number of bytes to send in this response
             uint16_t m_nbytes_sent;       // Number of bytes sent up to now. Includes headers and CRC
             TxError::eTxError m_tx_error; // Last Transmission error code
-            uint32_t m_crc;               // CRC of the incoming data computed has bytes come in
 
           private:
             static uint32_t s_session_counter; // A counter to generate session ID

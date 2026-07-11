@@ -101,8 +101,8 @@ TEST_F(TestFetchOperands, TestFetchLiteral)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::Literal;
-    operand.data.literal.val = 0.1234f;
+    operand.common.type = OperandType::Literal;
+    operand.literal.val = 0.1234f;
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
     EXPECT_EQ(val_type_pair.valtype, scrutiny::VariableType::float32);
@@ -117,9 +117,9 @@ TEST_F(TestFetchOperands, TestFetchVar)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::Var;
-    operand.data.var.addr = &my_var;
-    operand.data.var.datatype = scrutiny::VariableType::float32;
+    operand.common.type = OperandType::Var;
+    operand.var.addr = &my_var;
+    operand.var.datatype = scrutiny::VariableType::float32;
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
@@ -134,15 +134,15 @@ TEST_F(TestFetchOperands, TestFetchRPV)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::Rpv;
+    operand.common.type = OperandType::Rpv;
 
-    operand.data.rpv.id = 0x1234;
+    operand.rpv.id = 0x1234;
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
     EXPECT_EQ(val_type_pair.valtype, scrutiny::VariableType::uint32);
     EXPECT_EQ(val_type_pair.val.uint32, 0xaabbccdd);
 
-    operand.data.rpv.id = 0x5678;
+    operand.rpv.id = 0x5678;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
     EXPECT_EQ(val_type_pair.valtype, scrutiny::VariableType::float32);
@@ -166,12 +166,12 @@ TEST_F(TestFetchOperands, TestFetchVarBit)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::VarBit;
+    operand.common.type = OperandType::VarBit;
 
-    operand.data.varbit.addr = &my_struct;
-    operand.data.varbit.datatype = scrutiny::VariableType::sint16;
-    operand.data.varbit.bitoffset = 3;
-    operand.data.varbit.bitsize = 11;
+    operand.varbit.addr = &my_struct;
+    operand.varbit.datatype = scrutiny::VariableType::sint16;
+    operand.varbit.bitoffset = 3;
+    operand.varbit.bitsize = 11;
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
@@ -185,7 +185,7 @@ TEST_F(TestFetchOperands, TestBadOperandType)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = static_cast<OperandType::eOperandType>(0xff);
+    operand.common.type = static_cast<OperandType::eOperandType>(0xff);
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_FALSE(success);
@@ -197,8 +197,8 @@ TEST_F(TestFetchOperands, TestFetchInexistandRPV)
     val_type_pair.valtype = scrutiny::VariableType::unknown;
 
     Operand operand;
-    operand.type = OperandType::Rpv;
-    operand.data.rpv.id = 0xAAAA;
+    operand.common.type = OperandType::Rpv;
+    operand.rpv.id = 0xAAAA;
 
     bool success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_FALSE(success);
@@ -226,17 +226,17 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     bool success = false;
 
     Operand operand;
-    operand.type = OperandType::VarBit;
-    operand.data.varbit.addr = &my_struct;
-    operand.data.varbit.datatype = scrutiny::VariableType::sint16;
+    operand.common.type = OperandType::VarBit;
+    operand.varbit.addr = &my_struct;
+    operand.varbit.datatype = scrutiny::VariableType::sint16;
 
-    operand.data.varbit.bitoffset = 31;
-    operand.data.varbit.bitsize = 1;
+    operand.varbit.bitoffset = 31;
+    operand.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
 
-    operand.data.varbit.bitoffset = 32;
-    operand.data.varbit.bitsize = 1;
+    operand.varbit.bitoffset = 32;
+    operand.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
 
 #if SCRUTINY_SUPPORT_64BITS
@@ -245,13 +245,13 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     EXPECT_FALSE(success);
 #endif
 
-    operand.data.varbit.bitoffset = 0;
-    operand.data.varbit.bitsize = 32;
+    operand.varbit.bitoffset = 0;
+    operand.varbit.bitsize = 32;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_TRUE(success);
 
-    operand.data.varbit.bitoffset = 0;
-    operand.data.varbit.bitsize = 33;
+    operand.varbit.bitoffset = 0;
+    operand.varbit.bitsize = 33;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
 #if SCRUTINY_SUPPORT_64BITS
     EXPECT_TRUE(success);
@@ -259,8 +259,8 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     EXPECT_FALSE(success);
 #endif
 
-    operand.data.varbit.bitoffset = 63;
-    operand.data.varbit.bitsize = 1;
+    operand.varbit.bitoffset = 63;
+    operand.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
 #if SCRUTINY_SUPPORT_64BITS
     EXPECT_TRUE(success);
@@ -268,13 +268,13 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     EXPECT_FALSE(success);
 #endif
 
-    operand.data.varbit.bitoffset = 64;
-    operand.data.varbit.bitsize = 1;
+    operand.varbit.bitoffset = 64;
+    operand.varbit.bitsize = 1;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_FALSE(success);
 
-    operand.data.varbit.bitoffset = 0;
-    operand.data.varbit.bitsize = 64;
+    operand.varbit.bitoffset = 0;
+    operand.varbit.bitsize = 64;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
 #if SCRUTINY_SUPPORT_64BITS
     EXPECT_TRUE(success);
@@ -282,13 +282,13 @@ TEST_F(TestFetchOperands, TestFetchBitfieldsLimits)
     EXPECT_FALSE(success);
 #endif
 
-    operand.data.varbit.bitoffset = 0;
-    operand.data.varbit.bitsize = 65;
+    operand.varbit.bitoffset = 0;
+    operand.varbit.bitsize = 65;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_FALSE(success);
 
-    operand.data.varbit.bitoffset = 0;
-    operand.data.varbit.bitsize = 0;
+    operand.varbit.bitoffset = 0;
+    operand.varbit.bitsize = 0;
     success = fetch_operand(&scrutiny_handler, &operand, &val_type_pair, SCRUTINY_NULL);
     EXPECT_FALSE(success);
 }

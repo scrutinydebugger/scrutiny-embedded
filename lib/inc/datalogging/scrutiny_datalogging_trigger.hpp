@@ -40,7 +40,7 @@ namespace scrutiny
             {
                 EvalFn eval_fn;
                 ResetFn reset_fn;
-                unsigned int operand_count;
+                uint_least8_t operand_count;
             };
 
             class RelationalOperator
@@ -62,37 +62,37 @@ namespace scrutiny
             struct EqualCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct NotEqualCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct GreaterThanCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct GreaterOrEqualThanCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct LessThanCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct LessOrEqualThanCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct ChangeMoreThanCondition
@@ -103,19 +103,19 @@ namespace scrutiny
                     data->cmt.initialized = false;
                 };
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 2; }
+                static inline uint_least8_t get_operand_count(void) { return 2; }
             };
 
             struct IsWithinCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 3; }
+                static inline uint_least8_t get_operand_count(void) { return 3; }
             };
 
             struct AlwaysTrueCondition
             {
                 static bool evaluate(ConditionSharedData *const data, AnyValAndTypeComparePair const operands[]);
-                static inline unsigned int get_operand_count(void) { return 0; }
+                static inline uint_least8_t get_operand_count(void) { return 0; }
             }; // namespace AlwaysTrueCondition
 
         } // namespace trigger

@@ -112,30 +112,30 @@ namespace scrutiny
             LoopHandler *const caller)
         {
             bool success = true;
-            if (operand->type == OperandType::Literal)
+            if (operand->common.type == OperandType::Literal)
             {
-                val_type_pair->val.float32 = operand->data.literal.val;
+                val_type_pair->val.float32 = operand->literal.val;
                 val_type_pair->valtype = VariableType::float32;
             }
-            else if (operand->type == OperandType::Rpv)
+            else if (operand->common.type == OperandType::Rpv)
             {
                 RuntimePublishedValue rpv;
-                main_handler->get_rpv(operand->data.rpv.id, &rpv);
+                main_handler->get_rpv(operand->rpv.id, &rpv);
                 success = main_handler->get_rpv_read_callback()(rpv, &val_type_pair->val, caller);
                 val_type_pair->valtype = rpv.type;
             }
-            else if (operand->type == OperandType::Var)
+            else if (operand->common.type == OperandType::Var)
             {
-                success = main_handler->fetch_variable(operand->data.var.addr, operand->data.var.datatype, &val_type_pair->val);
-                val_type_pair->valtype = operand->data.var.datatype;
+                success = main_handler->fetch_variable(operand->var.addr, operand->var.datatype, &val_type_pair->val);
+                val_type_pair->valtype = operand->var.datatype;
             }
-            else if (operand->type == OperandType::VarBit)
+            else if (operand->common.type == OperandType::VarBit)
             {
                 success = main_handler->fetch_variable_bitfield(
-                    operand->data.varbit.addr,
-                    tools::get_var_type_type(operand->data.varbit.datatype),
-                    operand->data.varbit.bitoffset,
-                    operand->data.varbit.bitsize,
+                    operand->varbit.addr,
+                    tools::get_var_type_type(operand->varbit.datatype),
+                    operand->varbit.bitoffset,
+                    operand->varbit.bitsize,
                     val_type_pair);
             }
             else
