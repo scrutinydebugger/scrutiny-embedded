@@ -51,7 +51,7 @@ set(SCRUTINY_COMM_RX_TIMEOUT_US 50000 CACHE STRING "Maximum time between recepti
 set(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US 5000000 CACHE STRING "Maximum time without communication before closing the session (us)")
 set(SCRUTINY_PROTOCOL_VERSION_MAJOR 1 CACHE STRING "Protocol version major number")
 set(SCRUTINY_PROTOCOL_VERSION_MINOR 0 CACHE STRING "Protocol version minor")
-set(SCRUTINY_DATALOGGING_MAX_SIGNAL 32 CACHE STRING "Maximum number of datalogging signal if datalogging is enabled")
+set(SCRUTINY_DATALOGGING_MAX_SIGNAL 16 CACHE STRING "Maximum number of datalogging signal if datalogging is enabled")
 set(SCRUTINY_DATALOGGING_ENCODING  SCRUTINY_DATALOGGING_ENCODING_RAW CACHE STRING "Datalogging encoding scheme")
 set(SCRUTINY_DATALOGGING_BUFFER_32BITS  OFF CACHE STRING "Allow datalogging buffers bigger than 65536 bytes")
 
