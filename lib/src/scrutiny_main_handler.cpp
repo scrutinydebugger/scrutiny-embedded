@@ -617,8 +617,8 @@ namespace scrutiny
             // =========== [GetprotocolVersion] ==========
         case protocol::GetInfo::Subfunction::GetprotocolVersion:
         {
-            stack.get_protocol_version.response_data.major = SCRUTINY_PROTOCOL_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
-            stack.get_protocol_version.response_data.minor = SCRUTINY_PROTOCOL_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
+            stack.get_protocol_version.response_data.major = SCRUTINY_PROTOCOL_GET_VERSION_MAJOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
+            stack.get_protocol_version.response_data.minor = SCRUTINY_PROTOCOL_GET_VERSION_MINOR(SCRUTINY_ACTUAL_PROTOCOL_VERSION);
             code = m_codec.encode_response_protocol_version(&stack.get_protocol_version.response_data, response);
             break;
         }
