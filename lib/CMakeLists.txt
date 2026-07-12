@@ -27,34 +27,6 @@ if (SCRUTINY_ENABLE_DATALOGGING)
     )
 endif()
 
-if (${SCRUTINY_ENABLE_DATALOGGING})
-    message(STATUS "Scrutiny datalogging is ENABLED")
-else()
-    message(STATUS "Scrutiny datalogging is DISABLED")
-endif()
-
-if (${SCRUTINY_SUPPORT_64BITS})
-    message(STATUS "Scrutiny support for 64bits is ENABLED")
-else()
-    message(STATUS "Scrutiny support for 64bits is DISABLED")
-endif()
-
-if (${SCRUTINY_SUPPORT_PROTECTED_REGIONS})
-    message(STATUS "Scrutiny support for protected regions is  ENABLED")
-else()
-    message(STATUS "Scrutiny support for protected regions is  DISABLED")
-endif()
-
-
-set(SCRUTINY_REQUEST_MAX_PROCESS_TIME_US 100000  CACHE STRING "Maximum time allowed to process a request (us)")
-set(SCRUTINY_COMM_RX_TIMEOUT_US 50000 CACHE STRING "Maximum time between reception of 2 consecutive byte (us)")
-set(SCRUTINY_COMM_HEARTBEAT_TIMEOUT_US 5000000 CACHE STRING "Maximum time without communication before closing the session (us)")
-set(SCRUTINY_PROTOCOL_VERSION_MAJOR 1 CACHE STRING "Protocol version major number")
-set(SCRUTINY_PROTOCOL_VERSION_MINOR 0 CACHE STRING "Protocol version minor")
-set(SCRUTINY_DATALOGGING_MAX_SIGNAL 16 CACHE STRING "Maximum number of datalogging signal if datalogging is enabled")
-set(SCRUTINY_DATALOGGING_ENCODING  SCRUTINY_DATALOGGING_ENCODING_RAW CACHE STRING "Datalogging encoding scheme")
-set(SCRUTINY_DATALOGGING_BUFFER_32BITS  OFF CACHE STRING "Allow datalogging buffers bigger than 65536 bytes")
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/inc/scrutiny_build_config.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/configured/scrutiny_build_config.hpp
