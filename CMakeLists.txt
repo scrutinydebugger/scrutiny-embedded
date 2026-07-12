@@ -5,13 +5,13 @@
 cmake_minimum_required(VERSION 3.14)
 project(scrutiny-embedded)
 
-macro(SCRUTINY_OPTION name value type docstring)
+macro(SCRUTINY_OPTION name default_value type docstring)
     if(NOT DEFINED ${name})
-        set(${name} ${value} CACHE ${type} ${docstring})
+        set(${name} ${default_value} CACHE ${type} ${docstring})
     else()
         set(${name} ${${name}} CACHE ${type} ${docstring} FORCE)
     endif()
-    message(STATUS "Scrutiny option: ${name} = ${${name}}")
+    message(STATUS "Scrutiny option: ${name}=${${name}}")
 endmacro()
 
 SCRUTINY_OPTION(SCRUTINY_BUILD_TEST                     OFF         BOOL    "Activate test suite")
