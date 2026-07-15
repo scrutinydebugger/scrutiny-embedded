@@ -229,10 +229,6 @@ namespace scrutiny
             if (m_config_valid)
             {
                 m_encoder.set_timebase(m_timebase);
-                if (m_trigger.active_condition.reset_fn != SCRUTINY_NULL_FN_PTR(trigger::ResetFn))
-                {
-                    m_trigger.active_condition.reset_fn(&m_trigger.condition_data);
-                }
                 m_encoder.reset();
                 m_state = State::Configured;
             }
@@ -244,6 +240,10 @@ namespace scrutiny
 
         void DataLogger::arm_trigger(void)
         {
+            if (m_trigger.active_condition.reset_fn != SCRUTINY_NULL_FN_PTR(trigger::ResetFn))
+            {
+                m_trigger.active_condition.reset_fn(&m_trigger.condition_data);
+            }
             if (m_state == State::Configured || m_state == State::AcquisitionCompleted || m_state == State::Triggered)
             {
                 m_state = State::Armed;
