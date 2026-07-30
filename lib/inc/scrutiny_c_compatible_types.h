@@ -8,8 +8,11 @@
 //    Copyright (c) 2021 Scrutiny Debugger
 
 #include "scrutiny_setup.hpp"
+
+#ifndef SCRUTINY_C_TYPES_NO_INCLUDE
 #include <limits.h>
 #include <stdint.h>
+#endif
 
 typedef void (*scrutiny_c_user_command_callback_t)(
     uint_least8_t const subfunction,
@@ -129,7 +132,6 @@ typedef union
     double float64;
 #endif
 } scrutiny_c_any_type_t;
-
 
 /// @brief The fast version of AnyType
 typedef union

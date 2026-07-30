@@ -10,6 +10,7 @@
 #define ___SCRUTINY_TYPES_H___
 
 #include "scrutiny_setup.hpp"
+#include <limits.h>
 #include <stdint.h>
 
 namespace scrutiny
@@ -18,8 +19,10 @@ namespace scrutiny
 
     namespace ctypes
     {
+#define SCRUTINY_C_TYPES_NO_INCLUDE
 #include "scrutiny_c_compatible_types.h"
-    }
+#undef SCRUTINY_C_TYPES_NO_INCLUDE
+    } // namespace ctypes
 
     /// @brief Represents an storage endianness
     class Endianness
