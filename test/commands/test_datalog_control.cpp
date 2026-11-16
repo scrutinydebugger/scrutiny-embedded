@@ -574,6 +574,19 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitAlmostInForbiddenRegion)
 }
 #endif
 
+TEST_F(TestDatalogControl, TestConfigureOperandVarBitBitsizeZero)
+{
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].varbit.addr = &m_some_var_operand1;
+    refconfig.trigger.operands[1].varbit.datatype = VariableType::uint32;
+    refconfig.trigger.operands[1].varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].varbit.bitsize = 0;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
+
 TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
