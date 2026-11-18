@@ -625,6 +625,32 @@ TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
 }
 
+// Reject an operand Var with an unsupported variable type at decode time
+TEST_F(TestDatalogControl, TestConfigureOperandVarBadType)
+{
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::Var;
+    refconfig.trigger.operands[1].var.addr = &m_some_var_operand1;
+    refconfig.trigger.operands[1].var.datatype = static_cast<VariableType::eVariableType>(0xFF);
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
+
+// Reject an operand VarBit with an unsupported variable type at decode time
+TEST_F(TestDatalogControl, TestConfigureOperandVarBitBadType)
+{
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].varbit.addr = &m_some_var_operand1;
+    refconfig.trigger.operands[1].varbit.datatype = static_cast<VariableType::eVariableType>(0xFF);
+    refconfig.trigger.operands[1].varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].varbit.bitsize = 8;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
+
 TEST_F(TestDatalogControl, TestConfigureLoggableBadRPV)
 {
     SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;

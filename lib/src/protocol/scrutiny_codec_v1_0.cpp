@@ -1002,6 +1002,10 @@ namespace scrutiny
             config->probe_location = request->data[5] & 0xFF;
             config->timeout_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[6]);
             config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(request->data[10]);
+            if (request->data[10] >= datalogging::SupportedTriggerConditions::_count)
+            {
+                return ResponseCode::InvalidRequest;
+            }
             config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[11]);
             config->trigger.operand_count = request->data[15] & 0xFF;
 
@@ -1051,6 +1055,10 @@ namespace scrutiny
                         return ResponseCode::InvalidRequest;
                     }
                     config->trigger.operands[i].var.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
+                    if (!tools::is_supported_type(config->trigger.operands[i].var.datatype))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].var.addr));
@@ -1064,6 +1072,10 @@ namespace scrutiny
                     }
 
                     config->trigger.operands[i].varbit.datatype = static_cast<scrutiny::VariableType::eVariableType>(request->data[cursor++]);
+                    if (!tools::is_supported_type(config->trigger.operands[i].varbit.datatype))
+                    {
+                        return ResponseCode::InvalidRequest;
+                    }
                     cursor += codecs::decode_address_big_endian_8bits(
                         &request->data[cursor],
                         reinterpret_cast<uintptr_t *>(&config->trigger.operands[i].varbit.addr));
