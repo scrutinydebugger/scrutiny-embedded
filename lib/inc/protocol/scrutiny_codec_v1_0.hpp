@@ -71,12 +71,14 @@ namespace scrutiny
         class ReadRPVResponseEncoder : public ResponseEncoderBase
         {
           public:
+            bool can_write(RuntimePublishedValue const *const rpv) const;
             void write(RuntimePublishedValue const *const rpv, AnyType const v);
         };
 
         class WriteRPVResponseEncoder : public ResponseEncoderBase
         {
           public:
+            bool can_write() const;
             void write(RuntimePublishedValue const *const rpv);
         };
 
