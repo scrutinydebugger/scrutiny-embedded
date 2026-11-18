@@ -405,6 +405,12 @@ namespace scrutiny
             m_response->data_length = m_cursor;
         }
 
+        bool ReadRPVResponseEncoder::can_write(RuntimePublishedValue const *const rpv) const
+        {
+            uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
+            return (2u + typesize <= static_cast<uint16_t>(m_size_limit - m_cursor));
+        }
+
         void ReadRPVResponseEncoder::write(RuntimePublishedValue const *const rpv, AnyType const v)
         {
             uint_least8_t const typesize = tools::get_type_size_8bits(rpv->type);
@@ -429,6 +435,11 @@ namespace scrutiny
                 m_cursor += codecs::encode_anytype_big_endian_8bits(&v, typesize, &m_buffer[m_cursor]);
                 m_response->data_length = m_cursor;
             }
+        }
+
+        bool WriteRPVResponseEncoder::can_write() const
+        {
+            return (2u + 1u <= static_cast<uint16_t>(m_size_limit - m_cursor));
         }
 
         void WriteRPVResponseEncoder::write(RuntimePublishedValue const *const rpv)

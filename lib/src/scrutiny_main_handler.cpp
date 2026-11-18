@@ -1210,6 +1210,12 @@ namespace scrutiny
                         break;
                     }
 
+                    if (!stack.read_rpv.readrpv_encoder->can_write(&stack.read_rpv.rpv))
+                    {
+                        code = protocol::ResponseCode::Overflow;
+                        break;
+                    }
+
                     bool const callback_success = m_config.get_rpv_read_callback()(stack.read_rpv.rpv, &stack.read_rpv.v, SCRUTINY_NULL);
                     if (!callback_success)
                     {
@@ -1218,12 +1224,6 @@ namespace scrutiny
                     }
 
                     stack.read_rpv.readrpv_encoder->write(&stack.read_rpv.rpv, stack.read_rpv.v);
-
-                    if (stack.read_rpv.readrpv_encoder->overflow())
-                    {
-                        code = protocol::ResponseCode::Overflow;
-                        break;
-                    }
                 }
             }
             break;
@@ -1262,6 +1262,12 @@ namespace scrutiny
                     continue;
                 }
 
+                if (!stack.write_rpv.writerpv_encoder->can_write())
+                {
+                    code = protocol::ResponseCode::Overflow;
+                    break;
+                }
+
                 bool const write_success = m_config.get_rpv_write_callback()(stack.write_rpv.rpv, &stack.write_rpv.v, SCRUTINY_NULL);
                 if (!write_success)
                 {
@@ -1270,12 +1276,6 @@ namespace scrutiny
                 }
 
                 stack.write_rpv.writerpv_encoder->write(&stack.write_rpv.rpv);
-
-                if (stack.write_rpv.writerpv_encoder->overflow())
-                {
-                    code = protocol::ResponseCode::Overflow;
-                    break;
-                }
             }
 
             break;
