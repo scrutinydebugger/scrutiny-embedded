@@ -70,40 +70,39 @@ typedef enum
 typedef enum
 {
 #if CHAR_BIT == 8
-    SCRUTINY_C_VARIABLE_TYPE_sint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_8,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_sint8 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_sint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_8),
+    SCRUTINY_C_VARIABLE_TYPE_uint8 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_uint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_8),
+    SCRUTINY_C_VARIABLE_TYPE_float8 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_float) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_8),
+    SCRUTINY_C_VARIABLE_TYPE_cfloat8 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_8),
 #endif
 
-    SCRUTINY_C_VARIABLE_TYPE_sint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_16,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat16 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_sint16 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_sint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_16),
+    SCRUTINY_C_VARIABLE_TYPE_uint16 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_uint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_16),
+    SCRUTINY_C_VARIABLE_TYPE_float16 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_float) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_16),
+    SCRUTINY_C_VARIABLE_TYPE_cfloat16 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_16),
 
-    SCRUTINY_C_VARIABLE_TYPE_sint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_32,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat32 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_sint32 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_sint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_32),
+    SCRUTINY_C_VARIABLE_TYPE_uint32 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_uint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_32),
+    SCRUTINY_C_VARIABLE_TYPE_float32 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_float) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_32),
+    SCRUTINY_C_VARIABLE_TYPE_cfloat32 = ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_32),
 
 #ifdef __cplusplus
-    SCRUTINY_C_VARIABLE_TYPE_boolean = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_undef,
+    SCRUTINY_C_VARIABLE_TYPE_boolean = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_undef),
 #if CHAR_BIT == 8
-    SCRUTINY_C_VARIABLE_TYPE_boolean8 = SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_8, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_boolean8 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_8),
 #endif
     SCRUTINY_C_VARIABLE_TYPE_boolean16 =
-        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_16, // cppcheck-suppress[badBitmaskCheck]
+        ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_16),
     SCRUTINY_C_VARIABLE_TYPE_boolean32 =
-        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_32, // cppcheck-suppress[badBitmaskCheck]
+        ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_32),
 #endif
 
 #if SCRUTINY_SUPPORT_64BITS
-    SCRUTINY_C_VARIABLE_TYPE_sint64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_sint | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_uint64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_uint | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,     // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_float64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_float | SCRUTINY_C_VARIABLE_TYPE_SIZE_64,   // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_cfloat64 = SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
-    SCRUTINY_C_VARIABLE_TYPE_boolean64 =
-        SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean | SCRUTINY_C_VARIABLE_TYPE_SIZE_64, // cppcheck-suppress[badBitmaskCheck]
+    SCRUTINY_C_VARIABLE_TYPE_sint64 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_sint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_64),
+    SCRUTINY_C_VARIABLE_TYPE_uint64 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_uint) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_64),
+    SCRUTINY_C_VARIABLE_TYPE_float64 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_float) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_64),
+    SCRUTINY_C_VARIABLE_TYPE_cfloat64 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_cfloat) | ((uint_least8_t) SCRUTINY_C_VARIABLE_TYPE_SIZE_64),
+    SCRUTINY_C_VARIABLE_TYPE_boolean64 = ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_TYPE_boolean) | ((uint_least8_t)SCRUTINY_C_VARIABLE_TYPE_SIZE_64),
 #endif
     SCRUTINY_C_VARIABLE_TYPE_unknown = 0xFF
 } scrutiny_c_variable_type_e;
