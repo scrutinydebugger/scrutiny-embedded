@@ -1001,11 +1001,12 @@ namespace scrutiny
             config->decimation = codecs::decode_16_bits_big_endian_8bits(&request->data[3]);
             config->probe_location = request->data[5] & 0xFF;
             config->timeout_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[6]);
-            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(request->data[10]);
-            if (request->data[10] >= datalogging::SupportedTriggerConditions::_count)
+            unsigned char const trigger_condition_byte = request->data[10];
+            if (trigger_condition_byte >= datalogging::SupportedTriggerConditions::_count)
             {
                 return ResponseCode::InvalidRequest;
             }
+            config->trigger.condition = static_cast<datalogging::SupportedTriggerConditions::eSupportedTriggerConditions>(trigger_condition_byte);
             config->trigger.hold_time_100ns = codecs::decode_32_bits_big_endian_8bits(&request->data[11]);
             config->trigger.operand_count = request->data[15] & 0xFF;
 
