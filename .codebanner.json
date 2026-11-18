@@ -14,7 +14,6 @@
         ".sh"
     ],
     "exclude_patterns": [
-        "projects/platformio/*",
         "projects/examples/*"
     ],
     "license": "MIT - See LICENSE file",
