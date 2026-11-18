@@ -130,7 +130,8 @@ namespace scrutiny
                 GreaterThan = 5,        // Operand1 > Operand2
                 GreaterOrEqualThan = 6, // Operand1 >= Operand2
                 ChangeMoreThan = 7,     // |Operand1[n] - Operand1[n-1]| > |Operand2| && sign(Operand1[n] - Operand1[n-1]) == sign(Operand2)
-                IsWithin = 8            // |Operand1 - Operand2| < |Operand3|
+                IsWithin = 8,           // |Operand1 - Operand2| < |Operand3|
+                _count = 9
             };
             // clang-format on
         };
