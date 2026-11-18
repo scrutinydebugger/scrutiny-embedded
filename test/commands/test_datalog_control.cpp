@@ -353,6 +353,35 @@ void TestDatalogControl::test_configure(
     }
 }
 
+// When all loops have datalogging disabled, all DataLogControl subfunctions should return UnsupportedFeature
+TEST_F(TestDatalogControl, TestUnsupportedNoLoopWithDatalogging)
+{
+    const protocol::CommandId::eCommandId cmd = protocol::CommandId::DataLogControl;
+    const protocol::ResponseCode::eResponseCode failure = protocol::ResponseCode::UnsupportedFeature;
+
+    // Disable datalogging on all loops
+    fixed_freq_loop.allow_datalogging(false);
+    variable_freq_loop.allow_datalogging(false);
+    // fixed_freq_loop_no_datalogging already has datalogging disabled
+
+    unsigned char tx_buffer[32];
+
+    // GetSetup subfunction
+    unsigned char const subfn = 1;
+    unsigned char request_data[8] = { 5, subfn, 0, 0 };
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
+}
+
 TEST_F(TestDatalogControl, TestGetSetup)
 {
     unsigned char tx_buffer[32] = { 0 };
@@ -573,6 +602,19 @@ TEST_F(TestDatalogControl, TestConfigureOperandVarBitAlmostInForbiddenRegion)
     test_configure(loop_id, 0, refconfig, protocol::ResponseCode::OK); // We don't overflow
 }
 #endif
+
+TEST_F(TestDatalogControl, TestConfigureOperandVarBitBitsizeZero)
+{
+    SCRUTINY_CONSTEXPR uint_least8_t loop_id = 1;
+    datalogging::Configuration refconfig = get_valid_reference_configuration();
+    refconfig.trigger.operands[1].common.type = datalogging::OperandType::VarBit;
+    refconfig.trigger.operands[1].varbit.addr = &m_some_var_operand1;
+    refconfig.trigger.operands[1].varbit.datatype = VariableType::uint32;
+    refconfig.trigger.operands[1].varbit.bitoffset = 0;
+    refconfig.trigger.operands[1].varbit.bitsize = 0;
+
+    test_configure(loop_id, 0, refconfig, protocol::ResponseCode::InvalidRequest);
+}
 
 TEST_F(TestDatalogControl, TestConfigureUnknownCondition)
 {

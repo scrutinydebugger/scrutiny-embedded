@@ -667,3 +667,41 @@ TEST_F(TestGetInfo, TestGetLoopDefinitionOOBId)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
 }
+
+// GetLoopDefinition with wrong payload length should return InvalidRequest
+TEST_F(TestGetInfo, TestGetLoopDefinitionBadPayloadLength)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::GetInfo;
+    uint_least8_t const subfn = static_cast<uint_least8_t>(scrutiny::protocol::GetInfo::Subfunction::GetLoopDefinition);
+    const scrutiny::protocol::ResponseCode::eResponseCode failure = scrutiny::protocol::ResponseCode::InvalidRequest;
+
+    unsigned char tx_buffer[32];
+
+    // Send 0 bytes of data instead of the expected 1 byte (loop_id)
+    unsigned char request_data_empty[8] = { 1, 9, 0, 0 };
+    add_crc(request_data_empty, sizeof(request_data_empty) - 4);
+
+    scrutiny_handler.receive_data(request_data_empty, sizeof(request_data_empty));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
+
+    // Send 2 bytes of data instead of the expected 1 byte
+    unsigned char request_data_too_long[8 + 2] = { 1, 9, 0, 2, 0, 0 };
+    add_crc(request_data_too_long, sizeof(request_data_too_long) - 4);
+
+    scrutiny_handler.receive_data(request_data_too_long, sizeof(request_data_too_long));
+    scrutiny_handler.process(0);
+
+    n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    ASSERT_GT(n_to_read, 0);
+
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, failure);
+}

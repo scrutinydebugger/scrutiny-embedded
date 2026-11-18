@@ -782,7 +782,11 @@ namespace scrutiny
 
         case protocol::GetInfo::Subfunction::GetLoopDefinition:
         {
-            m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
+            code = m_codec.decode_request_get_loop_definition(request, &stack.get_loop_def.request_data);
+            if (code != protocol::ResponseCode::OK)
+            {
+                break;
+            }
             uint_least8_t const loop_id = stack.get_loop_def.request_data.loop_id;
             if (!m_config.is_loop_handlers_configured() || loop_id >= m_config.m_loop_count)
             {
@@ -1401,7 +1405,7 @@ namespace scrutiny
 
         } stack;
 
-        if (!m_config.is_datalogging_configured())
+        if (!m_config.is_datalogging_configured() || !m_config.has_at_least_one_loop_with_datalogging())
         {
             return protocol::ResponseCode::UnsupportedFeature;
         }

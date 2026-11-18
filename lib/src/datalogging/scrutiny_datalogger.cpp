@@ -174,7 +174,8 @@ namespace scrutiny
                     {
                         // Works with and without 64bits support
                         if (m_config.trigger.operands[i].varbit.bitoffset > (sizeof(scrutiny::BiggestUint) * CHAR_BIT - 1) ||
-                            m_config.trigger.operands[i].varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT)
+                            m_config.trigger.operands[i].varbit.bitsize > sizeof(scrutiny::BiggestUint) * CHAR_BIT ||
+                            m_config.trigger.operands[i].varbit.bitsize == 0)
                         {
                             m_config_valid = false;
                         }

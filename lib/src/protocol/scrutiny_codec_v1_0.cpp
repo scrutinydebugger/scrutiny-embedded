@@ -858,6 +858,11 @@ namespace scrutiny
 
             memcpy(request_data->magic, request->data, magic_size); // No need to dilate, array not packed
 
+            if (memcmp(CommControl::CONNECT_MAGIC, request_data->magic, magic_size) != 0)
+            {
+                return ResponseCode::InvalidRequest;
+            }
+
             return ResponseCode::OK;
         }
 

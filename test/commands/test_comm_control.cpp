@@ -250,6 +250,50 @@ TEST_F(TestCommControl, TestConnect)
     ASSERT_TRUE(scrutiny_handler.comm()->is_connected());
 }
 
+// Connect with wrong magic should be silently ignored (not connected)
+TEST_F(TestCommControl, TestConnectWrongMagic)
+{
+    ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC), 4u);
+    unsigned char request_data[8 + 4] = { 2, 4, 0, 4 };
+    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
+    request_data[4] = ~request_data[4];
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_EQ(n_to_read, 0u); // No response because we are not connected and connect is invalid
+    ASSERT_FALSE(scrutiny_handler.comm()->is_connected());
+}
+
+// Connect with wrong magic while already connected should return InvalidRequest
+TEST_F(TestCommControl, TestConnectWrongMagicWhileConnected)
+{
+    const scrutiny::protocol::CommandId::eCommandId cmd = scrutiny::protocol::CommandId::CommControl;
+    unsigned char const subfn = static_cast<unsigned char>(scrutiny::protocol::CommControl::Subfunction::Connect);
+    const scrutiny::protocol::ResponseCode::eResponseCode code = scrutiny::protocol::ResponseCode::InvalidRequest;
+    ASSERT_EQ(sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC), 4u);
+
+    scrutiny_handler.comm()->connect();
+    unsigned char request_data[8 + 4] = { 2, 4, 0, 4 };
+    std::memcpy(&request_data[4], scrutiny::protocol::CommControl::CONNECT_MAGIC, sizeof(scrutiny::protocol::CommControl::CONNECT_MAGIC));
+    request_data[4] = ~request_data[4];
+    add_crc(request_data, sizeof(request_data) - 4);
+
+    unsigned char tx_buffer[32];
+
+    scrutiny_handler.receive_data(request_data, sizeof(request_data));
+    scrutiny_handler.process(0);
+
+    uint16_t n_to_read = scrutiny_handler.data_to_send();
+    ASSERT_GT(n_to_read, 0u);
+    ASSERT_LT(n_to_read, sizeof(tx_buffer));
+    scrutiny_handler.pop_data(tx_buffer, n_to_read);
+    ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, code);
+    scrutiny_handler.process(0);
+}
+
 TEST_F(TestCommControl, TestDisconnect)
 {
     scrutiny_handler.comm()->connect();
