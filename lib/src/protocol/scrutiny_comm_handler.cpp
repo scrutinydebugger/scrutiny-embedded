@@ -428,6 +428,16 @@ namespace scrutiny
                 return false;
             }
 
+            if (m_active_request.data_length < sizeof(CommControl::CONNECT_MAGIC))
+            {
+                return false;
+            }
+
+            if (memcmp(CommControl::CONNECT_MAGIC, m_active_request.data, sizeof(CommControl::CONNECT_MAGIC)) != 0)
+            {
+                return false;
+            }
+
             return true;
         }
 
