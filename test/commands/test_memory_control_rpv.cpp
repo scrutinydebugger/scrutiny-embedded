@@ -943,21 +943,21 @@ TEST_F(TestMemoryControlRPV, TestReadRPVOverflowDoesNotCallCallback)
     SCRUTINY_CONSTEXPR scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     // Response per RPV: 2 (id) + 4 (uint32 value) = 6 bytes
-    // Size the TX buffer to fit exactly 1 response entry but not 2
-    SCRUTINY_CONSTEXPR uint16_t tx_data_size = 6; // fits 1 RPV (6 bytes), but not 2 (12 bytes)
+    SCRUTINY_CONSTEXPR uint16_t tx_data_size = scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE; // 32 bytes, fits 5 entries of 6 bytes
+    SCRUTINY_CONSTEXPR uint16_t nb_fit = tx_data_size / 6;
+    SCRUTINY_CONSTEXPR uint16_t nb_read = nb_fit + 1;
     SCRUTINY_CONSTEXPR uint16_t rx_data_size = scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE;
-    SCRUTINY_CONSTEXPR uint16_t request_size = 2 * 2 + scrutiny::protocol::REQUEST_OVERHEAD; // 2 RPV ids of 2 bytes each
+    SCRUTINY_CONSTEXPR uint16_t request_data_size = nb_read * 2; // 2 bytes per RPV id
+    SCRUTINY_CONSTEXPR uint16_t request_size = request_data_size + scrutiny::protocol::REQUEST_OVERHEAD;
 
     SCRUTINY_STATIC_ASSERT(tx_data_size >= scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
     SCRUTINY_STATIC_ASSERT(rx_data_size >= scrutiny::protocol::MINIMUM_RX_BUFFER_SIZE, "Buffer size doesn't match minimum size");
+    SCRUTINY_STATIC_ASSERT(request_data_size <= rx_data_size, "Request doesn't fit the RX buffer");
 
     unsigned char internal_rx_buffer[rx_data_size];
     unsigned char internal_tx_buffer[tx_data_size];
 
-    scrutiny::RuntimePublishedValue rpvs[] = {
-        { 0x1122, scrutiny::VariableType::uint32 },
-        { 0x3344, scrutiny::VariableType::float32 },
-    };
+    scrutiny::RuntimePublishedValue rpvs[] = { { 0x1122, scrutiny::VariableType::uint32 } };
 
     config.set_published_values(rpvs, sizeof(rpvs) / sizeof(rpvs[0]), rpv_read_callback);
     config.set_buffers(internal_rx_buffer, sizeof(internal_rx_buffer), internal_tx_buffer, sizeof(internal_tx_buffer));
@@ -966,8 +966,14 @@ TEST_F(TestMemoryControlRPV, TestReadRPVOverflowDoesNotCallCallback)
 
     rpv_read_callback_count = 0;
 
-    // Request 2 RPVs: first fits, second should overflow before callback
-    unsigned char request_data[request_size] = { 3, 4, 0, 4, 0x11, 0x22, 0x33, 0x44 };
+    // Request nb_fit+1 RPVs: the last one should overflow before the callback
+    unsigned char request_data[request_size] = { 3, 4, (request_data_size >> 8) & 0xFF, request_data_size & 0xFF };
+    uint16_t index = 4;
+    for (uint16_t i = 0; i < nb_read; i++)
+    {
+        request_data[index++] = 0x11;
+        request_data[index++] = 0x22;
+    }
     add_crc(request_data, request_size - 4);
 
     scrutiny_handler.receive_data(request_data, request_size);
@@ -979,8 +985,8 @@ TEST_F(TestMemoryControlRPV, TestReadRPVOverflowDoesNotCallCallback)
     scrutiny_handler.pop_data(tx_buffer, n_to_read);
 
     ASSERT_IS_PROTOCOL_RESPONSE(tx_buffer, cmd, subfn, overflow);
-    // The callback should have been called only once (for the first RPV that fit)
-    EXPECT_EQ(rpv_read_callback_count, 1u);
+    // The read callback should have been called only nb_fit times, not nb_fit+1
+    EXPECT_EQ(rpv_read_callback_count, static_cast<uint32_t>(nb_fit));
 }
 
 // Verify that the write callback is not invoked for RPVs that would overflow the response buffer
@@ -991,7 +997,6 @@ TEST_F(TestMemoryControlRPV, TestWriteRPVOverflowDoesNotCallCallback)
     SCRUTINY_CONSTEXPR scrutiny::protocol::ResponseCode::eResponseCode overflow = scrutiny::protocol::ResponseCode::Overflow;
 
     // Response per RPV: 2 (id) + 1 (length) = 3 bytes
-    // Size the TX buffer to fit exactly 1 response entry but not 2
     SCRUTINY_CONSTEXPR uint16_t tx_data_size = scrutiny::protocol::MINIMUM_TX_BUFFER_SIZE; // 32 bytes, fits 10 entries of 3 bytes
     SCRUTINY_CONSTEXPR uint16_t nb_fit = tx_data_size / 3;
     SCRUTINY_CONSTEXPR uint16_t nb_write = nb_fit + 1;
