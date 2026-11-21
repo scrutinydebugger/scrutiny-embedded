@@ -50,7 +50,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -108,7 +107,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/clang.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 scripts/build.sh
                                 '''
                             }
@@ -164,7 +162,6 @@ pipeline {
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/avr-gcc.cmake \
                         SCRUTINY_BUILD_CWRAPPER=0 \
                         SCRUTINY_BUILD_TEST=0 \
-                        SCRUTINY_BUILD_TESTAPP=0 \
                         scripts/build.sh
                         '''
                     }
@@ -181,7 +178,6 @@ pipeline {
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/aarch64-linux-gcc.cmake \
                         SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_BUILD_TESTAPP=1 \
                         scripts/build.sh
                         '''
                     }
@@ -198,7 +194,6 @@ pipeline {
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/powerpc64-linux-gcc.cmake \
                         SCRUTINY_BUILD_TEST=1 \
-                        SCRUTINY_BUILD_TESTAPP=1 \
                         scripts/build.sh
                         '''
                     }
@@ -215,7 +210,6 @@ pipeline {
                         sh '''
                         CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/arm-none-gcc.cmake \
                         SCRUTINY_BUILD_TEST=0 \
-                        SCRUTINY_BUILD_TESTAPP=0 \
                         scripts/build.sh
                         '''
                     }
@@ -239,7 +233,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
@@ -272,7 +265,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
@@ -305,7 +297,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
@@ -338,7 +329,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
@@ -372,7 +362,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=1 \
@@ -410,7 +399,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
@@ -443,7 +431,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
@@ -476,7 +463,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=0 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
@@ -509,7 +495,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=0 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
@@ -543,7 +528,6 @@ pipeline {
                                 CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
                                 SCRUTINY_BUILD_TEST=1 \
                                 SCRUTINY_USE_ASAN=1 \
-                                SCRUTINY_BUILD_TESTAPP=1 \
                                 SCRUTINY_ENABLE_DATALOGGING=1 \
                                 SCRUTINY_SUPPORT_64BITS=1 \
                                 SCRUTINY_SUPPORT_PROTECTED_REGIONS=0 \
@@ -560,6 +544,40 @@ pipeline {
                                 '''
                             }
                         }
+                    }
+                }
+            }
+        }
+        stage('Testapps'){
+            parallel{
+                stage('C++ Testapp'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=testapp -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                        scripts/build_testapp.sh
+                        '''
+                    }
+                }
+                stage('C Testapp'){
+                    agent {
+                        dockerfile {
+                            additionalBuildArgs '--target native-gcc'
+                            args '-e HOME=/tmp -e BUILD_CONTEXT=ctestapp -e CCACHE_DIR=/ccache -v $HOME/.ccache:/ccache'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh '''
+                        CMAKE_TOOLCHAIN_FILE=$(pwd)/cmake/gcc.cmake \
+                        scripts/build_ctestapp.sh
+                        '''
                     }
                 }
             }

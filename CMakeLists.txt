@@ -44,7 +44,6 @@ include(lib/cmake/scrutiny.cmake)    # Make available for project importing us w
 if (SCRUTINY_BUILD_CWRAPPER)
     add_subdirectory(cwrapper)
 endif()
-add_subdirectory(projects)
 
 if (SCRUTINY_BUILD_TEST)
     add_subdirectory(test)
