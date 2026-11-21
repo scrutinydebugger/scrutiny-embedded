@@ -116,54 +116,6 @@
         "lib/inc/scrutiny_tools.hpp": {
             "docstring": "Some simple tools used across the project"
         },
-        "projects/testapp/src/file1.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/argument_parser.cpp": {
-            "docstring": "For CLI parsing"
-        },
-        "projects/testapp/src/main.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/file2.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/file3.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/comm_channels/udp_bridge.cpp": {
-            "docstring": "Class that opens a UDP port and handles a single client."
-        },
-        "projects/testapp/include/file1.hpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/include/file2.hpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/include/file3.hpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/include/comm_channels/udp_bridge.hpp": {
-            "docstring": "Class that opens a UDP port and handles a single client."
-        },
-        "projects/testapp/include/argument_parser.hpp": {
-            "docstring": "For CLI parsing"
-        },
-        "projects/testapp/include/comm_channels/abstract_comm_channel.hpp": {
-            "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
-        },
-        "projects/testapp/include/comm_channels/nix_serial_port_bridge.hpp": {
-            "docstring": "Class that makes a *Nix Serial port available as a communication channel for the Testapp"
-        },
-        "projects/testapp/include/comm_channels/win_serial_port_bridge.hpp": {
-            "docstring": "Class that makes a Windows Serial port available as a communication channel for the Testapp"
-        },
-        "projects/testapp/src/comm_channels/nix_serial_port_bridge.cpp": {
-            "docstring": "Class that makes a *Nix Serial port available as a communication channel for the Testapp"
-        },
-        "projects/testapp/src/comm_channels/win_serial_port_bridge.cpp": {
-            "docstring": "Class that makes a Windows Serial port available as a communication channel for the Testapp"
-        },
         "lib/inc/scrutiny_common_codecs.hpp": {
             "docstring": "Some codecs function used across the project"
         },
@@ -190,9 +142,6 @@
         },
         "lib/src/datalogging/scrutiny_datalogger.cpp": {
             "docstring": "The implementation of the datalogger object that should exist in each loop"
-        },
-        "projects/testapp/src/include_test.cpp": {
-            "docstring": "Just a file that makes sure that we can include scrutiny.hpp in a blank file without breaking anything"
         },
         "test/test_ipc.cpp": {
             "docstring": "Tests for the inter-process communication tools"
@@ -251,54 +200,6 @@
         "lib/inc/scrutiny_c_compatible_types.h": {
             "docstring": "Types declaration that are valid in both C and C++. The C++ library extend them, the C-Wrapper uses them directly"
         },
-        "projects/c_testapp/include/argument_parser.h": {
-            "docstring": "For CLI parsing"
-        },
-        "projects/c_testapp/include/tools.h": {
-            "docstring": "Some tools used across the C TestApp project"
-        },
-        "projects/c_testapp/include/comm_channels/abstract_comm_channel.h": {
-            "docstring": "Define the interface for a communication channel used by the testapp to run the scrutiny embedded lib"
-        },
-        "projects/c_testapp/include/comm_channels/nix_serial_port_bridge.h": {
-            "docstring": "Serial interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/include/comm_channels/udp_bridge.h": {
-            "docstring": "UDP interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.h": {
-            "docstring": "Serial interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/src/main.c": {
-            "docstring": "Entry point of C TestApp"
-        },
-        "projects/c_testapp/src/argument_parser.c": {
-            "docstring": "For CLI parsing"
-        },
-        "projects/c_testapp/src/include_test.c": {
-            "docstring": "Just a file that makes sure that we can include scrutiny.hpp in a blank file without breaking anything"
-        },
-        "projects/c_testapp/src/comm_channels/win_serial_port_bridge.c": {
-            "docstring": "Serial interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/src/comm_channels/nix_serial_port_bridge.c": {
-            "docstring": "Serial interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/src/comm_channels/udp_bridge.c": {
-            "docstring": "UDP interface for the C testapp. Used to talk with the server"
-        },
-        "projects/c_testapp/include/file2.h": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/c_testapp/include/file1.h": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/c_testapp/src/file1.c": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/c_testapp/src/file2.c": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
         "lib/inc/scrutiny_compiler.hpp": {
             "docstring": "Macros for compiler feature and environment detection"
         },
@@ -313,12 +214,6 @@
         },
         "lib/src/datalogging/scrutiny_datalogging.cpp": {
             "docstring": "Implementation of some datalogging features"
-        },
-        "projects/c_testapp/include/comm_channels/win_serial_port_bridge.hpp": {
-            "docstring": "Windows serial port abstraction"
-        },
-        "projects/c_testapp/src/tools.c": {
-            "docstring": "Miscellaneous tools for C TestApp"
         },
         "lib/inc/ipc/scrutiny_ipc_tricore.hpp": {
             "docstring": "An implementation of the Scrutiny IPC based on Tricore intrinsics to store atomically"
@@ -352,18 +247,6 @@
         },
         "cwrapper/elf-symdump/src/main.c": {
             "docstring": "A simple tool that reads a .elf and finds the value of a symbol if available. Invoked like: \n scrutiny-elf-symdump -i <input> -o <output>.h SYMBOL1 SYMBOL2"
-        },
-        "projects/testapp/include/file4.hpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/file4.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/include/file5.hpp": {
-            "docstring": "Placeholder file for variable extraction test"
-        },
-        "projects/testapp/src/file5.cpp": {
-            "docstring": "Placeholder file for variable extraction test"
         },
         "test/test_cwrapper.cpp": {
             "docstring": "A testsuite for the CWrapper"
